@@ -1,5 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
+import type { UserRole } from '@/types/auth';
 
+/**
+ * Auth configuration for NextAuth.js
+ */
 export const authConfig: NextAuthConfig = {
     pages: {
         signIn: "/auth/login",
@@ -14,7 +18,7 @@ export const authConfig: NextAuthConfig = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                token.role = user.role;
+                token.role = (user.role as UserRole) || 'guest';
                 token.permissions = user.permissions;
             }
             return token;
@@ -23,7 +27,7 @@ export const authConfig: NextAuthConfig = {
             if (token && session.user) {
                 session.user.id = token.id as string;
                 if (token.role) {
-                    session.user.role = token.role;
+                    session.user.role = token.role as UserRole;
                 }
                 // session.user.permissions = token.permissions; 
             }

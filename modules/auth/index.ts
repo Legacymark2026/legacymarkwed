@@ -1,6 +1,20 @@
-// Auth Module - Public API
-export * from './actions';
-export * from './components';
-export * from './hooks';
+/**
+ * Auth Module - Public API
+ * Centralized authentication module
+ */
+
+// Types
 export type * from './types';
+
+// Components
+export * from './components';
+
+// Hooks
+export * from './hooks';
+
+// Actions
+export * from './actions';
+
+// Lib/Utils
 export * from './lib';
+
