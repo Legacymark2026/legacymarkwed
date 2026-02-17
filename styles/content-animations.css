@@ -1,0 +1,222 @@
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    }
+}
+
+@keyframes typewriter {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes blink {
+    50% {
+        border-color: transparent;
+    }
+}
+
+@keyframes gradient-x {
+
+    0%,
+    100% {
+        background-size: 200% 200%;
+        background-position: left center;
+    }
+
+    50% {
+        background-size: 200% 200%;
+        background-position: right center;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 200%;
+    }
+}
+
+@keyframes draw-check {
+    0% {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes border-rotate {
+    0% {
+        --angle: 0deg;
+    }
+
+    100% {
+        --angle: 360deg;
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+}
+
+.animate-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.animate-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: skewX(-20deg);
+    animation: shimmer 3s infinite;
+}
+
+.typewriter-text {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid cyan;
+    animation:
+        typewriter 3s steps(40, end),
+        blink .75s step-end infinite;
+}
+
+.animate-gradient-x {
+    animation: gradient-x 15s ease infinite;
+}
+
+/* Glassmorphism 2.0 - Light Mode */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.glass-card-hover:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(13, 148, 136, 0.3);
+    /* Teal-600 */
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.05),
+        0 10px 10px -5px rgba(0, 0, 0, 0.01);
+}
+
+.neural-bg {
+    background-color: #ffffff;
+    background-image:
+        radial-gradient(at 0% 0%, hsla(173, 80%, 95%, 1) 0, transparent 50%),
+        /* Teal tint */
+        radial-gradient(at 50% 0%, hsla(200, 80%, 96%, 1) 0, transparent 50%),
+        /* Sky tint */
+        radial-gradient(at 100% 0%, hsla(173, 80%, 95%, 1) 0, transparent 50%);
+}
+
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.text-glow {
+    text-shadow: 0 0 30px rgba(13, 148, 136, 0.2);
+    /* Teal glow */
+}
+
+/* Custom Range Slider - Teal */
+input[type=range] {
+    -webkit-appearance: none;
+    background: transparent;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #0d9488;
+    /* Teal-600 */
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2);
+    margin-top: -8px;
+    transition: all 0.2s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 6px rgba(13, 148, 136, 0.3);
+    transform: scale(1.1);
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #e2e8f0;
+    /* Slate-200 */
+    border-radius: 2px;
+}
+
+.gradient-border-mask {
+    position: relative;
+    background: #fff;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+    border-radius: 1.5rem;
+}
+
+.gradient-border-mask::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    margin: -1px;
+    border-radius: inherit;
+    background: linear-gradient(to bottom right, rgba(13, 148, 136, 0.5), rgba(14, 165, 233, 0.5), transparent);
+    /* Teal/Sky */
+}

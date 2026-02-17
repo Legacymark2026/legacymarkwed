@@ -1,0 +1,11 @@
+2026-02-16T19:12:17.647Z - Received webhook for provider: whatsapp, channel: WHATSAPP
+2026-02-16T19:12:17.652Z - Parsing webhook...
+2026-02-16T19:12:17.750Z - Inbound message parsed: {"channel":"WHATSAPP","externalId":"15550009999","content":"Hello! This is a verification message for the ultra-professional integration.","sender":{"id":"15550009999","name":"Integration Tester"},"metadata":{"wabaId":"888888888","messageId":"wamid.TEST_ID_1771269065410","phoneNumberId":"123456789"}}
+2026-02-16T19:12:17.752Z - Finding company...
+2026-02-16T19:12:18.091Z - Company found: 839e33e6-307b-4100-b9c3-b21e17a89295
+2026-02-16T19:12:18.092Z - Looking for lead with phone: 15550009999
+2026-02-16T19:12:18.162Z - Lead found: ab16b182-b99f-402f-915a-f7d89570e4b4
+2026-02-16T19:12:18.168Z - Looking for conversation with platformId: 15550009999
+2026-02-16T19:12:18.217Z - Updating conversation: 66f62792-aa15-47a7-9753-2b842891cae5
+2026-02-16T19:12:18.251Z - Creating message...
+2026-02-16T19:12:18.289Z - Message created: 8aa31c63-747f-43b1-90dc-a5ec06b175d6

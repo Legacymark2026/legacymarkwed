@@ -1,0 +1,117 @@
+
+> legacymark@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\hboho\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hboho\.gemini\antigravity\scratch\legacymark\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 4 errors:
+./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx:21:1
+Module not found: Can't resolve '@/components/automation/CustomNodes'
+  19 |
+  20 | import Sidebar from '@/components/automation/Sidebar';
+> 21 | import { nodeTypes } from '@/components/automation/CustomNodes';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  22 | import NodeConfigPanel from '@/components/automation/NodeConfigPanel';
+  23 | import { saveUserWorkflow } from '@/actions/marketing';
+  24 |
+
+Import map: aliased to relative './components/automation/CustomNodes' inside of [project]/.gemini/antigravity/scratch/legacymark
+
+
+Import traces:
+  Client Component Browser:
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Client Component Browser]
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Client Component SSR]
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx:22:1
+Module not found: Can't resolve '@/components/automation/NodeConfigPanel'
+  20 | import Sidebar from '@/components/automation/Sidebar';
+  21 | import { nodeTypes } from '@/components/automation/CustomNodes';
+> 22 | import NodeConfigPanel from '@/components/automation/NodeConfigPanel';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import { saveUserWorkflow } from '@/actions/marketing';
+  24 |
+  25 | const initialNodes = [
+
+Import map: aliased to relative './components/automation/NodeConfigPanel' inside of [project]/.gemini/antigravity/scratch/legacymark
+
+
+Import traces:
+  Client Component Browser:
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Client Component Browser]
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Client Component SSR]
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx:20:1
+Module not found: Can't resolve '@/components/automation/Sidebar'
+  18 | import { toast } from 'sonner';
+  19 |
+> 20 | import Sidebar from '@/components/automation/Sidebar';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  21 | import { nodeTypes } from '@/components/automation/CustomNodes';
+  22 | import NodeConfigPanel from '@/components/automation/NodeConfigPanel';
+  23 | import { saveUserWorkflow } from '@/actions/marketing';
+
+Import map: aliased to relative './components/automation/Sidebar' inside of [project]/.gemini/antigravity/scratch/legacymark
+
+
+Import traces:
+  Client Component Browser:
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Client Component Browser]
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Client Component SSR]
+    ./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/architecture/[id]/page.tsx:3:1
+Module not found: Can't resolve '@/components/crm/object-tabs'
+  1 | import { notFound } from "next/navigation";
+  2 | import { prisma } from "@/lib/prisma";
+> 3 | import { ObjectTabs } from "@/components/crm/object-tabs";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { ArrowLeft } from "lucide-react";
+  5 | import Link from "next/link";
+  6 | import { Button } from "@/components/ui/button";
+
+Import map: aliased to relative './components/crm/object-tabs' inside of [project]/.gemini/antigravity/scratch/legacymark
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx:21:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx:22:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/automation/builder/page.tsx:20:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./.gemini/antigravity/scratch/legacymark/app/(dashboard)/dashboard/admin/architecture/[id]/page.tsx:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

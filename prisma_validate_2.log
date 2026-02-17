@@ -1,0 +1,18 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+error: Error validating field `company` in model `Experiment`: The relation field `company` on model `Experiment` is missing an opposite relation field on the model `Company`. Either run `prisma format` or add it manually.
+  -->  schema.prisma:848
+   | 
+847 |   companyId   String   @map("company_id")
+848 |   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+849 |   
+   | 
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 5.10.2

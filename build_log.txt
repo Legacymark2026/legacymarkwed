@@ -1,0 +1,33 @@
+
+> legacymark@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\hboho\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hboho\.gemini\antigravity\scratch\legacymark\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./.gemini/antigravity/scratch/legacymark/proxy.ts:2:1
+Export authConfig doesn't exist in target module
+  1 | import { NextRequest } from "next/server";
+> 2 | import { authConfig } from "./lib/auth";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | import NextAuth from "next-auth";
+  4 |
+  5 | // Use the authorized callback from authConfig
+
+The export authConfig was not found in module [project]/.gemini/antigravity/scratch/legacymark/lib/auth.ts [middleware] (ecmascript).
+Did you mean to import auth?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+
+    at <unknown> (./.gemini/antigravity/scratch/legacymark/proxy.ts:2:1)

@@ -1,0 +1,34 @@
+app/(dashboard)/dashboard/experts/page.tsx(229,45): error TS2719: Type '(expert: Expert) => void' is not assignable to type '(expert: Expert) => void'. Two different types with this name exist, but they are unrelated.
+  Types of parameters 'expert' and 'expert' are incompatible.
+    Type 'Expert' is missing the following properties from type 'Expert': bio, socialLinks, order
+app/(dashboard)/dashboard/inbox/[conversationId]/page.tsx(19,62): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'Omit<GetConversationsParams, "companyId">'.
+app/(dashboard)/dashboard/marketing/campaigns/[id]/page.tsx(106,29): error TS2322: Type '"default" | "secondary"' is not assignable to type '"secondary" | "outline" | "primary" | "ghost" | undefined'.
+  Type '"default"' is not assignable to type '"secondary" | "outline" | "primary" | "ghost" | undefined'.
+app/(marketing)/soluciones/estrategia-de-marca/page.tsx(52,10): error TS2322: Type '{ children: ReactNode; disabled?: boolean | undefined; form?: string | undefined; formAction?: string | ((formData: FormData) => void | Promise<void>) | undefined; ... 286 more ...; className: string; }' is not assignable to type 'Omit<HTMLMotionProps<"button">, "ref">'.
+  Types of property 'onDrag' are incompatible.
+    Type 'DragEventHandler<HTMLButtonElement> | undefined' is not assignable to type '((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void) | undefined'.
+      Type 'DragEventHandler<HTMLButtonElement>' is not assignable to type '(event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void'.
+        Types of parameters 'event' and 'event' are incompatible.
+          Type 'MouseEvent | TouchEvent | PointerEvent' is not assignable to type 'DragEvent<HTMLButtonElement>'.
+            Type 'MouseEvent' is missing the following properties from type 'DragEvent<HTMLButtonElement>': dataTransfer, nativeEvent, isDefaultPrevented, isPropagationStopped, persist
+app/api/webhooks/channels/[provider]/route.ts(79,17): error TS2353: Object literal may only specify known properties, and 'source' does not exist in type 'CreateLeadInput'.
+auth.config.ts(26,21): error TS2322: Type '{}' is not assignable to type 'UserRole'.
+components/sections/contact-form.tsx(18,16): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: readonly Literal[], params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodLiteral<...>', gave the following error.
+    Argument of type 'boolean' is not assignable to parameter of type 'readonly Literal[]'.
+  Overload 2 of 2, '(value: true, params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodLiteral<...>', gave the following error.
+    Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; }'.
+components/ui/calendar.tsx(9,10): error TS2305: Module '"@/components/ui/button"' has no exported member 'buttonVariants'.
+components/ui/calendar.tsx(56,17): error TS2353: Object literal may only specify known properties, and 'IconLeft' does not exist in type 'Partial<CustomComponents>'.
+modules/analytics/components/index.ts(17,10): error TS2459: Module '"./funnel-chart"' declares 'FunnelChart' locally, but it is not exported.
+modules/analytics/components/index.ts(24,10): error TS2305: Module '"./overview"' has no exported member 'Overview'.
+modules/analytics/index.ts(6,1): error TS2308: Module './actions' has already exported a member named 'TrafficSource'. Consider explicitly re-exporting to resolve the ambiguity.
+modules/crm/components/index.ts(9,10): error TS2305: Module '"./DealExport"' has no exported member 'DealExport'.
+modules/crm/components/index.ts(20,10): error TS2305: Module '"./team-hierarchy"' has no exported member 'TeamHierarchy'.
+modules/crm/index.ts(14,1): error TS2308: Module './actions' has already exported a member named 'Deal'. Consider explicitly re-exporting to resolve the ambiguity.
+modules/leads/index.ts(2,15): error TS2307: Cannot find module './actions' or its corresponding type declarations.
+modules/portfolio/index.ts(2,15): error TS2307: Cannot find module './actions' or its corresponding type declarations.
+scripts/check-inbox.ts(27,50): error TS18047: 'msg.content' is possibly 'null'.
+scripts/check-meta-connection.ts(42,43): error TS2339: Property 'createdAt' does not exist on type '{ id: string; userId: string; type: string; provider: string; providerAccountId: string; refresh_token: string | null; access_token: string | null; expires_at: number | null; token_type: string | null; scope: string | null; id_token: string | null; session_state: string | null; }'.
+scripts/verify-instagram-sync.ts(32,83): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.

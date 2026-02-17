@@ -1,0 +1,22 @@
+
+🚀 STARTING FULL SYSTEM DEMO (AI + CONNECTIVITY) 🚀
+
+1️⃣ Creating Smart Workflow...
+PrismaClientKnownRequestError: 
+Invalid `prisma.workflow.create()` invocation in
+C:\Users\hboho\.gemini\antigravity\scratch\legacymark\scripts\demo_full_system.ts:10:44
+
+   7 
+   8 // 1. Create a Workflow with ALL Capabilities
+   9 console.log("\n1️⃣ Creating Smart Workflow...");
+→ 10 const workflow = await prisma.workflow.create(
+Foreign key constraint failed on the field: `(not available)`
+    at _n.handleRequestError (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\@prisma\client\runtime\library.js:123:6854)
+    at _n.handleAndLogRequestError (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\@prisma\client\runtime\library.js:123:6188)
+    at _n.request (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\@prisma\client\runtime\library.js:123:5896)
+    at async l (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\@prisma\client\runtime\library.js:128:10871)
+    at async runDemo (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\scripts\demo_full_system.ts:10:22) {
+  code: 'P2003',
+  clientVersion: '5.10.2',
+  meta: { modelName: 'Workflow', field_name: '(not available)' }
+}

@@ -1,0 +1,68 @@
+
+> legacymark@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\hboho\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hboho\.gemini\antigravity\scratch\legacymark\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Turbopack build encountered 2 warnings:
+./.gemini/antigravity/scratch/legacymark/app/api/webhooks/[workflowId]/route.ts:44:43
+Module not found: Can't resolve '@/actions/marketing'
+  42 |         // but usually works. Let's try importing executeWorkflow directly.
+  43 |
+> 44 |         const { executeWorkflow } = await import("@/actions/marketing");
+     |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  45 |
+  46 |         // We treat the body as the trigger data
+  47 |         await executeWorkflow(workflowId, body);
+
+Import map: aliased to relative './actions/marketing' inside of [project]/.gemini/antigravity/scratch/legacymark
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./.gemini/antigravity/scratch/legacymark/components/sections/contact-form.tsx:70:47
+Module not found: Can't resolve '@/actions/marketing'
+  68 |         try {
+  69 |             // Trigger Automation Workflow
+> 70 |             const { triggerWorkflow } = await import("@/actions/marketing");
+     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  71 |
+  72 |             await triggerWorkflow('FORM_SUBMISSION', {
+  73 |                 email: data.email,
+
+Import map: aliased to relative './actions/marketing' inside of [project]/.gemini/antigravity/scratch/legacymark
+
+
+Import trace:
+  Server Component:
+    ./.gemini/antigravity/scratch/legacymark/components/sections/contact-form.tsx
+    ./.gemini/antigravity/scratch/legacymark/app/(marketing)/contacto/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled successfully in 67s
+  Running TypeScript ...
+Failed to compile.
+
+./actions/projects.ts:136:17
+Type error: Object literal may only specify known properties, and 'isTemplate' does not exist in type 'Without<ProjectCreateInput, ProjectUncheckedCreateInput> & ProjectUncheckedCreateInput'.
+
+  134 |                 categoryId: categoryId || null,
+  135 |                 tags: tagConnections,
+> 136 |                 isTemplate,
+      |                 ^
+  137 |                 relatedProjects: {
+  138 |                     connect: relatedProjects.map((id: string) => ({ id }))
+  139 |                 }
+Next.js build worker exited with code: 1 and signal: null

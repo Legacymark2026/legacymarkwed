@@ -1,0 +1,79 @@
+
+> legacymark@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\hboho\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hboho\.gemini\antigravity\scratch\legacymark\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.3min
+  Running TypeScript ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/41) ...
+  Generating static pages using 3 workers (10/41) 
+  Generating static pages using 3 workers (20/41) 
+  Generating static pages using 3 workers (30/41) 
+✓ Generating static pages using 3 workers (41/41) in 18.2s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/analytics/end-session
+├ ƒ /api/analytics/heartbeat
+├ ƒ /api/analytics/track
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/automation/trigger
+├ ƒ /api/leads/capture
+├ ƒ /api/test-marketing
+├ ƒ /api/webhooks/[workflowId]
+├ ○ /auth/login
+├ ○ /auth/register
+├ ○ /blog
+├ ƒ /blog/[slug]
+├ ○ /contacto
+├ ƒ /dashboard
+├ ƒ /dashboard/admin/architecture
+├ ƒ /dashboard/admin/architecture/[id]
+├ ƒ /dashboard/admin/automation
+├ ƒ /dashboard/admin/automation/builder
+├ ƒ /dashboard/admin/automation/executions
+├ ƒ /dashboard/admin/crm
+├ ƒ /dashboard/admin/crm/campaigns
+├ ƒ /dashboard/admin/crm/leads
+├ ƒ /dashboard/admin/crm/pipeline
+├ ƒ /dashboard/analytics
+├ ƒ /dashboard/posts
+├ ƒ /dashboard/posts/[id]
+├ ƒ /dashboard/posts/create
+├ ƒ /dashboard/projects
+├ ƒ /dashboard/projects/[id]
+├ ƒ /dashboard/projects/create
+├ ƒ /dashboard/security
+├ ƒ /dashboard/settings
+├ ƒ /dashboard/users
+├ ○ /nosotros
+├ ○ /portfolio
+├ ƒ /portfolio/[slug]
+├ ○ /robots.txt
+├ ƒ /rss
+├ ○ /servicios
+├ ○ /sitemap.xml
+├ ○ /soluciones/automatizacion
+├ ○ /soluciones/web-dev
+├ ƒ /test_auth_debug
+└ ○ /vip
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

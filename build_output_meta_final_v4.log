@@ -1,0 +1,33 @@
+
+> legacymark@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\hboho\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hboho\.gemini\antigravity\scratch\legacymark\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 87s
+  Running TypeScript ...
+Failed to compile.
+
+./app/(dashboard)/dashboard/inbox/[conversationId]/page.tsx:36:35
+Type error: Type '({ lead: { id: string; name: string | null; email: string; } | null; _count: { messages: number; }; assignee: { id: string; name: string | null; image: string | null; } | null; } & { id: string; ... 13 more ...; updatedAt: Date; })[]' is not assignable to type 'Conversation[]'.
+  Type '{ lead: { id: string; name: string | null; email: string; } | null; _count: { messages: number; }; assignee: { id: string; name: string | null; image: string | null; } | null; } & { id: string; ... 13 more ...; updatedAt: Date; }' is not assignable to type 'Conversation'.
+    Types of property 'channel' are incompatible.
+      Type 'string' is not assignable to type 'ChannelType'.
+
+  34 |         <InboxLayout
+  35 |             sidebar={
+> 36 |                 <ConversationList conversations={conversations || []} />
+     |                                   ^
+  37 |             }
+  38 |         >
+  39 |             <div className="flex h-full">
+Next.js build worker exited with code: 1 and signal: null

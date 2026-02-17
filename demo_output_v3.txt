@@ -1,0 +1,44 @@
+
+🚀 STARTING FULL SYSTEM DEMO (AI + CONNECTIVITY) 🚀
+
+0️⃣  Ensuring Demo Company Exists...
+
+1️⃣ Creating Smart Workflow...
+✅ Workflow Created: 25d487b3-26b8-4910-b21c-c24133bff745
+🔗 Webhook URL: /api/webhooks/25d487b3-26b8-4910-b21c-c24133bff745
+
+2️⃣ Simulating Webhook Trigger (Angry Customer)...
+Executing workflow 25d487b3-26b8-4910-b21c-c24133bff745... {
+  name: 'Karen Smith',
+  email: 'karen@example.com',
+  message: 'This service is terrible! I want a refund immediately!',
+  source: 'Landing Page'
+}
+Running step 0: LOG
+WORKFLOW LOG: ⚡ New Lead Received via Webhook!
+Running step 1: AI_AGENT
+🤖 AI Agent Analyzing [SENTIMENT]...
+Running step 2: LOG
+WORKFLOW LOG: 🧠 AI Analysis Complete. Sentiment: {{ai_sentiment}}
+Running step 3: CONDITION
+Running step 4: SLACK
+💬 Sending Slack Message to https://hooks.slack.com/services/MOCK/DEMO/123
+Running step 5: AI_AGENT
+🤖 AI Agent Analyzing [GENERATION]...
+Running step 6: EMAIL
+⚠️ RESEND_API_KEY not found. Mocking email send:
+To: karen@example.com
+Subject: We are so sorry (AI Drafted)
+Body: Hello Karen Smith, <br> This is an automated message.
+
+3️⃣ Verifying Execution Logs...
+📜 Execution Logs:
+✅ [LOG] 
+✅ [AI_AGENT] AI [SENTIMENT]: "NEGATIVE"
+✅ [LOG] 
+👍 [CONDITION] Check ai_sentiment (NEGATIVE) equals NEGATIVE -> true
+✅ [SLACK] Sent to Chat
+✅ [AI_AGENT] AI [GENERATION]: "Hello Karen Smith,\n\nThank you for reaching out! based on your message about \"This service is terrible! I want a refund immediately!\", we have analyzed your request with our AI agent.\n\nBest,\nAutomated Agent"
+✅ [EMAIL] Sent to karen@example.com (ID: mock-id)
+
+🎉 Final Status: PASSED

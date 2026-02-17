@@ -1,0 +1,47 @@
+
+C:\Users\hboho\.gemini\antigravity\scratch\legacymark\app\(marketing)\servicios\page.tsx
+  13:39  warning  'useMemo' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  86:23  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\hboho\.gemini\antigravity\scratch\legacymark\app\(marketing)\servicios\page.tsx:86:23
+  84 | const FloatingParticle = ({ delay = 0, xRange = 100, yRange = 100, size = 10, color = "bg-teal-500" }: { delay?: number, xRange?: number, yRange?: number, size?: number, color?: string }) => {
+  85 |     const [duration, setDuration] = useState(15);
+> 86 |     useEffect(() => { setDuration(Math.random() * 10 + 10); }, []);
+     |                       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  87 |
+  88 |     return (
+  89 |         <motion.div  react-hooks/set-state-in-effect
+
+C:\Users\hboho\.gemini\antigravity\scratch\legacymark\app\(marketing)\soluciones\automatizacion\page.tsx
+  9:0  error  Parsing error: Declaration or statement expected
+
+C:\Users\hboho\.gemini\antigravity\scratch\legacymark\app\(marketing)\soluciones\web-dev\page.tsx
+    7:17   warning  'Code2' is defined but never used                                @typescript-eslint/no-unused-vars
+    7:24   warning  'Globe' is defined but never used                                @typescript-eslint/no-unused-vars
+    7:31   warning  'Laptop' is defined but never used                               @typescript-eslint/no-unused-vars
+    7:39   warning  'Server' is defined but never used                               @typescript-eslint/no-unused-vars
+    7:52   warning  'Shield' is defined but never used                               @typescript-eslint/no-unused-vars
+    8:48   warning  'Layers' is defined but never used                               @typescript-eslint/no-unused-vars
+    8:76   warning  'Scale' is defined but never used                                @typescript-eslint/no-unused-vars
+    8:83   warning  'Lock' is defined but never used                                 @typescript-eslint/no-unused-vars
+    8:89   warning  'RefreshCcw' is defined but never used                           @typescript-eslint/no-unused-vars
+   20:7    warning  'staggerContainer' is assigned a value but never used            @typescript-eslint/no-unused-vars
+   36:28   warning  'width' is assigned a value but never used                       @typescript-eslint/no-unused-vars
+   36:35   warning  'height' is assigned a value but never used                      @typescript-eslint/no-unused-vars
+   86:11   warning  'rotate' is assigned a value but never used                      @typescript-eslint/no-unused-vars
+  425:86   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  425:109  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  443:33   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  443:48   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\hboho\.gemini\antigravity\scratch\legacymark\app\api\webhooks\channels\[provider]\route.ts
+  5:10  warning  'db' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 21 problems (6 errors, 15 warnings)
+

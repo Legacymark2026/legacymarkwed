@@ -1,0 +1,30 @@
+
+> legacymark@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\hboho\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hboho\.gemini\antigravity\scratch\legacymark\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.9min
+  Running TypeScript ...
+Failed to compile.
+
+./actions/projects.ts:66:13
+Type error: Object literal may only specify known properties, and 'relatedProjects' does not exist in type 'ProjectInclude<DefaultArgs>'.
+
+  64 |             category: true,
+  65 |             tags: true,
+> 66 |             relatedProjects: {
+     |             ^
+  67 |                 select: { id: true, title: true, slug: true, coverImage: true }
+  68 |             }
+  69 |         }
+Next.js build worker exited with code: 1 and signal: null

@@ -1,0 +1,170 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:860
+   | 
+859 | }
+860 |   timezone    String?                       // America/Bogota
+
+861 |   
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:863
+   | 
+862 |   // Performance Metrics
+863 |   loadTime    Int?     @map("load_time")   // Page load time in ms
+
+864 |   domReady    Int?     @map("dom_ready")   // DOM ready time in ms
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:864
+   | 
+863 |   loadTime    Int?     @map("load_time")   // Page load time in ms
+864 |   domReady    Int?     @map("dom_ready")   // DOM ready time in ms
+
+865 |   
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:867
+   | 
+866 |   // Engagement
+867 |   duration    Int?                         // Time on page in seconds
+
+868 |   scrollDepth Int?     @map("scroll_depth") // Max scroll percentage (0-100)
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:868
+   | 
+867 |   duration    Int?                         // Time on page in seconds
+868 |   scrollDepth Int?     @map("scroll_depth") // Max scroll percentage (0-100)
+
+869 |   clicks      Int      @default(0)         // Number of clicks on page
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:869
+   | 
+868 |   scrollDepth Int?     @map("scroll_depth") // Max scroll percentage (0-100)
+869 |   clicks      Int      @default(0)         // Number of clicks on page
+
+870 |   
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:872
+   | 
+871 |   // Custom Data
+872 |   metadata    Json?    @default("{}")      // Flexible extra data
+
+873 |   
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:875
+   | 
+874 |   // Timestamps
+875 |   createdAt   DateTime @default(now()) @map("created_at")
+
+876 | 
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:878
+   | 
+877 |   // Relations
+878 |   session     AnalyticsSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+879 | 
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:880
+   | 
+879 | 
+880 |   @@map("analytics_events")
+
+881 |   @@index([eventType])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:881
+   | 
+880 |   @@map("analytics_events")
+881 |   @@index([eventType])
+
+882 |   @@index([path])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:882
+   | 
+881 |   @@index([eventType])
+882 |   @@index([path])
+
+883 |   @@index([sessionId])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:883
+   | 
+882 |   @@index([path])
+883 |   @@index([sessionId])
+
+884 |   @@index([visitorId])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:884
+   | 
+883 |   @@index([sessionId])
+884 |   @@index([visitorId])
+
+885 |   @@index([userId])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:885
+   | 
+884 |   @@index([visitorId])
+885 |   @@index([userId])
+
+886 |   @@index([createdAt])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:886
+   | 
+885 |   @@index([userId])
+886 |   @@index([createdAt])
+
+887 |   @@index([country, createdAt])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:887
+   | 
+886 |   @@index([createdAt])
+887 |   @@index([country, createdAt])
+
+888 |   @@index([device, createdAt])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:888
+   | 
+887 |   @@index([country, createdAt])
+888 |   @@index([device, createdAt])
+
+889 |   @@index([utmSource, utmMedium, utmCampaign])
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:889
+   | 
+888 |   @@index([device, createdAt])
+889 |   @@index([utmSource, utmMedium, utmCampaign])
+
+890 | }
+   | 
+error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.
+  -->  schema.prisma:890
+   | 
+889 |   @@index([utmSource, utmMedium, utmCampaign])
+890 | }
+
+891 | 
+   | 
+
+Validation Error Count: 20
+[Context: validate]
+
+Prisma CLI Version : 5.10.2

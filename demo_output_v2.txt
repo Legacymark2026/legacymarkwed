@@ -1,0 +1,32 @@
+
+🚀 STARTING FULL SYSTEM DEMO (AI + CONNECTIVITY) 🚀
+
+0️⃣  Ensuring Demo Company Exists...
+
+1️⃣ Creating Smart Workflow...
+✅ Workflow Created: 3689098e-49ee-476c-ab5e-d855e068eab1
+🔗 Webhook URL: /api/webhooks/3689098e-49ee-476c-ab5e-d855e068eab1
+
+2️⃣ Simulating Webhook Trigger (Angry Customer)...
+Executing workflow 3689098e-49ee-476c-ab5e-d855e068eab1... {
+  name: 'Karen Smith',
+  email: 'karen@example.com',
+  message: 'This service is terrible! I want a refund immediately!',
+  source: 'Landing Page'
+}
+Running step 0: LOG
+WORKFLOW LOG: ⚡ New Lead Received via Webhook!
+Running step 1: AI_AGENT
+🤖 AI Agent Analyzing [SENTIMENT]...
+Running step 2: LOG
+WORKFLOW LOG: 🧠 AI Analysis Complete. Sentiment: {{ai_sentiment}}
+Running step 3: CONDITION
+
+3️⃣ Verifying Execution Logs...
+📜 Execution Logs:
+✅ [LOG] 
+✅ [AI_AGENT] AI [SENTIMENT]: "NEUTRAL"
+✅ [LOG] 
+✅ [CONDITION] Check ai_sentiment (NEUTRAL) equals NEGATIVE -> false (Stopping Workflow)
+
+🎉 Final Status: FAILED

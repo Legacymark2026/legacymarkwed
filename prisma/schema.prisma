@@ -1,0 +1,1254 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  passwordHash  String?   @map("password_hash")
+
+  // Custom Fields
+  firstName String? @map("first_name")
+  lastName  String? @map("last_name")
+  phone     String?
+  role      String  @default("guest") // Enum UserRole
+
+  // Relations
+  profile               UserProfile?
+  accounts              Account[]
+  sessions              Session[]
+  companies             CompanyUser[]
+  apiKeys               ApiKey[]
+  activityLogs          UserActivityLog[]
+  invitedUsers          CompanyUser[]     @relation("InvitedBy")
+  posts                 Post[]
+  readingList           ReadingListItem[]
+  annotations           Annotation[]
+  crmActivities         CRMActivity[]
+  assignedDeals         Deal[]            @relation("AssignedDeals")
+  assignedConversations Conversation[]
+
+  // Marketing
+  marketingEvents MarketingEvent[]
+
+  // Security
+  mfaEnabled Boolean @default(false) @map("mfa_enabled")
+  mfaSecret  String? @map("mfa_secret")
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deactivatedAt DateTime? @map("deactivated_at")
+
+  @@index([role])
+  @@index([email])
+  @@map("users")
+}
+
+model UserProfile {
+  id     String @id @default(uuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  jobTitle         String? @map("job_title")
+  department       String?
+  bio              String? @db.Text
+  socialLinks      Json?   @default("{}") @map("social_links")
+  preferences      Json?   @default("{\"theme\": \"system\", \"notifications\": {\"email\": true}}")
+  metadata         Json?   @default("{}")
+  googleAnalytics  Json?   @map("google_analytics_config")
+  facebookPixel    Json?   @map("facebook_pixel_config")
+  googleTagManager Json?   @map("google_tag_manager_config")
+  hotjar           Json?   @map("hotjar_config")
+
+  @@map("user_profiles")
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Custom
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Company {
+  id       String  @id @default(uuid())
+  name     String
+  slug     String  @unique
+  logoUrl  String? @map("logo_url")
+  industry String?
+  website  String?
+
+  subscriptionTier   String @default("free") @map("subscription_tier")
+  subscriptionStatus String @default("active") @map("subscription_status")
+
+  members CompanyUser[]
+  apiKeys ApiKey[]
+
+  // CRM Core
+  teams                   Team[]
+  customObjectDefinitions CustomObjectDefinition[]
+
+  // Marketing
+  workflows Workflow[]
+
+  // CRM
+  deals         Deal[]
+  campaigns     Campaign[]
+  leads         Lead[]
+  experiments   Experiment[]
+  conversations Conversation[]
+
+  // Phase 1: Marketing Analytics
+  marketingEvents MarketingEvent[]
+  adSpends        AdSpend[]
+  shortLinks      ShortLink[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("companies")
+}
+
+model CompanyUser {
+  id          String @id @default(uuid())
+  userId      String @map("user_id")
+  companyId   String @map("company_id")
+  role        String @default("member") // role_in_company
+  permissions Json?  @default("[]")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  invitedBy String? @map("invited_by")
+  inviter   User?   @relation("InvitedBy", fields: [invitedBy], references: [id])
+
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  // CRM Enterprise Relation
+  teamId String? @map("team_id")
+  team   Team?   @relation(fields: [teamId], references: [id])
+
+  @@unique([userId, companyId])
+  @@index([role])
+  @@map("company_users")
+}
+
+// --- CRM ENTERPRISE CORE ---
+
+model Team {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  // Hierarchy: Materialized Path Pattern
+  path  String @default("/") // e.g. "/root-id/child-id/"
+  level Int    @default(0)
+
+  parentId String? @map("parent_id")
+  parent   Team?   @relation("TeamHierarchy", fields: [parentId], references: [id])
+  children Team[]  @relation("TeamHierarchy")
+
+  members     CompanyUser[]
+  permissions CustomObjectPermission[]
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([path])
+  @@map("teams")
+}
+
+model CustomObjectDefinition {
+  id          String  @id @default(cuid())
+  name        String // Internal name e.g. "deal"
+  label       String // Display name e.g. "Deal"
+  description String?
+
+  fields            CustomObjectField[]
+  relationshipsFrom CustomObjectRelationship[] @relation("RelationshipFrom")
+  relationshipsTo   CustomObjectRelationship[] @relation("RelationshipTo")
+  permissions       CustomObjectPermission[]
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  records CustomObjectRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, name])
+}
+
+model CustomObjectField {
+  id       String  @id @default(cuid())
+  name     String
+  label    String
+  type     String // TEXT, NUMBER, DATE, SELECT, BOOLEAN, USER_REF, TEAM_REF
+  required Boolean @default(false)
+  options  String? // Storing JSON options as string for SQLite compatibility if needed, or Json type if supported
+
+  definitionId String
+  definition   CustomObjectDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CustomObjectRelationship {
+  id   String @id @default(cuid())
+  name String // e.g., "deals"
+  type String // ONE_TO_MANY, MANY_TO_ONE, ONE_TO_ONE
+
+  fromId String
+  from   CustomObjectDefinition @relation("RelationshipFrom", fields: [fromId], references: [id], onDelete: Cascade)
+
+  toId String
+  to   CustomObjectDefinition @relation("RelationshipTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CustomObjectPermission {
+  id String @id @default(cuid())
+
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  definitionId String
+  definition   CustomObjectDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+
+  canCreate Boolean @default(false)
+  canRead   Boolean @default(false)
+  canUpdate Boolean @default(false)
+  canDelete Boolean @default(false)
+
+  @@unique([teamId, definitionId])
+}
+
+model CustomObjectRecord {
+  id String @id @default(uuid())
+
+  definitionId String                 @map("definition_id")
+  definition   CustomObjectDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+
+  data Json // The actual record data
+
+  createdBy String? @map("created_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([definitionId])
+  @@map("custom_object_records")
+}
+
+model UserActivityLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  details   Json?
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("user_activity_logs")
+}
+
+model ApiKey {
+  id      String @id @default(uuid())
+  name    String
+  keyHash String @unique @map("key_hash")
+
+  userId String? @map("user_id")
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyId String?  @map("company_id")
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("api_keys")
+}
+
+// Content Management
+model Post {
+  id         String  @id @default(uuid())
+  title      String
+  slug       String  @unique
+  excerpt    String? @db.Text
+  content    String  @db.Text
+  coverImage String? @map("cover_image")
+  imageAlt   String? @map("image_alt") // SEO: Alt text for cover image
+  published  Boolean @default(false)
+
+  // SEO Optimization
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description") @db.Text
+  canonicalUrl    String? @map("canonical_url") // SEO: Canonical URL for duplicate content
+  focusKeyword    String? @map("focus_keyword") // SEO: Primary keyword
+
+  // Workflow Management
+  status        String    @default("draft") // draft, published, scheduled
+  scheduledDate DateTime? @map("scheduled_date")
+
+  authorId String @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id])
+
+  tags       Tag[]
+  categories Category[]
+
+  // Engagement (new)
+  views    PostView[]
+  likes    PostLike[]
+  comments Comment[]
+
+  // Series support (for multi-part articles)
+  seriesId    String?     @map("series_id")
+  series      PostSeries? @relation(fields: [seriesId], references: [id])
+  seriesOrder Int?        @map("series_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([authorId])
+  @@index([seriesId])
+  @@map("posts")
+}
+
+model Project {
+  id          String  @id @default(uuid())
+  title       String
+  slug        String  @unique
+  description String  @db.Text
+  content     String? @db.Text
+  client      String?
+  coverImage  String? @map("cover_image")
+  imageAlt    String? @map("image_alt") // SEO: Alt text for cover image
+  gallery     Json?   @default("[]") // Array of image URLs
+  published   Boolean @default(false)
+
+  // SEO Optimization
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description") @db.Text
+  focusKeyword    String? @map("focus_keyword")
+
+  // Workflow Management
+  status        String    @default("draft") // draft, published, scheduled, archived
+  scheduledDate DateTime? @map("scheduled_date")
+  featured      Boolean   @default(false)
+  displayOrder  Int       @default(0) @map("display_order")
+
+  // Project Details
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  testimonial String?   @db.Text
+  results     Json?     @default("[]") // Key results/metrics
+  projectUrl  String?   @map("project_url") // Live project URL
+
+  // Power Features (New)
+  clientLogo String? @map("client_logo")
+  techStack  Json?   @default("[]") // Array of strings or objects
+  team       Json?   @default("[]") // Array of collaborators
+  videoUrl   String? @map("video_url") // YouTube/Vimeo
+  private    Boolean @default(false) // Password protected/Link only
+  pdfUrl     String? @map("pdf_url") // Case study download
+  seoScore   Int     @default(0) // 0-100
+
+  // Relations
+  services   Service[] // Relation to Services
+  categoryId String?          @map("category_id")
+  category   ProjectCategory? @relation(fields: [categoryId], references: [id])
+  tags       ProjectTag[]
+  views      ProjectView[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([featured])
+  @@map("projects")
+}
+
+model ProjectCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  color       String? // For UI display
+  projects    Project[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("project_categories")
+}
+
+model ProjectTag {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  projects Project[]
+
+  @@map("project_tags")
+}
+
+model ProjectView {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ipHash    String   @map("ip_hash")
+  userAgent String?  @map("user_agent")
+  referer   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([projectId, ipHash, createdAt])
+  @@index([projectId])
+  @@index([createdAt])
+  @@map("project_views")
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  icon        String?
+  description String?   @db.Text
+  projects    Project[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("services")
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String @unique
+  posts Post[]
+
+  @@map("tags")
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  slug  String @unique
+  posts Post[]
+
+  @@map("categories")
+}
+
+// --- MARKETING HUB (AUTOMATION) ---
+
+model Workflow {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean @default(false) @map("is_active")
+
+  triggerType   String @map("trigger_type") // e.g., "FORM_SUBMISSION", "CUSTOM_EVENT"
+  triggerConfig Json   @map("trigger_config") // Configuración específica
+
+  steps Json // Array de pasos (acciones)
+
+  executions WorkflowExecution[]
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@map("workflows")
+}
+
+model WorkflowExecution {
+  id     String @id @default(uuid())
+  status String // "PENDING", "SUCCESS", "FAILED"
+  logs   Json?
+
+  workflowId String   @map("workflow_id")
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Execution State
+  currentStep Int       @default(0) @map("current_step")
+  resumeAt    DateTime? @map("resume_at") // For WAIT nodes
+
+  @@index([workflowId])
+  @@index([status]) // For polling
+  @@map("workflow_executions")
+}
+
+// --- BLOG ENGAGEMENT ---
+
+model PostView {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ipHash    String   @map("ip_hash") // Hashed IP for privacy
+  userAgent String?  @map("user_agent")
+  referer   String? // Where they came from (SEO tracking)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, ipHash, createdAt]) // One view per IP per day
+  @@index([postId])
+  @@index([createdAt])
+  @@map("post_views")
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  sessionId String   @map("session_id") // Anonymous session identifier
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, sessionId])
+  @@index([postId])
+  @@map("post_likes")
+}
+
+model Comment {
+  id          String  @id @default(uuid())
+  content     String  @db.Text
+  authorName  String  @map("author_name")
+  authorEmail String  @map("author_email")
+  authorUrl   String? @map("author_url") // Optional website
+
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Nested comments support
+  parentId String?   @map("parent_id")
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+
+  // Moderation
+  approved Boolean @default(false)
+  flagged  Boolean @default(false)
+  ipHash   String? @map("ip_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([postId])
+  @@index([parentId])
+  @@index([approved])
+  @@map("comments")
+}
+
+model NewsletterSubscription {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  name         String?
+  source       String  @default("blog") // Where they subscribed from
+  confirmed    Boolean @default(false) // Double opt-in
+  confirmToken String? @map("confirm_token")
+
+  // Preferences
+  frequency String @default("weekly") // daily, weekly, monthly
+  interests Json?  @default("[]") // Category IDs they're interested in
+
+  unsubscribed   Boolean   @default(false)
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([confirmed])
+  @@index([unsubscribed])
+  @@map("newsletter_subscriptions")
+}
+
+model PostSeries {
+  id          String  @id @default(uuid())
+  title       String
+  slug        String  @unique
+  description String? @db.Text
+  coverImage  String? @map("cover_image")
+
+  posts Post[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("post_series")
+}
+
+// --- READING LIST (for logged-in users) ---
+
+model ReadingListItem {
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postSlug String   @map("post_slug") // Store slug for flexibility
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  @@unique([userId, postSlug])
+  @@index([userId])
+  @@map("reading_list_items")
+}
+
+// --- CRM PIPELINE (DEALS) ---
+
+model Deal {
+  id          String @id @default(uuid())
+  title       String
+  value       Float  @default(0)
+  currency    String @default("USD")
+  stage       String @default("NEW") // NEW, QUALIFIED, PROPOSAL, NEGOTIATION, WON, LOST
+  probability Int    @default(0) // 0-100
+
+  // Contact Info (Simplified for MVP, ideally linked to a Contact model)
+  contactName  String? @map("contact_name")
+  contactEmail String? @map("contact_email")
+
+  // Relations
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  priority   String        @default("MEDIUM") // LOW, MEDIUM, HIGH
+  activities CRMActivity[]
+
+  assignedTo   String? @map("assigned_to")
+  assignedUser User?   @relation("AssignedDeals", fields: [assignedTo], references: [id])
+
+  // Power Features
+  notes        String?  @db.Text
+  lostReason   String?  @map("lost_reason")
+  lastActivity DateTime @default(now()) @map("last_activity")
+
+  // Phase 14: Efficiency Fields
+  tags          String[]  @default([])
+  source        String?   @default("Unknown")
+  expectedClose DateTime? @map("expected_close")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([stage])
+  @@index([priority])
+  @@index([assignedTo])
+  @@map("deals")
+}
+
+// --- CRM ACTIVITY (Notes, Calls, Emails) ---
+
+model CRMActivity {
+  id      String @id @default(uuid())
+  type    String // NOTE, CALL, EMAIL, MEETING
+  content String @db.Text
+
+  dealId String @map("deal_id")
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([dealId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("crm_activities")
+}
+
+// --- LEAD SOURCE TRACKING & CAMPAIGN ATTRIBUTION ---
+
+model Campaign {
+  id          String    @id @default(uuid())
+  name        String
+  code        String    @unique // e.g., "FB-RETARGET-JAN24"
+  platform    String // FACEBOOK, GOOGLE, EMAIL, LINKEDIN, TIKTOK, etc.
+  status      String    @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
+  budget      Float?
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  description String?   @db.Text
+
+  // Metrics (updated via webhooks or manually)
+  impressions Int   @default(0)
+  clicks      Int   @default(0)
+  conversions Int   @default(0)
+  spend       Float @default(0)
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  leads           Lead[]
+  adSpends        AdSpend[]
+  marketingEvents MarketingEvent[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([code])
+  @@index([status])
+  @@map("campaigns")
+}
+
+model Lead {
+  id String @id @default(uuid())
+
+  // Contact Info
+  name     String?
+  email    String
+  phone    String?
+  company  String?
+  jobTitle String? @map("job_title")
+  message  String? @db.Text
+
+  // Source Tracking (Auto-detected)
+  source String // FACEBOOK, GOOGLE, REFERRAL, DIRECT, LINKEDIN, etc.
+  medium String? // cpc, organic, social, email, referral
+
+  // UTM Parameters (captured from URL)
+  utmSource   String? @map("utm_source")
+  utmMedium   String? @map("utm_medium")
+  utmCampaign String? @map("utm_campaign")
+  utmTerm     String? @map("utm_term")
+  utmContent  String? @map("utm_content")
+
+  // Tracking Metadata
+  referer     String? // Original referrer URL
+  landingPage String? @map("landing_page")
+  ipAddress   String? @map("ip_address")
+  userAgent   String? @map("user_agent")
+  country     String? // Detected from IP
+  city        String?
+
+  // Campaign Attribution
+  campaignId String?   @map("campaign_id")
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+
+  // Status & Conversion
+  status            String    @default("NEW") // NEW, CONTACTED, QUALIFIED, CONVERTED, LOST
+  score             Int       @default(0) // Lead score 0-100
+  convertedToDealId String?   @map("converted_to_deal_id")
+  convertedAt       DateTime? @map("converted_at")
+
+  // Extra Data
+  formId   String?  @map("form_id") // Which form captured this lead
+  formData Json?    @map("form_data") // Extra form fields as JSON
+  tags     String[] @default([])
+  notes    String?  @db.Text
+
+  // Assigned To
+  assignedTo String? @map("assigned_to")
+
+  // Multi-Channel
+  conversations   Conversation[]
+  marketingEvents MarketingEvent[]
+
+  companyId  String  @map("company_id")
+  crmCompany Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([source])
+  @@index([campaignId])
+  @@index([createdAt])
+  @@index([email])
+  @@index([status])
+  @@map("leads")
+}
+
+// --- MARKETING ANALYTICS & GROWTH ---
+
+model MarketingEvent {
+  id        String  @id @default(uuid())
+  eventType String // PAGE_VIEW, CLICK, FORM_SUBMIT, VIDEO_PLAY, EMAIL_OPEN
+  eventName String? // e.g. "Pricing Page", "Signup Button"
+
+  // Context
+  url       String?
+  referrer  String?
+  userAgent String?
+  ipAddress String?
+
+  // Identity
+  visitorId String? @map("visitor_id") // Cookie ID for anonymous tracking
+  leadId    String? @map("lead_id") // Linked if identified
+  lead      Lead?   @relation(fields: [leadId], references: [id])
+  userId    String? @map("user_id") // For logged in users
+  user      User?   @relation(fields: [userId], references: [id])
+
+  // Metadata
+  properties Json? @default("{}") // e.g. { "duration": 45, "percentage": 80 }
+
+  // Attribution
+  sessionId  String?   @map("session_id")
+  campaignId String?   @map("campaign_id")
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([visitorId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("marketing_events")
+}
+
+model AdSpend {
+  id   String   @id @default(uuid())
+  date DateTime @db.Date // Daily aggregation
+
+  platform String // FACEBOOK, GOOGLE, LINKEDIN
+  amount   Float // Spend amount
+  currency String @default("USD")
+
+  impressions Int @default(0)
+  clicks      Int @default(0)
+  conversions Int @default(0)
+
+  campaignId String?   @map("campaign_id")
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([date, campaignId, platform]) // Prevent duplicate daily entries
+  @@index([companyId])
+  @@index([date])
+  @@map("ad_spend")
+}
+
+model ShortLink {
+  id             String @id @default(uuid())
+  slug           String @unique // e.g. "summer-sale"
+  destinationUrl String @map("destination_url")
+
+  // Campaign Context
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  // Stats
+  clicks    Int       @default(0)
+  lastClick DateTime? @map("last_click")
+
+  isActive  Boolean   @default(true) @map("is_active")
+  expiresAt DateTime? @map("expires_at")
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([companyId])
+  @@map("short_links")
+}
+
+// ============================================
+// MULTI-CHANNEL INBOX (OMNICHANNEL)
+// ============================================
+
+model Conversation {
+  id String @id @default(uuid())
+
+  // Platform & Identity
+  channel    String // WHATSAPP, MESSENGER, INSTAGRAM, TWITTER, LINKEDIN, EMAIL, SMS
+  platformId String? @map("platform_id") // External ID (e.g., WA phone number, IG thread ID)
+
+  // Status & Workflow
+  status      String @default("OPEN") // OPEN, CLOSED, SNOOZED, ARCHIVED
+  priority    String @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  unreadCount Int    @default(0) @map("unread_count")
+
+  // Relations
+  leadId String? @map("lead_id") // Linked CRM Lead
+  lead   Lead?   @relation(fields: [leadId], references: [id])
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  assignedTo String? @map("assigned_to")
+  assignee   User?   @relation(fields: [assignedTo], references: [id])
+
+  messages Message[]
+
+  // Metadata
+  lastMessageAt      DateTime @default(now()) @map("last_message_at")
+  lastMessagePreview String?  @map("last_message_preview") // Cache for list view performance
+
+  tags     String[] @default([])
+  metadata Json?    @default("{}") // Platform specific data (e.g. WA profile pic)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([platformId, channel])
+  @@index([companyId])
+  @@index([status])
+  @@index([channel])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  conversationId String       @map("conversation_id")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // Content
+  content String? @db.Text
+  type    String  @default("TEXT") // TEXT, IMAGE, VIDEO, FILE, AUDIO, TEMPLATE
+
+  // Direction
+  direction String // INBOUND (from lead), OUTBOUND (from agent)
+  senderId  String? @map("sender_id") // If OUTBOUND, which user sent it?
+
+  // Status
+  status String @default("SENT") // SENT, DELIVERED, READ, FAILED
+
+  // Media/Attachments
+  mediaUrl  String? @map("media_url")
+  mediaType String? @map("media_type")
+
+  // Metadata
+  externalId String? @map("external_id") // ID from external platform
+  metadata   Json?   @default("{}")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([externalId, conversationId])
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ============================================
+// ANALYTICS MODELS - Real-time Website Tracking
+// ============================================
+
+// Individual page views and user interactions
+model AnalyticsEvent {
+  id String @id @default(uuid())
+
+  // Event Type
+  eventType String  @map("event_type") // PAGE_VIEW, CLICK, SCROLL, FORM_SUBMIT, CUSTOM
+  eventName String? @map("event_name") // Custom event name
+
+  // Page Context
+  path     String // /dashboard/analytics
+  title    String? // Page title
+  referrer String? // Previous page or external referrer
+
+  // UTM Attribution
+  utmSource   String? @map("utm_source")
+  utmMedium   String? @map("utm_medium")
+  utmCampaign String? @map("utm_campaign")
+  utmTerm     String? @map("utm_term")
+  utmContent  String? @map("utm_content")
+
+  // User/Session Identification
+  sessionId String  @map("session_id") // Links to AnalyticsSession
+  visitorId String  @map("visitor_id") // Persistent browser ID (localStorage)
+  userId    String? @map("user_id") // Authenticated user ID (if logged in)
+
+  // Device Information
+  device     String? // desktop, mobile, tablet
+  browser    String? // Chrome, Firefox, Safari, Edge
+  browserVer String? @map("browser_ver") // Browser version
+  os         String? // Windows, macOS, iOS, Android, Linux
+  osVersion  String? @map("os_version")
+  screenRes  String? @map("screen_res") // 1920x1080
+
+  // Geolocation (from IP)
+  country     String?
+  countryCode String? @map("country_code") // CO, US, MX
+  region      String? // Antioquia, California
+  city        String?
+
+  // Extended Metrics
+  timezone    String?
+  loadTime    Int?    @map("load_time")
+  domReady    Int?    @map("dom_ready")
+  duration    Int?
+  scrollDepth Int?    @map("scroll_depth")
+  clicks      Int     @default(0)
+  metadata    Json?   @default("{}")
+
+  // Relations
+  session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@index([eventType])
+  @@index([path])
+  @@index([visitorId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([utmSource, utmMedium, utmCampaign])
+  @@index([country, createdAt])
+  @@index([device, createdAt])
+  @@map("analytics_events")
+}
+
+// --- EXPERT MANAGEMENT (TEAM) ---
+
+model Expert {
+  id          String  @id @default(uuid())
+  name        String
+  role        String
+  bio         String? @db.Text
+  imageUrl    String? @map("image_url")
+  socialLinks Json?   @default("{}") @map("social_links")
+
+  order     Int     @default(0)
+  isVisible Boolean @default(true) @map("is_visible")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@index([isVisible])
+  @@map("experts")
+}
+
+model Experiment {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  status      String  @default("DRAFT") // DRAFT, RUNNING, COMPLETED, PAUSED
+  type        String  @default("AB_TEST")
+
+  startDate DateTime? @map("start_date")
+  endDate   DateTime? @map("end_date")
+
+  // Configuration
+  variants Json // Array of { id, name, trafficWeight, config }
+  metrics  Json // Primary metric to track
+
+  // Results (Snapshots)
+  results  Json? // { variantId, visitors, conversions, lift }
+  winnerId String? @map("winner_id")
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([status])
+  @@map("experiments")
+}
+
+model Annotation {
+  id       String   @id @default(uuid())
+  date     DateTime
+  content  String
+  category String // RELEASE, CAMPAIGN, UPDATE, MARKET_EVENT
+
+  authorId String? @map("author_id")
+  author   User?   @relation(fields: [authorId], references: [id])
+
+  companyId String @map("company_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([companyId])
+  @@index([date])
+  @@map("annotations")
+}
+
+// User session aggregation
+model AnalyticsSession {
+  id        String  @id @default(uuid())
+  visitorId String  @map("visitor_id")
+  userId    String? @map("user_id")
+
+  // Session Timing
+  startedAt DateTime  @default(now()) @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  duration  Int       @default(0) // Total session duration in seconds
+  isActive  Boolean   @default(true) @map("is_active")
+
+  // Pages
+  pageViews Int     @default(1) @map("page_views")
+  entryPage String  @map("entry_page") // First page visited
+  exitPage  String? @map("exit_page") // Last page visited
+
+  // Bounce Detection
+  isBounce Boolean @default(true) @map("is_bounce") // Single page visit
+
+  // Attribution (First Touch)
+  referrer    String?
+  utmSource   String? @map("utm_source")
+  utmMedium   String? @map("utm_medium")
+  utmCampaign String? @map("utm_campaign")
+
+  // Device (captured once per session)
+  device  String?
+  browser String?
+  os      String?
+
+  // Geolocation
+  country     String?
+  countryCode String? @map("country_code")
+  city        String?
+
+  // Conversion Tracking
+  converted       Boolean @default(false)
+  goalId          String? @map("goal_id")
+  conversionValue Float?  @map("conversion_value")
+
+  // Engagement Score (calculated)
+  engagementScore Int? @map("engagement_score") // 0-100
+
+  // Relations
+  events AnalyticsEvent[]
+
+  @@index([visitorId])
+  @@index([userId])
+  @@index([startedAt])
+  @@index([isActive])
+  @@index([country, startedAt])
+  @@index([utmSource, utmMedium])
+  @@index([device, startedAt])
+  @@index([isBounce, startedAt])
+  @@map("analytics_sessions")
+}
+
+// Conversion goals and KPIs
+model AnalyticsGoal {
+  id String @id @default(uuid())
+
+  // Goal Definition
+  name        String // "Contact Form Submission"
+  description String?
+  type        String // PAGE_VIEW, EVENT, DURATION, PAGES_PER_SESSION
+
+  // Trigger Conditions
+  matchType  String @map("match_type") // EXACT, CONTAINS, REGEX
+  matchValue String @map("match_value") // Path or event name to match
+
+  // Value Assignment
+  goalValue Float @default(0) @map("goal_value") // Conversion value in $
+
+  // Targets
+  targetCount Int? @map("target_count") // Monthly target
+
+  // Progress
+  completions Int   @default(0) // Total completions
+  totalValue  Float @default(0) @map("total_value") // Sum of conversion values
+
+  // Status
+  isActive Boolean @default(true) @map("is_active")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([type])
+  @@index([isActive])
+  @@map("analytics_goals")
+}
+
+// Daily aggregated metrics for fast dashboard queries
+model AnalyticsDailyStats {
+  id   String   @id @default(uuid())
+  date DateTime @db.Date // Date only (no time)
+
+  // Traffic Metrics
+  visitors  Int @default(0) // Unique visitors
+  sessions  Int @default(0) // Total sessions
+  pageViews Int @default(0) @map("page_views")
+
+  // Engagement
+  avgDuration     Float @default(0) @map("avg_duration") // Avg session duration
+  bounceRate      Float @default(0) @map("bounce_rate") // Percentage 0-100
+  pagesPerSession Float @default(0) @map("pages_per_session")
+
+  // Conversions
+  conversions    Int   @default(0)
+  conversionRate Float @default(0) @map("conversion_rate")
+  revenue        Float @default(0)
+
+  // Source Breakdown (JSON for flexibility)
+  byDevice  Json? @map("by_device") // {desktop: 60, mobile: 35, tablet: 5}
+  byCountry Json? @map("by_country") // {CO: 100, US: 50, MX: 25}
+  bySource  Json? @map("by_source") // {direct: 80, google: 50, facebook: 20}
+
+  // Top Pages
+  topPages Json? @map("top_pages") // [{path: "/", views: 500}, ...]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([date])
+  @@index([date])
+  @@map("analytics_daily_stats")
+}
