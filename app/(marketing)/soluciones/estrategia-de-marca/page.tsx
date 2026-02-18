@@ -206,9 +206,9 @@ export default function BrandStrategyPage() {
             <section ref={targetRef} className="relative min-h-screen flex items-center justify-center pt-32 pb-20 overflow-hidden bg-transparent z-10">
                 <motion.div
                     style={{ y, opacity }}
-                    className="container relative mx-auto px-6 lg:px-8 max-w-7xl"
+                    className="container relative mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl"
                 >
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
                         <div>
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
@@ -222,7 +222,7 @@ export default function BrandStrategyPage() {
                                     </span>
                                 </div>
 
-                                <h1 className="text-7xl md:text-9xl font-black tracking-tighter text-black mb-8 leading-[0.9]">
+                                <h1 className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-black mb-6 sm:mb-8 leading-[0.9]">
                                     LÓGICA<br />
                                     <span className="text-slate-400">DE MARCA.</span>
                                 </h1>
@@ -232,14 +232,14 @@ export default function BrandStrategyPage() {
                                     Construimos sistemas de identidad que convierten la atención en valor.
                                 </p>
 
-                                <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                                     <Link href="/contacto">
-                                        <MagneticButton className="h-16 px-10 bg-black text-white text-sm font-bold uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-3 shadow-xl hover:shadow-2xl">
+                                        <MagneticButton className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 bg-black text-white text-sm font-bold uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl">
                                             Iniciar Auditoría <ArrowRight size={16} />
                                         </MagneticButton>
                                     </Link>
                                     <Link href="#tools">
-                                        <Button variant="outline" className="h-16 px-10 border-2 border-black text-black bg-transparent hover:bg-black hover:text-white text-sm font-bold uppercase tracking-widest rounded-none transition-all">
+                                        <Button variant="outline" className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 border-2 border-black text-black bg-transparent hover:bg-black hover:text-white text-sm font-bold uppercase tracking-widest rounded-none transition-all">
                                             Explorar Herramientas
                                         </Button>
                                     </Link>
@@ -283,8 +283,8 @@ export default function BrandStrategyPage() {
             </section>
 
             {/* 2. STRATEGIC TOOLKIT SECTION (Interactivity) */}
-            <section id="tools" className="py-32 bg-slate-50 relative border-t border-slate-200">
-                <div className="container mx-auto px-6 lg:px-8 relative z-10">
+            <section id="tools" className="py-20 sm:py-32 bg-slate-50 relative border-t border-slate-200">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-20">
                         <div>
                             <Badge variant="outline" className="mb-4 border-black text-black bg-transparent rounded-none px-3 py-1 uppercase tracking-widest font-bold">
@@ -299,7 +299,7 @@ export default function BrandStrategyPage() {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                         {/* Tool 1: Archetypes */}
                         <div className="lg:col-span-2">
                             <ArchetypeSelector />
@@ -333,11 +333,11 @@ export default function BrandStrategyPage() {
             </section>
 
             {/* 3. CORE SERVICES - "The Process" */}
-            <section className="py-32 bg-white relative">
-                <div className="container mx-auto px-6 lg:px-8">
-                    <div className="grid md:grid-cols-2 gap-20">
-                        <div className="sticky top-32 h-fit">
-                            <h2 className="text-6xl font-black text-black mb-8 leading-none">
+            <section className="py-20 sm:py-32 bg-white relative">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20">
+                        <div className="md:sticky md:top-32 h-fit">
+                            <h2 className="text-4xl sm:text-6xl font-black text-black mb-6 sm:mb-8 leading-none">
                                 REBRANDING<br />TOTAL.
                             </h2>
                             <p className="text-xl text-slate-600 mb-12 leading-relaxed">
@@ -388,16 +388,16 @@ export default function BrandStrategyPage() {
             </section>
 
             {/* 4. CTA - Minimalist */}
-            <section className="py-40 bg-slate-50 border-t border-slate-200 relative overflow-hidden">
+            <section className="py-20 sm:py-40 bg-slate-50 border-t border-slate-200 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-[0.4] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-multiply" />
 
-                <div className="container mx-auto px-6 lg:px-8 text-center relative z-10">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className="text-5xl md:text-8xl font-black text-black mb-12 tracking-tighter">
+                        <h2 className="text-4xl sm:text-5xl md:text-8xl font-black text-black mb-8 sm:mb-12 tracking-tighter">
                             SÉ <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ATEMPORAL.</span>
                         </h2>
 
@@ -406,7 +406,7 @@ export default function BrandStrategyPage() {
                                 ¿Listo para construir una marca que sobreviva a las tendencias?
                             </p>
                             <Link href="/contacto">
-                                <MagneticButton className="h-20 px-16 bg-black text-white text-lg font-bold uppercase tracking-widest hover:bg-slate-900 border-2 border-black transition-all shadow-xl rounded-none">
+                                <MagneticButton className="w-full sm:w-auto h-16 sm:h-20 px-10 sm:px-16 bg-black text-white text-base sm:text-lg font-bold uppercase tracking-widest hover:bg-slate-900 border-2 border-black transition-all shadow-xl rounded-none">
                                     Agendar Estrategia
                                 </MagneticButton>
                             </Link>
