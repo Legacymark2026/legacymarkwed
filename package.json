@@ -2,7 +2,7 @@
   "name": "legacymark",
   "version": "0.1.0",
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "node prisma/seed.js"
   },
   "private": true,
   "scripts": {
