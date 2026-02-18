@@ -1,7 +1,7 @@
 export const siteConfig = {
     name: "LegacyMark",
     description: "Agencia de marketing performance con foco en ROI. Transformamos datos en crecimiento sostenible.",
-    url: "https://legacymark.com",
+    url: "https://legacymarksas.com",
     ogImage: "https://legacymark.com/og.jpg",
     links: {
         twitter: "https://twitter.com/legacymark",
