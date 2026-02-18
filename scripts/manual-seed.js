@@ -2,15 +2,46 @@ const { PrismaClient } = require('@prisma/client');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Explicitly load .env from root
-const envPath = path.resolve(__dirname, '../.env');
-const result = dotenv.config({ path: envPath });
+const fs = require('fs');
+const path = require('path');
 
-if (result.error) {
-    console.error("Error loading .env file from:", envPath);
-    console.error(result.error);
-} else {
-    console.log("Loaded .env file successfully.");
+// Explicitly load .env from root with custom parsing to handle "export " prefix
+const envPath = path.resolve(__dirname, '../.env');
+
+try {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    console.log("Loaded .env file content. Parsing...");
+
+    let dbUrlFound = false;
+
+    envContent.split('\n').forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) return;
+
+        // Match KEY=VAL, optionally prefixed with "export "
+        const match = trimmed.match(/^(?:export\s+)?([A-Za-z0-9_]+)=(.*)$/);
+        if (match) {
+            const key = match[1];
+            let val = match[2];
+
+            // Remove quotes if wrapping the value
+            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                val = val.slice(1, -1);
+            }
+
+            process.env[key] = val;
+            if (key === 'DATABASE_URL') dbUrlFound = true;
+        }
+    });
+
+    if (dbUrlFound) {
+        console.log("✓ Manually extracted DATABASE_URL from .env");
+    } else {
+        console.warn("⚠️ DATABASE_URL not found in .env via manual parsing. Falling back to what might be in process.env");
+    }
+
+} catch (err) {
+    console.error("Error manually reading .env:", err.message);
 }
 
 const prisma = new PrismaClient();
