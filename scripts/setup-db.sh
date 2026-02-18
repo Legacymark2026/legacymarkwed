@@ -24,7 +24,7 @@ else
       -e POSTGRES_USER=legacymark \
       -e POSTGRES_PASSWORD=$DB_PASSWORD \
       -e POSTGRES_DB=legacymark \
-      -p 5432:5432 \
+      -p 5433:5432 \
       -v legacymark_pgdata:/var/lib/postgresql/data \
       --restart always \
       postgres:15-alpine
@@ -33,7 +33,7 @@ else
     echo "---------------------------------------------------"
     echo "💾 YOUR DATABASE CREDENTIALS (SAVE THIS!):"
     echo ""
-    echo "DATABASE_URL=\"postgresql://legacymark:$DB_PASSWORD@localhost:5432/legacymark?schema=public\""
+    echo "DATABASE_URL=\"postgresql://legacymark:$DB_PASSWORD@localhost:5433/legacymark?schema=public\""
     echo ""
     echo "👉 ACTION REQUIRED: Copy the line above and add it to your .env file."
     echo "---------------------------------------------------"
