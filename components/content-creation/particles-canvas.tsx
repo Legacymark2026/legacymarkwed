@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 
 
-export default function ParticlesCanvas() {
+function ParticlesCanvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mousePosition = useRef({ x: 0, y: 0 });
 
@@ -138,3 +138,4 @@ export default function ParticlesCanvas() {
 }
 
 export default React.memo(ParticlesCanvas);
+
