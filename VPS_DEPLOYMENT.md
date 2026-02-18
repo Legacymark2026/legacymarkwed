@@ -18,7 +18,7 @@
 ### 1. Conectar al VPS
 
 ```bash
-ssh root@tu-ip-del-vps
+ssh ssh root@187.77.195.9
 ```
 
 ### 2. Ejecutar Script de Setup

@@ -36,10 +36,10 @@ const TEAM = [
 
 export function TeamGrid() {
     return (
-        <section className="bg-white py-32 relative overflow-hidden">
+        <section className="bg-white py-20 sm:py-32 relative overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
-            <div className="mx-auto max-w-7xl px-4 relative z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
                         Operativos de <span className="text-teal-600">Élite</span>
@@ -75,7 +75,7 @@ export function TeamGrid() {
                                             <member.icon size={14} className="text-teal-400" />
                                             <span className="text-[10px] font-mono tracking-widest uppercase bg-slate-900/50 px-2 py-0.5 rounded backdrop-blur-sm border border-white/10">{member.id}</span>
                                         </div>
-                                        <div className="font-bold text-lg leading-tight text-shadow-sm">{member.name}</div>
+                                        <div className="font-bold text-base sm:text-lg leading-tight text-shadow-sm line-clamp-2">{member.name}</div>
                                         <div className="text-xs text-gray-300 font-medium">{member.role}</div>
                                     </div>
                                 </div>

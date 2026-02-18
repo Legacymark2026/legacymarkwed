@@ -36,10 +36,10 @@ const PROJECTS = [
 
 export function CaseStudies() {
     return (
-        <section className="bg-slate-50 py-32 relative overflow-hidden border-y border-gray-200">
+        <section className="bg-slate-50 py-20 sm:py-32 relative overflow-hidden border-y border-gray-200">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
 
-            <div className="mx-auto max-w-7xl px-4 relative z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
@@ -56,7 +56,7 @@ export function CaseStudies() {
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     {PROJECTS.map((project, index) => (
                         <motion.div
                             key={project.id}

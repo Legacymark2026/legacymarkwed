@@ -48,12 +48,12 @@ export function FlyeringHero() {
                         <div className="absolute -left-12 top-0 text-6xl font-thin text-slate-800 hidden lg:block font-mono">{"{"}</div>
                         <div className="absolute -right-12 bottom-0 text-6xl font-thin text-slate-800 hidden lg:block font-mono">{"}"}</div>
 
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white mb-6 relative z-10 leading-[0.9]">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white mb-4 sm:mb-6 relative z-10 leading-[0.9]">
                             <span className="block mb-2 drop-shadow-sm">
                                 Impulsa tu Negocio
                             </span>
                             <div className="flex justify-center items-center gap-4 flex-wrap">
-                                <span className="text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">Estrategia</span>
+                                <span className="text-xl sm:text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">Estrategia</span>
                                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-emerald-500 to-cyan-600 animate-gradient-x font-mono relative">
                                     {glitchText}
                                 </span>
@@ -69,15 +69,15 @@ export function FlyeringHero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="flex flex-col sm:flex-row items-center gap-6 mt-8"
+                        className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-8 w-full sm:w-auto px-4 sm:px-0"
                     >
-                        <Button size="lg" className="h-14 px-10 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-lg transition-all hover:scale-105 shadow-xl shadow-red-700/20 relative overflow-hidden group animate-pulse-slow">
+                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-xl shadow-red-700/20 relative overflow-hidden group animate-pulse-slow">
                             <span className="relative flex items-center gap-2 uppercase tracking-wide">
                                 ¡RECLAMAR MI CUPO AHORA! <Rocket className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
                             </span>
                         </Button>
 
-                        <Button variant="ghost" size="lg" className="h-14 px-10 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all group relative overflow-hidden">
+                        <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all group relative overflow-hidden">
                             <span className="flex items-center gap-2 relative z-10 font-semibold">
                                 <Play className="w-4 h-4 fill-current" /> Ver Soluciones
                             </span>

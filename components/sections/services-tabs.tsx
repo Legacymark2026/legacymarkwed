@@ -89,7 +89,7 @@ export function ServicesTabs() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4 }}
-                                className="grid md:grid-cols-2 gap-12 items-center bg-zinc-900/50 p-8 md:p-12 rounded-3xl border border-white/10 backdrop-blur-md"
+                                className="grid md:grid-cols-2 gap-8 md:gap-12 items-center bg-zinc-900/50 p-6 md:p-12 rounded-3xl border border-white/10 backdrop-blur-md"
                             >
                                 <div>
                                     <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${service.bg} bg-opacity-20 mb-6 border border-white/10`}>

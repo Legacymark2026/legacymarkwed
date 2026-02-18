@@ -31,7 +31,7 @@ export const BentoServices = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:auto-rows-[300px]">
 
                     {/* CARD 1: Large (Span 2) - Marketing */}
                     <TechCard
@@ -122,7 +122,7 @@ const TechCard = ({
 }) => {
     return (
         <div className={cn(
-            "relative group overflow-hidden rounded-3xl bg-slate-50 border border-gray-200 p-8 transition-all hover:bg-white hover:shadow-xl hover:shadow-teal-900/5 hover:-translate-y-1",
+            "relative group overflow-hidden rounded-3xl bg-slate-50 border border-gray-200 p-6 md:p-8 min-h-[200px] md:min-h-0 transition-all hover:bg-white hover:shadow-xl hover:shadow-teal-900/5 hover:-translate-y-1",
             className
         )}>
             {/* Tech Decoration */}

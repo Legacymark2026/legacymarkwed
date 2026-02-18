@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useMousePosition } from "@/hooks/use-mouse-position";
+import React, { useEffect, useRef } from "react";
+
 
 export default function ParticlesCanvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const mousePosition = useMousePosition();
+    const mousePosition = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
+        const handleMouseMove = (event: MouseEvent) => {
+            mousePosition.current = { x: event.clientX, y: event.clientY };
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -47,8 +53,8 @@ export default function ParticlesCanvas() {
                 this.y += this.speedY;
 
                 // Mouse interaction
-                const dx = mousePosition.x - this.x;
-                const dy = mousePosition.y - this.y;
+                const dx = mousePosition.current.x - this.x;
+                const dy = mousePosition.current.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < 100) {
@@ -73,7 +79,9 @@ export default function ParticlesCanvas() {
 
         const init = () => {
             particles = [];
-            for (let i = 0; i < 100; i++) {
+            // Reduced particle count for better performance on mobile
+            const particleCount = window.innerWidth < 768 ? 50 : 80;
+            for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle());
             }
         };
@@ -114,9 +122,10 @@ export default function ParticlesCanvas() {
 
         return () => {
             window.removeEventListener("resize", resizeCanvas);
+            window.removeEventListener("mousemove", handleMouseMove);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [mousePosition]); // Re-bind effect if mouse position logic changes substantially, though ref usage is better for per-frame updates. 
+    }, []); // Re-bind effect if mouse position logic changes substantially, though ref usage is better for per-frame updates. 
     // Optimization: In a real high-perf scenario, we'd use a ref for mouse pos to avoid re-triggering effect, 
     // but for this effect binding it is okay or we can just read the latest ref value in animation loop.
     // The current useMousePosition hook causes re-renders on every move, which might re-trigger this effect if passed as dep.
@@ -127,3 +136,5 @@ export default function ParticlesCanvas() {
 
     return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
 }
+
+export default React.memo(ParticlesCanvas);

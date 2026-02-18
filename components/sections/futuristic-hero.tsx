@@ -95,8 +95,8 @@ export function FuturisticHero() {
                 </div>
             </div>
 
-            <div className="container relative z-20 px-4 md:px-6 pt-20">
-                <div className="flex flex-col items-center text-center space-y-10">
+            <div className="container relative z-20 px-4 md:px-6 pt-16 sm:pt-20">
+                <div className="flex flex-col items-center text-center space-y-8 sm:space-y-10">
 
                     {/* 3. Badge */}
                     <motion.div
@@ -115,23 +115,23 @@ export function FuturisticHero() {
                     </motion.div>
 
                     {/* 4. Main Headline (Dark Text) */}
-                    <div className="max-w-5xl space-y-6 relative">
+                    <div className="max-w-5xl space-y-4 sm:space-y-6 relative w-full">
                         {/* Decorative Brackets (Light Gray) */}
                         <div className="absolute -left-12 top-0 text-6xl font-thin text-gray-200 hidden lg:block font-mono">{"{"}</div>
                         <div className="absolute -right-12 bottom-0 text-6xl font-thin text-gray-200 hidden lg:block font-mono">{"}"}</div>
 
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-6 relative z-10 leading-[0.9]">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-4 sm:mb-6 relative z-10 leading-[0.9]">
                             <span className="block mb-2 drop-shadow-sm">
                                 Transformamos
                             </span>
-                            <div className="flex justify-center items-center gap-4 flex-wrap">
-                                <span className="text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">El Futuro</span>
+                            <div className="flex justify-center items-center gap-2 sm:gap-4 flex-wrap">
+                                <span className="text-xl sm:text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">El Futuro</span>
                                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-emerald-500 to-cyan-600 animate-gradient-x font-mono relative">
                                     {glitchText}
                                 </span>
                             </div>
                         </h1>
-                        <p className="mx-auto max-w-2xl text-lg md:text-xl text-slate-600 leading-relaxed text-pretty font-medium">
+                        <p className="mx-auto max-w-2xl text-base md:text-xl text-slate-600 leading-relaxed text-pretty font-medium">
                             LegacyMark fusiona <span className="text-teal-700 font-bold bg-teal-50 px-2 rounded border border-teal-100">INTELIGENCIA ARTIFICIAL</span> con estrategia de élite para construir ecosistemas digitales que dominan mercados.
                         </p>
                     </div>
@@ -141,23 +141,23 @@ export function FuturisticHero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="flex flex-col sm:flex-row items-center gap-6 mt-8"
+                        className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-6 sm:mt-8 w-full sm:w-auto"
                     >
-                        <Button size="lg" className="h-14 px-10 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg transition-all hover:scale-105 shadow-xl shadow-teal-700/20 relative overflow-hidden group">
+                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-xl shadow-teal-700/20 relative overflow-hidden group">
                             <span className="relative flex items-center gap-2">
                                 Iniciar Protocolo <Rocket className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
                             </span>
                         </Button>
 
-                        <Button variant="ghost" size="lg" className="h-14 px-10 rounded-full border border-gray-200 text-slate-700 hover:bg-gray-50 hover:text-teal-600 transition-all group relative overflow-hidden">
+                        <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-gray-200 text-slate-700 hover:bg-gray-50 hover:text-teal-600 transition-all group relative overflow-hidden">
                             <span className="flex items-center gap-2 relative z-10 font-semibold">
                                 <Play className="w-4 h-4 fill-current" /> Ver Demo Táctico
                             </span>
                         </Button>
                     </motion.div>
 
-                    {/* 6. 3D Parallax Dashboard (Light Glass Version) */}
-                    <div className="w-full max-w-6xl mt-20 perspective-[2000px] relative z-10 group/dashboard">
+                    {/* 6. 3D Parallax Dashboard - Hidden on mobile for performance */}
+                    <div className="w-full max-w-6xl mt-12 sm:mt-20 perspective-[2000px] relative z-10 group/dashboard hidden sm:block">
                         <motion.div
                             style={{ rotateX, rotateY }}
                             className="relative aspect-[16/9] md:aspect-[21/9] bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden"

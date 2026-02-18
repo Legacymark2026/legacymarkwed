@@ -2,8 +2,13 @@
 
 import { useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import ParticlesCanvas from "./particles-canvas";
+import dynamic from 'next/dynamic';
 import { ArrowDown, Play } from "lucide-react";
+
+const ParticlesCanvas = dynamic(() => import('./particles-canvas'), {
+    ssr: false,
+    loading: () => <div className="absolute inset-0 bg-slate-900/50" />
+});
 import { useMousePosition } from "@/hooks/use-mouse-position";
 
 export default function ContentHero() {
@@ -52,7 +57,7 @@ export default function ContentHero() {
                 </motion.div>
 
                 <motion.h1
-                    className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-slate-900 via-slate-800 to-teal-900 animate-gradient-x text-glow"
+                    className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter mb-6 sm:mb-8 bg-clip-text text-transparent bg-gradient-to-b from-slate-900 via-slate-800 to-teal-900 animate-gradient-x text-glow"
                     style={{ rotateX, rotateY }}
                 >
                     Creamos Contenido <br />
@@ -74,19 +79,19 @@ export default function ContentHero() {
                 </motion.div>
 
                 <motion.div
-                    className="flex flex-col md:flex-row gap-8 items-center"
+                    className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center w-full sm:w-auto px-4 sm:px-0"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                 >
-                    <button className="group relative px-10 py-5 bg-slate-900 text-white font-bold text-lg rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300 shadow-xl shadow-teal-900/10 animate-shimmer">
+                    <button className="w-full sm:w-auto group relative px-8 sm:px-10 py-4 sm:py-5 bg-slate-900 text-white font-bold text-base sm:text-lg rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300 shadow-xl shadow-teal-900/10 animate-shimmer">
                         <span className="absolute inset-0 bg-gradient-to-r from-teal-500 to-sky-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                         <span className="relative flex items-center gap-3">
                             Iniciar Proyecto <ArrowDown className="w-5 h-5" />
                         </span>
                     </button>
 
-                    <button className="px-10 py-5 rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-teal-300 transition-all flex items-center gap-4 backdrop-blur-md group shadow-sm bg-white/50">
+                    <button className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-teal-300 transition-all flex items-center justify-center gap-4 backdrop-blur-md group shadow-sm bg-white/50">
                         <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center group-hover:bg-teal-100 transition-colors">
                             <Play className="w-5 h-5 text-teal-600 fill-teal-600 group-hover:scale-110 transition-transform" />
                         </div>
@@ -94,7 +99,7 @@ export default function ContentHero() {
                     </button>
                 </motion.div>
 
-                {/* Floating Stats Cards - Parallax Layer */}
+                {/* Floating Stats Cards - Hidden on mobile */}
                 <motion.div style={{ y: y1 }} className="absolute -right-10 top-1/4 hidden xl:block z-0 opacity-80 hover:opacity-100 transition-opacity">
                     <div className="glass-card p-6 rounded-3xl w-72 rotate-12 hover:rotate-6 transition-transform duration-700 border-t border-white/60 bg-white/80 backdrop-blur-xl shadow-2xl shadow-teal-900/5">
                         <div className="flex justify-between items-center mb-4">

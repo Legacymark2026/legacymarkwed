@@ -102,9 +102,9 @@ export function Methodology() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-40" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,#ffffff_0%,transparent_100%)] opacity-80" />
 
-            <div className="mx-auto max-w-7xl px-4 relative z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 {/* 2. Header with 'System Status' aesthetic */}
-                <div className="text-center mb-24 relative">
+                <div className="text-center mb-12 sm:mb-24 relative">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
@@ -112,7 +112,7 @@ export function Methodology() {
                         </span>
                         Protocolo Activo v2.4
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6 text-slate-900">
+                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4 sm:mb-6 text-slate-900">
                         SISTEMA <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">A.C.T.I.O.N™</span>
                     </h2>
                     <p className="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
@@ -120,7 +120,7 @@ export function Methodology() {
                     </p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-20 items-stretch">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-stretch">
                     {/* 3. Steps Navigation (Timeline) */}
                     <div className="flex flex-col justify-between py-4 relative">
                         {/* Connecting Line - Darker for visibility */}
@@ -174,7 +174,7 @@ export function Methodology() {
                     </div>
 
                     {/* 4. Visualization Panel - Light Mode Card */}
-                    <div className="relative lg:h-auto min-h-[500px] flex items-center">
+                    <div className="relative lg:h-auto min-h-[350px] sm:min-h-[500px] flex items-center">
                         <div className="absolute inset-0 bg-white rounded-3xl border border-gray-200 md:rotate-2 hover:rotate-0 transition-transform duration-500 ease-out-expo shadow-2xl">
                             {/* Inner Grid */}
                             <div className="absolute inset-4 border border-gray-100 rounded-2xl overflow-hidden">
@@ -228,7 +228,7 @@ export function Methodology() {
                                         {STEPS[activeStep].tech_spec}
                                     </div>
 
-                                    <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4 sm:mb-6">
                                         {STEPS[activeStep].title}
                                     </h3>
 

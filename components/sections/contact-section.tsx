@@ -9,7 +9,7 @@ export function ContactSection() {
     return (
         <section className="bg-white py-24 border-t border-gray-100" id="contacto">
             <div className="mx-auto max-w-7xl px-4">
-                <div className="grid lg:grid-cols-2 gap-16">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                     {/* Left Column: Form */}
                     <div>
                         <div className="mb-8">
@@ -19,7 +19,7 @@ export function ContactSection() {
                             </p>
                         </div>
 
-                        <form className="space-y-6 bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                        <form className="space-y-6 bg-gray-50 p-6 sm:p-8 rounded-2xl border border-gray-100">
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label htmlFor="name" className="text-sm font-medium text-gray-900">Nombre</label>

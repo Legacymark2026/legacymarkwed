@@ -22,7 +22,7 @@ export function usePosts(filters?: PostFilters) {
             const result = await getPosts(filters);
 
             if (result.success && result.posts) {
-                setPosts(result.posts as Post[]);
+                setPosts(result.posts as unknown as Post[]);
                 setError(null);
             } else {
                 setError(result.error || 'Failed to load posts');

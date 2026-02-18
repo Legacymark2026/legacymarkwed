@@ -102,7 +102,7 @@ export function CorporateHero() {
 
                     {/* 4. Main Headline */}
                     <div className="max-w-5xl space-y-6 relative">
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-6 relative z-10 leading-[0.9]">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-4 sm:mb-6 relative z-10 leading-[0.9]">
                             <span className="block mb-2 drop-shadow-sm text-slate-400 font-thin text-4xl md:text-6xl tracking-widest uppercase">
                                 Innovación que
                             </span>
@@ -129,10 +129,10 @@ export function CorporateHero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.4 }}
-                        className="flex flex-col sm:flex-row items-center gap-6 pt-4 pb-8"
+                        className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 pt-4 pb-8 w-full sm:w-auto px-4 sm:px-0"
                     >
                         <MagneticButton>
-                            <Button size="lg" className="h-14 px-10 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-lg transition-all shadow-xl shadow-slate-900/20 relative overflow-hidden group">
+                            <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base sm:text-lg transition-all shadow-xl shadow-slate-900/20 relative overflow-hidden group">
                                 <span className="relative flex items-center gap-2">
                                     Iniciar Transformación <Zap className="w-5 h-5 text-teal-400 group-hover:text-teal-300 transition-colors" />
                                 </span>
@@ -140,7 +140,7 @@ export function CorporateHero() {
                         </MagneticButton>
 
                         <MagneticButton>
-                            <Button variant="ghost" size="lg" className="h-14 px-10 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-all group relative overflow-hidden">
+                            <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-all group relative overflow-hidden">
                                 <span className="flex items-center gap-2 relative z-10 font-semibold">
                                     <Play className="w-4 h-4 fill-current" /> Ver Reel de Agencia
                                 </span>
@@ -153,7 +153,7 @@ export function CorporateHero() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6 }}
-                        className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 border-t border-slate-100 w-full max-w-4xl"
+                        className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 pt-12 border-t border-slate-100 w-full max-w-4xl"
                     >
                         {[
                             { label: "Precisión", icon: Target, value: "99.8%" },

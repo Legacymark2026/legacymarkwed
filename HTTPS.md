@@ -76,7 +76,7 @@ Referrer-Policy: strict-origin      # Protege URLs
 3. **SSL Automático**
    - Vercel genera certificado
    - 1-2 minutos de espera
-   - ✅ `https://tudominio.com` listo
+   - ✅ `https://legacymarksas.com` listo
 
 ### En Railway
 
@@ -141,7 +141,7 @@ npm run dev:https
 
 ```bash
 # .env.production
-NEXTAUTH_URL="https://tudominio.com"  # HTTPS
+NEXTAUTH_URL="https://legacymarksas.com"  # HTTPS
 AUTH_TRUST_HOST="true"
 
 # Base de datos con SSL
@@ -209,7 +209,7 @@ https://securityheaders.com/?q=tudominio.com
 - [ ] Dominio agregado en Vercel/Railway
 - [ ] DNS configurado
 - [ ] SSL certificado generado
-- [ ] `https://tudominio.com` funciona
+- [ ] `https://legacymarksas.com` funciona
 
 ---
 

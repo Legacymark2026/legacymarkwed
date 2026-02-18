@@ -53,7 +53,7 @@ function Counter({ value, suffix }: { value: number, suffix: string }) {
     const displayValue = useTransform(springValue, (current) => Math.floor(current).toLocaleString());
 
     return (
-        <span className="text-5xl lg:text-6xl font-black tracking-tight text-slate-900 flex items-center justify-center font-mono relative z-10">
+        <span className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 flex items-center justify-center font-mono relative z-10">
             <motion.span ref={ref}>{displayValue}</motion.span>
             <span className="text-teal-600 ml-1">{suffix}</span>
         </span>
@@ -62,12 +62,12 @@ function Counter({ value, suffix }: { value: number, suffix: string }) {
 
 export function Stats() {
     return (
-        <section className="bg-slate-50 py-32 relative overflow-hidden border-y border-gray-200">
+        <section className="bg-slate-50 py-20 sm:py-32 relative overflow-hidden border-y border-gray-200">
             {/* Background Effects */}
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
             <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-transparent to-slate-50" />
 
-            <div className="mx-auto max-w-7xl px-4 relative z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 {/* Section Header */}
                 <div className="flex justify-center mb-16">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono uppercase tracking-widest backdrop-blur-md">
