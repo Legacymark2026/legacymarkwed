@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 const fs = require('fs');
-const fs = require('fs');
+// path and fs already required above
+
 // path already required above
 
 
