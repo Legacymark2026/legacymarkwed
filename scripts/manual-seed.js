@@ -3,7 +3,9 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 const fs = require('fs');
-const path = require('path');
+const fs = require('fs');
+// path already required above
+
 
 // Explicitly load .env from root with custom parsing to handle "export " prefix
 const envPath = path.resolve(__dirname, '../.env');
