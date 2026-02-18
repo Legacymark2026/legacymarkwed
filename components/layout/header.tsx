@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSession } from "next-auth/react";
+import { LayoutDashboard } from "lucide-react";
 
 interface NavLink {
     name: string;
@@ -39,6 +41,7 @@ export function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredLink, setHoveredLink] = useState<string | null>(null);
     const [isScrolled, setIsScrolled] = useState(false);
+    const { data: session } = useSession();
 
     // Handle scroll effect
     useEffect(() => {
@@ -105,12 +108,21 @@ export function Header() {
                             )}
                         </div>
                     ))}
-                    <Link href="/contacto">
-                        <Button size="sm" className={`rounded-full px-6 shadow-lg hover:shadow-xl transition-all ${isScrolled ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-slate-900 text-white hover:bg-slate-800"
-                            }`}>
-                            Transforma tu marca
-                        </Button>
-                    </Link>
+                    {session ? (
+                        <Link href="/dashboard">
+                            <Button size="sm" className="rounded-full px-6 shadow-lg hover:shadow-xl transition-all bg-teal-600 text-white hover:bg-teal-700 flex items-center gap-2">
+                                <LayoutDashboard size={15} />
+                                Panel de Control
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link href="/contacto">
+                            <Button size="sm" className={`rounded-full px-6 shadow-lg hover:shadow-xl transition-all ${isScrolled ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-slate-900 text-white hover:bg-slate-800"
+                                }`}>
+                                Transforma tu marca
+                            </Button>
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Mobile Menu Toggle */}
@@ -161,7 +173,15 @@ export function Header() {
                                     )}
                                 </div>
                             ))}
-                            <div className="pt-4">
+                            <div className="pt-4 space-y-3">
+                                {session && (
+                                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                                        <Button className="w-full h-12 rounded-full text-base bg-teal-600 text-white hover:bg-teal-700 flex items-center justify-center gap-2">
+                                            <LayoutDashboard size={18} />
+                                            Panel de Control
+                                        </Button>
+                                    </Link>
+                                )}
                                 <Link href="/contacto" onClick={() => setIsOpen(false)}>
                                     <Button className="w-full h-12 rounded-full text-lg bg-slate-900 text-white">
                                         Transforma tu marca
