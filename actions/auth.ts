@@ -59,7 +59,10 @@ export async function registerUser(formData: z.infer<typeof registerSchema>) {
 
 export async function loginUser(prevState: string | undefined, formData: FormData) {
     try {
-        await signIn('credentials', formData);
+        await signIn('credentials', {
+            ...Object.fromEntries(formData),
+            redirectTo: '/dashboard'
+        });
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {

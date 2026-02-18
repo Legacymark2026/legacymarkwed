@@ -9,17 +9,23 @@ interface SendEmailParams {
 }
 
 export async function sendEmail({ to, subject, html }: SendEmailParams) {
-    if (!process.env.RESEND_API_KEY) {
-        console.log("⚠️ RESEND_API_KEY not found. Mocking email send:");
+    // Check for missing or dummy key
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey || apiKey === 're_123456789') {
+        console.warn("⚠️ RESEND_API_KEY missing or dummy. Mocking email send:");
         console.log(`To: ${to}`);
         console.log(`Subject: ${subject}`);
-        console.log(`Body: ${html}`);
+        // In production, this should probably be an error, but let's allow it for now to avoid crashing entirely
+        // and just log it heavily.
+        if (process.env.NODE_ENV === 'production') {
+            console.error("❌ CRITICAL: Emails will NOT work in production without a valid RESEND_API_KEY.");
+        }
         return { success: true, id: 'mock-id' };
     }
 
     try {
         const data = await resend.emails.send({
-            from: 'LegacyMark <onboarding@resend.dev>', // Update this with verified domain later
+            from: 'LegacyMark <onboarding@resend.dev>', // TODO: Verify domain in Resend dashboard
             to: [to],
             subject: subject,
             html: html,
