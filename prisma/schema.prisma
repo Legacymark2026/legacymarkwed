@@ -55,6 +55,20 @@ model User {
   @@map("users")
 }
 
+// Password Reset Tokens — secure one-time-use tokens for password recovery
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email])
+  @@index([token])
+  @@map("password_reset_tokens")
+}
+
 model UserProfile {
   id     String @id @default(uuid())
   userId String @unique @map("user_id")
