@@ -15,6 +15,7 @@ const signInSchema = z.object({
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
+    trustHost: true,
     callbacks: {
         ...authConfig.callbacks,
         async signIn({ user, account, profile }) {
