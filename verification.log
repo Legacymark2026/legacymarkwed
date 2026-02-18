@@ -1,0 +1,21 @@
+🚀 Starting Chat Integration Verification...
+DEBUG: Found 2 companies in DB.
+DEBUG: First Company: {
+  id: '839e33e6-307b-4100-b9c3-b21e17a89295',
+  name: 'LegacyMark',
+  slug: 'legacymark',
+  logoUrl: null,
+  industry: null,
+  website: null,
+  subscriptionTier: 'free',
+  subscriptionStatus: 'active',
+  createdAt: 2026-02-12T17:30:56.238Z
+}
+Step 1: Initializing Chat...
+Error initializing chat: Error: Invariant: static generation store missing in revalidatePath /dashboard/inbox
+    at revalidate (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\next\src\server\web\spec-extension\revalidate.ts:126:11)
+    at revalidatePath (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\next\src\server\web\spec-extension\revalidate.ts:116:10)
+    at initializeChat (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\actions\chat.ts:60:13)
+    at async verifyChat (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\scripts\verify-chat.ts:24:28)
+❌ VERIFICATION FAILED: Error: Failed to initialize chat: Failed to start chat
+    at verifyChat (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\scripts\verify-chat.ts:27:19)

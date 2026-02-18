@@ -3,6 +3,14 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+const safeRevalidate = (path: string) => {
+    try {
+        revalidatePath(path);
+    } catch (e) {
+        // Ignore in script context
+    }
+};
+
 // Initialize Chat (Start Conversation)
 // 1. Find or Create Lead based on email
 // 2. Create Conversation (channel: WEB_CHAT) linked to Lead
@@ -57,7 +65,7 @@ export async function initializeChat(data: {
             });
 
             const newConversation = newLead.conversations[0];
-            revalidatePath("/dashboard/inbox");
+            safeRevalidate("/dashboard/inbox");
 
             return {
                 success: true,
@@ -112,7 +120,7 @@ export async function initializeChat(data: {
             },
         });
 
-        revalidatePath("/dashboard/inbox");
+        safeRevalidate("/dashboard/inbox");
         return {
             success: true,
             conversationId: conversation.id,
@@ -149,7 +157,7 @@ export async function sendMessage(conversationId: string, content: string, sende
             }
         });
 
-        revalidatePath(`/dashboard/inbox/${conversationId}`);
+        safeRevalidate(`/dashboard/inbox/${conversationId}`);
         return { success: true };
     } catch (error) {
         console.error("Error sending message:", error);

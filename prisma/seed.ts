@@ -57,6 +57,21 @@ async function main() {
         console.log(`✓ Created expert: ${expert.name}`);
     }
 
+    // Seed Default Company
+    const company = await prisma.company.upsert({
+        where: { slug: "legacymark" },
+        update: {},
+        create: {
+            name: "LegacyMark SAS",
+            slug: "legacymark",
+            industry: "Technology",
+            website: "https://legacymarksas.com",
+            subscriptionTier: "enterprise",
+            subscriptionStatus: "active",
+        },
+    });
+    console.log(`✓ Default company ready: ${company.name}`);
+
     console.log("🎉 Seed complete!");
 }
 
