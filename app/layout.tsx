@@ -17,6 +17,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { CommandMenu } from "@/components/ui/command-menu";
 import { PageTransition } from "@/components/ui/page-transition";
 import { SocialShare } from "@/components/ui/social-share";
+import { ChatWidget } from "@/components/chat/chat-widget";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -96,6 +97,7 @@ export default async function RootLayout({
           <BackToTop />
           <CookieConsent />
           <NewsletterPopup />
+          <ChatWidget />
         </Providers>
       </body>
     </html>
