@@ -109,11 +109,49 @@ export async function GET(req: NextRequest) {
 
         const finalToken = longLivedData.access_token || shortLivedToken;
 
-        // 4. Save to DB
+        // 4. Save to DB (Configuration)
         await updateIntegrationConfig('facebook', {
             ...config,
             accessToken: finalToken
         });
+
+        // 4.5 Save to DB (Account/Connection Status)
+        // CRITICAL: This is what the UI checks to show "Connected" badge
+        if (session?.user?.id) {
+            await prisma.account.upsert({
+                where: {
+                    provider_providerAccountId: {
+                        provider: 'facebook',
+                        providerAccountId: tokenData.user_id || config.appId // fallback to app ID if user_id missing, though it shouldn't be
+                    }
+                },
+                update: {
+                    access_token: finalToken,
+                    expires_at: Math.floor(Date.now() / 1000) + (longLivedData.expires_in || 5184000), // 60 days default
+                    refresh_token: shortLivedToken,
+                },
+                create: {
+                    userId: session.user.id,
+                    type: 'oauth',
+                    provider: 'facebook',
+                    providerAccountId: tokenData.user_id || config.appId,
+                    access_token: finalToken,
+                    expires_at: Math.floor(Date.now() / 1000) + (longLivedData.expires_in || 5184000),
+                    token_type: 'bearer',
+                    scope: 'public_profile,email,pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,ads_read,leads_retrieval,instagram_basic,instagram_manage_messages'
+                }
+            });
+            console.log("[Facebook Callback] Account record updated for UI status.");
+        }
+
+        // Force revalidation of the settings page so the UI updates immediately
+        try {
+            const { revalidatePath } = await import("next/cache");
+            revalidatePath('/dashboard/settings');
+            revalidatePath('/dashboard/settings/integrations');
+        } catch (e) {
+            console.error("Revalidation failed (non-fatal):", e);
+        }
 
         // 5. Redirect Success
         // Use the sanitized 'origin' to ensure we don't redirect to an internal localhost
