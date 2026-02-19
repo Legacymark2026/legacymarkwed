@@ -2,6 +2,7 @@
 import { ChannelType, ProcessingResult } from "@/types/inbox";
 import { ChannelProvider, OutboundMessage, InboundMessage } from "./types";
 import { MetaService } from "@/lib/meta-service";
+import crypto from "crypto";
 
 export class InstagramProvider implements ChannelProvider {
     channel: ChannelType = 'INSTAGRAM';
@@ -26,6 +27,37 @@ export class InstagramProvider implements ChannelProvider {
         } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
             console.error("Instagram Send Error:", error);
             return { success: false, error: error.message };
+        }
+    }
+
+    async verifySignature(request: Request): Promise<boolean> {
+        const signature = request.headers.get("x-hub-signature-256");
+        const appSecret = process.env.META_APP_SECRET;
+
+        if (!appSecret) {
+            console.warn("[InstagramProvider] META_APP_SECRET not set. Skipping verification (UNSAFE).");
+            return true;
+        }
+
+        if (!signature) {
+            console.warn("[InstagramProvider] No signature header found.");
+            return false;
+        }
+
+        try {
+            const body = await request.clone().arrayBuffer();
+            const expectedSignature = "sha256=" + crypto
+                .createHmac("sha256", appSecret)
+                .update(Buffer.from(body))
+                .digest("hex");
+
+            return crypto.timingSafeEqual(
+                Buffer.from(signature),
+                Buffer.from(expectedSignature)
+            );
+        } catch (error) {
+            console.error("[InstagramProvider] Signature verification failed:", error);
+            return false;
         }
     }
 

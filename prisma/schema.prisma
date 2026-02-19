@@ -144,6 +144,7 @@ model Company {
 
   members CompanyUser[]
   apiKeys ApiKey[]
+  integrationConfigs IntegrationConfig[]
 
   // CRM Core
   teams                   Team[]
@@ -1265,4 +1266,25 @@ model AnalyticsDailyStats {
   @@unique([date])
   @@index([date])
   @@map("analytics_daily_stats")
+}
+
+// --- INTEGRATIONS ---
+
+model IntegrationConfig {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  provider  String   // 'facebook', 'whatsapp', 'instagram'
+
+  // Encrypted/Stored JSON
+  config    Json     // { appId, appSecret, verifyToken, accessToken, etc. }
+
+  isEnabled Boolean  @default(true) @map("is_enabled")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([companyId, provider])
+  @@map("integration_configs")
 }

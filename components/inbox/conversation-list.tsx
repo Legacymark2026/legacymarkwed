@@ -41,6 +41,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const mockUserId = "user-123"; // TODO: get from context
+    const [activeChannel, setActiveChannel] = useState<ChannelType | 'ALL'>('ALL'); // Channel Filter
 
     // Real-time Polling (Phase 1 Improvement)
     useEffect(() => {
@@ -60,7 +61,9 @@ export function ConversationList({ conversations }: { conversations: Conversatio
         if (activeTab === 'mine') matchesTab = convo.assignedTo === mockUserId;
         if (activeTab === 'unassigned') matchesTab = !convo.assignedTo;
 
-        return matchesSearch && matchesStatus && matchesTab;
+        const matchesChannel = activeChannel === 'ALL' ? true : convo.channel === activeChannel;
+
+        return matchesSearch && matchesStatus && matchesTab && matchesChannel;
     });
 
     const toggleSelection = (id: string) => {
@@ -88,6 +91,33 @@ export function ConversationList({ conversations }: { conversations: Conversatio
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                </div>
+
+                {/* Channel Filters (Mini Icons) */}
+                <div className="flex gap-1.5 justify-start overflow-x-auto py-1 scrollbar-hide">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setActiveChannel('ALL')}
+                        className={cn("h-7 px-2 text-[10px] rounded-full border", activeChannel === 'ALL' ? "bg-gray-800 text-white border-gray-800" : "bg-white text-gray-600 border-gray-200")}
+                    >
+                        All
+                    </Button>
+                    {(['WHATSAPP', 'MESSENGER', 'INSTAGRAM'] as ChannelType[]).map(ch => (
+                        <button
+                            key={ch}
+                            onClick={() => setActiveChannel(ch)}
+                            className={cn(
+                                "h-7 w-7 rounded-full flex items-center justify-center border transition-all",
+                                activeChannel === ch
+                                    ? "bg-blue-50 border-blue-200 ring-1 ring-blue-200"
+                                    : "bg-white border-gray-200 hover:bg-gray-50"
+                            )}
+                            title={ch}
+                        >
+                            <ChannelIcon channel={ch} className={cn("text-sm", activeChannel !== ch && "opacity-60 grayscale")} />
+                        </button>
+                    ))}
                 </div>
 
                 {/* Tabs */}

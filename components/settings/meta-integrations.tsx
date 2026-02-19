@@ -4,7 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Facebook, MessageSquare } from "lucide-react";
 import { MetaConnectButton } from "./meta-connect-button";
+import { MetaConnectButton } from "./meta-connect-button";
 import { MetaDisconnectButton } from "./meta-disconnect-button";
+import { IntegrationConfigDialog } from "./integration-config-dialog";
 
 export async function MetaIntegrations() {
     const integrations = await getConnectedIntegrations();
@@ -37,18 +39,23 @@ export async function MetaIntegrations() {
                         <div className="flex flex-col">
                             <span className="font-medium">Permissions</span>
                             <span className="text-muted-foreground text-xs">Read Pages, Manage Messages, Read Ads.</span>
+                            <span className="font-medium">Permissions</span>
+                            <span className="text-muted-foreground text-xs">Read Pages, Manage Messages, Read Ads.</span>
                         </div>
-                        {isFacebookConnected ? (
-                            <MetaDisconnectButton provider="facebook" />
-                        ) : (
-                            isFacebookConfigured ? (
-                                <MetaConnectButton provider="facebook" />
+                        <div className="flex items-center gap-2">
+                            <IntegrationConfigDialog provider="facebook" title="Meta" />
+                            {isFacebookConnected ? (
+                                <MetaDisconnectButton provider="facebook" />
                             ) : (
-                                <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded">
-                                    Missing Env Vars
-                                </span>
-                            )
-                        )}
+                                isFacebookConfigured ? (
+                                    <MetaConnectButton provider="facebook" />
+                                ) : (
+                                    <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded">
+                                        Missing Env Vars
+                                    </span>
+                                )
+                            )}
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -62,6 +69,11 @@ export async function MetaIntegrations() {
                     </CardTitle>
                     <CardDescription>Direct integration with WhatsApp Cloud API (Coming Soon).</CardDescription>
                 </CardHeader>
+                <CardContent>
+                    <div className="flex justify-end">
+                        <IntegrationConfigDialog provider="whatsapp" title="WhatsApp" />
+                    </div>
+                </CardContent>
             </Card>
         </div>
     );

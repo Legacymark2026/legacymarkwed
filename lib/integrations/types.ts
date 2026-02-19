@@ -5,6 +5,7 @@ export interface OutboundMessage {
     content: string;
     attachments?: any[];
     replyToId?: string;
+    pageId?: string; // Optional: Context for multi-page/number setups
 }
 
 export interface InboundMessage {
@@ -19,11 +20,13 @@ export interface InboundMessage {
     attachments?: any[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: any;
+    images?: string[];
 }
 
 export interface ChannelProvider {
     channel: ChannelType;
     sendMessage(message: OutboundMessage): Promise<ProcessingResult>;
+    verifySignature(request: Request): Promise<boolean>;
     validateWebhook(request: Request): Promise<boolean>;
     parseWebhook(request: Request): Promise<InboundMessage | null>;
 }

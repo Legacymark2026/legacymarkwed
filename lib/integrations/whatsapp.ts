@@ -1,6 +1,9 @@
 
 import { ChannelType, ProcessingResult } from "@/types/inbox";
 import { ChannelProvider, OutboundMessage, InboundMessage } from "./types";
+import crypto from "crypto";
+import { getSystemIntegrationConfig } from "@/lib/integration-config-service";
+import { IntegrationConfigData } from "@/actions/integration-config";
 
 export class WhatsAppProvider implements ChannelProvider {
     channel: ChannelType = 'WHATSAPP';
@@ -17,18 +20,26 @@ export class WhatsAppProvider implements ChannelProvider {
     async sendMessage(message: OutboundMessage): Promise<ProcessingResult> {
         console.log(`[WhatsAppProvider] Sending message to ${message.conversationId}`);
 
-        if (!this.apiToken || !this.phoneNumberId) {
-            console.log("Mocking WhatsApp Success (Missing Credentials)");
+        let apiToken = this.apiToken;
+        let phoneNumberId = this.phoneNumberId;
+
+        // Dynamic Config
+        const config = await getSystemIntegrationConfig('whatsapp');
+        if (config?.accessToken) apiToken = config.accessToken;
+        if (config?.phoneNumberId) phoneNumberId = config.phoneNumberId;
+
+        if (!apiToken || !phoneNumberId) {
+            console.log("Mocking WhatsApp Success (Missing Credentials in ENV/DB)");
             await new Promise(r => setTimeout(r, 500));
             return { success: true, messageId: `wa-mock-${Date.now()}` };
         }
 
         try {
-            const url = `https://graph.facebook.com/v19.0/${this.phoneNumberId}/messages`;
+            const url = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.apiToken}`,
+                    'Authorization': `Bearer ${apiToken}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -48,11 +59,50 @@ export class WhatsAppProvider implements ChannelProvider {
         }
     }
 
+    async verifySignature(request: Request): Promise<boolean> {
+        const signature = request.headers.get("x-hub-signature-256");
+        // WhatsApp sometimes uses specific app secrets or the same as Meta
+        let appSecret = process.env.WHATSAPP_APP_SECRET || process.env.META_APP_SECRET;
+
+        // Dynamic Config
+        const config = await getSystemIntegrationConfig('whatsapp');
+        if (config?.appSecret) appSecret = config.appSecret;
+
+        if (!appSecret) {
+            console.warn("[WhatsAppProvider] WHATSAPP_APP_SECRET not set. Skipping verification (UNSAFE).");
+            return true;
+        }
+
+        if (!signature) {
+            console.warn("[WhatsAppProvider] No signature header found.");
+            return false;
+        }
+
+        try {
+            const body = await request.clone().arrayBuffer();
+            const expectedSignature = "sha256=" + crypto
+                .createHmac("sha256", appSecret)
+                .update(Buffer.from(body))
+                .digest("hex");
+
+            return crypto.timingSafeEqual(
+                Buffer.from(signature),
+                Buffer.from(expectedSignature)
+            );
+        } catch (error) {
+            console.error("[WhatsAppProvider] Signature verification failed:", error);
+            return false;
+        }
+    }
+
     async validateWebhook(request: Request): Promise<boolean> {
         const url = new URL(request.url);
         const mode = url.searchParams.get("hub.mode");
         const token = url.searchParams.get("hub.verify_token");
-        const verifyToken = process.env.META_WEBHOOK_VERIFY_TOKEN;
+        let verifyToken = process.env.META_WEBHOOK_VERIFY_TOKEN;
+
+        const config = await getSystemIntegrationConfig('whatsapp');
+        if (config?.verifyToken) verifyToken = config.verifyToken;
 
         return mode === "subscribe" && token === verifyToken;
     }
@@ -71,7 +121,7 @@ export class WhatsAppProvider implements ChannelProvider {
 
                             return {
                                 channel: this.channel,
-                                externalId: msg.from, // Phone Number
+                                externalId: msg.id, // FIX: Use Message ID
                                 content: msg.text?.body || "[Media/Template]",
                                 sender: {
                                     id: msg.from,

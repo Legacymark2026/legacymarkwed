@@ -21,6 +21,10 @@ export class YouTubeProvider implements ChannelProvider {
         return { success: true, messageId: `yt-${Date.now()}` };
     }
 
+    async verifySignature(request: Request): Promise<boolean> {
+        return true; // PubSubHubbub verification happens at subscription time mostly
+    }
+
     async validateWebhook(request: Request): Promise<boolean> {
         return false; // YouTube usually polls, but PubSubHubbub exists
     }

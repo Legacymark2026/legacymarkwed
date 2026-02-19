@@ -36,7 +36,16 @@ export async function getConversations({
             where: { id: session.user.id },
             include: { companies: true }
         });
-        const companyId = user?.companies[0]?.companyId;
+        let companyId = user?.companies[0]?.companyId;
+
+        // Fallback for single-tenant / reset scenarios: Use default company
+        if (!companyId) {
+            const defaultCompany = await prisma.company.findFirst();
+            if (defaultCompany) {
+                companyId = defaultCompany.id;
+            }
+        }
+
         if (!companyId) return { success: false, error: "No company found" };
         const skip = (page - 1) * limit;
 

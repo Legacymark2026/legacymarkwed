@@ -25,6 +25,28 @@ export async function POST(
     return handlePost(req, params);
 }
 
+export async function GET(
+    req: NextRequest,
+    props: { params: Promise<{ provider: string }> }
+) {
+    const params = await props.params;
+    const { provider } = params;
+    const channel = getChannelFromProvider(provider);
+    if (!channel) return new NextResponse("Invalid provider", { status: 400 });
+
+    const channelProvider = automationHub.get(channel);
+    if (!channelProvider) return new NextResponse("Provider not configured", { status: 501 });
+
+    const isValid = await channelProvider.validateWebhook(req);
+    if (isValid) {
+        const url = new URL(req.url);
+        const challenge = url.searchParams.get("hub.challenge");
+        return new NextResponse(challenge);
+    }
+
+    return new NextResponse("Invalid verification token", { status: 403 });
+}
+
 async function handlePost(
     req: NextRequest,
     { params }: { params: Promise<{ provider: string }> }
@@ -42,6 +64,13 @@ async function handlePost(
     }
 
     try {
+        // 0. Verify Signature (Security)
+        const isVerified = await channelProvider.verifySignature(req);
+        if (!isVerified) {
+            console.error(`[Webhook:${channel}] Invalid Signature`);
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         // 1. Parse incoming webhook
         const inboundMessage = await channelProvider.parseWebhook(req);
 
@@ -76,7 +105,7 @@ async function handlePost(
                 companyId: company.id,
                 name: inboundMessage.sender.name || "WhatsApp User",
                 phone: inboundMessage.externalId,
-                source: 'WHATSAPP',
+                // source: 'WHATSAPP', // Not in InputType, auto-detected from utmSource
                 utmSource: 'whatsapp',
                 tags: ['whatsapp-inbound']
             });
@@ -125,24 +154,40 @@ async function handlePost(
             });
         }
 
+        // 4. Link Lead to Conversation if not already linked
+        if (lead && !conversation.leadId) {
+            await prisma.conversation.update({
+                where: { id: conversation.id },
+                data: { leadId: lead.id }
+            });
+            conversation.leadId = lead.id; // Update local object
+        }
+
         // 5. Create Message
-        await prisma.message.create({
+        const message = await prisma.message.create({
             data: {
                 conversationId: conversation.id,
                 content: inboundMessage.content,
-                type: 'TEXT', // TODO: Enhance for media support
+                senderId: inboundMessage.sender.id,
+                externalId: inboundMessage.externalId,
+                // senderName/Avatar not in schema, store in metadata
+                mediaUrl: inboundMessage.images?.[0],
+                mediaType: inboundMessage.images?.length ? 'IMAGE' : 'TEXT',
+                metadata: {
+                    ...inboundMessage.metadata,
+                    senderName: inboundMessage.sender.name,
+                    senderAvatar: inboundMessage.sender.avatar
+                },
                 direction: 'INBOUND',
                 status: 'DELIVERED',
-                externalId: inboundMessage.metadata?.messageId,
-                senderId: null, // System/User
-                metadata: inboundMessage.metadata
+                // leadId removed as it's on Conversation
             }
         });
 
         return NextResponse.json({ success: true });
 
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error(`[Webhook:${channel}] Error:`, error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: error.message || "Internal Server Error", stack: error.stack }, { status: 500 });
     }
 }

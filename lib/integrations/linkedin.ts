@@ -21,6 +21,10 @@ export class LinkedInProvider implements ChannelProvider {
         return { success: true, messageId: `li-${Date.now()}` };
     }
 
+    async verifySignature(request: Request): Promise<boolean> {
+        return true;
+    }
+
     async validateWebhook(request: Request): Promise<boolean> {
         return true;
     }

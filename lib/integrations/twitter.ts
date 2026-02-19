@@ -23,6 +23,10 @@ export class TwitterProvider implements ChannelProvider {
         return { success: true, messageId: `tw-${Date.now()}` };
     }
 
+    async verifySignature(request: Request): Promise<boolean> {
+        return true; // Trusted source or check CRC here
+    }
+
     async validateWebhook(request: Request): Promise<boolean> {
         // CRC Check logic
         return true;

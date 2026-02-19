@@ -1,6 +1,9 @@
 import { ChannelType, ProcessingResult } from "@/types/inbox";
 import { ChannelProvider, OutboundMessage, InboundMessage } from "./types";
 import { MetaService } from "@/lib/meta-service";
+import crypto from "crypto";
+import { getSystemIntegrationConfig } from "@/lib/integration-config-service";
+import { IntegrationConfigData } from "@/actions/integration-config";
 
 export class FacebookProvider implements ChannelProvider {
     channel: ChannelType;
@@ -14,25 +17,25 @@ export class FacebookProvider implements ChannelProvider {
     async sendMessage(message: OutboundMessage): Promise<ProcessingResult> {
         console.log(`[FacebookProvider] Sending message to ${message.conversationId}`);
 
-        // In a real implementation:
-        // 1. We need to lookup the Page Access Token associated with the channel instance or conversation.
-        // For this MVP, we will assume a single page or fetch dynamically if we had context.
-        // Since `sendMessage` interface doesn't pass the Page Token, we have a challenge.
-        // Solution: The `channel` context should ideally store the Page Token.
-        // For now, we will assume we can retrieve it via context or fail.
+        // Prioritize the pageId from the message context if available
+        let tokenToUse = this.pageAccessToken;
 
-        // TEMPORARY: Retieve the first available page token from DB for the user who owns this conversation.
-        // In production, we'd look up: Conversation -> Channel (Page ID) -> Token.
+        // Dynamic Token Retrieval
+        const config = await getSystemIntegrationConfig('facebook');
+        if (config?.accessToken) {
+            tokenToUse = config.accessToken;
+        }
 
-        if (!this.pageAccessToken) {
+        if (message.pageId) {
+            // For advanced multi-page, we might look up a specific page token here
+        }
+
+        if (!tokenToUse) {
             return { success: false, error: "No Page Access Token available" };
         }
 
         try {
-            // Recipient ID (PSID) is stored in the conversation or metadata
-            // Assuming conversationId IS the PSID for now, or we look it up.
-            // Just for the interface match, we'll assume message.conversationId maps to recipient PSID.
-            const result = await MetaService.sendTextMessage(this.pageAccessToken, message.conversationId, message.content);
+            const result = await MetaService.sendTextMessage(tokenToUse, message.conversationId, message.content);
             return { success: true, messageId: result.message_id };
         } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
             console.error("Facebook Send Error:", error);
@@ -40,11 +43,55 @@ export class FacebookProvider implements ChannelProvider {
         }
     }
 
+    async verifySignature(request: Request): Promise<boolean> {
+        const signature = request.headers.get("x-hub-signature-256");
+        let appSecret = process.env.META_APP_SECRET;
+
+        // Try getting from DB
+        const config = await getSystemIntegrationConfig('facebook');
+        if (config?.appSecret) {
+            appSecret = config.appSecret;
+        }
+
+        // In dev mode, if no secret is set, we might want to bypass or warn.
+        // For "ultra-professional" mode, we enforce it if the header is present.
+        if (!appSecret) {
+            console.warn("[FacebookProvider] META_APP_SECRET not set in ENV or DB. Skipping verification (UNSAFE).");
+            return true;
+        }
+
+        if (!signature) {
+            console.warn("[FacebookProvider] No signature header found.");
+            return false;
+        }
+
+        try {
+            const body = await request.clone().arrayBuffer();
+            const expectedSignature = "sha256=" + crypto
+                .createHmac("sha256", appSecret)
+                .update(Buffer.from(body))
+                .digest("hex");
+
+            return crypto.timingSafeEqual(
+                Buffer.from(signature),
+                Buffer.from(expectedSignature)
+            );
+        } catch (error) {
+            console.error("[FacebookProvider] Signature verification failed:", error);
+            return false;
+        }
+    }
+
     async validateWebhook(request: Request): Promise<boolean> {
         const url = new URL(request.url);
         const mode = url.searchParams.get("hub.mode");
         const token = url.searchParams.get("hub.verify_token");
-        const verifyToken = process.env.META_WEBHOOK_VERIFY_TOKEN;
+
+        let verifyToken = process.env.META_WEBHOOK_VERIFY_TOKEN;
+        const config = await getSystemIntegrationConfig('facebook');
+        if (config?.verifyToken) {
+            verifyToken = config.verifyToken;
+        }
 
         if (mode === "subscribe" && token === verifyToken) {
             return true;
@@ -67,7 +114,7 @@ export class FacebookProvider implements ChannelProvider {
 
                         return {
                             channel: this.channel,
-                            externalId: senderPsid,
+                            externalId: webhookEvent.message.mid, // FIX: Use Message ID
                             content: webhookEvent.message.text || "[Attachment]",
                             sender: {
                                 id: senderPsid,
