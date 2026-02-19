@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Facebook, MessageSquare } from "lucide-react";
 import { MetaConnectButton } from "./meta-connect-button";
-import { MetaConnectButton } from "./meta-connect-button";
 import { MetaDisconnectButton } from "./meta-disconnect-button";
 import { IntegrationConfigDialog } from "./integration-config-dialog";
 
@@ -37,8 +36,6 @@ export async function MetaIntegrations() {
                 <CardContent className="grid gap-4 pt-4">
                     <div className="flex items-center justify-between text-sm">
                         <div className="flex flex-col">
-                            <span className="font-medium">Permissions</span>
-                            <span className="text-muted-foreground text-xs">Read Pages, Manage Messages, Read Ads.</span>
                             <span className="font-medium">Permissions</span>
                             <span className="text-muted-foreground text-xs">Read Pages, Manage Messages, Read Ads.</span>
                         </div>
