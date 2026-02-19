@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
-export function MetaConnectButton({ provider, appId }: { provider: string, appId?: string }) {
+export function MetaConnectButton({ provider, appId, redirectUri: propRedirectUri }: { provider: string, appId?: string, redirectUri?: string }) {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleConnect = async () => {
@@ -13,7 +13,8 @@ export function MetaConnectButton({ provider, appId }: { provider: string, appId
         try {
             if (provider === 'facebook' && appId) {
                 // Manual OAuth Flow for Dynamic App ID
-                const redirectUri = `${window.location.origin}/api/integrations/facebook/callback`;
+                const origin = typeof window !== 'undefined' ? window.location.origin : '';
+                const redirectUri = propRedirectUri || `${origin}/api/integrations/facebook/callback`;
                 const scope = "public_profile,email,pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,ads_read,leads_retrieval,instagram_basic,instagram_manage_messages";
                 const state = "custom_integration_flow";
 

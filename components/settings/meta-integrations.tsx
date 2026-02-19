@@ -62,6 +62,7 @@ export async function MetaIntegrations() {
                                 <MetaConnectButton
                                     provider="facebook"
                                     appId={activeAppId}
+                                    redirectUri={process.env.NEXTAUTH_URL ? `${process.env.NEXTAUTH_URL}/api/integrations/facebook/callback` : undefined}
                                 />
                             )}
                         </div>
