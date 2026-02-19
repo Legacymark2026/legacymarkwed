@@ -47,9 +47,7 @@ export async function MetaIntegrations() {
                                 isFacebookConfigured ? (
                                     <MetaConnectButton provider="facebook" />
                                 ) : (
-                                    <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded">
-                                        Missing Env Vars
-                                    </span>
+                                    <MetaConnectButton provider="facebook" />
                                 )
                             )}
                         </div>
