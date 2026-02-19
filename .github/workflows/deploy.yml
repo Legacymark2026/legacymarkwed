@@ -38,7 +38,8 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    environment: Production
+    environment: 
+      name: Production
     needs: quality-check
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
