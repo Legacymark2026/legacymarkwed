@@ -57,14 +57,26 @@ export async function GET(req: NextRequest) {
         // CRITICAL: origin must match the one used in the frontend button
         let origin = new URL(req.url).origin;
 
-        // Smart Origin Detection
+        // Smart Origin Detection (Aggressive)
         const envUrl = process.env.NEXTAUTH_URL;
         const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
 
+        // Check headers for real host (works behind Vercel/proxies)
+        const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+        const protocol = req.headers.get("x-forwarded-proto") || "https";
+
         if (envUrl && !envUrl.includes("localhost")) {
             origin = envUrl;
-        } else if (process.env.NODE_ENV === 'production' && vercelUrl) {
+        } else if (vercelUrl) {
             origin = `https://${vercelUrl}`;
+        } else if (host && !host.includes("localhost")) {
+            origin = `${protocol}://${host}`;
+        }
+
+        // FINAL SAFETY NET: If we are still "localhost" but clearly not in a local dev environment (no PORT),
+        // or just to be absolutely sure for this user:
+        if (origin.includes("localhost") && process.env.NODE_ENV === "production") {
+            origin = "https://legacymarksas.com";
         }
 
         // Safety: ensure no trailing slash
@@ -73,7 +85,7 @@ export async function GET(req: NextRequest) {
         const redirectUri = `${origin}/api/integrations/facebook/callback`;
 
         console.log(`[Facebook Callback] Exchanging code for token...`);
-        console.log(`[Facebook Callback] Origin used: ${origin} (Env: ${envUrl})`);
+        console.log(`[Facebook Callback] Origin used: ${origin}`);
         console.log(`[Facebook Callback] Redirect URI sent to FB: ${redirectUri}`);
 
         // IMPORTANT: Params must be encoded
@@ -104,10 +116,16 @@ export async function GET(req: NextRequest) {
         });
 
         // 5. Redirect Success
-        return NextResponse.redirect(new URL("/dashboard/settings?tab=integrations&success=facebook_connected", req.url));
+        // Use the sanitized 'origin' to ensure we don't redirect to an internal localhost
+        return NextResponse.redirect(`${origin}/dashboard/settings?tab=integrations&success=facebook_connected`);
 
     } catch (error: any) {
         console.error("[Facebook Callback] Error:", error);
-        return NextResponse.redirect(new URL(`/dashboard/settings?error=${encodeURIComponent(error.message)}`, req.url));
+        // Also use sanitized origin for error redirect if possible, otherwise safe fallback
+        const base = process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes("localhost")
+            ? process.env.NEXTAUTH_URL
+            : new URL(req.url).origin;
+
+        return NextResponse.redirect(`${base}/dashboard/settings?error=${encodeURIComponent(error.message)}`);
     }
 }
