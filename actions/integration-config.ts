@@ -101,7 +101,7 @@ export async function updateIntegrationConfig(provider: IntegrationProvider, dat
                     data: {
                         name: 'My Company',
                         slug: 'my-company-' + Math.random().toString(36).substring(7),
-                        CompanyUser: {
+                        members: {
                             create: {
                                 userId: session.user.id,
                                 role: 'OWNER'
