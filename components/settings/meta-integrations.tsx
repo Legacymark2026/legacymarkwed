@@ -11,7 +11,14 @@ export async function MetaIntegrations() {
     const integrations = await getConnectedIntegrations();
     const fb = integrations.find(i => i.provider === 'facebook');
     const isFacebookConnected = fb?.connected;
-    const isFacebookConfigured = fb?.isConfigured;
+
+    // Fetch DB Config specifically for Facebook to get the App ID
+    const { getIntegrationConfig } = await import("@/actions/integration-config");
+    const fbConfig = await getIntegrationConfig('facebook');
+    const dbAppId = fbConfig?.appId;
+
+    // Use DB AppID or fallback to empty (button will handle it)
+    const activeAppId = dbAppId || "";
 
     return (
         <div className="grid gap-6">
@@ -44,14 +51,10 @@ export async function MetaIntegrations() {
                             {isFacebookConnected ? (
                                 <MetaDisconnectButton provider="facebook" />
                             ) : (
-                                isFacebookConfigured ? (
-                                    <MetaConnectButton
-                                        provider="facebook"
-                                        appId={(await import("@/actions/integration-config").then(m => m.getIntegrationConfig('facebook')))?.appId}
-                                    />
-                                ) : (
-                                    <MetaConnectButton provider="facebook" />
-                                )
+                                <MetaConnectButton
+                                    provider="facebook"
+                                    appId={activeAppId}
+                                />
                             )}
                         </div>
                     </div>
