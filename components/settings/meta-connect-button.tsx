@@ -13,9 +13,9 @@ export function MetaConnectButton({ provider, appId }: { provider: string, appId
         try {
             if (provider === 'facebook' && appId) {
                 // Manual OAuth Flow for Dynamic App ID
-                const redirectUri = `${window.location.origin}/api/auth/callback/facebook`;
+                const redirectUri = `${window.location.origin}/api/integrations/facebook/callback`;
                 const scope = "public_profile,email,pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,ads_read,leads_retrieval,instagram_basic,instagram_manage_messages";
-                const state = "custom_flow"; // You might want to generate a random state here
+                const state = "custom_integration_flow";
 
                 const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${scope}&response_type=code`;
 
