@@ -45,7 +45,12 @@ export async function GET(req: NextRequest) {
         }
 
         if (!config?.appId || !config?.appSecret) {
-            throw new Error("Missing Facebook App Configuration in DB (and no Env Vars found)");
+            const missing = [];
+            if (!config?.appId) missing.push("App ID");
+            if (!config?.appSecret) missing.push("App Secret");
+
+            console.error(`[Facebook Callback] Missing Config: ${missing.join(", ")}`);
+            throw new Error(`Missing Facebook Configuration in DB & Env. Missing: ${missing.join(", ")}. Check FACEBOOK_CLIENT_ID/SECRET.`);
         }
 
         // 2. Exchange Code for Token

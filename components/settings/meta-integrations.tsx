@@ -68,15 +68,27 @@ export async function MetaIntegrations() {
                     </div>
 
                     {!isFacebookConnected && activeAppId && (
-                        <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-md flex gap-3 items-start">
-                            <div className="mt-0.5">
-                                <Facebook className="h-4 w-4 text-blue-600" />
+                        <div className="mt-4 space-y-3">
+                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-md flex gap-3 items-start">
+                                <div className="mt-0.5">
+                                    <Facebook className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div className="text-xs text-blue-800">
+                                    <p className="font-semibold mb-1">¿Error "Función no disponible"?</p>
+                                    <p>
+                                        Esto ocurre cuando tu App de Facebook está en <strong>Modo Desarrollo</strong>.
+                                        Ve al <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-950">Panel de Desarrolladores</a>, selecciona tu App y cambia el modo a <strong>En vivo</strong> (Live).
+                                    </p>
+                                </div>
                             </div>
-                            <div className="text-xs text-blue-800">
-                                <p className="font-semibold mb-1">¿Error "Función no disponible"?</p>
-                                <p>
-                                    Esto ocurre cuando tu App de Facebook está en <strong>Modo Desarrollo</strong>.
-                                    Ve al <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-950">Panel de Desarrolladores</a>, selecciona tu App y cambia el modo a <strong>En vivo</strong> (Live).
+
+                            <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                <p className="text-xs font-medium text-gray-500 mb-1">Redirect URI (Copiar a Facebook):</p>
+                                <code className="block w-full p-2 bg-white border border-gray-200 rounded text-xs font-mono text-gray-700 break-all">
+                                    {process.env.NEXTAUTH_URL ? `${process.env.NEXTAUTH_URL}/api/integrations/facebook/callback` : `${typeof window !== 'undefined' ? window.location.origin : ''}/api/integrations/facebook/callback`}
+                                </code>
+                                <p className="text-[10px] text-gray-400 mt-1">
+                                    Asegúrate de cambiar <code>localhost</code> por tu dominio real en producción.
                                 </p>
                             </div>
                         </div>
