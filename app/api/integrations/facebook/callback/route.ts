@@ -56,16 +56,24 @@ export async function GET(req: NextRequest) {
         // 2. Exchange Code for Token
         // CRITICAL: origin must match the one used in the frontend button
         let origin = new URL(req.url).origin;
-        if (process.env.NEXTAUTH_URL) {
-            origin = process.env.NEXTAUTH_URL;
-        } else if (process.env.NEXT_PUBLIC_APP_URL) {
-            origin = process.env.NEXT_PUBLIC_APP_URL;
+
+        // Smart Origin Detection
+        const envUrl = process.env.NEXTAUTH_URL;
+        const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+
+        if (envUrl && !envUrl.includes("localhost")) {
+            origin = envUrl;
+        } else if (process.env.NODE_ENV === 'production' && vercelUrl) {
+            origin = `https://${vercelUrl}`;
         }
+
+        // Safety: ensure no trailing slash
+        origin = origin.replace(/\/$/, "");
 
         const redirectUri = `${origin}/api/integrations/facebook/callback`;
 
         console.log(`[Facebook Callback] Exchanging code for token...`);
-        console.log(`[Facebook Callback] Origin used: ${origin}`);
+        console.log(`[Facebook Callback] Origin used: ${origin} (Env: ${envUrl})`);
         console.log(`[Facebook Callback] Redirect URI sent to FB: ${redirectUri}`);
 
         // IMPORTANT: Params must be encoded

@@ -20,6 +20,17 @@ export async function MetaIntegrations() {
     // Use DB AppID or fallback to Env Var (for button)
     const activeAppId = dbAppId || process.env.FACEBOOK_CLIENT_ID || "";
 
+    // Smart Redirect URI Calculation
+    let serverOrigin = "";
+    if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes("localhost")) {
+        serverOrigin = process.env.NEXTAUTH_URL;
+    } else if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+        serverOrigin = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    }
+
+    // If we have a valid server origin, construct the URI, otherwise undefined (let client handle it)
+    const computedRedirectUri = serverOrigin ? `${serverOrigin}/api/integrations/facebook/callback` : undefined;
+
     return (
         <div className="grid gap-6">
             {/* Meta / Facebook */}
@@ -62,7 +73,7 @@ export async function MetaIntegrations() {
                                 <MetaConnectButton
                                     provider="facebook"
                                     appId={activeAppId}
-                                    redirectUri={process.env.NEXTAUTH_URL ? `${process.env.NEXTAUTH_URL}/api/integrations/facebook/callback` : undefined}
+                                    redirectUri={computedRedirectUri}
                                 />
                             )}
                         </div>
@@ -86,7 +97,7 @@ export async function MetaIntegrations() {
                             <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
                                 <p className="text-xs font-medium text-gray-500 mb-1">Redirect URI (Copiar a Facebook):</p>
                                 <code className="block w-full p-2 bg-white border border-gray-200 rounded text-xs font-mono text-gray-700 break-all">
-                                    {process.env.NEXTAUTH_URL ? `${process.env.NEXTAUTH_URL}/api/integrations/facebook/callback` : `${typeof window !== 'undefined' ? window.location.origin : ''}/api/integrations/facebook/callback`}
+                                    {computedRedirectUri || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/integrations/facebook/callback`}
                                 </code>
                                 <p className="text-[10px] text-gray-400 mt-1">
                                     Asegúrate de cambiar <code>localhost</code> por tu dominio real en producción.
