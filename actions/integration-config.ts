@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram';
+export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics';
 
 export interface IntegrationConfigData {
     appId?: string;
@@ -13,6 +13,11 @@ export interface IntegrationConfigData {
     accessToken?: string; // Long-lived page token
     phoneNumberId?: string; // WhatsApp
     wabaId?: string; // WhatsApp Business Account ID
+
+    // Google Analytics 4 (Service Account)
+    propertyId?: string;
+    clientEmail?: string;
+    privateKey?: string;
 }
 
 export async function getIntegrationConfig(provider: IntegrationProvider): Promise<IntegrationConfigData | null> {

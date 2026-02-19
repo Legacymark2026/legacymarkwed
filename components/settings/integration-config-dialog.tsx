@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IntegrationConfigDialogProps {
-    provider: 'facebook' | 'whatsapp' | 'instagram';
+    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics';
     title: string;
 }
 
@@ -51,15 +51,31 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
     const [showToken, setShowToken] = useState(false);
     const [showPageToken, setShowPageToken] = useState(false);
     const [showSecret, setShowSecret] = useState(false);
+    const [showPrivateKey, setShowPrivateKey] = useState(false);
 
     // Brand Colors & Gradients
-    const brandColor = provider === 'whatsapp' ? 'text-emerald-600' : 'text-blue-600';
-    const brandBg = provider === 'whatsapp' ? 'bg-emerald-50' : 'bg-blue-50';
-    const brandBorder = provider === 'whatsapp' ? 'border-emerald-100' : 'border-blue-100';
-    const brandRing = provider === 'whatsapp' ? 'focus-visible:ring-emerald-500' : 'focus-visible:ring-blue-500';
-    const brandGradient = provider === 'whatsapp'
-        ? 'bg-gradient-to-r from-emerald-50 via-green-50 to-white'
-        : 'bg-gradient-to-r from-blue-50 via-indigo-50 to-white';
+    const isWhatsapp = provider === 'whatsapp';
+    const isGoogle = provider === 'google-analytics';
+
+    let brandColor = 'text-blue-600';
+    let brandBg = 'bg-blue-50';
+    let brandBorder = 'border-blue-100';
+    let brandRing = 'focus-visible:ring-blue-500';
+    let brandGradient = 'bg-gradient-to-r from-blue-50 via-indigo-50 to-white';
+
+    if (isWhatsapp) {
+        brandColor = 'text-emerald-600';
+        brandBg = 'bg-emerald-50';
+        brandBorder = 'border-emerald-100';
+        brandRing = 'focus-visible:ring-emerald-500';
+        brandGradient = 'bg-gradient-to-r from-emerald-50 via-green-50 to-white';
+    } else if (isGoogle) {
+        brandColor = 'text-orange-600';
+        brandBg = 'bg-orange-50';
+        brandBorder = 'border-orange-100';
+        brandRing = 'focus-visible:ring-orange-500';
+        brandGradient = 'bg-gradient-to-r from-orange-50 via-amber-50 to-white';
+    }
 
     useEffect(() => {
         if (open) {
@@ -116,7 +132,9 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-3 text-xl font-bold tracking-tight text-gray-900">
                             <div className={cn("p-2 rounded-xl bg-white shadow-sm ring-1 ring-inset", brandBorder)}>
-                                {provider === 'whatsapp' ? <Smartphone className={cn("h-6 w-6", brandColor)} /> : <Globe className={cn("h-6 w-6", brandColor)} />}
+                                {isWhatsapp ? <Smartphone className={cn("h-6 w-6", brandColor)} /> :
+                                    isGoogle ? <Globe className={cn("h-6 w-6", brandColor)} /> :
+                                        <Globe className={cn("h-6 w-6", brandColor)} />}
                             </div>
                             Configure {title}
                         </DialogTitle>
@@ -146,7 +164,67 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                     </Badge>
                                 </div>
 
-                                {provider === 'whatsapp' ? (
+                                {isGoogle ? (
+                                    <>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="propertyId" className="text-xs font-semibold text-gray-700">
+                                                GA4 Property ID
+                                            </Label>
+                                            <div className="relative">
+                                                <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                <Input
+                                                    id="propertyId"
+                                                    value={formData.propertyId || ''}
+                                                    onChange={e => handleChange('propertyId', e.target.value)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                    placeholder="e.g., 345678901"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="clientEmail" className="text-xs font-semibold text-gray-700">
+                                                Service Account Email
+                                            </Label>
+                                            <div className="relative">
+                                                <Globe className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                <Input
+                                                    id="clientEmail"
+                                                    value={formData.clientEmail || ''}
+                                                    onChange={e => handleChange('clientEmail', e.target.value)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                    placeholder="service-account@project.iam.gserviceaccount.com"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="privateKey" className="text-xs font-semibold text-gray-700">
+                                                Private Key
+                                            </Label>
+                                            <div className="relative group">
+                                                <Key className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                                                <Input
+                                                    id="privateKey"
+                                                    type={showPrivateKey ? "text" : "password"}
+                                                    value={formData.privateKey || ''}
+                                                    onChange={e => handleChange('privateKey', e.target.value)}
+                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-xs focus:bg-white", brandRing)}
+                                                    placeholder="-----BEGIN PRIVATE KEY-----..."
+                                                />
+                                                <div className="absolute right-2 top-2 flex gap-1">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600 rounded-md"
+                                                        onClick={() => setShowPrivateKey(!showPrivateKey)}
+                                                    >
+                                                        {showPrivateKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : isWhatsapp ? (
                                     <>
                                         <div className="grid gap-2">
                                             <Label htmlFor="phoneNumberId" className="text-xs font-semibold text-gray-700">
@@ -245,78 +323,80 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
 
                             <Separator className="bg-gray-100" />
 
-                            {/* Security Section */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                        <Lock className="h-3 w-3" />
-                                        Security & Webhooks
-                                    </h4>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <Info className="h-3.5 w-3.5 text-gray-300 hover:text-gray-500 transition-colors" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>Used to verify incoming requests from Meta.</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="appSecret" className="text-xs font-semibold text-gray-700">
-                                            App Secret
-                                        </Label>
-                                        <div className="relative group">
-                                            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
-                                            <Input
-                                                id="appSecret"
-                                                type={showSecret ? "text" : "password"}
-                                                value={formData.appSecret || ''}
-                                                onChange={e => handleChange('appSecret', e.target.value)}
-                                                className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
-                                                placeholder="••••••••"
-                                            />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 rounded-md"
-                                                onClick={() => setShowSecret(!showSecret)}
-                                            >
-                                                {showSecret ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                                            </Button>
-                                        </div>
+                            {/* Security Section - Only for Meta */}
+                            {!isGoogle && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                            <Lock className="h-3 w-3" />
+                                            Security & Webhooks
+                                        </h4>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Info className="h-3.5 w-3.5 text-gray-300 hover:text-gray-500 transition-colors" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Used to verify incoming requests from Meta.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="verifyToken" className="text-xs font-semibold text-gray-700">
-                                            Verify Token
-                                        </Label>
-                                        <div className="relative group">
-                                            <Check className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
-                                            <Input
-                                                id="verifyToken"
-                                                value={formData.verifyToken || ''}
-                                                onChange={e => handleChange('verifyToken', e.target.value)}
-                                                className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
-                                                placeholder="random-string"
-                                            />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 rounded-md"
-                                                onClick={() => copyToClipboard(formData.verifyToken)}
-                                            >
-                                                <Copy className="h-3 w-3" />
-                                            </Button>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="appSecret" className="text-xs font-semibold text-gray-700">
+                                                App Secret
+                                            </Label>
+                                            <div className="relative group">
+                                                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                                                <Input
+                                                    id="appSecret"
+                                                    type={showSecret ? "text" : "password"}
+                                                    value={formData.appSecret || ''}
+                                                    onChange={e => handleChange('appSecret', e.target.value)}
+                                                    className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
+                                                    placeholder="••••••••"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 rounded-md"
+                                                    onClick={() => setShowSecret(!showSecret)}
+                                                >
+                                                    {showSecret ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="verifyToken" className="text-xs font-semibold text-gray-700">
+                                                Verify Token
+                                            </Label>
+                                            <div className="relative group">
+                                                <Check className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                                                <Input
+                                                    id="verifyToken"
+                                                    value={formData.verifyToken || ''}
+                                                    onChange={e => handleChange('verifyToken', e.target.value)}
+                                                    className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
+                                                    placeholder="random-string"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 rounded-md"
+                                                    onClick={() => copyToClipboard(formData.verifyToken)}
+                                                >
+                                                    <Copy className="h-3 w-3" />
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
                 </div>
