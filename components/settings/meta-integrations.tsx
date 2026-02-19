@@ -17,8 +17,8 @@ export async function MetaIntegrations() {
     const fbConfig = await getIntegrationConfig('facebook');
     const dbAppId = fbConfig?.appId;
 
-    // Use DB AppID or fallback to empty (button will handle it)
-    const activeAppId = dbAppId || "";
+    // Use DB AppID or fallback to Env Var (for button)
+    const activeAppId = dbAppId || process.env.FACEBOOK_CLIENT_ID || "";
 
     return (
         <div className="grid gap-6">
@@ -47,6 +47,14 @@ export async function MetaIntegrations() {
                             <span className="text-muted-foreground text-xs">Read Pages, Manage Messages, Read Ads.</span>
                         </div>
                         <div className="flex items-center gap-2">
+                            {activeAppId && (
+                                <div className="hidden md:flex items-center gap-2 mr-2 px-3 py-1.5 bg-gray-50 rounded-md border border-gray-100">
+                                    <span className="text-xs text-gray-500 font-medium">App ID:</span>
+                                    <code className="text-xs font-mono text-gray-700">
+                                        {activeAppId.slice(0, 4)}••••{activeAppId.slice(-4)}
+                                    </code>
+                                </div>
+                            )}
                             <IntegrationConfigDialog provider="facebook" title="Meta" />
                             {isFacebookConnected ? (
                                 <MetaDisconnectButton provider="facebook" />
@@ -58,6 +66,21 @@ export async function MetaIntegrations() {
                             )}
                         </div>
                     </div>
+
+                    {!isFacebookConnected && activeAppId && (
+                        <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-md flex gap-3 items-start">
+                            <div className="mt-0.5">
+                                <Facebook className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="text-xs text-blue-800">
+                                <p className="font-semibold mb-1">¿Error "Función no disponible"?</p>
+                                <p>
+                                    Esto ocurre cuando tu App de Facebook está en <strong>Modo Desarrollo</strong>.
+                                    Ve al <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-950">Panel de Desarrolladores</a>, selecciona tu App y cambia el modo a <strong>En vivo</strong> (Live).
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 

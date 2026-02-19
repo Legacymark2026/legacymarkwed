@@ -254,6 +254,37 @@ postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
 
 ---
 
+## 🌐 Configuración de Facebook Login en Producción
+
+Para que el inicio de sesión con Facebook funcione en tu dominio real (`legacymark.com`), debes configurar lo siguiente en [Meta for Developers](https://developers.facebook.com/apps/):
+
+### 1. Cambio a Modo "En Vivo" (Live Mode)
+*   **Importante:** El interruptor en la barra superior debe estar en **App Mode: Live**.
+*   Si no lo haces, solo los administradores podrán iniciar sesión. Los usuarios verán el error "Función no disponible".
+
+### 2. Valid OAuth Redirect URIs
+En el panel izquierdo, ve a **Facebook Login > Settings** y asegúrate de agregar **TODAS** las URIs:
+
+```
+# Desarrollo (para que siga funcionando local)
+http://localhost:3000/api/integrations/facebook/callback
+
+# Producción (CRÍTICO)
+https://tudominio.com/api/integrations/facebook/callback
+https://www.tudominio.com/api/integrations/facebook/callback
+```
+*Reemplaza `tudominio.com` por tu dominio real.*
+
+### 3. Variables de Entorno (Recomendado)
+Aunque el sistema permite configurar desde la UI, es **altamente recomendado** tener estas variables en Vercel/Railway para mayor robustez (el sistema las usará como respaldo si falla la DB):
+
+```bash
+FACEBOOK_CLIENT_ID="tu-app-id-real"
+FACEBOOK_CLIENT_SECRET="tu-app-secret-real"
+```
+
+---
+
 ## 📝 Checklist Pre-Deploy
 
 - [ ] Todas las migraciones testeadas localmente

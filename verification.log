@@ -1,21 +1,23 @@
-🚀 Starting Chat Integration Verification...
-DEBUG: Found 2 companies in DB.
-DEBUG: First Company: {
-  id: '839e33e6-307b-4100-b9c3-b21e17a89295',
-  name: 'LegacyMark',
-  slug: 'legacymark',
-  logoUrl: null,
-  industry: null,
-  website: null,
-  subscriptionTier: 'free',
-  subscriptionStatus: 'active',
-  createdAt: 2026-02-12T17:30:56.238Z
-}
-Step 1: Initializing Chat...
-Error initializing chat: Error: Invariant: static generation store missing in revalidatePath /dashboard/inbox
-    at revalidate (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\next\src\server\web\spec-extension\revalidate.ts:126:11)
-    at revalidatePath (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\node_modules\next\src\server\web\spec-extension\revalidate.ts:116:10)
-    at initializeChat (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\actions\chat.ts:60:13)
-    at async verifyChat (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\scripts\verify-chat.ts:24:28)
-❌ VERIFICATION FAILED: Error: Failed to initialize chat: Failed to start chat
-    at verifyChat (C:\Users\hboho\.gemini\antigravity\scratch\legacymark\scripts\verify-chat.ts:27:19)
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+
+🔍 [36mINICIANDO DIAGNÓSTICO ULTRA-PROFESIONAL DE META INTEGRATION[0m
+============================================================
+
+[33m1. Verificando Variables de Entorno (Sistema de Respaldo)[0m
+   ✅ FACEBOOK_CLIENT_ID:  [32mPresente (7167...4147)[0m
+   ✅ FACEBOOK_CLIENT_SECRET: [32mPresente (********)[0m
+   ✅ NEXTAUTH_URL:        [32mhttp://localhost:3000[0m (Crítico para Redirect URI)
+
+[33m2. Verificando Configuración en Base de Datos (Sistema Principal)[0m
+   ⚠️ [33mNo se encontraron configuraciones en DB.[0m
+      -> El sistema usará las Variables de Entorno automáticamente.
+
+[33m3. Prueba de Conectividad con Facebook API[0m
+   ✅ Conexión Exitosa (645ms)
+
+[33m4. Validación de Redirect URI[0m
+   ℹ️ URL de Retorno Esperada: [36mhttp://localhost:3000/api/integrations/facebook/callback[0m
+   👉 [1mAsegúrate de que esta URL exacta esté en la 'Facebook App Settings' > 'Valid OAuth Redirect URIs'[0m
+
+============================================================
+✅ DIAGNÓSTICO COMPLETADO

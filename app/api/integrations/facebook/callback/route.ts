@@ -26,20 +26,52 @@ export async function GET(req: NextRequest) {
         }
 
         // 1. Get App Config from DB
-        const config = await getIntegrationConfig('facebook');
+        let config = await getIntegrationConfig('facebook');
+
+        // Fallback to Environment Variables if DB config is missing
         if (!config?.appId || !config?.appSecret) {
-            throw new Error("Missing Facebook App Configuration in DB");
+            console.log("[Facebook Callback] DB Config missing. Checking Environment Variables...");
+            const envAppId = process.env.FACEBOOK_CLIENT_ID;
+            const envAppSecret = process.env.FACEBOOK_CLIENT_SECRET;
+
+            if (envAppId && envAppSecret) {
+                config = {
+                    ...config,
+                    appId: envAppId,
+                    appSecret: envAppSecret
+                } as any;
+                console.log("[Facebook Callback] Used Environment Variables fallback.");
+            }
+        }
+
+        if (!config?.appId || !config?.appSecret) {
+            throw new Error("Missing Facebook App Configuration in DB (and no Env Vars found)");
         }
 
         // 2. Exchange Code for Token
-        const redirectUri = `${new URL(req.url).origin}/api/integrations/facebook/callback`;
-        const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${config.appId}&redirect_uri=${redirectUri}&client_secret=${config.appSecret}&code=${code}`;
+        // CRITICAL: origin must match the one used in the frontend button
+        let origin = new URL(req.url).origin;
+        if (process.env.NEXTAUTH_URL) {
+            origin = process.env.NEXTAUTH_URL;
+        } else if (process.env.NEXT_PUBLIC_APP_URL) {
+            origin = process.env.NEXT_PUBLIC_APP_URL;
+        }
+
+        const redirectUri = `${origin}/api/integrations/facebook/callback`;
+
+        console.log(`[Facebook Callback] Exchanging code for token...`);
+        console.log(`[Facebook Callback] Origin used: ${origin}`);
+        console.log(`[Facebook Callback] Redirect URI sent to FB: ${redirectUri}`);
+
+        // IMPORTANT: Params must be encoded
+        const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${config.appId}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${config.appSecret}&code=${code}`;
 
         const tokenRes = await fetch(tokenUrl);
         const tokenData = await tokenRes.json();
 
         if (tokenData.error) {
-            throw new Error(tokenData.error.message);
+            console.error("[Facebook Callback] Token Exchange Error:", JSON.stringify(tokenData.error, null, 2));
+            throw new Error(`Facebook Error: ${tokenData.error.message}`);
         }
 
         const shortLivedToken = tokenData.access_token;
