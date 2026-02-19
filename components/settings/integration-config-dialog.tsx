@@ -1,12 +1,10 @@
-'use client';
-
+// ... imports provided in previous view_file ... 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -25,7 +23,8 @@ import {
     Copy,
     Info,
     Smartphone,
-    Globe
+    Globe,
+    Shield
 } from "lucide-react";
 import { getIntegrationConfig, updateIntegrationConfig, IntegrationConfigData } from "@/actions/integration-config";
 import { toast } from "sonner";
@@ -51,10 +50,14 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
     const [showPageToken, setShowPageToken] = useState(false);
     const [showSecret, setShowSecret] = useState(false);
 
-    // Brand Colors
-    const brandColor = provider === 'whatsapp' ? 'text-green-600' : 'text-blue-600';
-    const brandBg = provider === 'whatsapp' ? 'bg-green-50' : 'bg-blue-50';
-    const brandRing = provider === 'whatsapp' ? 'focus-visible:ring-green-500' : 'focus-visible:ring-blue-500';
+    // Brand Colors & Gradients
+    const brandColor = provider === 'whatsapp' ? 'text-emerald-600' : 'text-blue-600';
+    const brandBg = provider === 'whatsapp' ? 'bg-emerald-50' : 'bg-blue-50';
+    const brandBorder = provider === 'whatsapp' ? 'border-emerald-100' : 'border-blue-100';
+    const brandRing = provider === 'whatsapp' ? 'focus-visible:ring-emerald-500' : 'focus-visible:ring-blue-500';
+    const brandGradient = provider === 'whatsapp'
+        ? 'bg-gradient-to-r from-emerald-50 via-green-50 to-white'
+        : 'bg-gradient-to-r from-blue-50 via-indigo-50 to-white';
 
     useEffect(() => {
         if (open) {
@@ -100,43 +103,43 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className={cn("gap-2 border-dashed transition-all hover:border-solid", brandBg, "border-opacity-50 hover:bg-opacity-100")}>
+                <Button variant="outline" size="sm" className={cn("gap-2 border transition-all hover:bg-opacity-100", brandBg, brandBorder, "bg-opacity-50")}>
                     <Settings className={cn("h-4 w-4", brandColor)} />
                     <span className={cn("font-medium", brandColor)}>Configure</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white/95 backdrop-blur-xl border border-gray-100 shadow-2xl">
+            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white/80 backdrop-blur-xl border border-gray-200 shadow-2xl">
                 {/* Header with Brand Gradient */}
-                <div className={cn("px-6 py-6 border-b", provider === 'whatsapp' ? 'bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-gradient-to-r from-blue-50 to-indigo-50')}>
+                <div className={cn("px-6 py-6 border-b", brandGradient)}>
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-3 text-xl font-bold tracking-tight">
-                            <div className={cn("p-2 rounded-xl bg-white shadow-sm", brandColor)}>
-                                {provider === 'whatsapp' ? <Smartphone className="h-6 w-6" /> : <Globe className="h-6 w-6" />}
+                        <DialogTitle className="flex items-center gap-3 text-xl font-bold tracking-tight text-gray-900">
+                            <div className={cn("p-2 rounded-xl bg-white shadow-sm ring-1 ring-inset", brandBorder)}>
+                                {provider === 'whatsapp' ? <Smartphone className={cn("h-6 w-6", brandColor)} /> : <Globe className={cn("h-6 w-6", brandColor)} />}
                             </div>
                             Configure {title}
                         </DialogTitle>
-                        <DialogDescription className="text-gray-500 mt-1.5 ml-1">
-                            Manage API credentials and webhook secrets securely.
+                        <DialogDescription className="text-gray-500 mt-1.5 flex items-center gap-1.5">
+                            <Shield className="h-3 w-3" /> Securely manage API credentials
                         </DialogDescription>
                     </DialogHeader>
                 </div>
 
-                <div className="px-6 py-6 space-y-6">
+                <div className="px-6 py-6 space-y-6 max-h-[60vh] overflow-y-auto">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 space-y-4">
                             <Loader2 className={cn("h-10 w-10 animate-spin", brandColor)} />
-                            <p className="text-sm text-gray-400 font-medium">Loading configuration...</p>
+                            <p className="text-sm text-gray-400 font-medium">Loading credentials...</p>
                         </div>
                     ) : (
                         <div className="space-y-6">
                             {/* Provider Specific Section */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                    <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                         <Hash className="h-3 w-3" />
                                         Identity & Access
                                     </h4>
-                                    <Badge variant="secondary" className="text-[10px] bg-gray-100 text-gray-500 font-medium">
+                                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 pointer-events-none">
                                         Required
                                     </Badge>
                                 </div>
@@ -144,7 +147,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                 {provider === 'whatsapp' ? (
                                     <>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="phoneNumberId" className="text-xs font-semibold text-gray-600">
+                                            <Label htmlFor="phoneNumberId" className="text-xs font-semibold text-gray-700">
                                                 Phone Number ID
                                             </Label>
                                             <div className="relative">
@@ -153,13 +156,13 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                     id="phoneNumberId"
                                                     value={formData.phoneNumberId || ''}
                                                     onChange={e => handleChange('phoneNumberId', e.target.value)}
-                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white", brandRing)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
                                                     placeholder="e.g., 1083921..."
                                                 />
                                             </div>
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="accessToken" className="text-xs font-semibold text-gray-600">
+                                            <Label htmlFor="accessToken" className="text-xs font-semibold text-gray-700">
                                                 Permanent Access Token
                                             </Label>
                                             <div className="relative group">
@@ -169,7 +172,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                     type={showToken ? "text" : "password"}
                                                     value={formData.accessToken || ''}
                                                     onChange={e => handleChange('accessToken', e.target.value)}
-                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm", brandRing)}
+                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
                                                     placeholder="EAAG..."
                                                 />
                                                 <div className="absolute right-2 top-2 flex gap-1">
@@ -177,20 +180,23 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600"
+                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600 rounded-md"
                                                         onClick={() => setShowToken(!showToken)}
                                                     >
                                                         {showToken ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                                                     </Button>
                                                 </div>
                                             </div>
-                                            <p className="text-[10px] text-gray-400">Generate this in Meta Business Manager under System Users.</p>
+                                            <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                                <Info className="h-3 w-3" />
+                                                Generate this in Meta Business Manager under System Users.
+                                            </p>
                                         </div>
                                     </>
                                 ) : (
                                     <>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="appId" className="text-xs font-semibold text-gray-600">
+                                            <Label htmlFor="appId" className="text-xs font-semibold text-gray-700">
                                                 App ID
                                             </Label>
                                             <div className="relative">
@@ -199,13 +205,13 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                     id="appId"
                                                     value={formData.appId || ''}
                                                     onChange={e => handleChange('appId', e.target.value)}
-                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white", brandRing)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
                                                     placeholder="e.g., 81293..."
                                                 />
                                             </div>
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="pageAccessToken" className="text-xs font-semibold text-gray-600">
+                                            <Label htmlFor="pageAccessToken" className="text-xs font-semibold text-gray-700">
                                                 Page Access Token
                                             </Label>
                                             <div className="relative group">
@@ -215,7 +221,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                     type={showPageToken ? "text" : "password"}
                                                     value={formData.accessToken || ''}
                                                     onChange={e => handleChange('accessToken', e.target.value)}
-                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm", brandRing)}
+                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
                                                     placeholder="EAAG..."
                                                 />
                                                 <div className="absolute right-2 top-2 flex gap-1">
@@ -223,7 +229,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600"
+                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600 rounded-md"
                                                         onClick={() => setShowPageToken(!showPageToken)}
                                                     >
                                                         {showPageToken ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -240,9 +246,9 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                             {/* Security Section */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                    <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                         <Lock className="h-3 w-3" />
-                                        Security & Webhook
+                                        Security & Webhooks
                                     </h4>
                                     <TooltipProvider>
                                         <Tooltip>
@@ -258,7 +264,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="appSecret" className="text-xs font-semibold text-gray-600">
+                                        <Label htmlFor="appSecret" className="text-xs font-semibold text-gray-700">
                                             App Secret
                                         </Label>
                                         <div className="relative group">
@@ -268,14 +274,14 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                 type={showSecret ? "text" : "password"}
                                                 value={formData.appSecret || ''}
                                                 onChange={e => handleChange('appSecret', e.target.value)}
-                                                className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm", brandRing)}
+                                                className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
                                                 placeholder="••••••••"
                                             />
                                             <Button
                                                 type="button"
                                                 variant="ghost"
                                                 size="icon"
-                                                className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                                className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 rounded-md"
                                                 onClick={() => setShowSecret(!showSecret)}
                                             >
                                                 {showSecret ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -284,7 +290,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="verifyToken" className="text-xs font-semibold text-gray-600">
+                                        <Label htmlFor="verifyToken" className="text-xs font-semibold text-gray-700">
                                             Verify Token
                                         </Label>
                                         <div className="relative group">
@@ -293,14 +299,14 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                                 id="verifyToken"
                                                 value={formData.verifyToken || ''}
                                                 onChange={e => handleChange('verifyToken', e.target.value)}
-                                                className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm", brandRing)}
+                                                className={cn("pl-9 pr-8 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-sm focus:bg-white", brandRing)}
                                                 placeholder="random-string"
                                             />
                                             <Button
                                                 type="button"
                                                 variant="ghost"
                                                 size="icon"
-                                                className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                                className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 rounded-md"
                                                 onClick={() => copyToClipboard(formData.verifyToken)}
                                             >
                                                 <Copy className="h-3 w-3" />
@@ -313,14 +319,16 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                     )}
                 </div>
 
-                <div className="px-6 py-4 bg-gray-50 border-t flex justify-end gap-3">
-                    <Button variant="ghost" onClick={() => setOpen(false)} disabled={saving} className="text-gray-500 hover:text-gray-700">
+                <div className="px-6 py-4 bg-gray-50 border-t flex justify-end gap-3 items-center">
+                    <Button variant="ghost" onClick={() => setOpen(false)} disabled={saving} className="text-gray-500 hover:text-gray-700 hover:bg-gray-100">
                         Cancel
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={loading || saving}
-                        className={cn("px-6 min-w-[120px] shadow-lg hover:shadow-xl transition-all", provider === 'whatsapp' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white')}
+                        className={cn("px-6 min-w-[140px] shadow-lg hover:shadow-xl transition-all font-semibold",
+                            provider === 'whatsapp' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        )}
                     >
                         {saving ? (
                             <>

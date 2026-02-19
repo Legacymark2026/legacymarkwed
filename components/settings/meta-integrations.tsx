@@ -7,6 +7,18 @@ import { MetaConnectButton } from "./meta-connect-button";
 import { MetaDisconnectButton } from "./meta-disconnect-button";
 import { IntegrationConfigDialog } from "./integration-config-dialog";
 
+
+import { getConnectedIntegrations } from "@/actions/integrations";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Facebook, MessageSquare, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import { MetaConnectButton } from "./meta-connect-button";
+import { MetaDisconnectButton } from "./meta-disconnect-button";
+import { IntegrationConfigDialog } from "./integration-config-dialog";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { Separator } from "@/components/ui/separator";
+
 export async function MetaIntegrations() {
     const integrations = await getConnectedIntegrations();
     const fb = integrations.find(i => i.provider === 'facebook');
@@ -15,6 +27,11 @@ export async function MetaIntegrations() {
     // Fetch DB Config specifically for Facebook to get the App ID
     const { getIntegrationConfig } = await import("@/actions/integration-config");
     const fbConfig = await getIntegrationConfig('facebook');
+    const waConfig = await getIntegrationConfig('whatsapp');
+
+    // Check if WhatsApp is configured (has Phone ID and Access Token)
+    const isWhatsappConfigured = !!waConfig?.phoneNumberId && !!waConfig?.accessToken;
+
     const dbAppId = fbConfig?.appId;
 
     // Use DB AppID or fallback to Env Var (for button)
@@ -32,97 +49,135 @@ export async function MetaIntegrations() {
     const computedRedirectUri = serverOrigin ? `${serverOrigin}/api/integrations/facebook/callback` : undefined;
 
     return (
-        <div className="grid gap-6">
-            {/* Meta / Facebook */}
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <div className="flex flex-col space-y-1">
-                        <CardTitle className="text-base font-semibold flex items-center gap-2">
-                            <Facebook className="h-5 w-5 text-blue-600" />
-                            Meta (Facebook & Instagram)
-                        </CardTitle>
-                        <CardDescription>
-                            Connect to allow access to Pages, Inbox messaging, and Ads Manager.
-                        </CardDescription>
-                    </div>
-                    {isFacebookConnected ? (
-                        <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">Connected</Badge>
-                    ) : (
-                        <Badge variant="outline">Not Connected</Badge>
-                    )}
-                </CardHeader>
-                <CardContent className="grid gap-4 pt-4">
-                    <div className="flex items-center justify-between text-sm">
-                        <div className="flex flex-col">
-                            <span className="font-medium">Permissions</span>
-                            <span className="text-muted-foreground text-xs">Read Pages, Manage Messages, Read Ads.</span>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-semibold tracking-tight">Meta Ecosystem</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Manage your connection to Facebook, Instagram, and WhatsApp.</p>
+                </div>
+                <div className="flex gap-2">
+                    <StatusBadge status={isFacebookConnected && isWhatsappConfigured ? 'connected' : 'loading'} />
+                </div>
+            </div>
+
+            <Separator className="bg-gradient-to-r from-gray-200 to-transparent" />
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+                {/* Meta / Facebook Card */}
+                <Card className="group border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1877F2] to-blue-400"></div>
+                    <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                            <div className="p-2.5 bg-blue-50 rounded-xl">
+                                <Facebook className="w-8 h-8 text-[#1877F2]" />
+                            </div>
+                            <StatusBadge status={isFacebookConnected ? 'connected' : 'disconnected'} />
                         </div>
+                        <CardTitle className="mt-4 text-lg font-bold text-gray-900">Facebook & Instagram</CardTitle>
+                        <CardDescription className="text-sm">
+                            Social Graph API connection for Pages, Messages, and Ads.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-3">
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <span>Read public page data</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <span>Manage inbox messages</span>
+                            </div>
+                        </div>
+
+                        {!isFacebookConnected && activeAppId && (
+                            <div className="mt-4 p-3 bg-blue-50/50 border border-blue-100 rounded-lg">
+                                <div className="flex gap-2 items-start">
+                                    <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-semibold text-blue-800">Setup Required</p>
+                                        <p className="text-[11px] text-blue-700 leading-tight">
+                                            Ensure your App is in <strong>Live Mode</strong>. Redirect URI:
+                                        </p>
+                                        <code className="block mt-1 p-1.5 bg-white rounded border border-blue-200 text-[10px] font-mono break-all text-blue-900">
+                                            {computedRedirectUri || "Loading..."}
+                                        </code>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                    <CardFooter className="pt-3 border-t bg-gray-50/50 flex justify-between items-center">
                         <div className="flex items-center gap-2">
                             {activeAppId && (
-                                <div className="hidden md:flex items-center gap-2 mr-2 px-3 py-1.5 bg-gray-50 rounded-md border border-gray-100">
-                                    <span className="text-xs text-gray-500 font-medium">App ID:</span>
-                                    <code className="text-xs font-mono text-gray-700">
-                                        {activeAppId.slice(0, 4)}••••{activeAppId.slice(-4)}
-                                    </code>
-                                </div>
+                                <Badge variant="outline" className="font-mono text-[10px] text-gray-500 bg-white">
+                                    ID: {activeAppId.slice(0, 4)}...{activeAppId.slice(-4)}
+                                </Badge>
                             )}
                             <IntegrationConfigDialog provider="facebook" title="Meta" />
-                            {isFacebookConnected ? (
-                                <MetaDisconnectButton provider="facebook" />
-                            ) : (
-                                <MetaConnectButton
-                                    provider="facebook"
-                                    appId={activeAppId}
-                                    redirectUri={computedRedirectUri}
-                                />
-                            )}
                         </div>
-                    </div>
+                        {isFacebookConnected ? (
+                            <MetaDisconnectButton provider="facebook" />
+                        ) : (
+                            <MetaConnectButton
+                                provider="facebook"
+                                appId={activeAppId}
+                                redirectUri={computedRedirectUri}
+                            />
+                        )}
+                    </CardFooter>
+                </Card>
 
-                    {!isFacebookConnected && activeAppId && (
-                        <div className="mt-4 space-y-3">
-                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-md flex gap-3 items-start">
-                                <div className="mt-0.5">
-                                    <Facebook className="h-4 w-4 text-blue-600" />
-                                </div>
-                                <div className="text-xs text-blue-800">
-                                    <p className="font-semibold mb-1">¿Error "Función no disponible"?</p>
-                                    <p>
-                                        Esto ocurre cuando tu App de Facebook está en <strong>Modo Desarrollo</strong>.
-                                        Ve al <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-950">Panel de Desarrolladores</a>, selecciona tu App y cambia el modo a <strong>En vivo</strong> (Live).
-                                    </p>
-                                </div>
+                {/* WhatsApp Business Card */}
+                <Card className="group border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#25D366] to-emerald-400"></div>
+                    <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                            <div className="p-2.5 bg-green-50 rounded-xl">
+                                <MessageSquare className="w-8 h-8 text-[#25D366]" />
                             </div>
-
-                            <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
-                                <p className="text-xs font-medium text-gray-500 mb-1">Redirect URI (Copiar a Facebook):</p>
-                                <code className="block w-full p-2 bg-white border border-gray-200 rounded text-xs font-mono text-gray-700 break-all">
-                                    {computedRedirectUri || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/integrations/facebook/callback`}
-                                </code>
-                                <p className="text-[10px] text-gray-400 mt-1">
-                                    Asegúrate de cambiar <code>localhost</code> por tu dominio real en producción.
-                                </p>
+                            <StatusBadge status={isWhatsappConfigured ? 'connected' : 'disconnected'} pulse={isWhatsappConfigured} />
+                        </div>
+                        <CardTitle className="mt-4 text-lg font-bold text-gray-900">WhatsApp Business</CardTitle>
+                        <CardDescription className="text-sm">
+                            Cloud API integration for high-volume messaging and automation.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-3">
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <span>Send automated templates</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <span>Receive realtime webhooks</span>
                             </div>
                         </div>
-                    )}
-                </CardContent>
-            </Card>
 
-            {/* Coming Soon - WhatsApp */}
-            <Card className="opacity-60 bg-gray-50 border-dashed">
-                <CardHeader>
-                    <CardTitle className="text-base font-semibold flex items-center gap-2 text-gray-500">
-                        <MessageSquare className="h-5 w-5" />
-                        WhatsApp Business API
-                    </CardTitle>
-                    <CardDescription>Direct integration with WhatsApp Cloud API (Coming Soon).</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex justify-end">
-                        <IntegrationConfigDialog provider="whatsapp" title="WhatsApp" />
-                    </div>
-                </CardContent>
-            </Card>
+                        <div className="mt-4 p-3 bg-gray-50 border border-gray-100 rounded-lg">
+                            <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                <span>Monthly Usage</span>
+                                <span className="font-medium text-gray-900">0 / 1000</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                <div className="bg-emerald-500 h-1.5 rounded-full w-[0%]"></div>
+                            </div>
+                        </div>
+                    </CardContent>
+                    <CardFooter className="pt-3 border-t bg-gray-50/50 flex justify-end items-center gap-2">
+                        <a
+                            href="https://developers.facebook.com/apps"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-gray-500 hover:text-gray-900 flex items-center gap-1 mr-auto transition-colors"
+                        >
+                            Console <ExternalLink className="w-3 h-3" />
+                        </a>
+                        <IntegrationConfigDialog provider="whatsapp" title="WhatsApp Business" />
+                    </CardFooter>
+                </Card>
+            </div>
         </div>
     );
 }
