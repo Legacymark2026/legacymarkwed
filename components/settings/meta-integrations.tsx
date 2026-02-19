@@ -45,7 +45,10 @@ export async function MetaIntegrations() {
                                 <MetaDisconnectButton provider="facebook" />
                             ) : (
                                 isFacebookConfigured ? (
-                                    <MetaConnectButton provider="facebook" />
+                                    <MetaConnectButton
+                                        provider="facebook"
+                                        appId={(await import("@/actions/integration-config").then(m => m.getIntegrationConfig('facebook')))?.appId}
+                                    />
                                 ) : (
                                     <MetaConnectButton provider="facebook" />
                                 )
