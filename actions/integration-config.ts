@@ -42,34 +42,52 @@ export async function getIntegrationConfig(provider: IntegrationProvider): Promi
 }
 
 export async function updateIntegrationConfig(provider: IntegrationProvider, data: IntegrationConfigData) {
-    const session = await auth();
-    if (!session?.user?.email) throw new Error("Unauthorized");
-
-    const companyUser = await prisma.companyUser.findFirst({
-        where: { userId: session.user.id },
-        select: { companyId: true }
-    });
-
-    if (!companyUser) throw new Error("No company found");
-
-    await prisma.integrationConfig.upsert({
-        where: {
-            companyId_provider: {
-                companyId: companyUser.companyId,
-                provider
-            }
-        },
-        update: {
-            config: data as any,
-        },
-        create: {
-            companyId: companyUser.companyId,
-            provider,
-            config: data as any,
-            isEnabled: true
+    console.log(`[IntegrationConfig] Updating config for ${provider}...`);
+    try {
+        const session = await auth();
+        if (!session?.user?.email || !session?.user?.id) {
+            console.error("[IntegrationConfig] No session or user email/id found.");
+            throw new Error("Unauthorized");
         }
-    });
 
-    revalidatePath('/dashboard/settings/integrations');
-    return { success: true };
+        console.log(`[IntegrationConfig] User ID: ${session.user.id}`);
+
+        const companyUser = await prisma.companyUser.findFirst({
+            where: { userId: session.user.id },
+            select: { companyId: true }
+        });
+
+        if (!companyUser) {
+            console.error(`[IntegrationConfig] No company found for user ${session.user.id}`);
+            throw new Error("No company found for this user");
+        }
+
+        console.log(`[IntegrationConfig] Found Company ID: ${companyUser.companyId}`);
+
+        const result = await prisma.integrationConfig.upsert({
+            where: {
+                companyId_provider: {
+                    companyId: companyUser.companyId,
+                    provider
+                }
+            },
+            update: {
+                config: data as any,
+                isEnabled: true
+            },
+            create: {
+                companyId: companyUser.companyId,
+                provider,
+                config: data as any,
+                isEnabled: true
+            }
+        });
+
+        console.log(`[IntegrationConfig] Saved successfully. ID: ${result.id}`);
+        revalidatePath('/dashboard/settings/integrations');
+        return { success: true };
+    } catch (error: any) {
+        console.error("[IntegrationConfig] Error updating config:", error);
+        throw new Error(error.message || "Failed to update configuration");
+    }
 }
