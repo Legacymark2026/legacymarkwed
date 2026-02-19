@@ -1,3 +1,5 @@
+'use client';
+
 // ... imports provided in previous view_file ... 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
