@@ -58,8 +58,80 @@ export async function updateIntegrationConfig(provider: IntegrationProvider, dat
         });
 
         if (!companyUser) {
-            console.error(`[IntegrationConfig] No company found for user ${session.user.id}`);
-            throw new Error("No company found for this user");
+            console.warn(`[IntegrationConfig] No companyUser link found for user ${session.user.id}. Attempting to find/create company...`);
+
+            // Fallback 1: Check if any company exists and link to it (Single Tenant Mode)
+            const firstCompany = await prisma.company.findFirst();
+
+            if (firstCompany) {
+                console.log(`[IntegrationConfig] Linking user to existing company: ${firstCompany.id}`);
+                await prisma.companyUser.create({
+                    data: {
+                        userId: session.user.id,
+                        companyId: firstCompany.id,
+                        role: 'OWNER' // Assume owner since they are configuring integrations
+                    }
+                });
+                // Continue with this company
+                const result = await prisma.integrationConfig.upsert({
+                    where: {
+                        companyId_provider: {
+                            companyId: firstCompany.id,
+                            provider
+                        }
+                    },
+                    update: {
+                        config: data as any,
+                        isEnabled: true
+                    },
+                    create: {
+                        companyId: firstCompany.id,
+                        provider,
+                        config: data as any,
+                        isEnabled: true
+                    }
+                });
+                console.log(`[IntegrationConfig] Saved successfully (with new link). ID: ${result.id}`);
+                revalidatePath('/dashboard/settings/integrations');
+                return { success: true };
+            } else {
+                // Fallback 2: Create a default Company
+                console.log(`[IntegrationConfig] No company found at all. Creating default company.`);
+                const newCompany = await prisma.company.create({
+                    data: {
+                        name: 'My Company',
+                        slug: 'my-company-' + Math.random().toString(36).substring(7),
+                        CompanyUser: {
+                            create: {
+                                userId: session.user.id,
+                                role: 'OWNER'
+                            }
+                        }
+                    }
+                });
+
+                const result = await prisma.integrationConfig.upsert({
+                    where: {
+                        companyId_provider: {
+                            companyId: newCompany.id,
+                            provider
+                        }
+                    },
+                    update: {
+                        config: data as any,
+                        isEnabled: true
+                    },
+                    create: {
+                        companyId: newCompany.id,
+                        provider,
+                        config: data as any,
+                        isEnabled: true
+                    }
+                });
+                console.log(`[IntegrationConfig] Saved successfully (new company created). ID: ${result.id}`);
+                revalidatePath('/dashboard/settings/integrations');
+                return { success: true };
+            }
         }
 
         console.log(`[IntegrationConfig] Found Company ID: ${companyUser.companyId}`);
