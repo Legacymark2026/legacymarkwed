@@ -9,6 +9,7 @@ import { MetaDisconnectButton } from "./meta-disconnect-button";
 import { IntegrationConfigDialog } from "./integration-config-dialog";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Separator } from "@/components/ui/separator";
+import { getIntegrationConfig } from "@/actions/integration-config";
 
 export async function MetaIntegrations() {
     const integrations = await getConnectedIntegrations();
@@ -16,7 +17,6 @@ export async function MetaIntegrations() {
     const isFacebookConnected = fb?.connected;
 
     // Fetch DB Config specifically for Facebook to get the App ID
-    const { getIntegrationConfig } = await import("@/actions/integration-config");
     const fbConfig = await getIntegrationConfig('facebook');
     const waConfig = await getIntegrationConfig('whatsapp');
 

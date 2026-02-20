@@ -49,10 +49,6 @@ export default async function SettingsPage({
                     <MetaIntegrations />
                     <GoogleIntegrations />
                     <HotjarIntegrations />
-
-                    <div className="border-t border-gray-100 pt-6">
-                        <IntegrationsForm initialData={settings} />
-                    </div>
                 </TabsContent>
             </Tabs>
         </div>

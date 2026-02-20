@@ -26,7 +26,8 @@ import {
     Info,
     Smartphone,
     Globe,
-    Shield
+    Shield,
+    Activity
 } from "lucide-react";
 import { getIntegrationConfig, updateIntegrationConfig, IntegrationConfigData } from "@/actions/integration-config";
 import { toast } from "sonner";

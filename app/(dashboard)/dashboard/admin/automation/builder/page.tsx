@@ -20,9 +20,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 
-import Sidebar from '@/components/automation/Sidebar';
-import { nodeTypes } from '@/components/automation/CustomNodes';
-import NodeConfigPanel from '@/components/automation/NodeConfigPanel';
+import Sidebar from '../../../../../../components/automation/Sidebar';
+import { nodeTypes } from '../../../../../../components/automation/CustomNodes';
+import NodeConfigPanel from '../../../../../../components/automation/NodeConfigPanel';
 import { saveUserWorkflow, getLatestWorkflow, getWorkflowById } from '@/actions/automation';
 
 const initialNodes = [
