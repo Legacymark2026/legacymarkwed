@@ -3,7 +3,7 @@ import { getConnectedIntegrations } from "@/actions/integrations";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Facebook, MessageSquare, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import { Facebook, MessageSquare, ExternalLink, CheckCircle2, AlertCircle, Activity, Hash } from "lucide-react";
 import { MetaConnectButton } from "./meta-connect-button";
 import { MetaDisconnectButton } from "./meta-disconnect-button";
 import { IntegrationConfigDialog } from "./integration-config-dialog";
@@ -168,7 +168,58 @@ export async function MetaIntegrations() {
                         <IntegrationConfigDialog provider="whatsapp" title="WhatsApp Business" />
                     </CardFooter>
                 </Card>
+
+
+                {/* Facebook Pixel Card */}
+                <Card className="group border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 overflow-hidden relative col-span-1 md:col-span-2">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+                    <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                            <div className="p-2.5 bg-indigo-50 rounded-xl">
+                                <Activity className="w-8 h-8 text-indigo-600" />
+                            </div>
+                            <StatusBadge status={fbConfig?.pixelId ? 'connected' : 'disconnected'} pulse={!!fbConfig?.pixelId} />
+                        </div>
+                        <CardTitle className="mt-4 text-lg font-bold text-gray-900">Meta Pixel (Facebook Pixel)</CardTitle>
+                        <CardDescription className="text-sm">
+                            Track website visitor actions and measure ad performance.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-3 grid md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <span>Track page views & events</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                <span>Audience retargeting</span>
+                            </div>
+                        </div>
+
+                        {fbConfig?.pixelId && (
+                            <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-lg flex flex-col justify-center">
+                                <div className="flex gap-2 items-center text-xs text-indigo-800">
+                                    <Hash className="w-3.5 h-3.5" />
+                                    Pixel ID: <span className="font-mono font-semibold">{fbConfig.pixelId}</span>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                    <CardFooter className="pt-3 border-t bg-gray-50/50 flex justify-end items-center gap-2">
+                        <a
+                            href="https://events_manager2.facebook.com/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-gray-500 hover:text-gray-900 flex items-center gap-1 mr-auto transition-colors"
+                        >
+                            Events Manager <ExternalLink className="w-3 h-3" />
+                        </a>
+                        <IntegrationConfigDialog provider="facebook-pixel" title="Meta Pixel" />
+                    </CardFooter>
+                </Card>
             </div>
+
         </div>
     );
 }

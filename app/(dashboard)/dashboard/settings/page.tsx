@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrackPageEvent } from "@/modules/analytics/components/track-page-event";
 import { GoogleIntegrations } from "@/components/settings/google-integrations";
 import { MetaIntegrations } from "@/components/settings/meta-integrations";
+import { HotjarIntegrations } from "@/components/settings/hotjar-integrations";
 
 // Force dynamic rendering to support OAuth callbacks
 export const dynamic = 'force-dynamic';
@@ -47,6 +48,7 @@ export default async function SettingsPage({
                 <TabsContent value="integrations" className="space-y-8">
                     <MetaIntegrations />
                     <GoogleIntegrations />
+                    <HotjarIntegrations />
 
                     <div className="border-t border-gray-100 pt-6">
                         <IntegrationsForm initialData={settings} />

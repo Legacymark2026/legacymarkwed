@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IntegrationConfigDialogProps {
-    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics';
+    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar';
     title: string;
 }
 
@@ -55,13 +55,15 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
 
     // Brand Colors & Gradients
     const isWhatsapp = provider === 'whatsapp';
-    const isGoogle = provider === 'google-analytics';
+    const isGoogle = provider === 'google-analytics' || provider === 'google-tag-manager';
+    const isMeta = provider === 'facebook' || provider === 'instagram' || provider === 'facebook-pixel';
+    const isHotjar = provider === 'hotjar';
 
-    let brandColor = 'text-blue-600';
-    let brandBg = 'bg-blue-50';
-    let brandBorder = 'border-blue-100';
-    let brandRing = 'focus-visible:ring-blue-500';
-    let brandGradient = 'bg-gradient-to-r from-blue-50 via-indigo-50 to-white';
+    let brandColor = 'text-gray-600';
+    let brandBg = 'bg-gray-50';
+    let brandBorder = 'border-gray-100';
+    let brandRing = 'focus-visible:ring-gray-500';
+    let brandGradient = 'bg-gradient-to-r from-gray-50 via-gray-100 to-white';
 
     if (isWhatsapp) {
         brandColor = 'text-emerald-600';
@@ -70,11 +72,25 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
         brandRing = 'focus-visible:ring-emerald-500';
         brandGradient = 'bg-gradient-to-r from-emerald-50 via-green-50 to-white';
     } else if (isGoogle) {
-        brandColor = 'text-orange-600';
-        brandBg = 'bg-orange-50';
-        brandBorder = 'border-orange-100';
-        brandRing = 'focus-visible:ring-orange-500';
-        brandGradient = 'bg-gradient-to-r from-orange-50 via-amber-50 to-white';
+        brandColor = provider === 'google-tag-manager' ? 'text-blue-600' : 'text-orange-600';
+        brandBg = provider === 'google-tag-manager' ? 'bg-blue-50' : 'bg-orange-50';
+        brandBorder = provider === 'google-tag-manager' ? 'border-blue-100' : 'border-orange-100';
+        brandRing = provider === 'google-tag-manager' ? 'focus-visible:ring-blue-500' : 'focus-visible:ring-orange-500';
+        brandGradient = provider === 'google-tag-manager'
+            ? 'bg-gradient-to-r from-blue-50 via-indigo-50 to-white'
+            : 'bg-gradient-to-r from-orange-50 via-amber-50 to-white';
+    } else if (isMeta) {
+        brandColor = 'text-blue-600';
+        brandBg = 'bg-blue-50';
+        brandBorder = 'border-blue-100';
+        brandRing = 'focus-visible:ring-blue-500';
+        brandGradient = 'bg-gradient-to-r from-blue-50 via-indigo-50 to-white';
+    } else if (isHotjar) {
+        brandColor = 'text-rose-600';
+        brandBg = 'bg-rose-50';
+        brandBorder = 'border-rose-100';
+        brandRing = 'focus-visible:ring-rose-500';
+        brandGradient = 'bg-gradient-to-r from-rose-50 via-red-50 to-white';
     }
 
     useEffect(() => {
@@ -134,7 +150,8 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                             <div className={cn("p-2 rounded-xl bg-white shadow-sm ring-1 ring-inset", brandBorder)}>
                                 {isWhatsapp ? <Smartphone className={cn("h-6 w-6", brandColor)} /> :
                                     isGoogle ? <Globe className={cn("h-6 w-6", brandColor)} /> :
-                                        <Globe className={cn("h-6 w-6", brandColor)} />}
+                                        isHotjar ? <Activity className={cn("h-6 w-6", brandColor)} /> :
+                                            <Globe className={cn("h-6 w-6", brandColor)} />}
                             </div>
                             Configure {title}
                         </DialogTitle>
@@ -164,7 +181,7 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                     </Badge>
                                 </div>
 
-                                {isGoogle ? (
+                                {provider === 'google-analytics' ? (
                                     <>
                                         <div className="grid gap-2">
                                             <Label htmlFor="propertyId" className="text-xs font-semibold text-gray-700">
@@ -224,6 +241,54 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                             </div>
                                         </div>
                                     </>
+                                ) : provider === 'google-tag-manager' ? (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="containerId" className="text-xs font-semibold text-gray-700">
+                                            GTM Container ID
+                                        </Label>
+                                        <div className="relative">
+                                            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                            <Input
+                                                id="containerId"
+                                                value={formData.containerId || ''}
+                                                onChange={e => handleChange('containerId', e.target.value)}
+                                                className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                placeholder="e.g., GTM-XXXXXXX"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : provider === 'facebook-pixel' ? (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="pixelId" className="text-xs font-semibold text-gray-700">
+                                            Pixel ID
+                                        </Label>
+                                        <div className="relative">
+                                            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                            <Input
+                                                id="pixelId"
+                                                value={formData.pixelId || ''}
+                                                onChange={e => handleChange('pixelId', e.target.value)}
+                                                className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                placeholder="e.g., 123456789012345"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : provider === 'hotjar' ? (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="siteId" className="text-xs font-semibold text-gray-700">
+                                            Site ID
+                                        </Label>
+                                        <div className="relative">
+                                            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                            <Input
+                                                id="siteId"
+                                                value={formData.siteId || ''}
+                                                onChange={e => handleChange('siteId', e.target.value)}
+                                                className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                placeholder="e.g., 1234567"
+                                            />
+                                        </div>
+                                    </div>
                                 ) : isWhatsapp ? (
                                     <>
                                         <div className="grid gap-2">
@@ -323,8 +388,8 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
 
                             <Separator className="bg-gray-100" />
 
-                            {/* Security Section - Only for Meta */}
-                            {!isGoogle && (
+                            {/* Security Section - Only for Meta Apps (FB, Insta) */}
+                            {(provider === 'facebook' || provider === 'instagram') && (
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -408,8 +473,11 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                     <Button
                         onClick={handleSave}
                         disabled={loading || saving}
-                        className={cn("px-6 min-w-[140px] shadow-lg hover:shadow-xl transition-all font-semibold",
-                            provider === 'whatsapp' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        className={cn("px-6 min-w-[140px] shadow-lg hover:shadow-xl transition-all font-semibold text-white",
+                            isWhatsapp ? 'bg-emerald-600 hover:bg-emerald-700' :
+                                isGoogle ? (provider === 'google-tag-manager' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-orange-600 hover:bg-orange-700') :
+                                    isHotjar ? 'bg-rose-600 hover:bg-rose-700' :
+                                        'bg-blue-600 hover:bg-blue-700'
                         )}
                     >
                         {saving ? (

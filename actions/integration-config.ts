@@ -4,20 +4,26 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics';
+export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar';
 
 export interface IntegrationConfigData {
+    // Meta Config
     appId?: string;
     appSecret?: string;
     verifyToken?: string;
     accessToken?: string; // Long-lived page token
     phoneNumberId?: string; // WhatsApp
     wabaId?: string; // WhatsApp Business Account ID
+    pixelId?: string; // Facebook Pixel
 
-    // Google Analytics 4 (Service Account)
-    propertyId?: string;
-    clientEmail?: string;
-    privateKey?: string;
+    // Google Config
+    propertyId?: string; // GA4
+    clientEmail?: string; // GA4
+    privateKey?: string; // GA4
+    containerId?: string; // GTM
+
+    // Hotjar Config
+    siteId?: string;
 }
 
 export async function getIntegrationConfig(provider: IntegrationProvider): Promise<IntegrationConfigData | null> {
