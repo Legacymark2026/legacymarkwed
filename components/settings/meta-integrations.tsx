@@ -19,6 +19,7 @@ export async function MetaIntegrations() {
     // Fetch DB Config specifically for Facebook to get the App ID
     const fbConfig = await getIntegrationConfig('facebook');
     const waConfig = await getIntegrationConfig('whatsapp');
+    const pixelConfig = await getIntegrationConfig('facebook-pixel');
 
     // Check if WhatsApp is configured (has Phone ID and Access Token)
     const isWhatsappConfigured = !!waConfig?.phoneNumberId && !!waConfig?.accessToken;
@@ -178,7 +179,7 @@ export async function MetaIntegrations() {
                             <div className="p-2.5 bg-indigo-50 rounded-xl">
                                 <Activity className="w-8 h-8 text-indigo-600" />
                             </div>
-                            <StatusBadge status={fbConfig?.pixelId ? 'connected' : 'disconnected'} pulse={!!fbConfig?.pixelId} />
+                            <StatusBadge status={pixelConfig?.pixelId ? 'connected' : 'disconnected'} pulse={!!pixelConfig?.pixelId} />
                         </div>
                         <CardTitle className="mt-4 text-lg font-bold text-gray-900">Meta Pixel (Facebook Pixel)</CardTitle>
                         <CardDescription className="text-sm">
@@ -197,11 +198,11 @@ export async function MetaIntegrations() {
                             </div>
                         </div>
 
-                        {fbConfig?.pixelId && (
+                        {pixelConfig?.pixelId && (
                             <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-lg flex flex-col justify-center">
                                 <div className="flex gap-2 items-center text-xs text-indigo-800">
                                     <Hash className="w-3.5 h-3.5" />
-                                    Pixel ID: <span className="font-mono font-semibold">{fbConfig.pixelId}</span>
+                                    Pixel ID: <span className="font-mono font-semibold">{pixelConfig.pixelId}</span>
                                 </div>
                             </div>
                         )}

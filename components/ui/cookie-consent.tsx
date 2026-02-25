@@ -11,10 +11,10 @@ export function CookieConsent() {
 
     useEffect(() => {
         const consent = localStorage.getItem("cookie_consent");
-        // FOR DEBUGGING: Auto-accept if missing to rule out consent blocking
         if (!consent) {
-            console.log("[CookieConsent] No consent found. Defaulting to 'accepted' for debugging.");
+            // Auto-accept on first visit — dispara el evento para que el AnalyticsProvider active el tracking
             localStorage.setItem("cookie_consent", "accepted");
+            window.dispatchEvent(new Event("cookie_consent_updated"));
             setIsVisible(true);
         } else {
             if (consent !== 'accepted') {
@@ -25,11 +25,13 @@ export function CookieConsent() {
 
     const handleAccept = () => {
         localStorage.setItem("cookie_consent", "accepted");
+        window.dispatchEvent(new Event("cookie_consent_updated"));
         setIsVisible(false);
     };
 
     const handleDecline = () => {
         localStorage.setItem("cookie_consent", "declined");
+        window.dispatchEvent(new Event("cookie_consent_updated"));
         setIsVisible(false);
     };
 

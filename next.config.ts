@@ -1,8 +1,19 @@
 import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
+  async redirects() {
+    return [
+      // Canonical redirect: www → non-www (matches NEXTAUTH_URL in production)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.legacymarksas.com' }],
+        destination: 'https://legacymarksas.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

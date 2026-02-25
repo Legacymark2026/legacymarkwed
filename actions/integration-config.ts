@@ -17,7 +17,8 @@ export interface IntegrationConfigData {
     pixelId?: string; // Facebook Pixel
 
     // Google Config
-    propertyId?: string; // GA4
+    measurementId?: string; // GA4 Measurement ID (G-XXXXXXXX) — used by gtag.js in browser
+    propertyId?: string; // GA4 Property ID (numeric) — used by server-side Reporting API
     clientEmail?: string; // GA4
     privateKey?: string; // GA4
     containerId?: string; // GTM

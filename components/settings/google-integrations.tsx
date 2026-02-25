@@ -10,11 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { getIntegrationConfig } from "@/actions/integration-config";
 
 export async function GoogleIntegrations() {
-    // Fetch DB Config for Google Analytics
+    // Fetch DB Config for Google Analytics and GTM separately
     const gaConfig = await getIntegrationConfig('google-analytics');
+    const gtmConfig = await getIntegrationConfig('google-tag-manager');
 
-    // Check if GA4 is configured
-    const isGaConfigured = !!gaConfig?.propertyId && !!gaConfig?.clientEmail;
+    // GA4 is configured when it has a Measurement ID (G-XXXXXXXX) for browser tracking
+    const isGaConfigured = !!gaConfig?.measurementId;
+    // GTM is configured when it has a Container ID
+    const isGtmConfigured = !!gtmConfig?.containerId;
 
     return (
         <div className="space-y-6">
@@ -60,7 +63,7 @@ export async function GoogleIntegrations() {
                             <div className="mt-4 p-3 bg-orange-50/50 border border-orange-100 rounded-lg">
                                 <div className="flex gap-2 items-center text-xs text-orange-800">
                                     <Globe className="w-3.5 h-3.5" />
-                                    Property ID: <span className="font-mono font-semibold">{gaConfig?.propertyId}</span>
+                                    Measurement ID: <span className="font-mono font-semibold">{gaConfig?.measurementId}</span>
                                 </div>
                             </div>
                         )}
@@ -87,7 +90,7 @@ export async function GoogleIntegrations() {
                             <div className="p-2.5 bg-blue-50 rounded-xl">
                                 <Activity className="w-8 h-8 text-blue-600" />
                             </div>
-                            <StatusBadge status={!!gaConfig?.containerId ? 'connected' : 'disconnected'} pulse={!!gaConfig?.containerId} />
+                            <StatusBadge status={isGtmConfigured ? 'connected' : 'disconnected'} pulse={isGtmConfigured} />
                         </div>
                         <CardTitle className="mt-4 text-lg font-bold text-gray-900">Google Tag Manager</CardTitle>
                         <CardDescription className="text-sm">
@@ -106,11 +109,11 @@ export async function GoogleIntegrations() {
                             </div>
                         </div>
 
-                        {!!gaConfig?.containerId && (
+                        {isGtmConfigured && (
                             <div className="mt-4 p-3 bg-blue-50/50 border border-blue-100 rounded-lg">
                                 <div className="flex gap-2 items-center text-xs text-blue-800">
                                     <Hash className="w-3.5 h-3.5" />
-                                    Container ID: <span className="font-mono font-semibold">{gaConfig.containerId}</span>
+                                    Container ID: <span className="font-mono font-semibold">{gtmConfig?.containerId}</span>
                                 </div>
                             </div>
                         )}

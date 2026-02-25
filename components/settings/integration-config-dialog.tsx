@@ -185,8 +185,27 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                 {provider === 'google-analytics' ? (
                                     <>
                                         <div className="grid gap-2">
+                                            <Label htmlFor="measurementId" className="text-xs font-semibold text-gray-700">
+                                                Measurement ID <span className="text-orange-500 font-bold">(requerido)</span>
+                                            </Label>
+                                            <div className="relative">
+                                                <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                <Input
+                                                    id="measurementId"
+                                                    value={formData.measurementId || ''}
+                                                    onChange={e => handleChange('measurementId', e.target.value)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white font-mono", brandRing)}
+                                                    placeholder="G-XXXXXXXXXX"
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 flex items-center gap-1">
+                                                <Info className="h-3 w-3" />
+                                                GA4 → Admin → Flujos de datos → tu flujo web → Measurement ID
+                                            </p>
+                                        </div>
+                                        <div className="grid gap-2">
                                             <Label htmlFor="propertyId" className="text-xs font-semibold text-gray-700">
-                                                GA4 Property ID
+                                                Property ID <span className="text-gray-400">(opcional, para reportería server-side)</span>
                                             </Label>
                                             <div className="relative">
                                                 <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />

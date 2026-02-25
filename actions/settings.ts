@@ -219,9 +219,16 @@ export async function getPublicIntegrations() {
         console.log("[Settings] Initializing Public Integrations Retrieval...");
 
         // 1. Fetch from IntegrationConfig (New standard)
-        const allConfigs = await prisma.integrationConfig.findMany({
-            where: { isEnabled: true }
-        });
+        let allConfigs: any[] = [];
+        try {
+            allConfigs = await prisma.integrationConfig.findMany({
+                where: { isEnabled: true }
+            });
+            console.log(`[Settings] Found ${allConfigs.length} enabled integration configs`);
+        } catch (dbErr) {
+            console.error("[Settings] CRITICAL: Failed to query integrationConfig table:", dbErr);
+            // Continue with empty configs — don't abort the whole function
+        }
 
         // 2. Fetch from UserProfile (Legacy/Fallback)
         const profile = await prisma.userProfile.findFirst({
@@ -239,6 +246,8 @@ export async function getPublicIntegrations() {
         let gtmId = process.env.NEXT_PUBLIC_GTM_ID || "";
         let hotjarId = process.env.NEXT_PUBLIC_HOTJAR_ID || "";
         let gaPropertyId = process.env.NEXT_PUBLIC_GA_PROPERTY_ID || "";
+        // measurementId (G-XXXXXXXX) is what gtag.js needs — different from propertyId
+        let gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
 
         // Merge Strategy: IntegrationConfig > UserProfile > Env Vars
 
@@ -266,6 +275,7 @@ export async function getPublicIntegrations() {
                 try {
                     const p = typeof profile.googleAnalytics === 'string' ? JSON.parse(profile.googleAnalytics) : profile.googleAnalytics;
                     if (p?.propertyId) gaPropertyId = p.propertyId;
+                    if (p?.measurementId) gaMeasurementId = p.measurementId;
                 } catch { }
             }
         }
@@ -276,13 +286,21 @@ export async function getPublicIntegrations() {
             if (conf.provider === 'facebook-pixel' && data?.pixelId) fbPixelId = data.pixelId;
             if (conf.provider === 'google-tag-manager' && data?.containerId) gtmId = data.containerId;
             if (conf.provider === 'hotjar' && data?.siteId) hotjarId = data.siteId;
-            if (conf.provider === 'google-analytics' && data?.propertyId) gaPropertyId = data.propertyId;
+            if (conf.provider === 'google-analytics') {
+                if (data?.propertyId) gaPropertyId = data.propertyId;
+                if (data?.measurementId) gaMeasurementId = data.measurementId;
+            }
 
             // Special Case: Facebook provider might also have Pixel ID
             if (conf.provider === 'facebook' && data?.pixelId) fbPixelId = data.pixelId;
         });
 
-        const results = { fbPixelId, gtmId, hotjarId, gaPropertyId };
+        // gaPropertyId used as fallback for gaMeasurementId if it looks like a Measurement ID
+        if (!gaMeasurementId && gaPropertyId && gaPropertyId.startsWith('G-')) {
+            gaMeasurementId = gaPropertyId;
+        }
+
+        const results = { fbPixelId, gtmId, hotjarId, gaPropertyId: gaMeasurementId };
 
         if (Object.values(results).some(v => !!v)) {
             console.log("[Settings] Public Integrations Found:", JSON.stringify(results));
@@ -296,3 +314,4 @@ export async function getPublicIntegrations() {
         return { fbPixelId: "", gtmId: "", hotjarId: "", gaPropertyId: "" };
     }
 }
+
