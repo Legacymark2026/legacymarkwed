@@ -26,34 +26,34 @@ export default async function HomePage() {
             <div className="fixed top-0 left-0 w-[800px] h-[800px] bg-teal-200/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
             <div className="fixed bottom-0 right-0 w-[800px] h-[800px] bg-sky-200/20 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-            <FuturisticHero />
+            <div data-ga-section="hero"><FuturisticHero /></div>
 
             <div className="relative z-10 space-y-0 pb-0">
-                <StrategicAlliances />
+                <div data-ga-section="alianzas"><StrategicAlliances /></div>
 
                 {/* Separator */}
                 <div className="w-full h-px bg-gray-100" />
 
-                <BentoServices />
+                <div data-ga-section="servicios"><BentoServices /></div>
 
                 <div className="w-full h-px bg-gray-100" />
 
-                <Stats />
-                <ValueProposition />
-                <CaseStudies />
-                <TestimonialSlider />
+                <div data-ga-section="estadisticas"><Stats /></div>
+                <div data-ga-section="propuesta-valor"><ValueProposition /></div>
+                <div data-ga-section="casos-de-exito"><CaseStudies /></div>
+                <div data-ga-section="testimonios"><TestimonialSlider /></div>
 
                 {/* 19. Grid Background for Tech Section - Light Mode */}
                 <div className="relative">
                     <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] -z-10" />
-                    <Methodology />
+                    <div data-ga-section="metodologia"><Methodology /></div>
                 </div>
 
-                <TeamGrid />
-                <FaqAccordion />
-                <CTA />
-                <PortfolioPreview projects={projects} />
-                <LatestPosts posts={posts} />
+                <div data-ga-section="equipo"><TeamGrid /></div>
+                <div data-ga-section="faq"><FaqAccordion /></div>
+                <div data-ga-section="cta-principal"><CTA /></div>
+                <div data-ga-section="portfolio-preview"><PortfolioPreview projects={projects} /></div>
+                <div data-ga-section="blog-preview"><LatestPosts posts={posts} /></div>
             </div>
         </main>
     );

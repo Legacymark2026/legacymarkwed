@@ -51,7 +51,7 @@ function reportWebVitals() {
             gtagEvent('web_vitals', { metric_name: 'INP', metric_value: Math.round(inp), metric_rating: inp < 200 ? 'good' : inp < 500 ? 'needs_improvement' : 'poor' });
         }
     });
-    try { interactionObserver.observe({ type: 'event', buffered: true, durationThreshold: 16 }); } catch (_) { }
+    try { interactionObserver.observe({ type: 'event', buffered: true }); } catch (_) { }
 
     // TTFB — Time to First Byte
     const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
@@ -104,7 +104,41 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
             page_path: url,
             page_title: document.title,
         });
-    }, [pathname, searchParams, consent, config.gaPropertyId]);
+
+        // ── Meta Pixel: ViewContent for key pages
+        if (config.fbPixelId && (window as any).fbq) {
+            const fbq = (window as any).fbq;
+
+            // Service/solution pages → ViewContent
+            if (pathname.startsWith('/soluciones') || pathname.startsWith('/servicios')) {
+                fbq('track', 'ViewContent', {
+                    content_name: document.title,
+                    content_category: 'Servicio',
+                    content_ids: [pathname],
+                });
+            }
+            // Portfolio pages → ViewContent
+            else if (pathname.startsWith('/portfolio')) {
+                fbq('track', 'ViewContent', {
+                    content_name: document.title,
+                    content_category: 'Portfolio',
+                    content_ids: [pathname],
+                });
+            }
+            // Blog articles → ViewContent
+            else if (pathname.startsWith('/blog/')) {
+                fbq('track', 'ViewContent', {
+                    content_name: document.title,
+                    content_category: 'Blog',
+                    content_ids: [pathname],
+                });
+            }
+            // Contact page → InitiateCheckout (high-intent signal)
+            else if (pathname === '/contacto') {
+                fbq('track', 'InitiateCheckout');
+            }
+        }
+    }, [pathname, searchParams, consent, config.gaPropertyId, config.fbPixelId]);
 
     // ── Scroll Depth: 25 / 50 / 75 / 100 % ──────────────────────────────
     useEffect(() => {
