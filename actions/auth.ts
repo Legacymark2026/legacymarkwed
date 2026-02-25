@@ -284,3 +284,80 @@ function getPasswordResetEmailHtml({ name, resetUrl }: { name: string; resetUrl:
 </html>`;
 }
 
+// ─── CHANGE PASSWORD (authenticated) ─────────────────────────────────────────
+
+const changePasswordSchema = z
+    .object({
+        currentPassword: z.string().min(1, "Ingresa tu contraseña actual"),
+        newPassword: z
+            .string()
+            .min(8, "Mínimo 8 caracteres")
+            .regex(/[A-Z]/, "Debe contener al menos una letra mayúscula")
+            .regex(/[a-z]/, "Debe contener al menos una letra minúscula")
+            .regex(/[0-9]/, "Debe contener al menos un número"),
+        confirmPassword: z.string().min(1, "Confirma tu nueva contraseña"),
+    })
+    .refine((d) => d.newPassword === d.confirmPassword, {
+        message: "Las contraseñas no coinciden",
+        path: ["confirmPassword"],
+    });
+
+/**
+ * Allows an authenticated user to change their own password.
+ * Verifies current password before updating to prevent unauthorized changes.
+ */
+export async function changePassword(
+    prevState: { success?: boolean; error?: string } | undefined,
+    formData: FormData
+): Promise<{ success?: boolean; error?: string }> {
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+
+    if (!session?.user?.email) {
+        return { error: "Sesión no válida. Por favor inicia sesión de nuevo." };
+    }
+
+    const parsed = changePasswordSchema.safeParse({
+        currentPassword: formData.get("currentPassword"),
+        newPassword: formData.get("newPassword"),
+        confirmPassword: formData.get("confirmPassword"),
+    });
+
+    if (!parsed.success) {
+        return { error: parsed.error.issues[0]?.message || "Datos inválidos." };
+    }
+
+    const { currentPassword, newPassword } = parsed.data;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            select: { id: true, passwordHash: true },
+        });
+
+        if (!user) return { error: "Usuario no encontrado." };
+
+        if (!user.passwordHash) {
+            return {
+                error: "Tu cuenta usa Google/Facebook. Usa 'Recuperar contraseña' en el login para establecer una contraseña.",
+            };
+        }
+
+        const isCurrentValid = await bcrypt.compare(currentPassword, user.passwordHash);
+        if (!isCurrentValid) return { error: "La contraseña actual es incorrecta." };
+
+        const isSame = await bcrypt.compare(newPassword, user.passwordHash);
+        if (isSame) return { error: "La nueva contraseña debe ser diferente a la actual." };
+
+        const newHash = await bcrypt.hash(newPassword, 12);
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { passwordHash: newHash },
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("[CHANGE PASSWORD] Error:", error);
+        return { error: "Error interno. Por favor intenta de nuevo." };
+    }
+}
