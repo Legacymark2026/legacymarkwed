@@ -15,14 +15,13 @@ export const metadata: Metadata = {
 export default function ContentCreationPage() {
     return (
         <main className="min-h-screen bg-white text-slate-900 relative overflow-hidden">
-            <ContentHero />
-
-            <ContentShowcase />
+            <div data-ga-section="contenido-hero"><ContentHero /></div>
+            <div data-ga-section="contenido-showcase"><ContentShowcase /></div>
             <div className="relative z-10">
-                <RoiCalculator />
-                <SocialProofSection />
-                <PricingBuilder />
-                <ProcessWorkflow />
+                <div data-ga-section="contenido-roi"><RoiCalculator /></div>
+                <div data-ga-section="contenido-testimonios"><SocialProofSection /></div>
+                <div data-ga-section="contenido-pricing"><PricingBuilder /></div>
+                <div data-ga-section="contenido-proceso"><ProcessWorkflow /></div>
             </div>
         </main>
     );
