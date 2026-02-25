@@ -12,13 +12,8 @@ export { DateRangeSelector } from './date-range-selector';
 export { DeviceChart } from './device-chart';
 export { EngagementRadar } from './engagement-radar';
 export { ExportButton } from './export-button';
-export { FacebookPixel } from './facebook-pixel';
-export { FullscreenButton } from './fullscreen-button';
-export { FunnelChartComponent as FunnelChart } from './funnel-chart';
-export { GeoMap } from './geo-map';
-export { GoalsWidget } from './goals-widget';
-export { GoogleTagManager } from './google-tag-manager';
-export { Hotjar } from './hotjar';
+// FacebookPixel, GoogleTagManager, Hotjar — disponibles via analytics-provider
+
 export { KpiAlerts } from './kpi-alerts';
 export { LiveVisitorsMap } from './live-visitors-map';
 export { AnalyticsOverview as Overview } from './overview';

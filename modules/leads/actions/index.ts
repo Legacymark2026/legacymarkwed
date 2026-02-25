@@ -56,16 +56,6 @@ export async function getLeads(filters?: LeadFilters) {
 
         const leads = await prisma.lead.findMany({
             where,
-            include: {
-                assignedTo: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                },
-            },
             take: limit,
             skip: offset,
             orderBy: { [orderBy]: order },
@@ -94,16 +84,6 @@ export async function getLeadById(id: string) {
     try {
         const lead = await prisma.lead.findUnique({
             where: { id },
-            include: {
-                assignedTo: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                    },
-                },
-            },
         });
 
         if (!lead) {
@@ -148,7 +128,6 @@ export async function createLead(data: CreateLeadInput) {
                 email: validData.email,
                 phone: validData.phone,
                 company: validData.company,
-                website: validData.website,
                 jobTitle: validData.jobTitle,
                 message: validData.message,
                 source: validData.source,
@@ -159,6 +138,7 @@ export async function createLead(data: CreateLeadInput) {
                 utmCampaign: validData.utmParams?.campaign,
                 utmTerm: validData.utmParams?.term,
                 utmContent: validData.utmParams?.content,
+                companyId: '', // Placeholder — set properly in context
             },
         });
 
@@ -267,7 +247,7 @@ export async function assignLead(leadId: string, userId: string) {
     try {
         const lead = await prisma.lead.update({
             where: { id: leadId },
-            data: { assignedToId: userId },
+            data: { assignedTo: userId },
         });
 
         revalidatePath('/dashboard/leads');

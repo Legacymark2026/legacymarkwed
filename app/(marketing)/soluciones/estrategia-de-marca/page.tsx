@@ -25,11 +25,13 @@ const SwissGrid = () => (
 );
 
 // 2. Magnetic Button (Light Mode)
-interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface MagneticButtonProps {
     children: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
 }
 
-const MagneticButton = ({ children, className = "", ...props }: MagneticButtonProps) => {
+const MagneticButton = ({ children, className = "", onClick }: MagneticButtonProps) => {
     const ref = useRef<HTMLButtonElement>(null);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -55,8 +57,8 @@ const MagneticButton = ({ children, className = "", ...props }: MagneticButtonPr
             transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
+            onClick={onClick}
             className={className}
-            {...props}
         >
             {children}
         </motion.button>

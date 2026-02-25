@@ -29,7 +29,7 @@ async function verifyInstagramSync() {
 
         for (const page of pages) {
             console.log(`\n--- Page: ${page.name} (${page.id}) ---`);
-            const pageAccessToken = await MetaService.getPageAccessToken(page.id, account.access_token);
+            const pageAccessToken = await MetaService.getPageAccessToken(page.id, account.access_token!);
 
             if (pageAccessToken) {
                 console.log("✅ Page Access Token: Retrieved");

@@ -103,7 +103,7 @@ export default async function CampaignEditorPage({ params }: { params: { id: str
                     <p className="text-muted-foreground">Sequence Editor</p>
                 </div>
                 <div className="ml-auto">
-                    <Button variant={campaign.status === 'ACTIVE' ? "default" : "secondary"}>
+                    <Button variant={campaign.status === 'ACTIVE' ? "primary" : "secondary"}>
                         {campaign.status}
                     </Button>
                 </div>

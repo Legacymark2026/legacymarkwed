@@ -38,8 +38,7 @@ async function checkMetaConnection() {
             console.log(`Account ${i + 1}:`);
             console.log(`  Provider ID: ${acc.providerAccountId}`);
             console.log(`  Has Access Token: ${!!acc.access_token}`);
-            console.log(`  Scope: ${acc.scope}`);
-            console.log(`  Created: ${acc.createdAt}\n`);
+            console.log(`  Scope: ${acc.scope}\n`);
         });
     }
 

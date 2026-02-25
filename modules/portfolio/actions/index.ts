@@ -86,11 +86,10 @@ export async function getProjectBySlug(slug: string) {
             };
         }
 
-        // Increment view count
-        await prisma.project.update({
-            where: { id: project.id },
-            data: { views: { increment: 1 } },
-        });
+        // Increment view count via ProjectView
+        await prisma.projectView.create({
+            data: { projectId: project.id, ipHash: 'server-fetch' },
+        }).catch(() => {/* ignore duplicate */ });
 
         return {
             success: true,
@@ -128,21 +127,13 @@ export async function createProject(data: CreateProjectInput) {
             data: {
                 title: validData.title,
                 slug,
-                description: validData.description,
-                excerpt: validData.excerpt,
-                content: validData.content,
+                description: validData.description || '',
+                content: validData.content || '',
                 coverImage: validData.coverImage,
-                images: validData.images,
-                category: validData.category,
-                status: validData.status || 'DRAFT',
+                status: validData.status || 'draft',
                 featured: validData.featured || false,
                 client: validData.client,
-                clientLogo: validData.clientLogo,
-                websiteUrl: validData.websiteUrl,
-                completedAt: validData.completedAt,
-                technologies: validData.technologies,
-                tags: validData.tags,
-                // Note: metrics would need to be stored as JSON if schema supports it
+                projectUrl: validData.websiteUrl,
             },
         });
 

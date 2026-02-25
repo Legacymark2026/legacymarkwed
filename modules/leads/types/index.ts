@@ -56,8 +56,8 @@ export interface Lead {
     priority?: LeadPriority;
     score?: number;
     utmParams?: UtmParams | null;
-    assignedToId?: string | null;
-    assignedTo?: LeadAssignee;
+    assignedToId?: string | null;  // kept for backward compat
+    assignedTo?: string | null;    // actual Prisma field: stored user ID
     tags?: string[];
     notes?: string;
     contactedAt?: Date | null;
@@ -107,7 +107,7 @@ export interface UpdateLeadInput {
     status?: LeadStatus;
     priority?: LeadPriority;
     score?: number;
-    assignedToId?: string;
+    assignedTo?: string;
     tags?: string[];
     notes?: string;
 }

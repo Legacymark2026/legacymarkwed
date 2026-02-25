@@ -42,7 +42,7 @@ export const createProjectSchema = z.object({
         trafficIncrease: z.number().optional(),
         conversionRate: z.number().optional(),
         revenueGrowth: z.number().optional(),
-        customMetrics: z.record(z.union([z.string(), z.number()])).optional(),
+        customMetrics: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
     }).optional(),
 });
 

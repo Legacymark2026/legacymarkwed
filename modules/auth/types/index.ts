@@ -101,14 +101,3 @@ export type OAuthProvider = 'google' | 'github' | 'facebook';
  * Password strength level
  */
 export type PasswordStrength = 'weak' | 'medium' | 'strong' | 'very-strong';
-
-/**
- * User profile update data
- */
-export interface ProfileUpdateData {
-    name?: string;
-    firstName?: string;
-    lastName?: string;
-    phone?: string;
-    image?: string;
-}

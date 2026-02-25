@@ -53,7 +53,7 @@ export async function getPosts(filters?: PostFilters) {
                         image: true,
                     },
                 },
-                category: true,
+                categories: true,
             },
             take: limit,
             skip: offset,
@@ -89,7 +89,7 @@ export async function getPostBySlug(slug: string) {
                         image: true,
                     },
                 },
-                category: true,
+                categories: true,
             },
         });
 
@@ -100,11 +100,10 @@ export async function getPostBySlug(slug: string) {
             };
         }
 
-        // Increment view count
-        await prisma.post.update({
-            where: { id: post.id },
-            data: { views: { increment: 1 } },
-        });
+        // Increment view count via PostView
+        await prisma.postView.create({
+            data: { postId: post.id, ipHash: 'server-fetch' },
+        }).catch(() => {/* ignore duplicate */ });
 
         return {
             success: true,
@@ -149,10 +148,7 @@ export async function createPost(data: CreatePostInput, authorId: string) {
                 content: validData.content,
                 coverImage: validData.coverImage,
                 published: validData.published || false,
-                featured: validData.featured || false,
-                readTime,
                 authorId,
-                categoryId: validData.categoryIds?.[0], // For simplicity, use first category
             },
         });
 
@@ -256,7 +252,7 @@ export async function togglePublishPost(id: string) {
             where: { id },
             data: {
                 published: !post.published,
-                publishedAt: !post.published ? new Date() : null,
+                status: !post.published ? 'published' : 'draft',
             },
         });
 
@@ -314,7 +310,6 @@ export async function createCategory(data: { name: string; slug?: string; descri
             data: {
                 name: validData.name,
                 slug,
-                description: validData.description,
             },
         });
 

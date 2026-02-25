@@ -13,10 +13,8 @@ export default async function InboxConversationPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
     const { conversationId } = await params;
-    const companyId = "default-company-id"; // Placeholder
-
-    // Fetch conversations list for sidebar
-    const { data: conversations } = await getConversations({ companyId });
+    // Fetch conversations list for sidebar (companyId is handled server-side via session)
+    const { data: conversations } = await getConversations({ limit: 50 });
 
     // Fetch active conversation details & messages
     // In a real app, optimize to not re-fetch list if possible (stream it), but server components make this pattern common.

@@ -33,7 +33,8 @@ export interface Project {
     content?: string | null;
     coverImage?: string | null;
     images?: string[];
-    category: ProjectCategory;
+    categoryId?: string | null;
+    category?: ProjectCategory | null;
     status: ProjectStatus;
     featured?: boolean;
     client?: string | null;

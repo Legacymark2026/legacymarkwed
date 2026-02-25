@@ -15,8 +15,8 @@ const formSchema = z.object({
     email: z.string().email("Email inválido."),
     company: z.string().optional(),
     message: z.string().min(10, "El mensaje debe tener al menos 10 caracteres."),
-    consent: z.literal(true, {
-        errorMap: () => ({ message: "Debes aceptar la política de privacidad." }),
+    consent: z.literal(true).refine((val) => val === true, {
+        message: "Debes aceptar la política de privacidad.",
     }),
 });
 

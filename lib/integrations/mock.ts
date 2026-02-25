@@ -23,4 +23,9 @@ export class MockProvider implements ChannelProvider {
     async parseWebhook(request: Request): Promise<InboundMessage | null> {
         return null;
     }
+
+    async verifySignature(request: Request): Promise<boolean> {
+        // Mock: always valid
+        return true;
+    }
 }
