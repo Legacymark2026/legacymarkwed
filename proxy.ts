@@ -19,6 +19,6 @@ export default NextAuth(authConfig).auth;
 export const config = {
     // Aplica el proxy a todas las rutas excepto archivos estáticos e imágenes
     matcher: [
-        "/((?!_next/static|_next/image|favicon.ico|logo.png|images/|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+        "/((?!_next/static|_next/image|favicon.ico|logo.png|images/|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest|txt|xml|json)$).*)",
     ],
 };
