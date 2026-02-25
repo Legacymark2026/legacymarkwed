@@ -15,11 +15,10 @@ interface Expert {
     role: string;
     imageUrl: string | null;
     isVisible: boolean;
-    // Campos adicionales del tipo completo de la página
-    bio?: string | null;
+    bio: string | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    socialLinks?: any;
-    order?: number;
+    socialLinks: any;
+    order: number;
 }
 
 interface ExpertCardProps {
