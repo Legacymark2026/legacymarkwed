@@ -65,9 +65,7 @@ const nextConfig = {
     ],
   },
 
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // typescript: ignoreBuildErrors removido — los errores TS son visibles en build (intencional)
 };
 
 export default nextConfig;

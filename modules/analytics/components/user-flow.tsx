@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowRight, Users, FileText, BarChart3, Target, DollarSign } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { FunnelStage } from '@/modules/analytics/actions/analytics';
 
 interface UserFlowProps {
@@ -8,8 +9,8 @@ interface UserFlowProps {
 }
 
 // Map common funnel stage names to icons and colors
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const stageConfig: Record<string, { icon: any, color: string }> = {
+// T-4 Fix: LucideIcon usado en lugar de `any`
+const stageConfig: Record<string, { icon: LucideIcon, color: string }> = {
     'Visitas': { icon: Users, color: 'violet' },
     'Sesiones': { icon: Users, color: 'violet' },
     'Páginas Vistas': { icon: FileText, color: 'blue' },

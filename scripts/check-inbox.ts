@@ -24,7 +24,7 @@ async function main() {
         console.log(`💬 Messages: ${conv.messages.length}`);
 
         conv.messages.forEach(msg => {
-            console.log(`   [${msg.direction}] ${msg.content.substring(0, 50)}...`);
+            console.log(`   [${msg.direction}] ${msg.content?.substring(0, 50) ?? "(sin contenido)"}...`);
         });
     }
 }

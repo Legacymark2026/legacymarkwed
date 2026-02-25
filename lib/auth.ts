@@ -7,75 +7,80 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { authConfig } from "@/auth.config";
+import type { UserRole, Permission } from "@/types/auth";
+import { logger } from "@/lib/logger";
 
 const signInSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
 });
 
+/**
+ * C-2 Fix: Email alias resuelto desde variables de entorno.
+ * Nunca hardcodear emails en el código fuente.
+ */
+function resolveAdminAlias(email: string | null | undefined): string | null {
+    const alias = process.env.ADMIN_OAUTH_EMAIL_ALIAS;
+    const canonical = process.env.ADMIN_CANONICAL_EMAIL;
+    if (alias && canonical && email === alias) return canonical;
+    return null;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
     trustHost: true,
     callbacks: {
         ...authConfig.callbacks,
-        async signIn({ user, account, profile }) {
-            console.log('[AUTH] signIn callback triggered');
-            console.log('[AUTH] Provider:', account?.provider);
-            console.log('[AUTH] User email:', user?.email);
+        async signIn({ user, account }) {
+            logger.auth("signIn callback triggered");
+            logger.auth("Provider:", account?.provider);
 
-            // For OAuth providers, save the account to database
-            if (account && account.provider !== 'credentials') {
-                console.log('[AUTH] Processing OAuth provider:', account.provider);
+            // Para providers OAuth, guardar el account en BD
+            if (account && account.provider !== "credentials") {
+                logger.auth("Processing OAuth provider:", account.provider);
 
                 try {
-                    // Check if user exists
+                    // Buscar usuario existente
                     let dbUser = await prisma.user.findUnique({
-                        where: { email: user.email! }
+                        where: { email: user.email! },
                     });
 
-                    // PROFESSIONAL FIX: Map known social email to admin account
-                    // This prevents creating a duplicate user when the social email differs from the admin email
-                    if (!dbUser && user.email === 'nestor.garcia1603@outlook.com') {
-                        console.log('[AUTH] 🔄 Mapping Facebook email to Admin account...');
-                        dbUser = await prisma.user.findUnique({
-                            where: { email: 'administrador@legacymark.com' }
-                        });
-                        if (dbUser) {
-                            console.log('[AUTH] ✅ Successfully mapped to:', dbUser.email);
+                    // C-2: Resolver alias desde env vars (no hardcodeado)
+                    if (!dbUser) {
+                        const aliasEmail = resolveAdminAlias(user.email);
+                        if (aliasEmail) {
+                            logger.auth("Resolving admin alias to canonical email...");
+                            dbUser = await prisma.user.findUnique({
+                                where: { email: aliasEmail },
+                            });
                         }
                     }
 
-                    console.log('[AUTH] Existing user found:', !!dbUser);
-
-                    // Create user if doesn't exist
+                    // Crear usuario si no existe
                     if (!dbUser) {
-                        console.log('[AUTH] Creating new user...');
+                        logger.auth("Creating new user...");
                         dbUser = await prisma.user.create({
                             data: {
                                 email: user.email!,
                                 name: user.name,
                                 image: user.image,
-                                role: 'CLIENT_USER',
-                            }
+                                role: "CLIENT_USER",
+                            },
                         });
-                        console.log('[AUTH] User created:', dbUser.id);
+                        logger.auth("User created:", dbUser.id);
                     }
 
-                    // Check if account already exists
+                    // Verificar si la cuenta OAuth ya existe
                     const existingAccount = await prisma.account.findUnique({
                         where: {
                             provider_providerAccountId: {
                                 provider: account.provider,
-                                providerAccountId: account.providerAccountId
-                            }
-                        }
+                                providerAccountId: account.providerAccountId,
+                            },
+                        },
                     });
 
-                    console.log('[AUTH] Existing account found:', !!existingAccount);
-
-                    // Create account if doesn't exist
                     if (!existingAccount) {
-                        console.log('[AUTH] Creating new account...');
                         await prisma.account.create({
                             data: {
                                 userId: dbUser.id,
@@ -88,96 +93,121 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 token_type: account.token_type,
                                 scope: account.scope,
                                 id_token: account.id_token,
-                            }
+                            },
                         });
-                        console.log('[AUTH] ✅ Account created successfully!');
+                        logger.auth("OAuth account linked successfully.");
                     } else {
-                        console.log('[AUTH] ℹ️ Account already exists, skipping creation');
+                        logger.auth("Account already linked, skipping.");
                     }
                 } catch (error) {
-                    console.error('[AUTH] ❌ Error saving OAuth account:', error);
+                    logger.error("Error saving OAuth account:", error);
                     return false;
                 }
             }
 
-            console.log('[AUTH] signIn callback completed successfully');
             return true;
         },
+
         async jwt({ token, user, account }) {
-            // Initial sign in
+            // Solo en el sign-in inicial (cuando `user` está presente)
             if (user) {
-                console.log('[AUTH] JWT Callback - Initial Sign In');
-                console.log('[AUTH] Original User ID:', user.id);
+                logger.auth("JWT Callback — Initial sign-in, resolving DB user...");
 
                 try {
-                    // 1. Priority: Check if this OAuth account is already linked to a user
+                    // 1. Prioridad: Buscar por account OAuth vinculado
                     if (account) {
                         const dbAccount = await prisma.account.findUnique({
                             where: {
                                 provider_providerAccountId: {
                                     provider: account.provider,
-                                    providerAccountId: account.providerAccountId
-                                }
+                                    providerAccountId: account.providerAccountId,
+                                },
                             },
-                            include: { user: true }
+                            include: { user: true },
                         });
 
-                        if (dbAccount && dbAccount.user) {
-                            console.log('[AUTH] JWT: Found linked account for user:', dbAccount.user.email);
+                        if (dbAccount?.user) {
+                            logger.auth("JWT: Resolved via linked OAuth account →", dbAccount.user.email);
+                            // B-2: Cargar companyId y permissions desde CompanyUser
+                            const userWithMeta = await prisma.user.findUnique({
+                                where: { id: dbAccount.user.id },
+                                select: {
+                                    id: true,
+                                    role: true,
+                                    companies: {
+                                        select: { companyId: true, permissions: true },
+                                        take: 1
+                                    }
+                                }
+                            });
                             token.id = dbAccount.user.id;
                             token.role = dbAccount.user.role;
+                            token.companyId = userWithMeta?.companies[0]?.companyId ?? null;
+                            token.permissions = ((userWithMeta?.companies[0]?.permissions ?? []) as string[]) as Permission[];
                             return token;
                         }
                     }
 
-                    // 2. Fallback: Lookup by email
-                    // Fetch the real user from DB to get the correct UUID
+                    // 2. Fallback: Buscar por email
                     let dbUser = await prisma.user.findUnique({
-                        where: { email: user.email! }
+                        where: { email: user.email! },
                     });
 
-                    // Handle Alias (same logic as signIn)
-                    if (!dbUser && user.email === 'nestor.garcia1603@outlook.com') {
-                        dbUser = await prisma.user.findUnique({
-                            where: { email: 'administrador@legacymark.com' }
-                        });
+                    // C-2: Resolver alias desde env var
+                    if (!dbUser) {
+                        const aliasEmail = resolveAdminAlias(user.email);
+                        if (aliasEmail) {
+                            dbUser = await prisma.user.findUnique({
+                                where: { email: aliasEmail },
+                            });
+                        }
                     }
 
                     if (dbUser) {
-                        console.log('[AUTH] JWT: Setting token ID to DB User ID:', dbUser.id);
+                        // B-2: Cargar companyId y permissions desde CompanyUser
+                        const userWithMeta = await prisma.user.findUnique({
+                            where: { id: dbUser.id },
+                            select: {
+                                id: true,
+                                role: true,
+                                companies: {
+                                    select: { companyId: true, permissions: true },
+                                    take: 1
+                                }
+                            }
+                        });
                         token.id = dbUser.id;
                         token.role = dbUser.role;
-                        // token.permissions = dbUser.permissions;
+                        token.companyId = userWithMeta?.companies[0]?.companyId ?? null;
+                        token.permissions = ((userWithMeta?.companies[0]?.permissions ?? []) as string[]) as Permission[];
                     } else {
-                        console.log('[AUTH] JWT: User not found in DB, using OAuth ID');
+                        logger.auth("JWT: User not found in DB, using OAuth ID as fallback.");
                         token.id = user.id;
-                        token.role = (user as any).role;
+                        token.role = (user as { role?: string }).role;
                     }
                 } catch (error) {
-                    console.error('[AUTH] JWT Error:', error);
+                    logger.error("JWT callback error:", error);
                     token.id = user.id;
                 }
             }
+
             return token;
         },
+
+        /**
+         * C-3 Fix: Session callback sin query a BD por request.
+         * B-2 Fix: companyId y permissions propagados desde JWT → sesión.
+         */
         async session({ session, token }) {
             if (token && session.user) {
                 session.user.id = token.id as string;
-                session.user.role = (token.role as any);
-
-                // CRITICAL VALIDATION: Ensure user exists in DB
-                // This handles the "Phantom User" case (Self-Healing)
-                if (token.id) {
-                    try {
-                        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
-                        if (!dbUser) {
-                            console.log('❌ Session Validation Failed: User not found in DB', token.id);
-                            // Invalid session because user was deleted
-                            return null as any;
-                        }
-                    } catch (e) {
-                        console.error("Session validation error:", e);
-                    }
+                session.user.role = token.role as UserRole;
+                // B-2: Exponer companyId y permissions en la sesión del cliente
+                if (token.companyId) {
+                    session.user.companyId = token.companyId as string;
+                }
+                if (token.permissions) {
+                    session.user.permissions = token.permissions as Permission[];
                 }
             }
             return session;
@@ -204,7 +234,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Credentials({
             credentials: {
                 email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" }
+                password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
                 const parsedCredentials = signInSchema.safeParse(credentials);
@@ -214,7 +244,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     const user = await prisma.user.findUnique({
                         where: { email },
-                        include: { companies: true }
+                        include: { companies: true },
                     });
 
                     if (!user || !user.passwordHash) return null;
@@ -227,12 +257,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             name: user.name,
                             email: user.email,
                             image: user.image,
-                            role: user.role,
-                        } as any;
+                            role: user.role as UserRole,
+                        };
                     }
                 }
 
-                console.log("Invalid credentials");
+                logger.warn("Invalid credentials attempt.");
                 return null;
             },
         }),

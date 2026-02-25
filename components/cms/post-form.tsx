@@ -6,15 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { createPost, updatePost } from "@/actions/cms";
 import { PostSchema, type PostFormData } from "@/lib/schemas";
 import { Loader2, Calendar } from "lucide-react";
-import { RichTextEditor } from "./rich-text-editor";
 import { CharacterCounter } from "./character-counter";
 import { ImageUploadPreview } from "./image-upload-preview";
 import { CategorySelector } from "./category-selector";
 import { TagInput } from "./tag-input";
 import { format } from "date-fns";
+
+// Fix rendimiento: Tiptap (~300KB) se carga de forma lazy.
+// No bloquea el primer render de la página.
+const RichTextEditor = dynamic(
+    () => import("./rich-text-editor").then((m) => m.RichTextEditor),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="border border-gray-200 rounded-md overflow-hidden animate-pulse">
+                <div className="bg-gray-50 border-b p-2 flex gap-2">
+                    {Array.from({ length: 7 }).map((_, i) => (
+                        <div key={i} className="h-8 w-8 bg-gray-200 rounded" />
+                    ))}
+                </div>
+                <div className="min-h-[300px] p-4 space-y-3">
+                    <div className="h-4 bg-gray-100 rounded w-3/4" />
+                    <div className="h-4 bg-gray-100 rounded w-full" />
+                    <div className="h-4 bg-gray-100 rounded w-5/6" />
+                </div>
+            </div>
+        ),
+    }
+);
 
 interface Category {
     id: string;

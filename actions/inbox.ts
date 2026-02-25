@@ -1,8 +1,11 @@
 'use server';
 
 import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma"; // A-2: static import (no dynamic)
+import { auth } from "@/lib/auth";    // A-2: static import (no dynamic)
 import { revalidatePath } from "next/cache";
 import { ChannelType } from "@/types/inbox";
+import { rateLimit } from "@/lib/rate-limit"; // A-5: rate limiting
 
 // --- Types ---
 export interface GetConversationsParams {
@@ -26,11 +29,10 @@ export async function getConversations({
     limit = 20
 }: Omit<GetConversationsParams, 'companyId'>) {
     try {
-        const { auth } = await import("@/lib/auth");
-        const { prisma } = await import("@/lib/prisma"); // Use singleton if available
         const session = await auth();
 
         if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
 
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
@@ -278,11 +280,12 @@ export async function simulateIncomingMessage(params: {
 
         // Auto-detect company from session if creating a simulation manually
         if (companyId === 'default-company-id' || !companyId) {
-            const { auth } = await import("@/lib/auth");
-            const { prisma } = await import("@/lib/prisma");
-
             const session = await auth();
             if (session?.user?.id) {
+                // A-5: Rate limit para simulación de mensajes entrantes (10/min)
+                const allowed = rateLimit(`simulate_msg:${session.user.id}`, 10, 60_000);
+                if (!allowed) return { success: false, error: "Rate limit: demasiadas simulaciones. Espera un momento." };
+
                 const userCompany = await prisma.companyUser.findFirst({
                     where: { userId: session.user.id },
                     select: { companyId: true }
@@ -372,13 +375,15 @@ export async function simulateIncomingMessage(params: {
 // ==================== META INBOX INTEGRATION ====================
 
 export async function syncMetaConversations() {
-    const { auth } = await import("@/lib/auth");
-    const { prisma } = await import("@/lib/prisma");
     const session = await auth();
 
     if (!session?.user?.id) {
         return { success: false, error: "Unauthorized" };
     }
+
+    // A-5: Rate limit para sincronización Meta (5 veces por minuto)
+    const allowed = rateLimit(`sync_meta:${session.user.id}`, 5, 60_000);
+    if (!allowed) return { success: false, error: "Rate limit: espera antes de sincronizar de nuevo." };
 
     // Get user's company
     const userCompany = await prisma.companyUser.findFirst({
@@ -414,8 +419,6 @@ export async function syncMetaConversations() {
 
 export async function getLeadDetails(leadId: string) {
     try {
-        const { prisma } = await import("@/lib/prisma"); // Dynamic import to avoid build loops
-
         const lead = await prisma.lead.findUnique({
             where: { id: leadId },
             include: {

@@ -216,55 +216,83 @@ export async function updateIntegrations(data: { gaPropertyId?: string; gaClient
 
 export async function getPublicIntegrations() {
     try {
-        // Fetch the first user profile (assumes single tenant / admin is first)
+        console.log("[Settings] Initializing Public Integrations Retrieval...");
+
+        // 1. Fetch from IntegrationConfig (New standard)
+        const allConfigs = await prisma.integrationConfig.findMany({
+            where: { isEnabled: true }
+        });
+
+        // 2. Fetch from UserProfile (Legacy/Fallback)
         const profile = await prisma.userProfile.findFirst({
             where: {
                 OR: [
                     { facebookPixel: { not: Prisma.DbNull } },
                     { googleTagManager: { not: Prisma.DbNull } },
-                    { hotjar: { not: Prisma.DbNull } }
+                    { hotjar: { not: Prisma.DbNull } },
+                    { googleAnalytics: { not: Prisma.DbNull } }
                 ]
             }
         });
 
-        if (profile) {
-            let fbPixelId = "";
-            let gtmId = "";
-            let hotjarId = "";
+        let fbPixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || "";
+        let gtmId = process.env.NEXT_PUBLIC_GTM_ID || "";
+        let hotjarId = process.env.NEXT_PUBLIC_HOTJAR_ID || "";
+        let gaPropertyId = process.env.NEXT_PUBLIC_GA_PROPERTY_ID || "";
 
+        // Merge Strategy: IntegrationConfig > UserProfile > Env Vars
+
+        // Process UserProfile (Legacy)
+        if (profile) {
             if (profile.facebookPixel) {
                 try {
-                    // @ts-ignore
-                    const fb = profile.facebookPixel;
-                    const p = typeof fb === 'string' ? JSON.parse(fb) : fb;
-                    fbPixelId = p?.pixelId || "";
+                    const p = typeof profile.facebookPixel === 'string' ? JSON.parse(profile.facebookPixel) : profile.facebookPixel;
+                    if (p?.pixelId) fbPixelId = p.pixelId;
                 } catch { }
             }
-
             if (profile.googleTagManager) {
                 try {
-                    // @ts-ignore
-                    const gtm = profile.googleTagManager;
-                    const p = typeof gtm === 'string' ? JSON.parse(gtm) : gtm;
-                    gtmId = p?.containerId || "";
+                    const p = typeof profile.googleTagManager === 'string' ? JSON.parse(profile.googleTagManager) : profile.googleTagManager;
+                    if (p?.containerId) gtmId = p.containerId;
                 } catch { }
             }
-
             if (profile.hotjar) {
                 try {
-                    // @ts-ignore
-                    const hj = profile.hotjar;
-                    const p = typeof hj === 'string' ? JSON.parse(hj) : hj;
-                    hotjarId = p?.siteId || "";
+                    const p = typeof profile.hotjar === 'string' ? JSON.parse(profile.hotjar) : profile.hotjar;
+                    if (p?.siteId) hotjarId = p.siteId;
                 } catch { }
             }
-
-            return { fbPixelId, gtmId, hotjarId };
+            if (profile.googleAnalytics) {
+                try {
+                    const p = typeof profile.googleAnalytics === 'string' ? JSON.parse(profile.googleAnalytics) : profile.googleAnalytics;
+                    if (p?.propertyId) gaPropertyId = p.propertyId;
+                } catch { }
+            }
         }
-        return { fbPixelId: "", gtmId: "", hotjarId: "" };
+
+        // Process IntegrationConfig (Priority)
+        allConfigs.forEach(conf => {
+            const data = conf.config as any;
+            if (conf.provider === 'facebook-pixel' && data?.pixelId) fbPixelId = data.pixelId;
+            if (conf.provider === 'google-tag-manager' && data?.containerId) gtmId = data.containerId;
+            if (conf.provider === 'hotjar' && data?.siteId) hotjarId = data.siteId;
+            if (conf.provider === 'google-analytics' && data?.propertyId) gaPropertyId = data.propertyId;
+
+            // Special Case: Facebook provider might also have Pixel ID
+            if (conf.provider === 'facebook' && data?.pixelId) fbPixelId = data.pixelId;
+        });
+
+        const results = { fbPixelId, gtmId, hotjarId, gaPropertyId };
+
+        if (Object.values(results).some(v => !!v)) {
+            console.log("[Settings] Public Integrations Found:", JSON.stringify(results));
+        } else {
+            console.log("[Settings] No active public integrations found.");
+        }
+
+        return results;
     } catch (error) {
-        console.error(error);
-        // Fallback
-        return { fbPixelId: "", gtmId: "", hotjarId: "" };
+        console.error("[Settings] Error fetching public integrations:", error);
+        return { fbPixelId: "", gtmId: "", hotjarId: "", gaPropertyId: "" };
     }
 }

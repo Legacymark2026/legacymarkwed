@@ -5,14 +5,13 @@ import { UserRole } from "@/types/auth";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-// Verify admin access
-async function checkAdmin() {
+// Verifica acceso de admin y retorna la sesión
+async function checkAdmin(): Promise<{ error: string } | null> {
     const session = await auth();
-    // Cast user to any to avoid lint errors until types are perfectly aligned, or use ExtendedUser if available
-    const userRole = (session?.user as any)?.role;
+    const userRole = (session?.user as { role?: string })?.role;
 
     if (userRole !== UserRole.SUPER_ADMIN && userRole !== UserRole.ADMIN) {
-        return { error: "Unauthorized" };
+        return { error: "No autorizado. Se requiere rol de Administrador o SuperAdmin." };
     }
     return null;
 }
@@ -58,21 +57,36 @@ export async function deleteUser(userId: string) {
     }
 }
 
-export async function updateUserRole(userId: string, newRole: UserRole) {
+export async function updateUserRole(
+    userId: string,
+    newRole: UserRole
+): Promise<{ success: boolean; error?: string }> {
+    const session = await auth();
+    const currentUserId = session?.user?.id;
     const authCheck = await checkAdmin();
-    if (authCheck) return authCheck;
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    // Protección: un usuario no puede cambiarse su propio rol
+    if (currentUserId === userId) {
+        return { success: false, error: "No puedes cambiar tu propio rol." };
+    }
+
+    // Solo el SuperAdmin puede asignar el rol super_admin
+    const callerRole = (session?.user as { role?: string })?.role;
+    if (newRole === UserRole.SUPER_ADMIN && callerRole !== UserRole.SUPER_ADMIN) {
+        return { success: false, error: "Solo el SuperAdmin puede asignar ese rol." };
+    }
 
     try {
-        // Prevent changing own role if critical/implementation detail
         await prisma.user.update({
             where: { id: userId },
-            data: { role: newRole }
+            data: { role: newRole },
         });
         revalidatePath("/dashboard/users");
-        return { success: "User role updated" };
+        return { success: true };
     } catch (error) {
-        console.error("Failed to update user role", error);
-        return { error: "Failed to update role" };
+        console.error("Failed to update user role:", error);
+        return { success: false, error: "Error al actualizar el rol. Inténtalo de nuevo." };
     }
 }
 

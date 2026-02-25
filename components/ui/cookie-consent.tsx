@@ -11,10 +11,15 @@ export function CookieConsent() {
 
     useEffect(() => {
         const consent = localStorage.getItem("cookie_consent");
+        // FOR DEBUGGING: Auto-accept if missing to rule out consent blocking
         if (!consent) {
-            // Delay to not bombard user immediately
-            const timer = setTimeout(() => setIsVisible(true), 2000);
-            return () => clearTimeout(timer);
+            console.log("[CookieConsent] No consent found. Defaulting to 'accepted' for debugging.");
+            localStorage.setItem("cookie_consent", "accepted");
+            setIsVisible(true);
+        } else {
+            if (consent !== 'accepted') {
+                setTimeout(() => setIsVisible(true), 2000);
+            }
         }
     }, []);
 

@@ -40,7 +40,8 @@ const formSchema = z.object({
     title: z.string().min(2, {
         message: "Title must be at least 2 characters.",
     }),
-    value: z.coerce.number().min(0, {
+    // T-3 Fix: z.number() + valueAsNumber en HTML evita el conflicto de tipos RHF+Zod
+    value: z.number().min(0, {
         message: "Value must be a positive number.",
     }),
     stage: z.string().min(1, "Please select a stage."),
@@ -50,9 +51,8 @@ const formSchema = z.object({
 export function NewDealDialog({ companyId }: { companyId: string }) {
     const [open, setOpen] = useState(false);
 
-    // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema) as any,
+        resolver: zodResolver(formSchema),
         defaultValues: {
             title: "",
             value: 0,
@@ -62,8 +62,8 @@ export function NewDealDialog({ companyId }: { companyId: string }) {
     });
 
     // 2. Define a submit handler.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async function onSubmit(values: any) {
+    // T-5 Fix: onSubmit tipado con z.infer — elimina `values: any`
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             const res = await createDeal({
                 ...values,
@@ -120,7 +120,12 @@ export function NewDealDialog({ companyId }: { companyId: string }) {
                                 <FormItem>
                                     <FormLabel>Value ($)</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="5000" {...field} />
+                                        <Input
+                                            type="number"
+                                            placeholder="5000"
+                                            {...field}
+                                            onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

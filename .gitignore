@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# B-4 Fix: Logs de build y debug generados en el directorio raíz
+# Nunca deben entrar al repositorio
+build_log*.txt
+build_output*.log
+build_error*.log
+debug_output*.txt
+lint_results*.txt
+lint_output*.txt
+lint_final*.txt
+lint_check*.txt
+production_log*.txt
+marketing_lint.txt
+typescript_errors*.log
+verification.log
+demo_output*.txt
+prisma_error.log
+prisma_validate*.log
+debug-whatsapp.log

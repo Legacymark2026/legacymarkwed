@@ -1,8 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 import type { UserRole } from '@/types/auth';
+import { canAccessRoute, isPublicRoute } from "@/lib/rbac";
 
 /**
  * Auth configuration for NextAuth.js
+ * El callback `authorized` actúa como segunda capa de RBAC (después del middleware),
+ * ambas usan la misma matriz de rbac.ts para consistencia.
  */
 export const authConfig: NextAuthConfig = {
     pages: {
@@ -19,6 +22,7 @@ export const authConfig: NextAuthConfig = {
             if (user) {
                 token.id = user.id;
                 token.role = (user.role as UserRole) || 'guest';
+                token.companyId = user.companyId;
                 token.permissions = user.permissions;
             }
             return token;
@@ -29,18 +33,29 @@ export const authConfig: NextAuthConfig = {
                 if (token.role) {
                     session.user.role = token.role as UserRole;
                 }
-                // session.user.permissions = token.permissions; 
+                if (token.companyId) {
+                    session.user.companyId = token.companyId as string;
+                }
+                session.user.permissions = token.permissions as import("@/types/auth").Permission[] | undefined;
             }
             return session;
         },
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname.startsWith('/admin');
+            const pathname = nextUrl.pathname;
 
-            if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
+            // Rutas públicas → siempre OK
+            if (isPublicRoute(pathname)) return true;
+
+            // No autenticado → redirect a login
+            if (!isLoggedIn) return false;
+
+            // Verificar rol para rutas de dashboard/admin
+            if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
+                const role = (auth?.user?.role as UserRole) || 'guest';
+                return canAccessRoute(pathname, role);
             }
+
             return true;
         },
     },

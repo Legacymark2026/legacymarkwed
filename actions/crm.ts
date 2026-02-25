@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { rateLimit } from "@/lib/rate-limit";
 
 // Basic check for authenticated user (MVP)
 async function checkAuth() {
@@ -67,17 +68,18 @@ export async function getCRMStats() {
 }
 
 export async function getSalesFunnel() {
-    // Return data format compatible with Recharts
+    // A-1 Fix: groupBy elimina el N+1 (5 queries → 1)
+    const stages = ["NEW", "QUALIFIED", "PROPOSAL", "NEGOTIATION", "WON"] as const;
     try {
-        const stages = ["NEW", "QUALIFIED", "PROPOSAL", "NEGOTIATION", "WON"];
-        const funnelData = [];
-
-        for (const stage of stages) {
-            const count = await prisma.deal.count({ where: { stage } });
-            funnelData.push({ name: stage, value: count });
-        }
-
-        return funnelData;
+        const grouped = await prisma.deal.groupBy({
+            by: ["stage"],
+            _count: { stage: true },
+            where: { stage: { in: [...stages] } },
+        });
+        return stages.map((s) => ({
+            name: s,
+            value: grouped.find((g) => g.stage === s)?._count.stage ?? 0,
+        }));
     } catch (error) {
         console.error(error);
         return [];
@@ -160,135 +162,110 @@ export async function getHighPerformanceStats() {
         const lastMonthStart = startOfMonth(subDays(today, 30));
         const lastMonthEnd = endOfMonth(subDays(today, 30));
 
-        // 1. Basic Stats (Reuse logic)
-        const [wonDealsCount, lostDealsCount] = await Promise.all([
-            // prisma.deal.aggregate({
-            //     _sum: { value: true },
-            //     where: { stage: { notIn: ["WON", "LOST"] } }
-            // }),
+        // A-3 Fix: Agrupar queries independientes en Promise.all
+        // Bloque 1: Todas las métricas que no tienen dependencias entre sí
+        const [
+            wonDealsCount,
+            lostDealsCount,
+            wonDealsData,
+            stagnantDealsCount,
+            leadSources,
+            lostReasons,
+            currentPipeline,
+            lastMonthPipeline,
+            recentActivitiesCount,
+            leaderboardData,
+        ] = await Promise.all([
             prisma.deal.count({ where: { stage: "WON" } }),
-            prisma.deal.count({ where: { stage: "LOST" } })
+            prisma.deal.count({ where: { stage: "LOST" } }),
+            prisma.deal.findMany({
+                where: { stage: "WON" },
+                select: { createdAt: true, updatedAt: true, value: true },
+            }),
+            prisma.deal.count({
+                where: { stage: { notIn: ["WON", "LOST"] }, updatedAt: { lt: thirtyDaysAgo } },
+            }),
+            prisma.lead.groupBy({
+                by: ["source"],
+                _count: { source: true },
+                orderBy: { _count: { source: "desc" } },
+                take: 5,
+            }),
+            prisma.deal.groupBy({
+                by: ["lostReason"],
+                where: { stage: "LOST", lostReason: { not: null } },
+                _count: { lostReason: true },
+                orderBy: { _count: { lostReason: "desc" } },
+            }),
+            prisma.deal.aggregate({
+                _sum: { value: true },
+                where: { createdAt: { gte: startOfMonth(today) } },
+            }),
+            prisma.deal.aggregate({
+                _sum: { value: true },
+                where: { createdAt: { gte: lastMonthStart, lte: lastMonthEnd } },
+            }),
+            prisma.cRMActivity.count({
+                where: { createdAt: { gte: subDays(today, 7) } },
+            }),
+            prisma.user.findMany({
+                where: { assignedDeals: { some: { stage: "WON" } } },
+                select: {
+                    name: true,
+                    assignedDeals: { where: { stage: "WON" }, select: { value: true } },
+                },
+            }),
         ]);
 
-        // 2. Revenue Forecast (Next 3 Months Weighted)
+        // 2. Revenue Forecast (Next 3 Months Weighted — en paralelo)
         const next3Months = [
-            { start: startOfMonth(today), end: endOfMonth(today), name: format(today, 'MMM') },
-            { start: startOfMonth(subDays(today, -30)), end: endOfMonth(subDays(today, -30)), name: format(subDays(today, -30), 'MMM') },
-            { start: startOfMonth(subDays(today, -60)), end: endOfMonth(subDays(today, -60)), name: format(subDays(today, -60), 'MMM') },
+            { start: startOfMonth(today), end: endOfMonth(today), name: format(today, "MMM") },
+            { start: startOfMonth(subDays(today, -30)), end: endOfMonth(subDays(today, -30)), name: format(subDays(today, -30), "MMM") },
+            { start: startOfMonth(subDays(today, -60)), end: endOfMonth(subDays(today, -60)), name: format(subDays(today, -60), "MMM") },
         ];
 
-        const forecastData = await Promise.all(next3Months.map(async month => {
-            const deals = await prisma.deal.findMany({
-                where: {
-                    stage: { notIn: ["WON", "LOST"] },
-                    expectedClose: { gte: month.start, lte: month.end }
-                },
-                select: { value: true, probability: true }
-            });
+        const forecastData = await Promise.all(
+            next3Months.map(async (month) => {
+                const deals = await prisma.deal.findMany({
+                    where: { stage: { notIn: ["WON", "LOST"] }, expectedClose: { gte: month.start, lte: month.end } },
+                    select: { value: true, probability: true },
+                });
+                const weighted = deals.reduce((acc, d) => acc + d.value * (d.probability / 100), 0);
+                const total = deals.reduce((acc, d) => acc + d.value, 0);
+                return { name: month.name, weighted: Math.round(weighted), total: Math.round(total) };
+            })
+        );
 
-            const weighted = deals.reduce((acc, d) => acc + (d.value * (d.probability / 100)), 0);
-            const total = deals.reduce((acc, d) => acc + d.value, 0);
-
-            return {
-                name: month.name,
-                weighted: Math.round(weighted),
-                total: Math.round(total)
-            };
-        }));
-
+        // 3. Calcular métricas derivadas
         const forecastValue = forecastData.reduce((acc, d) => acc + d.weighted, 0);
-
-        // 3. Lead Sources
-        const leadSources = await prisma.lead.groupBy({
-            by: ['source'],
-            _count: { source: true },
-            orderBy: { _count: { source: 'desc' } },
-            take: 5
-        });
-
-        // 4. Lost Reason Breakdown
-        const lostReasons = await prisma.deal.groupBy({
-            by: ['lostReason'],
-            where: { stage: "LOST", lostReason: { not: null } },
-            _count: { lostReason: true },
-            orderBy: { _count: { lostReason: 'desc' } }
-        });
-
-        // 5. Stagnant Deals
-        const stagnantDealsCount = await prisma.deal.count({
-            where: {
-                stage: { notIn: ["WON", "LOST"] },
-                updatedAt: { lt: thirtyDaysAgo }
-            }
-        });
-
-        // 6. MoM Growth
-        const currentPipeline = await prisma.deal.aggregate({
-            _sum: { value: true },
-            where: { createdAt: { gte: startOfMonth(today) } }
-        });
-
-        const lastMonthPipeline = await prisma.deal.aggregate({
-            _sum: { value: true },
-            where: { createdAt: { gte: lastMonthStart, lte: lastMonthEnd } }
-        });
-
         const currentVal = currentPipeline._sum.value || 0;
         const lastVal = lastMonthPipeline._sum.value || 0;
         const momGrowth = lastVal === 0 ? 100 : ((currentVal - lastVal) / lastVal) * 100;
 
-        // 7. Deal Velocity
-        const wonDeals = await prisma.deal.findMany({
-            where: { stage: "WON" },
-            select: { createdAt: true, updatedAt: true, value: true }
-        });
-
-        const totalDays = wonDeals.reduce((acc, deal) => {
+        const totalDays = wonDealsData.reduce((acc, deal) => {
             const diffTime = Math.abs(deal.updatedAt.getTime() - deal.createdAt.getTime());
             return acc + Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }, 0);
+        const avgDaysToClose = wonDealsData.length > 0 ? Math.round(totalDays / wonDealsData.length) : 0;
+        const wonValue = wonDealsData.reduce((acc, deal) => acc + deal.value, 0);
 
-        const avgDaysToClose = wonDeals.length > 0 ? Math.round(totalDays / wonDeals.length) : 0;
-
-        // 8. Goal Progress (Hardcoded target $50k for now)
-        const wonValue = wonDeals.reduce((acc, deal) => acc + deal.value, 0);
-        const monthlyTarget = 50000;
+        // B-3 Fix: monthlyTarget desde env var (no hardcodeado)
+        const monthlyTarget = parseInt(process.env.MONTHLY_SALES_TARGET ?? "50000", 10);
         const goalProgress = (wonValue / monthlyTarget) * 100;
 
-        // 9. Activity Intensity (New Model)
-        const recentActivitiesCount = await (prisma as any).cRMActivity.count({
-            where: { createdAt: { gte: subDays(today, 7) } }
-        });
-
-        // 10. Sales Leaderboard (Rank by won value)
-        const leaderboard = await (prisma as any).user.findMany({
-            where: {
-                assignedDeals: {
-                    some: { stage: "WON" }
-                }
-            },
-            select: {
-                name: true,
-                assignedDeals: {
-                    where: { stage: "WON" },
-                    select: { value: true }
-                }
-            }
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const rankedLeaderboard = leaderboard.map((user: any) => ({
-            name: user.name || "Unknown",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            wonValue: user.assignedDeals.reduce((sum: number, deal: any) => sum + (deal.value || 0), 0)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        })).sort((a: any, b: any) => b.wonValue - a.wonValue).slice(0, 5);
+        const rankedLeaderboard = leaderboardData
+            .map((user) => ({
+                name: user.name || "Unknown",
+                wonValue: user.assignedDeals.reduce((sum, deal) => sum + (deal.value || 0), 0),
+            }))
+            .sort((a, b) => b.wonValue - a.wonValue)
+            .slice(0, 5);
 
         return {
             forecastValue: Math.round(forecastValue),
             forecastData,
-            leadSources: leadSources.map(ls => ({ name: ls.source, value: ls._count.source })),
-            lostReasons: lostReasons.map(lr => ({ reason: lr.lostReason || "Other", count: lr._count.lostReason })),
+            leadSources: leadSources.map((ls) => ({ name: ls.source, value: ls._count.source })),
+            lostReasons: lostReasons.map((lr) => ({ reason: lr.lostReason || "Other", count: lr._count.lostReason })),
             stagnantDealsCount,
             momGrowth: Math.round(momGrowth),
             avgDaysToClose,
@@ -296,15 +273,18 @@ export async function getHighPerformanceStats() {
             monthlyTarget,
             goalProgress: Math.min(100, Math.round(goalProgress)),
             activityIntensity: recentActivitiesCount,
-            winRate: (wonDealsCount + lostDealsCount > 0) ? Math.round((wonDealsCount / (wonDealsCount + lostDealsCount)) * 100) : 0,
-            leaderboard: rankedLeaderboard
+            winRate:
+                wonDealsCount + lostDealsCount > 0
+                    ? Math.round((wonDealsCount / (wonDealsCount + lostDealsCount)) * 100)
+                    : 0,
+            leaderboard: rankedLeaderboard,
         };
-
     } catch (error) {
         console.error("Failed to fetch high performance stats:", error);
         return { error: "Failed to load high performance stats" };
     }
 }
+
 
 export async function updateDealStage(dealId: string, stage: string) {
     const authCheck = await checkAuth();
@@ -371,7 +351,7 @@ export async function createTeam(name: string, companyId: string, parentId?: str
     if (authCheck) return { error: "Unauthorized" };
 
     try {
-        await (prisma as any).team.create({
+        await prisma.team.create({
             data: {
                 name,
                 companyId,
@@ -391,6 +371,12 @@ export async function createTeam(name: string, companyId: string, parentId?: str
 export async function createDeal(data: any) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
+
+    // A-5 Fix: Rate limiting — máximo 5 creaciones de deal por minuto por usuario
+    const session = await auth();
+    const userId = session?.user?.id ?? "anonymous";
+    const allowed = rateLimit(`create_deal:${userId}`, 5, 60_000);
+    if (!allowed) return { error: "Demasiadas peticiones. Espera un momento antes de crear otro deal." };
 
     try {
         await prisma.deal.create({
@@ -422,13 +408,12 @@ export async function createCustomObjectDefinition(data: any) {
     if (authCheck) return { error: "Unauthorized" };
 
     try {
-        await (prisma as any).customObjectDefinition.create({
+        await prisma.customObjectDefinition.create({
             data: {
                 name: data.name,
-                apiName: data.apiName,
+                label: data.label ?? data.name,
                 description: data.description,
                 companyId: data.companyId,
-                // Add default fields or empty lists if schema requires
             }
         });
 

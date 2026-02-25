@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "../styles/globals.css";
 import { Providers } from "@/components/providers";
-import { FacebookPixel } from "@/modules/analytics/components/facebook-pixel";
-import { GoogleTagManager } from "@/modules/analytics/components/google-tag-manager";
-import { Hotjar } from "@/modules/analytics/components/hotjar";
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { getPublicIntegrations } from "@/actions/settings";
 import { Suspense } from "react";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -77,6 +75,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const integrations = await getPublicIntegrations();
+  console.log("DEBUG: RootLayout integrations:", JSON.stringify(integrations, null, 2));
 
   return (
     <html lang="es" suppressHydrationWarning>
@@ -85,9 +84,10 @@ export default async function RootLayout({
       >
         <Providers>
           <Suspense fallback={null}>
-            {integrations?.fbPixelId && <FacebookPixel pixelId={integrations.fbPixelId} />}
-            {integrations?.gtmId && <GoogleTagManager gtmId={integrations.gtmId} />}
-            {integrations?.hotjarId && <Hotjar hotjarId={integrations.hotjarId} />}
+            <AnalyticsProvider config={{
+              ...integrations,
+              debug: process.env.NODE_ENV === 'development'
+            }} />
           </Suspense>
 
           <ScrollProgress />

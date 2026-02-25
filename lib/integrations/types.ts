@@ -1,9 +1,20 @@
 import { ChannelType, ProcessingResult } from "@/types/inbox";
 
+/**
+ * T-1 Fix: Attachment tipado correctamente — elimina `any[]`
+ */
+export interface Attachment {
+    url: string;
+    type: "image" | "video" | "audio" | "document" | "sticker";
+    name?: string;
+    mimeType?: string;
+    size?: number;
+}
+
 export interface OutboundMessage {
     conversationId: string;
     content: string;
-    attachments?: any[];
+    attachments?: Attachment[];
     replyToId?: string;
     pageId?: string; // Optional: Context for multi-page/number setups
 }
@@ -17,9 +28,8 @@ export interface InboundMessage {
         name: string;
         avatar?: string;
     };
-    attachments?: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    metadata?: any;
+    attachments?: Attachment[];
+    metadata?: Record<string, unknown>;
     images?: string[];
 }
 
