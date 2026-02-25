@@ -7,19 +7,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Switch } from "@/components/ui/switch"; // Assuming we have a Switch component, or I'll use a button toggle
+import { Switch } from "@/components/ui/switch";
+import type { Expert } from "@/types/experts";
 
-interface Expert {
-    id: string;
-    name: string;
-    role: string;
-    imageUrl: string | null;
-    isVisible: boolean;
-    bio: string | null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    socialLinks: any;
-    order: number;
-}
 
 interface ExpertCardProps {
     expert: Expert;

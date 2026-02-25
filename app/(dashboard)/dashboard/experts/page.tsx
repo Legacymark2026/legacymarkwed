@@ -12,18 +12,9 @@ import { ExpertCard } from "@/components/experts/ExpertCard";
 import { ExpertForm } from "@/components/experts/ExpertForm";
 import { ExpertStats } from "@/components/experts/ExpertStats";
 import { ExpertToolbar } from "@/components/experts/ExpertToolbar";
+import type { Expert } from "@/types/experts";
 
-// --- Expert Interface ---
-interface Expert {
-    id: string;
-    name: string;
-    role: string;
-    bio: string | null;
-    imageUrl: string | null;
-    socialLinks: any;
-    isVisible: boolean;
-    order: number;
-}
+
 
 export default function ExpertsPage() {
     const [experts, setExperts] = useState<Expert[]>([]);
