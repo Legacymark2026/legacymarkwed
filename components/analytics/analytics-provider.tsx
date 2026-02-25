@@ -12,137 +12,333 @@ type AnalyticsConfig = {
     debug?: boolean;
 };
 
-// Helper to fire gtag events safely
+// ─────────────────────────────────────────────
+// GLOBAL HELPER — use this from any component
+// ─────────────────────────────────────────────
 export function gtagEvent(eventName: string, params?: Record<string, unknown>) {
     if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', eventName, params);
     }
 }
 
+// ─────────────────────────────────────────────
+// CORE WEB VITALS
+// ─────────────────────────────────────────────
+function reportWebVitals() {
+    if (typeof window === 'undefined') return;
+
+    // LCP — Largest Contentful Paint
+    const lcpObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const last = entries[entries.length - 1] as any;
+        gtagEvent('web_vitals', { metric_name: 'LCP', metric_value: Math.round(last.startTime), metric_rating: last.startTime < 2500 ? 'good' : last.startTime < 4000 ? 'needs_improvement' : 'poor' });
+    });
+    try { lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true }); } catch (_) { }
+
+    // CLS — Cumulative Layout Shift
+    let clsValue = 0;
+    const clsObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+            if (!(entry as any).hadRecentInput) clsValue += (entry as any).value;
+        }
+    });
+    try { clsObserver.observe({ type: 'layout-shift', buffered: true }); } catch (_) { }
+
+    // FID / INP — Interaction to Next Paint
+    const interactionObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+            const inp = (entry as any).processingStart - (entry as any).startTime;
+            gtagEvent('web_vitals', { metric_name: 'INP', metric_value: Math.round(inp), metric_rating: inp < 200 ? 'good' : inp < 500 ? 'needs_improvement' : 'poor' });
+        }
+    });
+    try { interactionObserver.observe({ type: 'event', buffered: true, durationThreshold: 16 }); } catch (_) { }
+
+    // TTFB — Time to First Byte
+    const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (navEntries.length > 0) {
+        const ttfb = navEntries[0].responseStart - navEntries[0].requestStart;
+        gtagEvent('web_vitals', { metric_name: 'TTFB', metric_value: Math.round(ttfb), metric_rating: ttfb < 800 ? 'good' : ttfb < 1800 ? 'needs_improvement' : 'poor' });
+    }
+
+    // CLS: report on page hide
+    window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            gtagEvent('web_vitals', { metric_name: 'CLS', metric_value: Math.round(clsValue * 1000), metric_rating: clsValue < 0.1 ? 'good' : clsValue < 0.25 ? 'needs_improvement' : 'poor' });
+        }
+    }, { once: true });
+}
+
+// ─────────────────────────────────────────────
+// MAIN COMPONENT
+// ─────────────────────────────────────────────
 export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [consent, setConsent] = useState<'granted' | 'denied' | 'unknown'>('unknown');
 
-    // --- Consent Management ---
+    // ── Consent Management ──────────────────────────────────────────────
     useEffect(() => {
         const stored = localStorage.getItem('cookie_consent');
         setConsent(stored === 'accepted' ? 'granted' : 'denied');
 
-        const handleConsentUpdate = () => {
+        const handleUpdate = () => {
             const updated = localStorage.getItem('cookie_consent');
             setConsent(updated === 'accepted' ? 'granted' : 'denied');
-            if (config.debug) console.log('[Analytics] Consent updated:', updated);
         };
+        window.addEventListener('cookie_consent_updated', handleUpdate);
+        return () => window.removeEventListener('cookie_consent_updated', handleUpdate);
+    }, []);
 
-        window.addEventListener('cookie_consent_updated', handleConsentUpdate);
-        return () => window.removeEventListener('cookie_consent_updated', handleConsentUpdate);
-    }, [config.debug]);
-
-    // --- Fix: React to consent changes and update gtag immediately ---
+    // ── React to consent changes and update gtag ─────────────────────────
     useEffect(() => {
-        if (consent === 'unknown') return;
-        if (typeof window === 'undefined' || !(window as any).gtag) return;
+        if (consent === 'unknown' || !(window as any).gtag) return;
+        const v = consent === 'granted' ? 'granted' : 'denied';
+        (window as any).gtag('consent', 'update', { analytics_storage: v, ad_storage: v });
+    }, [consent]);
 
-        const consentValue = consent === 'granted' ? 'granted' : 'denied';
-        (window as any).gtag('consent', 'update', {
-            analytics_storage: consentValue,
-            ad_storage: consentValue,
+    // ── Pageview on route change ──────────────────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted' || !config.gaPropertyId || !(window as any).gtag) return;
+        const url = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
+        (window as any).gtag('config', config.gaPropertyId, {
+            page_path: url,
+            page_title: document.title,
         });
+    }, [pathname, searchParams, consent, config.gaPropertyId]);
 
-        if (config.debug) console.log('[Analytics] GA4 consent set to:', consentValue);
-    }, [consent, config.debug]);
-
-    // --- Track Pageviews on Route Change ---
-    useEffect(() => {
-        if (consent === 'granted' && config.gaPropertyId) {
-            const url = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
-            if (typeof window !== 'undefined' && (window as any).gtag) {
-                (window as any).gtag('config', config.gaPropertyId, {
-                    page_path: url,
-                    page_title: document.title,
-                });
-                if (config.debug) console.log('[Analytics] Pageview:', url);
-            }
-        }
-    }, [pathname, searchParams, consent, config.gaPropertyId, config.debug]);
-
-    // --- Auto-track: Scroll Depth (25%, 50%, 75%, 100%) ---
+    // ── Scroll Depth: 25 / 50 / 75 / 100 % ──────────────────────────────
     useEffect(() => {
         if (consent !== 'granted' || !config.gaPropertyId) return;
-
-        const milestones = [25, 50, 75, 100];
+        const milestones = new Set([25, 50, 75, 100]);
         const fired = new Set<number>();
 
-        const handleScroll = () => {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            if (docHeight <= 0) return;
-            const pct = Math.round((scrollTop / docHeight) * 100);
-
+        const onScroll = () => {
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            if (docH <= 0) return;
+            const pct = Math.round((window.scrollY / docH) * 100);
             milestones.forEach(m => {
                 if (pct >= m && !fired.has(m)) {
                     fired.add(m);
-                    gtagEvent('scroll_depth', { depth: m, page: pathname });
+                    gtagEvent('scroll_depth', { percent_scrolled: m, page_path: pathname });
                 }
             });
         };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
     }, [pathname, consent, config.gaPropertyId]);
 
-    // --- Auto-track: Engaged Time (30s, 60s on page) ---
+    // ── Engagement Time: 10s / 30s / 60s / 120s ─────────────────────────
     useEffect(() => {
         if (consent !== 'granted' || !config.gaPropertyId) return;
-
-        const t30 = setTimeout(() => gtagEvent('engaged_30s', { page: pathname }), 30000);
-        const t60 = setTimeout(() => gtagEvent('engaged_60s', { page: pathname }), 60000);
-
-        return () => {
-            clearTimeout(t30);
-            clearTimeout(t60);
-        };
+        const timers = [
+            setTimeout(() => gtagEvent('user_engagement', { engagement_time_msec: 10000, page_path: pathname }), 10000),
+            setTimeout(() => gtagEvent('user_engagement', { engagement_time_msec: 30000, page_path: pathname }), 30000),
+            setTimeout(() => gtagEvent('user_engagement', { engagement_time_msec: 60000, page_path: pathname }), 60000),
+            setTimeout(() => gtagEvent('user_engagement', { engagement_time_msec: 120000, page_path: pathname }), 120000),
+        ];
+        return () => timers.forEach(clearTimeout);
     }, [pathname, consent, config.gaPropertyId]);
 
-    // --- Auto-track: Outbound links and WhatsApp clicks ---
+    // ── Global Click Tracking ─────────────────────────────────────────────
     useEffect(() => {
         if (consent !== 'granted') return;
 
-        const handleClick = (e: MouseEvent) => {
-            const target = (e.target as HTMLElement).closest('a');
-            if (!target) return;
+        const onClick = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
 
-            const href = target.href || '';
+            // ── Link clicks
+            const link = target.closest('a');
+            if (link) {
+                const href = link.href || '';
+                const text = (link.textContent || '').trim().slice(0, 100);
 
-            // WhatsApp links
-            if (href.includes('wa.me') || href.includes('whatsapp.com')) {
-                gtagEvent('whatsapp_click', { page: pathname });
+                if (href.includes('wa.me') || href.includes('whatsapp.com')) {
+                    gtagEvent('whatsapp_click', { page_path: pathname, link_text: text });
+                    if (config.fbPixelId && (window as any).fbq) (window as any).fbq('track', 'Contact');
+                } else if (href.startsWith('mailto:')) {
+                    gtagEvent('email_click', { email_address: href.replace('mailto:', ''), page_path: pathname });
+                } else if (href.startsWith('tel:')) {
+                    gtagEvent('phone_call', { phone_number: href.replace('tel:', ''), page_path: pathname });
+                } else if (href && !href.startsWith(window.location.origin) && href.startsWith('http')) {
+                    gtagEvent('click', { link_url: href, link_text: text, outbound: true, page_path: pathname });
+                }
+                return;
             }
-            // External links
-            else if (href && !href.startsWith(window.location.origin) && href.startsWith('http')) {
-                gtagEvent('outbound_link_click', {
-                    link_url: href,
-                    page: pathname,
-                });
-            }
-            // Email links
-            else if (href.startsWith('mailto:')) {
-                gtagEvent('email_click', { email: href.replace('mailto:', ''), page: pathname });
-            }
-            // Phone links
-            else if (href.startsWith('tel:')) {
-                gtagEvent('phone_click', { phone: href.replace('tel:', ''), page: pathname });
+
+            // ── Button / CTA clicks
+            const btn = target.closest('button, [role="button"]');
+            if (btn) {
+                const text = (btn.textContent || '').trim().slice(0, 100);
+                const id = (btn as HTMLElement).id || undefined;
+                const cls = (btn as HTMLElement).className?.toString().slice(0, 80) || undefined;
+                gtagEvent('cta_click', { button_text: text, button_id: id, button_class: cls, page_path: pathname });
             }
         };
 
-        document.addEventListener('click', handleClick);
-        return () => document.removeEventListener('click', handleClick);
+        document.addEventListener('click', onClick);
+        return () => document.removeEventListener('click', onClick);
+    }, [pathname, consent, config.fbPixelId]);
+
+    // ── Form Tracking: start / submit / error ────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted') return;
+
+        // form_start — first focus inside a form
+        const formStarted = new Set<HTMLFormElement>();
+        const onFocusin = (e: FocusEvent) => {
+            const form = (e.target as HTMLElement).closest('form');
+            if (form && !formStarted.has(form)) {
+                formStarted.add(form);
+                gtagEvent('form_start', { form_id: form.id || 'unknown', page_path: pathname });
+            }
+        };
+
+        // form_submit
+        const onSubmit = (e: Event) => {
+            const form = e.target as HTMLFormElement;
+            gtagEvent('form_submit', { form_id: form.id || 'unknown', page_path: pathname });
+        };
+
+        document.addEventListener('focusin', onFocusin);
+        document.addEventListener('submit', onSubmit);
+        return () => {
+            document.removeEventListener('focusin', onFocusin);
+            document.removeEventListener('submit', onSubmit);
+        };
     }, [pathname, consent]);
 
+    // ── Video Tracking (HTML5 video elements) ────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted') return;
+
+        const videos = document.querySelectorAll('video');
+        const handlers: Array<{ el: HTMLVideoElement; events: [string, () => void][] }> = [];
+
+        videos.forEach((video) => {
+            const src = video.src || video.currentSrc || 'unknown';
+            const onPlay = () => gtagEvent('video_start', { video_url: src, page_path: pathname });
+            const onPause = () => gtagEvent('video_pause', { video_url: src, video_current_time: Math.round(video.currentTime), page_path: pathname });
+            const onEnded = () => gtagEvent('video_complete', { video_url: src, page_path: pathname });
+            const onProgress = () => {
+                if (!video.duration) return;
+                const pct = Math.round((video.currentTime / video.duration) * 100);
+                if ([25, 50, 75].includes(pct)) {
+                    gtagEvent('video_progress', { video_url: src, video_percent: pct, page_path: pathname });
+                }
+            };
+
+            const evts: [string, () => void][] = [['play', onPlay], ['pause', onPause], ['ended', onEnded], ['timeupdate', onProgress]];
+            evts.forEach(([ev, fn]) => video.addEventListener(ev, fn));
+            handlers.push({ el: video, events: evts });
+        });
+
+        return () => handlers.forEach(({ el, events }) => events.forEach(([ev, fn]) => el.removeEventListener(ev, fn)));
+    }, [pathname, consent]);
+
+    // ── JavaScript Error Tracking ─────────────────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted') return;
+
+        const onError = (e: ErrorEvent) => {
+            gtagEvent('exception', {
+                description: `${e.message} (${e.filename}:${e.lineno})`,
+                fatal: false,
+            });
+        };
+        const onUnhandledRejection = (e: PromiseRejectionEvent) => {
+            gtagEvent('exception', {
+                description: `Unhandled Promise: ${String(e.reason)}`,
+                fatal: false,
+            });
+        };
+
+        window.addEventListener('error', onError);
+        window.addEventListener('unhandledrejection', onUnhandledRejection);
+        return () => {
+            window.removeEventListener('error', onError);
+            window.removeEventListener('unhandledrejection', onUnhandledRejection);
+        };
+    }, [consent]);
+
+    // ── Core Web Vitals ───────────────────────────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted' || !config.gaPropertyId) return;
+        reportWebVitals();
+    }, [consent, config.gaPropertyId]);
+
+    // ── User Properties: connection, device, language ─────────────────────
+    useEffect(() => {
+        if (consent !== 'granted' || !config.gaPropertyId || !(window as any).gtag) return;
+        const nav = navigator as any;
+        (window as any).gtag('set', 'user_properties', {
+            language: navigator.language,
+            screen_resolution: `${screen.width}x${screen.height}`,
+            connection_type: nav.connection?.effectiveType || 'unknown',
+            device_memory: nav.deviceMemory ? `${nav.deviceMemory}GB` : 'unknown',
+            hardware_concurrency: navigator.hardwareConcurrency || 'unknown',
+        });
+    }, [consent, config.gaPropertyId]);
+
+    // ── In-Page Search Tracking ───────────────────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted') return;
+
+        const onKeyUp = (e: KeyboardEvent) => {
+            if (e.key !== 'Enter') return;
+            const input = document.activeElement as HTMLInputElement;
+            if (input?.tagName === 'INPUT' && (input.type === 'search' || input.type === 'text')) {
+                const q = input.value.trim();
+                if (q.length > 1) gtagEvent('search', { search_term: q, page_path: pathname });
+            }
+        };
+        window.addEventListener('keyup', onKeyUp);
+        return () => window.removeEventListener('keyup', onKeyUp);
+    }, [pathname, consent]);
+
+    // ── Copy Text Tracking ────────────────────────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted') return;
+
+        const onCopy = () => {
+            const selected = window.getSelection()?.toString().trim().slice(0, 100);
+            if (selected && selected.length > 5) {
+                gtagEvent('content_copy', { copied_text: selected, page_path: pathname });
+            }
+        };
+        document.addEventListener('copy', onCopy);
+        return () => document.removeEventListener('copy', onCopy);
+    }, [pathname, consent]);
+
+    // ── Element Visibility: hero, CTA sections ────────────────────────────
+    useEffect(() => {
+        if (consent !== 'granted' || typeof IntersectionObserver === 'undefined') return;
+
+        const targets = document.querySelectorAll('[data-ga-section]');
+        if (targets.length === 0) return;
+
+        const seen = new Set<string>();
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const section = (entry.target as HTMLElement).dataset.gaSection || 'unknown';
+                    if (!seen.has(section)) {
+                        seen.add(section);
+                        gtagEvent('section_view', { section_name: section, page_path: pathname });
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        targets.forEach(el => observer.observe(el));
+        return () => observer.disconnect();
+    }, [pathname, consent]);
+
+    // ─────────────────────────────────────────────
+    // SCRIPTS
+    // ─────────────────────────────────────────────
     return (
         <>
-            {/* --- GOOGLE ANALYTICS 4 --- */}
+            {/* ── GOOGLE ANALYTICS 4 ── */}
             {config.gaPropertyId && (
                 <>
                     <Script
@@ -153,18 +349,19 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                                 window.dataLayer = window.dataLayer || [];
                                 function gtag(){dataLayer.push(arguments);}
                                 gtag('js', new Date());
-                                
-                                // Default consent denied — React useEffect will update once consent is known
                                 gtag('consent', 'default', {
                                     'analytics_storage': 'denied',
                                     'ad_storage': 'denied',
                                     'wait_for_update': 500
                                 });
-
                                 gtag('config', '${config.gaPropertyId}', {
                                     page_path: window.location.pathname,
                                     page_title: document.title,
-                                    send_page_view: true
+                                    send_page_view: true,
+                                    cookie_domain: 'legacymarksas.com',
+                                    cookie_flags: 'SameSite=None;Secure',
+                                    allow_google_signals: true,
+                                    allow_ad_personalization_signals: false
                                 });
                             `
                         }}
@@ -173,14 +370,11 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                         id="ga4-lib"
                         src={`https://www.googletagmanager.com/gtag/js?id=${config.gaPropertyId}`}
                         strategy="afterInteractive"
-                        onLoad={() => {
-                            if (config.debug) console.log('[Analytics] GA4 Script Loaded');
-                        }}
                     />
                 </>
             )}
 
-            {/* --- GOOGLE TAG MANAGER --- */}
+            {/* ── GOOGLE TAG MANAGER ── */}
             {config.gtmId && (
                 <Script
                     id="gtm-init"
@@ -197,7 +391,7 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                 />
             )}
 
-            {/* --- FACEBOOK PIXEL --- */}
+            {/* ── FACEBOOK PIXEL ── */}
             {config.fbPixelId && (
                 <Script
                     id="fb-pixel-init"
@@ -216,13 +410,10 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                             fbq('track', 'PageView');
                         `
                     }}
-                    onLoad={() => {
-                        if (config.debug) console.log('[Analytics] Facebook Pixel Script Loaded');
-                    }}
                 />
             )}
 
-            {/* --- HOTJAR --- */}
+            {/* ── HOTJAR ── */}
             {config.hotjarId && (
                 <Script
                     id="hotjar-init"
