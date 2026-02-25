@@ -125,6 +125,30 @@ export function AnalyticsProvider({ children, userId, enabled = true }: Analytic
         return () => window.removeEventListener('scroll', handleScroll);
     }, [enabled]);
 
+    // Forward event to GA4 (gtag) if available
+    const forwardToGa4 = useCallback((eventType: string, eventName?: string, data?: Record<string, any>) => {
+        if (typeof window === 'undefined' || !(window as any).gtag) return;
+        const gtag = (window as any).gtag;
+
+        if (eventType === 'PAGE_VIEW') {
+            gtag('event', 'page_view', { page_path: pathname, page_title: document.title });
+        } else if (eventName === 'GENERATE_LEAD') {
+            gtag('event', 'generate_lead', {
+                source: data?.source || 'unknown',
+                ...(data?.company ? { company: data.company } : {}),
+            });
+        } else if (eventName === 'PURCHASE') {
+            gtag('event', 'purchase', data);
+        } else if (eventName === 'SIGN_UP') {
+            gtag('event', 'sign_up', { method: data?.method || 'form' });
+        } else if (eventName === 'BEGIN_CHECKOUT') {
+            gtag('event', 'begin_checkout', data);
+        } else if (eventName) {
+            // Forward other custom events with their original name (snake_case)
+            gtag('event', eventName.toLowerCase(), data);
+        }
+    }, [pathname]);
+
     // Send tracking data
     const sendTrackingData = useCallback(async (
         eventType: string,
@@ -132,6 +156,9 @@ export function AnalyticsProvider({ children, userId, enabled = true }: Analytic
         data?: Record<string, any>
     ) => {
         if (!enabled) return;
+
+        // Forward to GA4 in parallel (non-blocking)
+        forwardToGa4(eventType, eventName, data);
 
         try {
             const response = await fetch('/api/analytics/track', {
@@ -162,7 +189,7 @@ export function AnalyticsProvider({ children, userId, enabled = true }: Analytic
         } catch (error) {
             console.error('Analytics track failed:', error);
         }
-    }, [enabled, pathname, sessionId, visitorId, userId]);
+    }, [enabled, pathname, sessionId, visitorId, userId, forwardToGa4]);
 
     // Track page view
     const trackPageView = useCallback((path?: string, title?: string) => {

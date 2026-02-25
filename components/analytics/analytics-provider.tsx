@@ -12,17 +12,23 @@ type AnalyticsConfig = {
     debug?: boolean;
 };
 
+// Helper to fire gtag events safely
+export function gtagEvent(eventName: string, params?: Record<string, unknown>) {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', eventName, params);
+    }
+}
+
 export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [consent, setConsent] = useState<'granted' | 'denied' | 'unknown'>('unknown');
 
+    // --- Consent Management ---
     useEffect(() => {
-        // Initial consent check
         const stored = localStorage.getItem('cookie_consent');
         setConsent(stored === 'accepted' ? 'granted' : 'denied');
 
-        // Listen for updates (custom event from CookieConsent)
         const handleConsentUpdate = () => {
             const updated = localStorage.getItem('cookie_consent');
             setConsent(updated === 'accepted' ? 'granted' : 'denied');
@@ -33,18 +39,106 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
         return () => window.removeEventListener('cookie_consent_updated', handleConsentUpdate);
     }, [config.debug]);
 
-    // Track Pageviews on Route Change
+    // --- Fix: React to consent changes and update gtag immediately ---
+    useEffect(() => {
+        if (consent === 'unknown') return;
+        if (typeof window === 'undefined' || !(window as any).gtag) return;
+
+        const consentValue = consent === 'granted' ? 'granted' : 'denied';
+        (window as any).gtag('consent', 'update', {
+            analytics_storage: consentValue,
+            ad_storage: consentValue,
+        });
+
+        if (config.debug) console.log('[Analytics] GA4 consent set to:', consentValue);
+    }, [consent, config.debug]);
+
+    // --- Track Pageviews on Route Change ---
     useEffect(() => {
         if (consent === 'granted' && config.gaPropertyId) {
-            const url = pathname + searchParams.toString();
+            const url = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
             if (typeof window !== 'undefined' && (window as any).gtag) {
                 (window as any).gtag('config', config.gaPropertyId, {
                     page_path: url,
+                    page_title: document.title,
                 });
-                if (config.debug) console.log('[Analytics] Pageview sent:', url);
+                if (config.debug) console.log('[Analytics] Pageview:', url);
             }
         }
     }, [pathname, searchParams, consent, config.gaPropertyId, config.debug]);
+
+    // --- Auto-track: Scroll Depth (25%, 50%, 75%, 100%) ---
+    useEffect(() => {
+        if (consent !== 'granted' || !config.gaPropertyId) return;
+
+        const milestones = [25, 50, 75, 100];
+        const fired = new Set<number>();
+
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (docHeight <= 0) return;
+            const pct = Math.round((scrollTop / docHeight) * 100);
+
+            milestones.forEach(m => {
+                if (pct >= m && !fired.has(m)) {
+                    fired.add(m);
+                    gtagEvent('scroll_depth', { depth: m, page: pathname });
+                }
+            });
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [pathname, consent, config.gaPropertyId]);
+
+    // --- Auto-track: Engaged Time (30s, 60s on page) ---
+    useEffect(() => {
+        if (consent !== 'granted' || !config.gaPropertyId) return;
+
+        const t30 = setTimeout(() => gtagEvent('engaged_30s', { page: pathname }), 30000);
+        const t60 = setTimeout(() => gtagEvent('engaged_60s', { page: pathname }), 60000);
+
+        return () => {
+            clearTimeout(t30);
+            clearTimeout(t60);
+        };
+    }, [pathname, consent, config.gaPropertyId]);
+
+    // --- Auto-track: Outbound links and WhatsApp clicks ---
+    useEffect(() => {
+        if (consent !== 'granted') return;
+
+        const handleClick = (e: MouseEvent) => {
+            const target = (e.target as HTMLElement).closest('a');
+            if (!target) return;
+
+            const href = target.href || '';
+
+            // WhatsApp links
+            if (href.includes('wa.me') || href.includes('whatsapp.com')) {
+                gtagEvent('whatsapp_click', { page: pathname });
+            }
+            // External links
+            else if (href && !href.startsWith(window.location.origin) && href.startsWith('http')) {
+                gtagEvent('outbound_link_click', {
+                    link_url: href,
+                    page: pathname,
+                });
+            }
+            // Email links
+            else if (href.startsWith('mailto:')) {
+                gtagEvent('email_click', { email: href.replace('mailto:', ''), page: pathname });
+            }
+            // Phone links
+            else if (href.startsWith('tel:')) {
+                gtagEvent('phone_click', { phone: href.replace('tel:', ''), page: pathname });
+            }
+        };
+
+        document.addEventListener('click', handleClick);
+        return () => document.removeEventListener('click', handleClick);
+    }, [pathname, consent]);
 
     return (
         <>
@@ -60,15 +154,17 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                                 function gtag(){dataLayer.push(arguments);}
                                 gtag('js', new Date());
                                 
-                                // Default Denied
+                                // Default consent denied — React useEffect will update once consent is known
                                 gtag('consent', 'default', {
+                                    'analytics_storage': 'denied',
                                     'ad_storage': 'denied',
-                                    'analytics_storage': 'denied'
+                                    'wait_for_update': 500
                                 });
 
                                 gtag('config', '${config.gaPropertyId}', {
                                     page_path: window.location.pathname,
-                                    send_page_view: true // Handle initial load
+                                    page_title: document.title,
+                                    send_page_view: true
                                 });
                             `
                         }}
@@ -79,13 +175,6 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                         strategy="afterInteractive"
                         onLoad={() => {
                             if (config.debug) console.log('[Analytics] GA4 Script Loaded');
-                            // If consent already granted, update immediately
-                            if (consent === 'granted') {
-                                (window as any).gtag('consent', 'update', {
-                                    'ad_storage': 'granted',
-                                    'analytics_storage': 'granted'
-                                });
-                            }
                         }}
                     />
                 </>
@@ -125,7 +214,6 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                             'https://connect.facebook.net/en_US/fbevents.js');
                             fbq('init', '${config.fbPixelId}');
                             fbq('track', 'PageView');
-                            if (window.analytics_debug) console.log('[Analytics] Facebook Pixel Initialized:', '${config.fbPixelId}');
                         `
                     }}
                     onLoad={() => {
