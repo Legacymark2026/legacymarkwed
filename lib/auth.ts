@@ -7,8 +7,10 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { authConfig } from "@/auth.config";
-import type { UserRole, Permission } from "@/types/auth";
+import type { Permission } from "@/types/auth";
+import { UserRole } from "@/types/auth";
 import { logger } from "@/lib/logger";
+
 
 const signInSchema = z.object({
     email: z.string().email(),
@@ -64,7 +66,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 email: user.email!,
                                 name: user.name,
                                 image: user.image,
-                                role: "CLIENT_USER",
+                                // ⚠️ Usar el valor del enum (minúsculas) — no el nombre del enum
+                                role: UserRole.CLIENT_USER, // = 'client_user'
                             },
                         });
                         logger.auth("User created:", dbUser.id);
@@ -183,7 +186,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     } else {
                         logger.auth("JWT: User not found in DB, using OAuth ID as fallback.");
                         token.id = user.id;
-                        token.role = (user as { role?: string }).role;
+                        // Fallback seguro: si el rol es undefined → 'guest' (nunca acceso no autorizado)
+                        const fallbackRole = (user as { role?: string }).role ?? UserRole.GUEST;
+                        token.role = fallbackRole as UserRole;
                     }
                 } catch (error) {
                     logger.error("JWT callback error:", error);
