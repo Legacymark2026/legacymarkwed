@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+    const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -304,4 +307,11 @@
 </div>
 
 </body>
-</html>
+</html>`;
+
+    return new NextResponse(html, {
+        headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+        },
+    });
+}
