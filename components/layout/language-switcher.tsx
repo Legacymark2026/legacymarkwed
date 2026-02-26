@@ -1,23 +1,20 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { useTransition } from 'react';
 
 export function LanguageSwitcher() {
     const locale = useLocale();
     const router = useRouter();
-    const pathname = usePathname();
+    const pathname = usePathname(); // pathname WITHOUT locale prefix
     const [isPending, startTransition] = useTransition();
 
     function switchLocale(nextLocale: string) {
         if (nextLocale === locale) return;
-        // Replace the locale segment in the pathname
-        const segments = pathname.split('/');
-        segments[1] = nextLocale;
-        const newPath = segments.join('/');
         startTransition(() => {
-            router.push(newPath);
+            // next-intl handles building the correct URL with the new locale
+            router.replace(pathname, { locale: nextLocale });
         });
     }
 
