@@ -46,9 +46,9 @@ export default function ContentHero() {
 
             <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
                 <motion.div
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 1, y: 0 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                     className="mb-8"
                 >
                     <span className="px-5 py-2 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs md:text-sm font-bold tracking-widest uppercase animate-pulse-glow backdrop-blur-md">
@@ -68,9 +68,9 @@ export default function ContentHero() {
                 </motion.h1>
 
                 <motion.div
-                    initial={{ opacity: 0 }}
+                    initial={{ opacity: 0.7 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 1 }}
+                    transition={{ delay: 0.2, duration: 0.6 }}
                     className="text-xl md:text-3xl text-slate-600 max-w-3xl mb-12 h-[3rem] font-light"
                 >
                     <span className="typewriter-text border-r-4 border-teal-500 pr-3 drop-shadow-sm">
@@ -80,9 +80,9 @@ export default function ContentHero() {
 
                 <motion.div
                     className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center w-full sm:w-auto px-4 sm:px-0"
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0.8, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
+                    transition={{ delay: 0.15, duration: 0.4 }}
                 >
                     <button className="w-full sm:w-auto group relative px-8 sm:px-10 py-4 sm:py-5 bg-slate-900 text-white font-bold text-base sm:text-lg rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300 shadow-xl shadow-teal-900/10 animate-shimmer">
                         <span className="absolute inset-0 bg-gradient-to-r from-teal-500 to-sky-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>

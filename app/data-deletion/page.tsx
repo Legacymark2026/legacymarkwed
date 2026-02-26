@@ -77,14 +77,14 @@ export default function DataDeletionPage() {
                         <div className="space-y-2 text-center md:text-left">
                             <h3 className="text-xl font-bold flex items-center gap-2 justify-center md:justify-start">
                                 <Mail className="w-5 h-5 text-gray-400" />
-                                soporte@legacymarksas.com
+                                legacymarkcolombia@legacymarksas.com
                             </h3>
                             <p className="text-gray-500 text-sm max-w-md">
                                 Haz clic en el botón para abrir tu cliente de correo con la plantilla de solicitud ya preparada.
                             </p>
                         </div>
                         <a
-                            href="mailto:soporte@legacymarksas.com?subject=Solicitud de Eliminación de Datos de Usuario&body=Hola equipo de LegacyMark,%0D%0A%0D%0ASolicito formalmente la eliminación de mis datos personales y cuenta asociada a este correo electrónico.%0D%0A%0D%0AIdentificación de Usuario (si conoce): %0D%0A%0D%0AGracias."
+                            href="mailto:legacymarkcolombia@legacymarksas.com?subject=Solicitud de Eliminación de Datos de Usuario&body=Hola equipo de LegacyMark,%0D%0A%0D%0ASolicito formalmente la eliminación de mis datos personales y cuenta asociada a este correo electrónico.%0D%0A%0D%0AIdentificación de Usuario (si conoce): %0D%0A%0D%0AGracias."
                             className="w-full md:w-auto"
                         >
                             <Button size="lg" className="w-full bg-black hover:bg-gray-800 text-white gap-2 shadow-lg hover:shadow-xl transition-all h-12 px-8 rounded-full">

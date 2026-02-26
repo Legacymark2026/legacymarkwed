@@ -166,7 +166,7 @@ export default function PrivacyPolicyPage() {
                                 </div>
                                 <div className="space-y-4">
                                     <InfoItem label="Dirección" value="CRR 18 A 22-21, Giron, Santander" />
-                                    <InfoItem label="Email DPO" value="LegacyMarkColombia@gmail.com" />
+                                    <InfoItem label="Email DPO" value="legacymarkcolombia@legacymarksas.com" />
                                 </div>
                             </div>
                         </SectionCard>
@@ -258,13 +258,13 @@ export default function PrivacyPolicyPage() {
                                     Si tienes preguntas o deseas actualizar tu información, nuestro Oficial de Protección de Datos está listo para ayudarte.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-6">
-                                    <a href="mailto:LegacyMarkColombia@gmail.com" className="flex items-center space-x-4 bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all border border-white/10 backdrop-blur-sm group">
+                                    <a href="mailto:legacymarkcolombia@legacymarksas.com" className="flex items-center space-x-4 bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all border border-white/10 backdrop-blur-sm group">
                                         <div className="bg-blue-500/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
                                             <Mail className="w-6 h-6 text-blue-400" />
                                         </div>
                                         <div>
                                             <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Email</div>
-                                            <div className="font-medium">LegacyMarkColombia@gmail.com</div>
+                                            <div className="font-medium">legacymarkcolombia@legacymarksas.com</div>
                                         </div>
                                     </a>
                                     <a href="tel:+573222047353" className="flex items-center space-x-4 bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all border border-white/10 backdrop-blur-sm group">

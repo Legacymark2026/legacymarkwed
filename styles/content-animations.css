@@ -111,9 +111,11 @@
 .typewriter-text {
     overflow: hidden;
     white-space: nowrap;
+    /* Start with a small visible width so text isn't blank before JS hydrates */
+    min-width: 1ch;
     border-right: 2px solid cyan;
     animation:
-        typewriter 3s steps(40, end),
+        typewriter 1.8s steps(40, end),
         blink .75s step-end infinite;
 }
 

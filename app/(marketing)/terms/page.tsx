@@ -226,13 +226,13 @@ export default function TermsPage() {
                                     Si tiene alguna pregunta sobre estos Términos, por favor contáctenos.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-6">
-                                    <a href="mailto:legal@legacymark.com" className="flex items-center space-x-4 bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all border border-white/10 backdrop-blur-sm group">
+                                    <a href="mailto:legacymarkcolombia@legacymarksas.com" className="flex items-center space-x-4 bg-white/10 hover:bg-white/20 p-4 rounded-xl transition-all border border-white/10 backdrop-blur-sm group">
                                         <div className="bg-indigo-500/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
                                             <Mail className="w-6 h-6 text-indigo-400" />
                                         </div>
                                         <div>
                                             <div className="text-xs text-indigo-300 uppercase tracking-wider font-semibold">Email</div>
-                                            <div className="font-medium">legal@legacymark.com</div>
+                                            <div className="font-medium">legacymarkcolombia@legacymarksas.com</div>
                                         </div>
                                     </a>
                                 </div>

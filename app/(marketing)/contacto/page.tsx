@@ -21,9 +21,11 @@ export default function ContactPage() {
                                     <Mail size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-black">Email</h3>
-                                    <p className="text-gray-600">hola@legacymark.com</p>
-                                    <p className="text-gray-600">soporte@legacymark.com</p>
+                                    <p className="text-gray-600">
+                                        <a href="mailto:legacymarkcolombia@legacymarksas.com" className="hover:text-black transition-colors">
+                                            legacymarkcolombia@legacymarksas.com
+                                        </a>
+                                    </p>
                                 </div>
                             </div>
 

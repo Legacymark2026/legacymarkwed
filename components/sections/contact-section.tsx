@@ -77,7 +77,11 @@ export function ContactSection() {
                                 <h4 className="flex items-center text-lg font-bold text-gray-900 mb-2">
                                     <Mail className="mr-3 text-gray-400" size={20} /> Email Directo
                                 </h4>
-                                <p className="text-gray-600 pl-8">hello@agencia.com</p>
+                                <p className="text-gray-600">
+                                    <a href="mailto:legacymarkcolombia@legacymarksas.com" className="hover:text-black transition-colors">
+                                        legacymarkcolombia@legacymarksas.com
+                                    </a>
+                                </p>
                             </div>
 
                             <div>
