@@ -34,27 +34,27 @@ const AltSectionSkeleton = () => (
 // ─── Dynamic (lazy) imports — split each into its own JS chunk ────────────────
 const ContentShowcase = dynamic(
     () => import('@/components/content-creation/content-showcase'),
-    { loading: () => <SectionSkeleton />, ssr: false }
+    { loading: () => <SectionSkeleton /> }
 );
 
 const RoiCalculator = dynamic(
     () => import('@/components/content-creation/roi-calculator'),
-    { loading: () => <AltSectionSkeleton />, ssr: false }
+    { loading: () => <AltSectionSkeleton /> }
 );
 
 const SocialProofSection = dynamic(
     () => import('@/components/content-creation/social-proof-section'),
-    { loading: () => <SectionSkeleton />, ssr: false }
+    { loading: () => <SectionSkeleton /> }
 );
 
 const PricingBuilder = dynamic(
     () => import('@/components/content-creation/pricing-builder'),
-    { loading: () => <AltSectionSkeleton />, ssr: false }
+    { loading: () => <AltSectionSkeleton /> }
 );
 
 const ProcessWorkflow = dynamic(
     () => import('@/components/content-creation/process-workflow'),
-    { loading: () => <SectionSkeleton />, ssr: false }
+    { loading: () => <SectionSkeleton /> }
 );
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
