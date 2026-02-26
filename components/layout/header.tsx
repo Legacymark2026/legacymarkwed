@@ -8,6 +8,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { LayoutDashboard } from "lucide-react";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 interface NavLink {
     name: string;
@@ -108,6 +109,7 @@ export function Header() {
                             )}
                         </div>
                     ))}
+                    <LanguageSwitcher />
                     {session ? (
                         <Link href="/dashboard">
                             <Button size="sm" className="rounded-full px-6 shadow-lg hover:shadow-xl transition-all bg-teal-600 text-white hover:bg-teal-700 flex items-center gap-2">
@@ -174,6 +176,9 @@ export function Header() {
                                 </div>
                             ))}
                             <div className="pt-4 space-y-3">
+                                <div className="flex justify-center">
+                                    <LanguageSwitcher />
+                                </div>
                                 {session && (
                                     <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                                         <Button className="w-full h-12 rounded-full text-base bg-teal-600 text-white hover:bg-teal-700 flex items-center justify-center gap-2">

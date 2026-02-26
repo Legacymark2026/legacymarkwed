@@ -1,0 +1,187 @@
+{
+  "nav": {
+    "services": "Services",
+    "methodology": "Methodology",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "contact": "Contact",
+    "getStarted": "Get Started"
+  },
+  "footer": {
+    "tagline": "We transform brands through innovation, design, and digital strategy.",
+    "services": "Services",
+    "company": "Company",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Receive the latest marketing and innovation trends.",
+    "email": "Your email",
+    "subscribe": "Subscribe",
+    "privacyConsent": "I accept the",
+    "privacyPolicy": "Privacy Policy",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "sitemap": "Sitemap",
+    "links": {
+      "strategy": "Brand Strategy",
+      "content": "Content Creation",
+      "marketing": "Digital Marketing",
+      "design": "Design & Creativity",
+      "analytics": "Analytics & ROI",
+      "flyering": "360° Marketing",
+      "methodology": "Methodology",
+      "portfolio": "Portfolio",
+      "blog": "Insights",
+      "contact": "Contact"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Digital Marketing Agency",
+      "title": "We transform your brand with strategy and innovation",
+      "subtitle": "We create digital strategies that generate real results and sustainable growth for your business.",
+      "cta": "Start your project",
+      "ctaSecondary": "View portfolio"
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive solutions to grow your brand in the digital environment."
+    },
+    "stats": {
+      "clients": "Happy clients",
+      "projects": "Completed projects",
+      "growth": "Average growth",
+      "years": "Years of experience"
+    },
+    "cta": {
+      "title": "Ready to transform your business?",
+      "subtitle": "Let's talk about how we can help you reach your goals.",
+      "button": "Schedule a consultation"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're ready to help you take your brand to the next level.",
+    "form": {
+      "name": "Name",
+      "email": "Email address",
+      "company": "Company",
+      "message": "Message",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "success": "Message sent! We'll be in touch soon.",
+      "error": "Error sending. Please try again."
+    },
+    "info": {
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "hours": "Business Hours",
+      "hoursValue": "Mon–Fri: 8am – 6pm (COT)"
+    }
+  },
+  "services": {
+    "content": {
+      "title": "Premium Content Creation",
+      "subtitle": "We elevate your brand with high-impact strategic content.",
+      "description": "We produce content that connects, converts, and positions your brand as a leader in your industry.",
+      "cta": "View plans"
+    },
+    "strategy": {
+      "title": "Brand Strategy",
+      "subtitle": "We build lasting brand identities.",
+      "description": "We develop comprehensive brand strategies that differentiate your business and connect with your audience."
+    },
+    "automation": {
+      "title": "Automation & AI",
+      "subtitle": "Power your business with artificial intelligence.",
+      "description": "We implement automation and AI solutions that optimize your processes and maximize efficiency."
+    },
+    "webdev": {
+      "title": "Web Development",
+      "subtitle": "Websites that convert visitors into customers.",
+      "description": "We create modern, fast, SEO-optimized websites that generate measurable results."
+    },
+    "flyering": {
+      "title": "360° Marketing",
+      "subtitle": "Comprehensive strategies covering all channels.",
+      "description": "We design complete marketing campaigns that maximize your presence and ROI across all touchpoints."
+    }
+  },
+  "methodology": {
+    "title": "Our Methodology",
+    "subtitle": "A proven process to guarantee exceptional results.",
+    "steps": {
+      "discover": "Discover",
+      "discoverDesc": "We deeply analyze your business, market, and competition.",
+      "strategy": "Strategy",
+      "strategyDesc": "We develop a personalized plan based on real data.",
+      "execute": "Execute",
+      "executeDesc": "We implement with excellence and attention to detail.",
+      "measure": "Measure",
+      "measureDesc": "We monitor results and continuously optimize."
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "Projects that have transformed real brands.",
+    "filter": {
+      "all": "All",
+      "branding": "Branding",
+      "digital": "Digital",
+      "content": "Content"
+    },
+    "viewProject": "View project"
+  },
+  "blog": {
+    "title": "Insights & Trends",
+    "subtitle": "Expert knowledge to grow your business.",
+    "readMore": "Read more",
+    "categories": {
+      "all": "All",
+      "marketing": "Marketing",
+      "strategy": "Strategy",
+      "technology": "Technology"
+    }
+  },
+  "terms": {
+    "title": "Terms & Conditions",
+    "subtitle": "Please read these terms before using our services.",
+    "lastUpdated": "Effective as of:"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "At LegacyMark, your privacy is our priority.",
+    "lastUpdated": "Updated:"
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "subtitle": "At LegacyMark, we are committed to transparency.",
+    "accept": "Accept all",
+    "reject": "Reject non-essential",
+    "configure": "Configure"
+  },
+  "dataDeletion": {
+    "title": "Privacy & Data Control",
+    "subtitle": "You have full control over your personal information.",
+    "requestDeletion": "Request Deletion",
+    "steps": {
+      "step1": "Submit Request",
+      "step1Desc": "Send an email to our privacy team.",
+      "step2": "Validation",
+      "step2Desc": "We'll verify your identity to protect your data.",
+      "step3": "Secure Deletion",
+      "step3Desc": "Your data will be deleted within 30 days."
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "learnMore": "Learn more",
+    "viewAll": "View all",
+    "backHome": "Back to home",
+    "nit": "Tax ID",
+    "address": "Address",
+    "whatsappMessage": "Hello LegacyMark, I would like to get more information about your services.",
+    "chatWithUs": "Chat with us"
+  }
+}

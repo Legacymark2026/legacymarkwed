@@ -1,0 +1,187 @@
+{
+  "nav": {
+    "services": "Servicios",
+    "methodology": "Metodología",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "contact": "Contacto",
+    "getStarted": "Empezar Ahora"
+  },
+  "footer": {
+    "tagline": "Transformamos marcas a través de la innovación, el diseño y la estrategia digital.",
+    "services": "Servicios",
+    "company": "Empresa",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Recibe las últimas tendencias en marketing e innovación.",
+    "email": "Tu email",
+    "subscribe": "Suscribir",
+    "privacyConsent": "Acepto la",
+    "privacyPolicy": "Política de Privacidad",
+    "rights": "Todos los derechos reservados.",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies",
+    "sitemap": "Mapa del sitio",
+    "links": {
+      "strategy": "Estrategia de Marca",
+      "content": "Creación de Contenido",
+      "marketing": "Marketing Digital",
+      "design": "Diseño & Creatividad",
+      "analytics": "Analytics & ROI",
+      "flyering": "Marketing 360°",
+      "methodology": "Metodología",
+      "portfolio": "Portfolio",
+      "blog": "Insights",
+      "contact": "Contacto"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Agencia de Marketing Digital",
+      "title": "Transformamos tu marca con estrategia e innovación",
+      "subtitle": "Creamos estrategias digitales que generan resultados reales y crecimiento sostenible para tu negocio.",
+      "cta": "Comenzar proyecto",
+      "ctaSecondary": "Ver portfolio"
+    },
+    "services": {
+      "title": "Nuestros Servicios",
+      "subtitle": "Soluciones integrales para hacer crecer tu marca en el entorno digital."
+    },
+    "stats": {
+      "clients": "Clientes satisfechos",
+      "projects": "Proyectos completados",
+      "growth": "Crecimiento promedio",
+      "years": "Años de experiencia"
+    },
+    "cta": {
+      "title": "¿Listo para transformar tu negocio?",
+      "subtitle": "Hablemos sobre cómo podemos ayudarte a alcanzar tus metas.",
+      "button": "Agenda una consulta"
+    }
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "subtitle": "Estamos listos para ayudarte a llevar tu marca al siguiente nivel.",
+    "form": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "company": "Empresa",
+      "message": "Mensaje",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando...",
+      "success": "¡Mensaje enviado! Te contactaremos pronto.",
+      "error": "Error al enviar. Por favor intenta de nuevo."
+    },
+    "info": {
+      "email": "Email",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "hours": "Horario",
+      "hoursValue": "Lun–Vie: 8am – 6pm (COT)"
+    }
+  },
+  "services": {
+    "content": {
+      "title": "Creación de Contenido Premium",
+      "subtitle": "Elevamos tu marca con contenido estratégico de alto impacto.",
+      "description": "Producimos contenido que conecta, convierte y posiciona tu marca como líder en tu industria.",
+      "cta": "Ver planes"
+    },
+    "strategy": {
+      "title": "Estrategia de Marca",
+      "subtitle": "Construimos identidades de marca que perduran.",
+      "description": "Desarrollamos estrategias de marca completas que diferencian tu negocio y conectan con tu audiencia."
+    },
+    "automation": {
+      "title": "Automatización & IA",
+      "subtitle": "Potencia tu negocio con inteligencia artificial.",
+      "description": "Implementamos soluciones de automatización y AI que optimizan tus procesos y maximizan la eficiencia."
+    },
+    "webdev": {
+      "title": "Desarrollo Web",
+      "subtitle": "Sitios web que convierten visitantes en clientes.",
+      "description": "Creamos sitios web modernos, rápidos y optimizados para SEO que generan resultados medibles."
+    },
+    "flyering": {
+      "title": "Marketing 360°",
+      "subtitle": "Estrategias integrales que abarcan todos los canales.",
+      "description": "Diseñamos campañas de marketing completas que maximizan tu presencia y ROI en todos los puntos de contacto."
+    }
+  },
+  "methodology": {
+    "title": "Nuestra Metodología",
+    "subtitle": "Un proceso probado para garantizar resultados excepcionales.",
+    "steps": {
+      "discover": "Descubrir",
+      "discoverDesc": "Analizamos tu negocio, mercado y competencia en profundidad.",
+      "strategy": "Estrategia",
+      "strategyDesc": "Desarrollamos un plan personalizado basado en datos reales.",
+      "execute": "Ejecutar",
+      "executeDesc": "Implementamos con excelencia y atención al detalle.",
+      "measure": "Medir",
+      "measureDesc": "Monitoreamos resultados y optimizamos continuamente."
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "Proyectos que han transformado marcas reales.",
+    "filter": {
+      "all": "Todos",
+      "branding": "Branding",
+      "digital": "Digital",
+      "content": "Contenido"
+    },
+    "viewProject": "Ver proyecto"
+  },
+  "blog": {
+    "title": "Insights & Tendencias",
+    "subtitle": "Conocimiento experto para hacer crecer tu negocio.",
+    "readMore": "Leer más",
+    "categories": {
+      "all": "Todos",
+      "marketing": "Marketing",
+      "strategy": "Estrategia",
+      "technology": "Tecnología"
+    }
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "subtitle": "Por favor lee estos términos antes de usar nuestros servicios.",
+    "lastUpdated": "Vigente desde:"
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "subtitle": "En LegacyMark, tu privacidad es nuestra prioridad.",
+    "lastUpdated": "Actualizado:"
+  },
+  "cookies": {
+    "title": "Política de Cookies",
+    "subtitle": "En LegacyMark, nos comprometemos con la transparencia.",
+    "accept": "Aceptar todas",
+    "reject": "Rechazar no esenciales",
+    "configure": "Configurar"
+  },
+  "dataDeletion": {
+    "title": "Control de Privacidad y Datos",
+    "subtitle": "Tienes control total sobre tu información personal.",
+    "requestDeletion": "Solicitar Eliminación",
+    "steps": {
+      "step1": "Inicia la Solicitud",
+      "step1Desc": "Envía un correo electrónico a nuestro equipo de privacidad.",
+      "step2": "Validación",
+      "step2Desc": "Verificaremos tu identidad para proteger tus datos.",
+      "step3": "Borrado Seguro",
+      "step3Desc": "Tus datos serán eliminados en 30 días."
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "learnMore": "Más información",
+    "viewAll": "Ver todos",
+    "backHome": "Volver al inicio",
+    "nit": "NIT",
+    "address": "Dirección",
+    "whatsappMessage": "Hola LegacyMark, me gustaría obtener más información sobre sus servicios.",
+    "chatWithUs": "Chatea con nosotros"
+  }
+}
