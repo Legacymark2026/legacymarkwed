@@ -10,7 +10,6 @@ import { CustomCursor } from "@/components/ui/custom-cursor";
 import { AmbientBackground } from "@/components/ui/ambient-background";
 import { BackToTop } from "@/components/ui/back-to-top";
 import { CookieConsent } from "@/components/ui/cookie-consent";
-import { NewsletterPopup } from "@/components/ui/newsletter-popup";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CommandMenu } from "@/components/ui/command-menu";
 import { PageTransition } from "@/components/ui/page-transition";
@@ -101,7 +100,6 @@ export default async function RootLayout({
           </PageTransition>
           <BackToTop />
           <CookieConsent />
-          <NewsletterPopup />
           <ChatWidget />
         </Providers>
       </body>

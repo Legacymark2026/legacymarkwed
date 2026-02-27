@@ -1082,6 +1082,11 @@ model Expert {
   imageUrl    String? @map("image_url")
   socialLinks Json?   @default("{}") @map("social_links")
 
+  // Nuevos campos para Team Grid
+  badgeId   String?  @map("badge_id")
+  iconName  String?  @map("icon_name")
+  skills    String[] @default([])
+
   order     Int     @default(0)
   isVisible Boolean @default(true) @map("is_visible")
 

@@ -28,6 +28,9 @@ const expertSchema = z.object({
         platform: z.string(),
         url: z.string().url("Must be a valid URL."),
     })).optional(),
+    badgeId: z.string().optional(),
+    iconName: z.string().optional(),
+    skills: z.string().optional(), // We'll handle comma-separated string
     isVisible: z.boolean().default(true),
 });
 
@@ -49,6 +52,9 @@ export function ExpertForm({ initialData, onSubmit, onCancel, isLoading }: Exper
             bio: "",
             imageUrl: "",
             socialLinks: [],
+            badgeId: "",
+            iconName: "",
+            skills: "",
             isVisible: true,
         },
     });
@@ -115,6 +121,45 @@ export function ExpertForm({ initialData, onSubmit, onCancel, isLoading }: Exper
                                     onChange={field.onChange}
                                     disabled={isLoading}
                                 />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="badgeId"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Badge ID (Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g. OP-01" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="iconName"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Icon Name (Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g. Shield, Code2, Users" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="skills"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Skills (Comma-separated, Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g. React, Node.js, AWS" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

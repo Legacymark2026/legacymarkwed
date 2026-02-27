@@ -7,6 +7,7 @@ import { Methodology } from "@/components/sections/methodology";
 import { LatestPosts } from "@/components/sections/latest-posts";
 import { PortfolioPreview } from "@/components/sections/portfolio-preview";
 import { getRecentProjects, getRecentPosts } from "@/lib/data";
+import { getExperts } from "@/actions/experts";
 import { TestimonialSlider } from "@/components/sections/testimonial-slider";
 import { TeamGrid } from "@/components/sections/team-grid";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
@@ -16,6 +17,7 @@ import { CTA } from "@/components/sections/cta";
 export default async function HomePage() {
     const projects = await getRecentProjects(4);
     const posts = await getRecentPosts(3);
+    const experts = await getExperts();
 
     return (
         <main className="relative bg-white text-slate-900 overflow-hidden scroll-smooth">
@@ -49,7 +51,7 @@ export default async function HomePage() {
                     <div data-ga-section="metodologia"><Methodology /></div>
                 </div>
 
-                <div data-ga-section="equipo"><TeamGrid /></div>
+                <div data-ga-section="equipo"><TeamGrid experts={experts} /></div>
                 <div data-ga-section="faq"><FaqAccordion /></div>
                 <div data-ga-section="cta-principal"><CTA /></div>
                 <div data-ga-section="portfolio-preview"><PortfolioPreview projects={projects} /></div>

@@ -13,7 +13,7 @@ import {
 } from "@/components/blog/blog-post-components";
 import { EngagementBar } from "@/components/blog/blog-engagement";
 import { CommentSection } from "@/components/blog/blog-comments";
-import { NewsletterPopup, NewsletterInline } from "@/components/blog/newsletter";
+import { NewsletterInline } from "@/components/blog/newsletter";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/seo/structured-data";
 import { getPostComments, getCommentCount } from "@/actions/blog";
 import { BlogContentViewer } from "@/components/blog/blog-content-viewer";
@@ -351,9 +351,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         </div>
                     </section>
                 )}
-
-                {/* Newsletter Popup */}
-                <NewsletterPopup delay={45000} exitIntent={true} />
 
                 {/* Reading Progress Script */}
                 <script

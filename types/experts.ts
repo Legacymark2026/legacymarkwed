@@ -11,7 +11,10 @@ export interface Expert {
     role: string;
     bio: string | null;
     imageUrl: string | null;
-    socialLinks: any;
+    socialLinks: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    badgeId: string | null;
+    iconName: string | null;
+    skills: string[];
     isVisible: boolean;
     order: number;
 }

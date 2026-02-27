@@ -105,9 +105,15 @@ export default function ExpertsPage() {
 
     async function handleFormSubmit(data: any) {
         setIsSaving(true);
+        // Transform skills string back to array
+        const submitData = {
+            ...data,
+            skills: data.skills ? data.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+        };
+
         try {
             if (editingExpert) {
-                const res = await updateExpert(editingExpert.id, data);
+                const res = await updateExpert(editingExpert.id, submitData);
                 if (res.success) {
                     toast.success("Expert updated successfully.");
                 } else {
@@ -115,7 +121,7 @@ export default function ExpertsPage() {
                 }
             } else {
                 const res = await createExpert({
-                    ...data,
+                    ...submitData,
                     order: experts.length,
                 });
                 if (res.success) {
@@ -267,6 +273,10 @@ export default function ExpertsPage() {
                             role: editingExpert.role,
                             bio: editingExpert.bio || "",
                             imageUrl: editingExpert.imageUrl || "",
+                            socialLinks: editingExpert.socialLinks || [],
+                            badgeId: editingExpert.badgeId || "",
+                            iconName: editingExpert.iconName || "",
+                            skills: editingExpert.skills ? editingExpert.skills.join(", ") : "",
                             isVisible: editingExpert.isVisible
                         } : undefined}
                         onSubmit={handleFormSubmit}

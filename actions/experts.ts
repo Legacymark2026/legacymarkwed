@@ -12,6 +12,9 @@ const ExpertSchema = z.object({
     bio: z.string().optional(),
     imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
     socialLinks: z.string().optional(), // JSON string
+    badgeId: z.string().optional(),
+    iconName: z.string().optional(),
+    skills: z.array(z.string()).default([]),
     isVisible: z.boolean().default(true),
     order: z.number().default(0),
 });
@@ -66,6 +69,9 @@ export async function createExpert(data: ExpertInput) {
                 bio: validated.bio,
                 imageUrl: validated.imageUrl,
                 socialLinks: socialLinksJson,
+                badgeId: validated.badgeId,
+                iconName: validated.iconName,
+                skills: validated.skills,
                 isVisible: validated.isVisible,
                 order: validated.order,
             },
