@@ -8,6 +8,7 @@ import { getAllExpertsAdmin, createExpert, updateExpert, deleteExpert, reorderEx
 import { toast } from "sonner";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { Skeleton } from "@/components/ui/skeleton";
 import { ExpertCard } from "@/components/experts/ExpertCard";
 import { ExpertForm } from "@/components/experts/ExpertForm";
 import { ExpertStats } from "@/components/experts/ExpertStats";
@@ -36,6 +37,17 @@ export default function ExpertsPage() {
 
     useEffect(() => {
         loadExperts();
+
+        // Keyboard Shortcut: Cmd/Ctrl + K for search
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                const searchInput = document.getElementById('expert-search-input');
+                if (searchInput) searchInput.focus();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
     async function loadExperts() {
@@ -85,6 +97,19 @@ export default function ExpertsPage() {
         setIsSheetOpen(true);
     }
 
+    function handleDuplicate(expert: Expert) {
+        // Formateamos para que funcione con el modal de creación (eliminar IDs / timestamps no existe en form)
+        const duplicatedData = {
+            ...expert,
+            id: undefined, // no id
+            name: `${expert.name} (Copia)`,
+            skills: expert.skills ? expert.skills.filter(s => typeof s === 'string') : []
+        };
+        // @ts-ignore // Setting initial form behavior for creation
+        setEditingExpert(duplicatedData);
+        setIsSheetOpen(true);
+    }
+
     async function handleToggleVisibility(id: string, currentStatus: boolean) {
         // Optimistic UI Update
         const originalExperts = [...experts];
@@ -105,10 +130,13 @@ export default function ExpertsPage() {
 
     async function handleFormSubmit(data: any) {
         setIsSaving(true);
-        // Transform skills string back to array
+        // Transform skills string back to array and ensure socialLinks are strictly a JSON string
         const submitData = {
             ...data,
-            skills: data.skills ? data.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+            skills: data.skills && typeof data.skills === 'string'
+                ? data.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
+                : (Array.isArray(data.skills) ? data.skills : []),
+            socialLinks: data.socialLinks ? JSON.stringify(data.socialLinks) : "[]"
         };
 
         try {
@@ -202,8 +230,29 @@ export default function ExpertsPage() {
 
             {/* Content Area */}
             {isLoading ? (
-                <div className="flex justify-center py-20">
-                    <Loader2 className="animate-spin text-teal-600 h-10 w-10" />
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 min-h-[400px]">
+                    <div className="space-y-4">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/50">
+                                <Skeleton className="h-6 w-6 rounded-md" />
+                                <Skeleton className="h-14 w-14 rounded-full" />
+                                <div className="space-y-2 flex-1">
+                                    <Skeleton className="h-5 w-[250px]" />
+                                    <Skeleton className="h-4 w-[200px]" />
+                                    <div className="flex gap-2">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-20" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 pt-4 border-t border-slate-100 sm:border-0 sm:pt-0">
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             ) : (
                 <div className="bg-slate-50/50 rounded-2xl p-6 min-h-[400px] border border-dashed border-slate-300">
@@ -226,6 +275,7 @@ export default function ExpertsPage() {
                                             onEdit={openEditSheet}
                                             onDelete={handleDelete}
                                             onToggleVisibility={handleToggleVisibility}
+                                            onDuplicate={handleDuplicate}
                                         />
                                     ))}
                                 </div>
@@ -252,11 +302,14 @@ export default function ExpertsPage() {
                 </div>
             )}
 
-            {/* Create/Edit Sheet */}
+            {/* Create/Edit Sheet - Glassmorphism UI */}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetContent
-                    className="sm:max-w-md overflow-y-auto"
-                    onInteractOutside={(e: any) => e.preventDefault()}
+                    className="sm:max-w-[450px] overflow-y-auto bg-white/95 backdrop-blur-xl border-l-0 shadow-2xl p-6 custom-scrollbar"
+                    onInteractOutside={(e: any) => {
+                        // Impedir cierre accidental
+                        e.preventDefault();
+                    }}
                 >
                     <SheetHeader className="mb-6">
                         <SheetTitle>{editingExpert ? "Edit Expert" : "Add New Expert"}</SheetTitle>
@@ -276,8 +329,8 @@ export default function ExpertsPage() {
                             socialLinks: editingExpert.socialLinks || [],
                             badgeId: editingExpert.badgeId || "",
                             iconName: editingExpert.iconName || "",
-                            skills: editingExpert.skills ? editingExpert.skills.join(", ") : "",
-                            isVisible: editingExpert.isVisible
+                            skills: editingExpert.skills && Array.isArray(editingExpert.skills) ? editingExpert.skills.join(",") : (editingExpert.skills || ""),
+                            isVisible: editingExpert.isVisible !== undefined ? editingExpert.isVisible : true
                         } : undefined}
                         onSubmit={handleFormSubmit}
                         onCancel={() => setIsSheetOpen(false)}
