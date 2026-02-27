@@ -29,6 +29,8 @@ export async function getUsers() {
                 email: true,
                 role: true,
                 createdAt: true,
+                deactivatedAt: true,
+                mfaEnabled: true,
                 _count: {
                     select: { sessions: true }
                 }
@@ -54,6 +56,82 @@ export async function deleteUser(userId: string) {
     } catch (error) {
         console.error("Failed to delete user:", error);
         return { error: "Failed to delete user" };
+    }
+}
+
+export async function toggleUserStatus(userId: string) {
+    const session = await auth();
+    const currentUserId = session?.user?.id;
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    if (currentUserId === userId) {
+        return { success: false, error: "No puedes suspender tu propia cuenta." };
+    }
+
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) return { success: false, error: "Usuario no encontrado" };
+
+        const newStatus = user.deactivatedAt ? null : new Date();
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { deactivatedAt: newStatus },
+        });
+
+        revalidatePath("/dashboard/users");
+        return { success: true, isDeactivated: !!newStatus };
+    } catch (error) {
+        console.error("Failed to toggle user status:", error);
+        return { success: false, error: "Error al actualizar estado" };
+    }
+}
+
+export async function bulkDeleteUsers(userIds: string[]) {
+    const session = await auth();
+    const currentUserId = session?.user?.id;
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    if (currentUserId && userIds.includes(currentUserId)) {
+        return { success: false, error: "No puedes auto-eliminarte en una acción masiva." };
+    }
+
+    try {
+        const res = await prisma.user.deleteMany({
+            where: { id: { in: userIds } },
+        });
+        revalidatePath("/dashboard/users");
+        return { success: true, count: res.count };
+    } catch (error) {
+        console.error("Failed to bulk delete users:", error);
+        return { success: false, error: "Error al eliminar múltiples usuarios" };
+    }
+}
+
+export async function bulkToggleUsersStatus(userIds: string[], deactivate: boolean) {
+    const session = await auth();
+    const currentUserId = session?.user?.id;
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    const targetUserIds = userIds.filter(id => id !== currentUserId);
+
+    if (targetUserIds.length === 0) {
+        return { success: false, error: "Selección no válida o intentaste afectar tu propia cuenta." };
+    }
+
+    try {
+        const res = await prisma.user.updateMany({
+            where: { id: { in: targetUserIds } },
+            data: { deactivatedAt: deactivate ? new Date() : null },
+        });
+        revalidatePath("/dashboard/users");
+        return { success: true, count: res.count };
+    } catch (error) {
+        console.error("Failed to bulk toggle users:", error);
+        return { success: false, error: "Error al actualizar múltiples usuarios" };
     }
 }
 
