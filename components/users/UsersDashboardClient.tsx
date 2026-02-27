@@ -270,7 +270,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
                                                             <div className="flex items-center gap-2">
                                                                 <p className="text-sm font-bold text-slate-900">{user.name || "Sin Nombre"}</p>
                                                                 {isSelf && <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Tú</span>}
-                                                                {user.mfaEnabled && <Shield size={12} className="text-emerald-500" title="MFA Activado" />}
+                                                                {user.mfaEnabled && <span title="MFA Activado"><Shield size={12} className="text-emerald-500" /></span>}
                                                             </div>
                                                             <p className="text-xs text-slate-500 font-medium font-mono mt-0.5">{user.email}</p>
                                                         </div>
