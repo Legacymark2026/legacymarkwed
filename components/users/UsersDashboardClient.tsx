@@ -5,20 +5,28 @@ import { UserRole } from "@/types/auth";
 import { RoleSelector } from "@/components/dashboard/RoleSelector";
 import { toggleUserStatus, bulkDeleteUsers, bulkToggleUsersStatus } from "@/actions/admin";
 import { toast } from "sonner";
-import { Crown, Shield, Megaphone, ShoppingBag, Palette, Users, UserPlus, Search, Download, Trash, UserX, UserCheck, Inbox } from "lucide-react";
+import {
+    Crown, Shield, Megaphone, ShoppingBag, Palette, Users, UserPlus,
+    Search, Download, Trash, UserX, Inbox, LayoutGrid, List, SlidersHorizontal,
+    MoreVertical, Star, EyeOff, Briefcase
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Prisma } from "@prisma/client";
+import { UserDrawer } from "./UserDrawer";
 
-// Mapped User type matching our Prisma schema returns for `getUsers`
 type UserRecord = {
     id: string;
     name: string | null;
     email: string | null;
     role: string;
+    phone: string | null;
+    jobTitle: string | null;
+    adminNotes: string | null;
+    customTag: string | null;
     createdAt: Date;
     deactivatedAt: Date | null;
     mfaEnabled: boolean;
+    emailVerified: boolean | null;
     _count: { sessions: number };
 };
 
@@ -36,115 +44,89 @@ const ROLE_INFO: Record<string, { icon: React.ReactNode; label: string; color: s
     guest: { icon: <Users size={12} />, label: "Invitado", color: "bg-gray-50 text-gray-500 border-gray-200" },
 };
 
-function StatsCard({ label, value, icon, index }: { label: string; value: number; icon: React.ReactNode; index: number }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
-            className="bg-white rounded-2xl border border-slate-200/60 p-5 flex items-center gap-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-md transition-shadow"
-        >
-            <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 shadow-sm">
-                {icon}
-            </div>
-            <div>
-                <motion.p
-                    initial={{ scale: 0.5 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 100, delay: index * 0.1 + 0.2 }}
-                    className="text-2xl font-black text-slate-900"
-                >
-                    {value}
-                </motion.p>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</p>
-            </div>
-        </motion.div>
-    );
-}
-
 export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClientProps) {
     const [users, setUsers] = useState<UserRecord[]>(initialUsers);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
     const [roleFilter, setRoleFilter] = useState("all");
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [starredIds, setStarredIds] = useState<Set<string>>(new Set());
     const [isClient, setIsClient] = useState(false);
 
-    // Hydration fix
+    // View States
+    const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+    const [showMetrics, setShowMetrics] = useState(true);
+    const [selectedUserForDrawer, setSelectedUserForDrawer] = useState<UserRecord | null>(null);
+    const [contextMenu, setContextMenu] = useState<{ x: number, y: number, userId: string } | null>(null);
+
     useEffect(() => {
         setIsClient(true);
-        // Cmd/Ctrl+K mapping
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
                 document.getElementById("user-search-input")?.focus();
             }
         };
+        const closeContext = () => setContextMenu(null);
         document.addEventListener("keydown", down);
-        return () => document.removeEventListener("keydown", down);
+        document.addEventListener("click", closeContext);
+        return () => {
+            document.removeEventListener("keydown", down);
+            document.removeEventListener("click", closeContext);
+        };
     }, []);
 
-    // Filter Logic
     const filteredUsers = useMemo(() => {
-        return users.filter(user => {
+        let result = users.filter(user => {
             const matchesSearch = (user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 user.email?.toLowerCase().includes(searchQuery.toLowerCase()));
             const matchesRole = roleFilter === "all" || user.role === roleFilter;
             return matchesSearch && matchesRole;
         });
-    }, [users, searchQuery, roleFilter]);
 
-    // Derived stats
-    const totalUsers = users.length;
-    const roleCount = (role: string) => users.filter(u => u.role === role).length;
+        // Sort starred first
+        result.sort((a, b) => {
+            if (starredIds.has(a.id) && !starredIds.has(b.id)) return -1;
+            if (!starredIds.has(a.id) && starredIds.has(b.id)) return 1;
+            return 0;
+        });
 
-    // Selection
-    const toggleSelectAll = () => {
-        if (selectedIds.size === filteredUsers.length && filteredUsers.length > 0) {
-            setSelectedIds(new Set());
-        } else {
-            setSelectedIds(new Set(filteredUsers.map(u => u.id)));
-        }
+        return result;
+    }, [users, searchQuery, roleFilter, starredIds]);
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+        setIsTyping(true);
+        setTimeout(() => setIsTyping(false), 500);
     };
 
-    const toggleSelectOne = (id: string) => {
-        const next = new Set(selectedIds);
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-        setSelectedIds(next);
-    };
-
-    // Actions
     const handleToggleStatus = async (userId: string) => {
         const originalStatus = users.find(u => u.id === userId)?.deactivatedAt;
-
-        // Optimistic UI updates
         setUsers(prev => prev.map(u => u.id === userId ? { ...u, deactivatedAt: originalStatus ? null : new Date() } : u));
-
         const res = await toggleUserStatus(userId);
         if (res.success) {
             toast.success(res.isDeactivated ? "Usuario suspendido correctamente." : "Usuario reactivado.");
         } else {
             toast.error(res.error || "Algo falló.");
-            // Revert
             setUsers(prev => prev.map(u => u.id === userId ? { ...u, deactivatedAt: originalStatus ?? null } : u));
         }
     };
 
-    const handleBulkDeactivate = async () => {
-        if (selectedIds.size === 0) return;
-
-        const res = await bulkToggleUsersStatus(Array.from(selectedIds), true);
-        if (res.success) {
-            toast.success(`${res.count} usuarios suspendidos.`);
-            setUsers(prev => prev.map(u => selectedIds.has(u.id) && u.id !== currentUserId ? { ...u, deactivatedAt: new Date() } : u));
-            setSelectedIds(new Set());
-        } else { toast.error(res.error); }
+    const handleDrawerUpdate = (userId: string, data: Partial<UserRecord>) => {
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...data } : u));
     };
 
-    const copyEmail = (email: string | null) => {
-        if (!email) return;
-        navigator.clipboard.writeText(email);
-        toast.success("Correo copiado al portapapeles", { icon: "📋" });
+    const handleRightClick = (e: React.MouseEvent, userId: string) => {
+        e.preventDefault();
+        setContextMenu({ x: e.clientX, y: e.clientY, userId });
+    };
+
+    const toggleStar = (userId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const next = new Set(starredIds);
+        if (next.has(userId)) next.delete(userId);
+        else next.add(userId);
+        setStarredIds(next);
     };
 
     const generateAvatarColor = (name: string | null) => {
@@ -160,7 +142,6 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
         return palettes[charCode % palettes.length];
     };
 
-    // Formateador de fechas relativas ultra-pro
     const getRelativeDate = (date: Date) => {
         const rtf = new Intl.RelativeTimeFormat('es-CO', { numeric: 'auto' });
         const daysDiff = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
@@ -173,228 +154,236 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
     if (!isClient) return <Skeleton className="w-full h-[600px] rounded-2xl" />;
 
     return (
-        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500 pb-20">
             {/* HERO HEADER */}
             <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 rounded-2xl p-8 text-white shadow-xl">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 text-indigo-500/10">
                     <Users size={300} />
                 </div>
-                <div className="relative z-10">
-                    <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
-                        Agencia Hub <span className="text-indigo-400">|</span> Users
-                    </h1>
-                    <p className="mt-2 text-indigo-100/80 max-w-xl text-sm leading-relaxed">
-                        Control del directorio C-Level, gestores creativos e invitados. Panel centralizado de accesos.
-                    </p>
-                    <div className="mt-6 flex gap-3">
-                        <button className="bg-white text-indigo-900 px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:shadow-md hover:bg-indigo-50 transition-all flex items-center gap-2">
-                            <UserPlus size={16} />
-                            Invitar Usuario
+                <div className="relative z-10 flex justify-between items-start">
+                    <div>
+                        <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
+                            <span className="text-indigo-400">♦</span> Directorio IAM
+                        </h1>
+                        <p className="mt-2 text-indigo-100/80 max-w-xl text-sm leading-relaxed">
+                            Control de identidades, accesos y métricas operativas de la organización.
+                        </p>
+                    </div>
+                    <div className="flex gap-3">
+                        <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center gap-2 backdrop-blur-md">
+                            <Download size={16} /> Exportar IAM
+                        </button>
+                        <button className="bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all flex items-center gap-2">
+                            <UserPlus size={16} /> Invitar Miembro
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* 3D STATS CARDS */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <StatsCard index={0} label="Total Network" value={totalUsers} icon={<Users size={20} />} />
-                <StatsCard index={1} label="Super Admins" value={roleCount('super_admin')} icon={<Crown size={20} className="text-red-500" />} />
-                <StatsCard index={2} label="Project Mgrs" value={roleCount('admin')} icon={<Shield size={20} className="text-indigo-500" />} />
-                <StatsCard index={3} label="Content / SEO" value={roleCount('content_manager')} icon={<Megaphone size={20} className="text-teal-500" />} />
-                <StatsCard index={4} label="Ventas" value={roleCount('client_admin')} icon={<ShoppingBag size={20} className="text-amber-500" />} />
-            </div>
+            {/* TOOLBAR AVANZADO */}
+            <div className="bg-white rounded-2xl border border-slate-200 outline outline-4 outline-slate-50/50 shadow-sm p-4 flex flex-col xl:flex-row gap-4 justify-between items-center sticky top-4 z-30">
+                <div className="flex w-full xl:w-auto items-center gap-2 relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <input
+                        id="user-search-input"
+                        type="text"
+                        placeholder="Buscar identidad (Cmd+K)..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-14 py-2 text-sm w-full xl:w-80 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                    />
+                    <AnimatePresence>
+                        {isTyping && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute right-12 top-1/2 -translate-y-1/2 flex gap-1">
+                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
+                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
-            {/* MAIN TABLE WRAPPER */}
-            <div className="bg-white rounded-2xl border border-slate-200 outline outline-4 outline-slate-50/50 shadow-sm overflow-hidden flex flex-col">
-
-                {/* TOOLBAR */}
-                <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center gap-4 justify-between">
-                    <div className="flex w-full md:w-auto items-center gap-2 relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                        <input
-                            id="user-search-input"
-                            type="text"
-                            placeholder="Buscar por nombre o correo..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-white border border-slate-200 rounded-lg pl-9 pr-14 py-2 text-sm w-full md:w-80 shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                        />
-                        <div className="absolute right-2 opacity-60 text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">⌘K</div>
-                    </div>
-
-                    <div className="flex w-full md:w-auto items-center gap-3 overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
-                        {/* ROLE PILLS FILTER */}
-                        <div className="flex gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
-                            <button
-                                onClick={() => setRoleFilter('all')}
-                                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${roleFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                            >
-                                Todos
+                <div className="flex w-full xl:w-auto items-center gap-3 overflow-x-auto pb-1 xl:pb-0 hide-scrollbar">
+                    <div className="flex gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
+                        <button onClick={() => setRoleFilter('all')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${roleFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Todos</button>
+                        {Object.entries(ROLE_INFO).filter(([k]) => k !== 'guest').map(([k, info]) => (
+                            <button key={k} onClick={() => setRoleFilter(k)} className={`px-3 py-1.5 flex items-center gap-1.5 text-xs font-bold rounded-lg transition-all ${roleFilter === k ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
+                                {info.icon} <span className="hidden sm:inline">{info.label}</span>
                             </button>
-                            {Object.entries(ROLE_INFO).filter(([k]) => k !== 'guest').map(([k, info]) => (
-                                <button
-                                    key={k}
-                                    onClick={() => setRoleFilter(k)}
-                                    className={`px-3 py-1 flex items-center gap-1.5 text-xs font-semibold rounded-lg transition-all ${roleFilter === k ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
-                                >
-                                    {info.icon} <span className="hidden lg:inline">{info.label}</span>
-                                </button>
-                            ))}
-                        </div>
+                        ))}
                     </div>
-                </div>
 
-                {/* BATCH ACTIONS BAR (Conditionally Rendered) */}
-                <AnimatePresence>
-                    {selectedIds.size > 0 && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="bg-indigo-50 border-b border-indigo-100 px-6 py-3 flex items-center justify-between overflow-hidden"
-                        >
-                            <span className="text-sm font-semibold text-indigo-900 flex items-center gap-2">
-                                <span className="bg-indigo-600 text-white w-5 h-5 rounded flex items-center justify-center text-xs">{selectedIds.size}</span>
-                                seleccionados
-                            </span>
-                            <div className="flex gap-2">
-                                <button onClick={handleBulkDeactivate} className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold bg-white text-amber-600 border border-amber-200 hover:bg-amber-50 transition-colors shadow-sm">
-                                    <UserX size={14} /> Suspender Masivo
-                                </button>
-                                <button className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold bg-white text-red-600 border border-red-200 hover:bg-red-50 transition-colors shadow-sm">
-                                    <Trash size={14} /> Eliminar
-                                </button>
-                                <button className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm ml-2">
-                                    <Download size={14} /> CSV
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                    <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
 
-                {/* ADVANCED TABLE */}
-                <div className="overflow-x-auto min-h-[400px]">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-slate-200 bg-white">
-                                <th className="py-4 px-6 relative w-12">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedIds.size === filteredUsers.length && filteredUsers.length > 0}
-                                        onChange={toggleSelectAll}
-                                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
-                                    />
-                                </th>
-                                <th className="py-4 px-6 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Perfil y Acceso</th>
-                                <th className="py-4 px-6 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Rol / Permisos</th>
-                                <th className="py-4 px-6 text-[10px] font-bold tracking-wider text-slate-400 uppercase hidden md:table-cell">Métricas</th>
-                                <th className="py-4 px-6 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Estado Vital</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            <AnimatePresence>
-                                {filteredUsers.map((user) => {
-                                    const isSelf = user.id === currentUserId;
-                                    const isDeactivated = !!user.deactivatedAt;
-                                    const avatarGradient = generateAvatarColor(user.name);
+                    <div className="flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
+                        <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><List size={16} /></button>
+                        <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid size={16} /></button>
+                    </div>
 
-                                    return (
-                                        <motion.tr
-                                            key={user.id}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className={`group transition-colors hover:bg-slate-50/50 ${selectedIds.has(user.id) ? 'bg-indigo-50/30' : ''} ${isDeactivated ? 'opacity-60 grayscale' : ''}`}
-                                        >
-                                            <td className="py-4 px-6 relative">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedIds.has(user.id)}
-                                                    onChange={() => toggleSelectOne(user.id)}
-                                                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
-                                                />
-                                                {/* Hover Glow Edge Effect */}
-                                                <div className="absolute inset-y-0 left-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </td>
-
-                                            {/* Profile Cell */}
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`h-10 w-10 shrink-0 rounded-full bg-gradient-to-br border flex items-center justify-center font-bold text-sm ${avatarGradient}`}>
-                                                        {user.name?.[0]?.toUpperCase() ?? "U"}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <p className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors cursor-pointer">
-                                                                {user.name || "Usuario Sin Nombre"}
-                                                            </p>
-                                                            {isSelf && <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-500 border border-indigo-100 glow-pulse">You</span>}
-                                                            {user.mfaEnabled && <span title="2FA Activado" className="text-xs">🛡️</span>}
-                                                        </div>
-                                                        <p onClick={() => copyEmail(user.email)} className="text-xs text-slate-500 hover:text-slate-800 cursor-copy transition-colors group/copy">
-                                                            {user.email} <span className="opacity-0 group-hover/copy:opacity-100">📋</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            {/* Role Selector */}
-                                            <td className="py-4 px-6">
-                                                <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} />
-                                            </td>
-
-                                            {/* Metrics */}
-                                            <td className="py-4 px-6 hidden md:table-cell">
-                                                <p className="text-xs font-semibold text-slate-700">{user._count?.sessions ?? 0} logins</p>
-                                                <p className="text-[10px] text-slate-400 mt-0.5">unido {getRelativeDate(new Date(user.createdAt))}</p>
-                                            </td>
-
-                                            {/* Status Toggle */}
-                                            <td className="py-4 px-6">
-                                                <button
-                                                    onClick={() => handleToggleStatus(user.id)}
-                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border transition-all hover:shadow-sm 
-                                                        ${isDeactivated
-                                                            ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
-                                                            : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'
-                                                        }`}
-                                                    title={isSelf ? "No puedes suspender tu cuenta" : "Click para cambiar estado"}
-                                                    disabled={isSelf}
-                                                >
-                                                    {!isDeactivated ? (
-                                                        <>
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Activo
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-red-400" /> Ausente
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </td>
-                                        </motion.tr>
-                                    );
-                                })}
-                            </AnimatePresence>
-
-                            {filteredUsers.length === 0 && (
-                                <tr>
-                                    <td colSpan={5} className="py-16 text-center">
-                                        <div className="flex flex-col items-center justify-center text-slate-400">
-                                            <Inbox className="w-12 h-12 mb-3 opacity-20" />
-                                            <p className="text-sm font-medium">No encontramos coincidencias para esta búsqueda o filtro.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div className="bg-slate-50 border-t border-slate-100 p-4 text-xs text-slate-400 font-medium text-center">
-                    Usa las casillas de la izquierda para acciones masivas (eliminar/suspender bloque).
+                    <button onClick={() => setShowMetrics(!showMetrics)} className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 bg-slate-50 border border-slate-200 transition-colors" title="Alternar Columnas">
+                        <SlidersHorizontal size={16} />
+                    </button>
                 </div>
             </div>
+
+            {/* VIEW RENDERER */}
+            {viewMode === "table" ? (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto min-h-[400px]">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-200 bg-slate-50/50">
+                                    <th className="py-4 px-6 w-12"><Star size={14} className="text-slate-300" /></th>
+                                    <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase">Identidad Registrada</th>
+                                    <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase">Asignación de Rol</th>
+                                    {showMetrics && <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase">Actividad</th>}
+                                    <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase text-right">Controles</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                <AnimatePresence>
+                                    {filteredUsers.map((user) => {
+                                        const isSelf = user.id === currentUserId;
+                                        const isDeactivated = !!user.deactivatedAt;
+                                        const avatarGradient = generateAvatarColor(user.name);
+                                        const isStarred = starredIds.has(user.id);
+
+                                        return (
+                                            <motion.tr
+                                                key={user.id}
+                                                layout
+                                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                                onContextMenu={(e) => handleRightClick(e, user.id)}
+                                                onClick={() => setSelectedUserForDrawer(user)}
+                                                className={`group transition-colors hover:bg-slate-50 cursor-pointer ${isDeactivated ? 'opacity-60 grayscale' : ''} ${isStarred ? 'bg-amber-50/10' : ''}`}
+                                            >
+                                                <td className="py-4 px-6" onClick={(e) => toggleStar(user.id, e)}>
+                                                    <Star size={16} className={`transition-colors hover:text-amber-500 ${isStarred ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`} />
+                                                </td>
+
+                                                <td className="py-4 px-6">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`h-10 w-10 shrink-0 rounded-full bg-gradient-to-br border flex items-center justify-center font-bold text-sm ${avatarGradient} shadow-sm group-hover:scale-105 transition-transform`}>
+                                                            {user.name?.[0]?.toUpperCase() ?? "U"}
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-sm font-bold text-slate-900">{user.name || "Sin Nombre"}</p>
+                                                                {isSelf && <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Tú</span>}
+                                                                {user.mfaEnabled && <Shield size={12} className="text-emerald-500" title="MFA Activado" />}
+                                                            </div>
+                                                            <p className="text-xs text-slate-500 font-medium font-mono mt-0.5">{user.email}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
+                                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} />
+                                                    {user.jobTitle && <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1"><Briefcase size={10} /> {user.jobTitle}</p>}
+                                                </td>
+
+                                                {showMetrics && (
+                                                    <td className="py-4 px-6">
+                                                        <div className="flex flex-col gap-1">
+                                                            <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                                                                {user._count?.sessions ?? 0} Inicios de sesión
+                                                            </p>
+                                                            <p className="text-[10px] text-slate-400">Ingreso: {getRelativeDate(new Date(user.createdAt))}</p>
+                                                        </div>
+                                                    </td>
+                                                )}
+
+                                                <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id); }}
+                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border transition-all hover:shadow-sm ${isDeactivated ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+                                                        disabled={isSelf}
+                                                    >
+                                                        {isDeactivated ? <><EyeOff size={12} /> Suspendido</> : 'Suspender'}
+                                                    </button>
+                                                </td>
+                                            </motion.tr>
+                                        );
+                                    })}
+                                </AnimatePresence>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            ) : (
+                /* GRID VIEW */
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredUsers.map(user => {
+                        const avatarGradient = generateAvatarColor(user.name);
+                        return (
+                            <div key={user.id} onClick={() => setSelectedUserForDrawer(user)} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group relative overflow-hidden">
+                                {user.deactivatedAt && <div className="absolute inset-0 bg-slate-100/50 backdrop-blur-[1px] z-10 flex items-center justify-center"><span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">Cuenta Suspendida</span></div>}
+
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br border flex items-center justify-center font-black text-lg ${avatarGradient} shadow-sm group-hover:-translate-y-1 transition-transform`}>
+                                        {user.name?.[0]?.toUpperCase() ?? "U"}
+                                    </div>
+                                    <button onClick={(e) => toggleStar(user.id, e)} className="p-1 z-20 hover:bg-slate-50 rounded-full">
+                                        <Star size={16} className={starredIds.has(user.id) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'} />
+                                    </button>
+                                </div>
+                                <h3 className="font-bold text-slate-900 truncate">{user.name || "Usuario Sin Nombre"}</h3>
+                                <p className="text-xs text-slate-500 font-mono truncate mb-4">{user.email}</p>
+
+                                <div className="flex items-center gap-2 mb-4" onClick={(e) => e.stopPropagation()}>
+                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={user.id === currentUserId} />
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <span>{user._count.sessions} Logins</span>
+                                    <span>{getRelativeDate(new Date(user.createdAt))}</span>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </motion.div>
+            )}
+
+            {filteredUsers.length === 0 && (
+                <div className="py-20 flex flex-col items-center justify-center text-slate-400 bg-white border border-slate-200 rounded-2xl border-dashed">
+                    <Inbox className="w-16 h-16 mb-4 opacity-20" />
+                    <p className="text-lg font-bold text-slate-600">No hay creativos a la vista</p>
+                    <p className="text-sm mt-1">Intenta con otro filtro o término de búsqueda.</p>
+                </div>
+            )}
+
+            {/* CONTEXT MENU COMPONENT */}
+            <AnimatePresence>
+                {contextMenu && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        style={{ top: contextMenu.y, left: contextMenu.x }}
+                        className="fixed z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-1.5 min-w-[180px]"
+                    >
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-2 pb-1 border-b border-slate-100 mb-1">Opciones Rápidas</p>
+                        <button onClick={() => { setSelectedUserForDrawer(users.find(u => u.id === contextMenu.userId) || null); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 rounded-lg transition-colors">
+                            Abrir Ficha Técnica
+                        </button>
+                        <button onClick={() => { handleToggleStatus(contextMenu.userId); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                            Alterar Estado
+                        </button>
+                        <button className="w-full text-left px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            Eliminar del Hub
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* USER DRAWER (SIDE PANEL) */}
+            <UserDrawer
+                user={selectedUserForDrawer}
+                onClose={() => setSelectedUserForDrawer(null)}
+                onUpdate={handleDrawerUpdate}
+            />
+
         </div>
     );
 }

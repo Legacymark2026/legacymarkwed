@@ -28,9 +28,14 @@ export async function getUsers() {
                 name: true,
                 email: true,
                 role: true,
+                phone: true,
+                jobTitle: true,
+                adminNotes: true,
+                customTag: true,
                 createdAt: true,
                 deactivatedAt: true,
                 mfaEnabled: true,
+                emailVerified: true, // For visual check
                 _count: {
                     select: { sessions: true }
                 }
@@ -40,6 +45,70 @@ export async function getUsers() {
     } catch (error) {
         console.error("Failed to fetch users:", error);
         return { error: "Failed to fetch users" };
+    }
+}
+
+export async function updateUserMeta(
+    userId: string,
+    data: { phone?: string; jobTitle?: string; adminNotes?: string; customTag?: string }
+) {
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    try {
+        const updated = await prisma.user.update({
+            where: { id: userId },
+            data,
+        });
+        revalidatePath("/dashboard/users");
+        return { success: true, user: updated };
+    } catch (error) {
+        console.error("Failed to update user meta:", error);
+        return { success: false, error: "Failed to update user notes" };
+    }
+}
+
+export async function forcePasswordReset(userId: string) {
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    try {
+        await prisma.passwordResetToken.create({
+            data: {
+                token: `admin-forced-${Math.random().toString(36).substring(7)}`,
+                expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
+                email: (await prisma.user.findUnique({ where: { id: userId } }))?.email || ""
+            }
+        });
+
+        await prisma.userActivityLog.create({
+            data: {
+                userId,
+                action: "ADMIN_FORCED_PASSWORD_RESET",
+                ipAddress: "System",
+                userAgent: "Admin Dashboard",
+            }
+        });
+
+        return { success: true, message: "Enlace de reseteo enviado" };
+    } catch (error) {
+        console.error("Failed to force reset:", error);
+        return { success: false, error: "Error forzando reseteo" };
+    }
+}
+
+export async function revokeAllSessions(userId: string) {
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    try {
+        await prisma.session.deleteMany({
+            where: { userId }
+        });
+        return { success: true, message: "Todas las sesiones revocadas" };
+    } catch (error) {
+        console.error("Failed to revoke sessions:", error);
+        return { success: false, error: "Error revocando sesiones" };
     }
 }
 

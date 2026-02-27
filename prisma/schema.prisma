@@ -19,10 +19,13 @@ model User {
   passwordHash  String?   @map("password_hash")
 
   // Custom Fields
-  firstName String? @map("first_name")
-  lastName  String? @map("last_name")
-  phone     String?
-  role      String  @default("guest") // Enum UserRole
+  firstName  String? @map("first_name")
+  lastName   String? @map("last_name")
+  phone      String?
+  jobTitle   String? @map("job_title")
+  adminNotes String? @map("admin_notes")
+  customTag  String? @map("custom_tag")
+  role       String  @default("guest") // Enum UserRole
 
   // Relations
   profile               UserProfile?
