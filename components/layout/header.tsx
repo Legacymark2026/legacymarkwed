@@ -63,7 +63,7 @@ export function Header() {
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative h-12 w-[200px] sm:h-14 sm:w-[280px] transition-transform duration-300 ease-out group-hover:scale-105">
+                    <div className="relative h-[62px] w-[260px] sm:h-[73px] sm:w-[364px] transition-transform duration-300 ease-out group-hover:scale-105">
                         {/* TODO: Update with dark logo for light theme if needed. Assuming current logo works on white or is adaptive */}
                         <Image src="/logo.png" alt="LegacyMark" fill className="object-contain" priority />
                     </div>
