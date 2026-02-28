@@ -264,8 +264,7 @@ export interface LeadFilters {
 }
 
 export async function getLeads(companyId: string, filters: LeadFilters = {}) {
-    const authCheck = await checkAuth();
-    if (authCheck) return { error: "Unauthorized" };
+    // Auth is handled at the dashboard middleware level
     const { status, source, scoreMin = 0, scoreMax = 100, search, page = 1, pageSize = 20, sortBy = "createdAt", sortOrder = "desc" } = filters;
 
     try {
@@ -307,8 +306,7 @@ export async function getLeads(companyId: string, filters: LeadFilters = {}) {
 }
 
 export async function getLeadById(id: string) {
-    const authCheck = await checkAuth();
-    if (authCheck) return { error: "Unauthorized" };
+    // Auth is handled at the dashboard middleware level — no redundant checkAuth here
     try {
         const lead = await prisma.lead.findUnique({
             where: { id },

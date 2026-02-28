@@ -4,8 +4,9 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { updateLead, bulkUpdateLeads } from "@/actions/crm";
-import { Search, Filter, Download, UserPlus, ChevronUp, ChevronDown, Check, X, Mail, Phone } from "lucide-react";
+import { bulkUpdateLeads } from "@/actions/crm";
+import { CreateLeadDialog } from "@/components/crm/create-lead-dialog";
+import { Search, Download, ChevronUp, ChevronDown, X, Mail, Phone } from "lucide-react";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -20,7 +21,6 @@ interface Props {
     leads: Lead[];
     total: number;
     companyId: string;
-    onFiltersChange?: (filters: Record<string, string>) => void;
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -116,9 +116,7 @@ export function LeadsTable({ leads, total, companyId }: Props) {
                 <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors">
                     <Download className="w-4 h-4" /> Exportar
                 </button>
-                <Link href="#new-lead" className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-teal-600 rounded-xl hover:bg-teal-700 transition-colors">
-                    <UserPlus className="w-4 h-4" /> Nuevo Lead
-                </Link>
+                <CreateLeadDialog companyId={companyId} />
                 <div className="ml-auto text-sm text-slate-400">{filtered.length} de {total} leads</div>
             </div>
 
