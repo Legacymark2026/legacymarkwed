@@ -29,8 +29,8 @@ export default function RoiCalculator() {
                     <div className="space-y-8">
                         <motion.h2
                             initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
+                            animate={{ opacity: 1, x: 0 }}
+                            
                             className="text-4xl font-bold text-slate-900"
                         >
                             Calcula tu ROI Potencial
@@ -97,8 +97,8 @@ export default function RoiCalculator() {
                     {/* Results Card */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        
                         className="glass-card rounded-3xl p-8 relative overflow-hidden group bg-white border border-slate-200 shadow-xl"
                     >
                         <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/10 via-sky-500/10 to-teal-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>

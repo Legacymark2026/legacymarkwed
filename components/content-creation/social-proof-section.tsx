@@ -110,16 +110,16 @@ export default function SocialProofSection() {
                 <div className="text-center mb-20">
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
+                        
                         className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-bold tracking-widest uppercase mb-6"
                     >
                         <Zap className="w-3 h-3" /> Resultados Reales
                     </motion.span>
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
+                        
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight"
                     >
@@ -130,8 +130,8 @@ export default function SocialProofSection() {
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1 }}
+                        
                         transition={{ delay: 0.2 }}
                         className="text-slate-500 text-lg max-w-lg mx-auto"
                     >
@@ -145,8 +145,8 @@ export default function SocialProofSection() {
                         <motion.div
                             key={idx}
                             initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            animate={{ opacity: 1, y: 0 }}
+                            
                             transition={{ delay: idx * 0.08 }}
                             className="group relative p-6 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-xl transition-all duration-500 hover:-translate-y-1 overflow-hidden"
                         >
@@ -179,8 +179,8 @@ export default function SocialProofSection() {
                             <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, x: -20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
+                                animate={{ opacity: 1, x: 0 }}
+                                
                                 transition={{ delay: idx * 0.1 }}
                                 onClick={() => setActiveTestimonial(idx)}
                                 className={`relative p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${activeTestimonial === idx
@@ -230,8 +230,8 @@ export default function SocialProofSection() {
                     {/* Case Study Card — 2 cols */}
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, x: 0 }}
+                        
                         transition={{ duration: 0.6 }}
                         className="lg:col-span-2"
                     >
@@ -253,8 +253,8 @@ export default function SocialProofSection() {
                                         <motion.div
                                             key={i}
                                             initial={{ height: 0 }}
-                                            whileInView={{ height: `${h}%` }}
-                                            viewport={{ once: true }}
+                                            animate={{ height: `${h}%` }}
+                                            
                                             transition={{ delay: i * 0.05, duration: 0.4 }}
                                             className="flex-1 rounded-sm bg-gradient-to-t from-teal-500 to-sky-400 opacity-80"
                                         />

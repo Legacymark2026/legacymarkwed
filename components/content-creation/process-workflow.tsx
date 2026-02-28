@@ -95,8 +95,8 @@ export default function ProcessWorkflow() {
                 <div className="text-center mb-20">
                     <motion.span
                         initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
+                        
                         className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-400 text-xs font-bold tracking-widest uppercase mb-6"
                     >
                         <Zap className="w-3 h-3" /> Proceso Comprobado
@@ -104,8 +104,8 @@ export default function ProcessWorkflow() {
 
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
+                        
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight"
                     >
@@ -116,8 +116,8 @@ export default function ProcessWorkflow() {
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1 }}
+                        
                         transition={{ delay: 0.2 }}
                         className="text-slate-400 text-lg max-w-xl mx-auto"
                     >
@@ -127,8 +127,8 @@ export default function ProcessWorkflow() {
                     {/* Timeline indicator */}
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
+                        
                         transition={{ delay: 0.3 }}
                         className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm"
                     >
@@ -152,8 +152,8 @@ export default function ProcessWorkflow() {
                             <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, x: idx % 2 === 0 ? -40 : 40 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true, margin: "-80px" }}
+                                animate={{ opacity: 1, x: 0 }}
+                                
                                 transition={{ duration: 0.6, delay: idx * 0.08, ease: "easeOut" }}
                                 className={`flex flex-col md:flex-row items-start md:items-center gap-6 pl-16 md:pl-0 ${idx % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
                                 onMouseEnter={() => setActiveStep(idx)}
@@ -235,8 +235,8 @@ export default function ProcessWorkflow() {
                 {/* CTA Final */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    animate={{ opacity: 1, y: 0 }}
+                    
                     transition={{ duration: 0.6 }}
                     className="mt-24 max-w-3xl mx-auto"
                 >
