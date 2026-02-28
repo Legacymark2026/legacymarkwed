@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createLead } from "@/actions/crm";
+import { createLead, checkDuplicateEmail } from "@/actions/crm";
 import { useRouter } from "next/navigation";
-import { UserPlus, X } from "lucide-react";
+import { UserPlus, X, AlertTriangle } from "lucide-react";
+import Link from "next/link";
 
 const SOURCES = ["GOOGLE", "FACEBOOK", "INSTAGRAM", "LINKEDIN", "TIKTOK", "REFERRAL", "DIRECT", "EMAIL", "ORGANIC", "WHATSAPP", "OTRO"];
 
@@ -15,6 +16,7 @@ export function CreateLeadDialog({ companyId }: Props) {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
+    const [duplicate, setDuplicate] = useState<{ leadId: string; leadName?: string } | null>(null);
     const [form, setForm] = useState({
         name: "", email: "", phone: "", company: "",
         source: "DIRECT", message: "",
@@ -22,6 +24,13 @@ export function CreateLeadDialog({ companyId }: Props) {
     });
 
     const set = (k: string, v: string) => setForm((prev) => ({ ...prev, [k]: v }));
+
+    const handleEmailBlur = async () => {
+        if (!form.email || !form.email.includes("@")) return;
+        const res = await checkDuplicateEmail(form.email, companyId);
+        if (res.isDuplicate) setDuplicate({ leadId: res.leadId!, leadName: res.leadName });
+        else setDuplicate(null);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -96,7 +105,14 @@ export function CreateLeadDialog({ companyId }: Props) {
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-semibold text-slate-600">Email <span className="text-red-400">*</span></label>
-                                            <input type="email" required value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="ana@empresa.com" className={inputCls} />
+                                            <input type="email" required value={form.email} onChange={(e) => set("email", e.target.value)} onBlur={handleEmailBlur} placeholder="ana@empresa.com" className={inputCls} />
+                                            {duplicate && (
+                                                <div className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs">
+                                                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                                                    <span className="text-amber-800">Ya existe: <strong>{duplicate.leadName ?? duplicate.leadId}</strong></span>
+                                                    <Link href={`/dashboard/admin/crm/leads/${duplicate.leadId}`} onClick={() => setOpen(false)} className="ml-auto font-bold text-teal-600 hover:underline">Ver →</Link>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-semibold text-slate-600">WhatsApp / Teléfono</label>

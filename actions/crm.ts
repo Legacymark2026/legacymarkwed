@@ -414,6 +414,20 @@ export async function createLead(data: {
     }
 }
 
+export async function checkDuplicateEmail(email: string, companyId: string): Promise<{ isDuplicate: boolean; leadId?: string; leadName?: string }> {
+    try {
+        const existing = await prisma.lead.findFirst({
+            where: { email: { equals: email, mode: "insensitive" }, companyId },
+            select: { id: true, name: true },
+        });
+        if (existing) return { isDuplicate: true, leadId: existing.id, leadName: existing.name ?? undefined };
+        return { isDuplicate: false };
+    } catch {
+        return { isDuplicate: false };
+    }
+}
+
+
 // ─── ACTIVITY ACTIONS ─────────────────────────────────────────────────────────
 
 export async function createDealActivity(dealId: string, type: string, content: string) {

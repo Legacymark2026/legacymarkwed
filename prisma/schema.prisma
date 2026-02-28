@@ -41,6 +41,8 @@ model User {
   crmActivities         CRMActivity[]
   assignedDeals         Deal[]            @relation("AssignedDeals")
   assignedConversations Conversation[]
+  assignedTasks         Task[]            @relation("TaskAssignee")
+  createdTasks          Task[]            @relation("TaskCreator")
 
   // Marketing
   marketingEvents MarketingEvent[]
@@ -167,6 +169,11 @@ model Company {
   marketingEvents MarketingEvent[]
   adSpends        AdSpend[]
   shortLinks      ShortLink[]
+
+  // CRM Advanced Features
+  tasks           Task[]
+  emailTemplates  EmailTemplate[]
+  scoringRules    LeadScoringRule[]
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -730,6 +737,86 @@ model CRMActivity {
   @@index([createdAt])
   @@map("crm_activities")
 }
+
+// --- CRM TASKS / REMINDERS ---
+
+model Task {
+  id          String    @id @default(uuid())
+  title       String
+  description String?   @db.Text
+  dueDate     DateTime? @map("due_date")
+  priority    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  completed   Boolean   @default(false)
+  completedAt DateTime? @map("completed_at")
+
+  // Linked to deal or lead (optional)
+  dealId  String? @map("deal_id")
+  leadId  String? @map("lead_id")
+
+  // Ownership
+  assignedTo String? @map("assigned_to")
+  createdBy  String  @map("created_by")
+  companyId  String  @map("company_id")
+
+  company  Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignee User?   @relation("TaskAssignee", fields: [assignedTo], references: [id])
+  creator  User    @relation("TaskCreator", fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([assignedTo])
+  @@index([dealId])
+  @@index([dueDate])
+  @@index([completed])
+  @@map("tasks")
+}
+
+// --- EMAIL TEMPLATES ---
+
+model EmailTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  subject     String
+  body        String   @db.Text
+  description String?
+  variables   String[] @default([]) // ["name", "company", "dealValue"]
+  category    String   @default("GENERAL") // GENERAL, FOLLOW_UP, PROPOSAL, CLOSING
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([category])
+  @@map("email_templates")
+}
+
+// --- LEAD SCORING RULES ---
+
+model LeadScoringRule {
+  id       String  @id @default(uuid())
+  name     String
+  field    String  // "hasPhone", "source", "formData.budget", "company"
+  operator String  // "exists", "equals", "contains", "greaterThan", "in"
+  value    String? // The comparison value
+  points   Int     // Positive = boost, Negative = penalty
+  active   Boolean @default(true)
+
+  companyId String  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@index([active])
+  @@map("lead_scoring_rules")
+}
+
 
 // --- LEAD SOURCE TRACKING & CAMPAIGN ATTRIBUTION ---
 

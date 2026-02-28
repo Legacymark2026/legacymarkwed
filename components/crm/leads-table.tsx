@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { bulkUpdateLeads } from "@/actions/crm";
@@ -53,14 +54,15 @@ function ScoreBar({ score }: { score: number }) {
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export function LeadsTable({ leads, total, companyId }: Props) {
-    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const router = useRouter();
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
     const [filterSource, setFilterSource] = useState("");
-    const [sortCol, setSortCol] = useState<string>("createdAt");
+    const [sortCol, setSortCol] = useState("createdAt");
     const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+    const [selected, setSelected] = useState<Set<string>>(new Set());
     const [bulkStatus, setBulkStatus] = useState("");
-    const [isBulkLoading, setIsBulkLoading] = useState(false);
+    const [bulkLoading, setBulkLoading] = useState(false);
 
     const toggleAll = () => { if (selected.size === leads.length) setSelected(new Set()); else setSelected(new Set(leads.map((l) => l.id))); };
     const toggle = (id: string) => setSelected((prev) => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
@@ -84,10 +86,23 @@ export function LeadsTable({ leads, total, companyId }: Props) {
 
     const handleBulkAction = useCallback(async () => {
         if (!bulkStatus || selected.size === 0) return;
-        setIsBulkLoading(true);
+        setBulkLoading(true);
         await bulkUpdateLeads(Array.from(selected), { status: bulkStatus });
-        setSelected(new Set()); setBulkStatus(""); setIsBulkLoading(false);
+        setSelected(new Set()); setBulkStatus(""); setBulkLoading(false);
     }, [bulkStatus, selected]);
+
+    const exportCSV = useCallback(() => {
+        const rows = sorted.map((l) => ([
+            l.name ?? "", l.email, l.phone ?? "", l.company ?? "",
+            l.source, l.status, l.score, l.createdAt.toString(),
+        ]));
+        const header = ["Nombre", "Email", "Teléfono", "Empresa", "Fuente", "Estado", "Score", "Fecha"];
+        const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click(); URL.revokeObjectURL(url);
+    }, [sorted]);
 
     const SortIcon = ({ col }: { col: string }) => sortCol === col
         ? sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
@@ -113,8 +128,8 @@ export function LeadsTable({ leads, total, companyId }: Props) {
                     <option value="">Todas las fuentes</option>
                     {Object.keys(SOURCE_ICONS).map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors">
-                    <Download className="w-4 h-4" /> Exportar
+                <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors">
+                    <Download className="w-4 h-4" /> Exportar CSV
                 </button>
                 <CreateLeadDialog companyId={companyId} />
                 <div className="ml-auto text-sm text-slate-400">{filtered.length} de {total} leads</div>
@@ -129,8 +144,8 @@ export function LeadsTable({ leads, total, companyId }: Props) {
                             <option value="">Cambiar estado…</option>
                             {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                         </select>
-                        <button onClick={handleBulkAction} disabled={!bulkStatus || isBulkLoading} className="px-3 py-1.5 text-sm font-bold bg-teal-600 text-white rounded-lg disabled:opacity-40 transition-opacity hover:bg-teal-700">
-                            {isBulkLoading ? "..." : "Aplicar"}
+                        <button onClick={handleBulkAction} disabled={!bulkStatus || bulkLoading} className="px-3 py-1.5 text-sm font-bold bg-teal-600 text-white rounded-lg disabled:opacity-40 transition-opacity hover:bg-teal-700">
+                            {bulkLoading ? "..." : "Aplicar"}
                         </button>
                     </div>
                     <button onClick={() => setSelected(new Set())} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
