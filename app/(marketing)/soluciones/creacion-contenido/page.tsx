@@ -12,81 +12,154 @@ export const metadata: Metadata = {
 // ─── STATIC DATA ──────────────────────────────────────────────────────────────
 
 const services = [
-    { icon: '🎬', title: 'Video Short-Form', desc: 'Reels, TikToks y Shorts optimizados para viralizarse. Guión, producción y edición estilo Hormozi.', stat: '2.4M Vistas' },
-    { icon: '🎨', title: 'Identidad Visual', desc: 'Diseño gráfico de alto impacto que detiene el scroll. Miniaturas, carruseles y posts que convierten.', stat: '+12k Shares' },
-    { icon: '✍️', title: 'Copywriting', desc: 'Palabras que venden. Email sequences, captions y scripts con tasas de apertura de 45%+.', stat: '45% Open Rate' },
-    { icon: '📊', title: 'Estrategia & Datos', desc: 'No creamos a ciegas. Analizamos métricas, tendencias y competencia para maximizar cada acción.', stat: '8.7x ROAS' },
+    { icon: '🎬', tag: '4K', title: 'Video Short-Form', desc: 'Reels, TikToks y Shorts optimizados para viralizarse. Guión, producción y edición estilo Hormozi.', stat: '2.4M Vistas', color: 'from-rose-500 to-pink-600' },
+    { icon: '🎨', tag: 'HD', title: 'Identidad Visual', desc: 'Diseño gráfico de alto impacto que detiene el scroll. Miniaturas, carruseles y posts que convierten.', stat: '+12k Shares', color: 'from-violet-500 to-purple-600' },
+    { icon: '✍️', tag: 'COPY', title: 'Copywriting', desc: 'Palabras que venden. Email sequences, captions y scripts con tasas de apertura de 45%+.', stat: '45% Open Rate', color: 'from-sky-500 to-blue-600' },
+    { icon: '📊', tag: 'DATA', title: 'Estrategia & Datos', desc: 'No creamos a ciegas. Analizamos métricas, tendencias y competencia para maximizar cada acción.', stat: '8.7x ROAS', color: 'from-teal-500 to-emerald-600' },
 ];
 
 const steps = [
-    { num: '01', title: 'Estrategia & Concepto', desc: 'Analizamos tendencias en tiempo real y diseñamos hooks virales para tu nicho específico.', time: 'Día 1–2', color: 'from-violet-500 to-purple-600' },
-    { num: '02', title: 'Planificación Editorial', desc: 'Guiones palabra por palabra, storyboards y calendario de 30 días listos para tu aprobación.', time: 'Día 3', color: 'from-sky-500 to-cyan-500' },
-    { num: '03', title: 'Producción Premium', desc: 'Grabación 4K, iluminación profesional y dirección creativa de nivel internacional.', time: 'Día 4–5', color: 'from-orange-500 to-red-500' },
-    { num: '04', title: 'Edición Hormozi-Style', desc: 'Cortes dinámicos, subtítulos animados nativos y motion graphics que frenan el scroll.', time: 'Día 6–8', color: 'from-teal-500 to-emerald-500' },
-    { num: '05', title: 'Distribución & Escala', desc: 'Publicación en horario pico, gestión primeras 48h y reporte de métricas detallado.', time: 'Día 9+', color: 'from-pink-500 to-rose-500' },
+    { num: '01', title: 'Estrategia & Concepto', desc: 'Analizamos tendencias en tiempo real y diseñamos hooks virales para tu nicho específico.', time: 'Día 1–2', color: 'from-violet-500 to-purple-600', glyph: '💡' },
+    { num: '02', title: 'Planificación Editorial', desc: 'Guiones palabra por palabra, storyboards y calendario de 30 días listos para tu aprobación.', time: 'Día 3', color: 'from-sky-500 to-cyan-500', glyph: '📋' },
+    { num: '03', title: 'Producción Premium', desc: 'Grabación 4K, iluminación profesional y dirección creativa de nivel internacional.', time: 'Día 4–5', color: 'from-orange-500 to-red-500', glyph: '🎥' },
+    { num: '04', title: 'Edición Hormozi-Style', desc: 'Cortes dinámicos, subtítulos animados nativos y motion graphics que frenan el scroll.', time: 'Día 6–8', color: 'from-teal-500 to-emerald-500', glyph: '✂️' },
+    { num: '05', title: 'Distribución & Escala', desc: 'Publicación en horario pico, gestión primeras 48h y reporte de métricas detallado.', time: 'Día 9+', color: 'from-pink-500 to-rose-500', glyph: '🚀' },
 ];
 
 const testimonials = [
-    { author: 'Sofia R.', role: 'Marketing Director · TechStart', text: 'Pasamos de 500 a 15k views promedio en reels en solo 3 semanas. Saben exactamente cómo crear contenido que para el scroll.', metric: '+2,900%', metricLabel: 'Views' },
-    { author: 'Carlos M.', role: 'CEO · InmoGroup', text: 'La calidad visual es de otro nivel. Nuestros clientes ahora nos perciben como líderes del sector.', metric: '18x', metricLabel: 'ROAS' },
-    { author: 'Ana P.', role: 'Founder · EcoBrand', text: 'ROI positivo desde el mes 1 y triplicamos nuestra base de suscriptores en 90 días.', metric: '3x', metricLabel: 'Base de clientes' },
+    { author: 'Sofia R.', role: 'Marketing Director · TechStart', text: 'Pasamos de 500 a 15k views promedio en reels en solo 3 semanas. Saben exactamente cómo crear contenido que para el scroll.', metric: '+2,900%', metricLabel: 'Views', avatar: 'SR', color: 'from-violet-500 to-purple-600' },
+    { author: 'Carlos M.', role: 'CEO · InmoGroup', text: 'La calidad visual es de otro nivel. Nuestros clientes ahora nos perciben como líderes del sector.', metric: '18x', metricLabel: 'ROAS', avatar: 'CM', color: 'from-sky-500 to-cyan-600' },
+    { author: 'Ana P.', role: 'Founder · EcoBrand', text: 'ROI positivo desde el mes 1 y triplicamos nuestra base de suscriptores en 90 días.', metric: '3x', metricLabel: 'Clientes', avatar: 'AP', color: 'from-teal-500 to-emerald-600' },
 ];
 
 const stats = [
-    { value: '2.4B+', label: 'Views Generadas' },
-    { value: '8.7x', label: 'ROAS Promedio' },
-    { value: '$4.2M', label: 'Revenue Generado' },
-    { value: '120+', label: 'Clientes Activos' },
+    { value: '2.4B+', label: 'Views Generadas', icon: '👁️' },
+    { value: '8.7x', label: 'ROAS Promedio', icon: '📈' },
+    { value: '$4.2M', label: 'Revenue Generado', icon: '💰' },
+    { value: '120+', label: 'Clientes Activos', icon: '🤝' },
 ];
 
-// ─── PAGE (SERVER COMPONENT — zero hydration risk) ────────────────────────────
+// SVG icons for audiovisual theme
+const CameraLens = () => (
+    <svg viewBox="0 0 80 80" className="w-full h-full" fill="none">
+        <circle cx="40" cy="40" r="36" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3" className="animate-aperture" />
+        <circle cx="40" cy="40" r="26" stroke="currentColor" strokeWidth="1" opacity=".5" className="animate-aperture-rev" />
+        <circle cx="40" cy="40" r="16" stroke="currentColor" strokeWidth="1.5" />
+        <circle cx="40" cy="40" r="6" fill="currentColor" opacity=".4" />
+        <circle cx="34" cy="34" r="2.5" fill="white" opacity=".6" />
+    </svg>
+);
+
+const Waveform = ({ className = '' }: { className?: string }) => (
+    <div className={`flex items-center gap-[3px] ${className}`} style={{ height: 32 }}>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((_, i) => (
+            <span
+                key={i}
+                className={`inline-block w-[3px] rounded-full bg-current wave-bar-${(i % 5) + 1}`}
+                style={{ height: `${20 + Math.sin(i * 0.8) * 10}px`, animationDelay: `${i * 0.08}s`, transformOrigin: 'center' }}
+            />
+        ))}
+    </div>
+);
 
 export default function ContentCreationPage() {
     return (
         <main className="min-h-screen bg-white text-slate-900 overflow-hidden">
 
             {/* ── HERO ──────────────────────────────────────────────────────── */}
-            <section className="relative min-h-screen flex items-center justify-center pt-24 pb-20 bg-gradient-to-br from-slate-50 via-white to-teal-50/40 overflow-hidden">
-                {/* Decorative blobs — pure CSS, no JS, zero hydration risk */}
-                <div className="absolute top-1/4 -left-32 w-96 h-96 bg-teal-200/30 rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-sky-200/30 rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-teal-100/20 rounded-full blur-[100px] pointer-events-none" />
+            <section className="relative min-h-screen flex items-center justify-center pt-24 pb-20 overflow-hidden" style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 0%, #f0fdf4 0%, #f8fafc 55%, #eff6ff 100%)' }}>
+
+                {/* Lens flare blobs */}
+                <div className="absolute top-1/4 -left-48 w-[500px] h-[500px] bg-teal-200/25 rounded-full blur-[140px] pointer-events-none animate-lens" />
+                <div className="absolute bottom-1/4 -right-48 w-[500px] h-[500px] bg-sky-200/25 rounded-full blur-[140px] pointer-events-none animate-lens" style={{ animationDelay: '2s' }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-violet-100/20 rounded-full blur-[100px] pointer-events-none" />
+
+                {/* Camera lens decorative (top right) */}
+                <div className="absolute top-8 right-8 w-24 h-24 text-teal-300/40 hidden lg:block" aria-hidden>
+                    <CameraLens />
+                </div>
+                {/* Camera lens decorative (bottom left) */}
+                <div className="absolute bottom-12 left-8 w-16 h-16 text-sky-300/30 hidden lg:block" aria-hidden>
+                    <CameraLens />
+                </div>
+
+                {/* Scanline sweep */}
+                <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-teal-400/10 to-transparent pointer-events-none animate-scanline" aria-hidden />
+
+                {/* Viewfinder corners */}
+                {[
+                    'top-20 left-6 border-t-2 border-l-2',
+                    'top-20 right-6 border-t-2 border-r-2',
+                    'bottom-6 left-6 border-b-2 border-l-2',
+                    'bottom-6 right-6 border-b-2 border-r-2',
+                ].map((cls, i) => (
+                    <div key={i} className={`absolute w-6 h-6 border-teal-400/30 hidden md:block ${cls}`} aria-hidden />
+                ))}
+
+                {/* REC indicator */}
+                <div className="absolute top-24 right-6 flex items-center gap-2 px-3 py-1 bg-black/5 backdrop-blur-sm rounded-full border border-red-200/40 hidden md:flex" aria-hidden>
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-rec" />
+                    <span className="text-[10px] font-black tracking-widest text-red-500 uppercase">REC</span>
+                </div>
 
                 <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center max-w-5xl mx-auto">
-                    <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs md:text-sm font-bold tracking-widest uppercase mb-8 shadow-sm">
-                        🚀 Next-Gen Content Studio
-                    </span>
 
-                    <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-slate-900 via-slate-800 to-teal-800 leading-[0.9]">
-                        Creamos<br />
-                        <span className="relative inline-block">
-                            <span className="absolute -inset-2 blur-2xl bg-teal-300/30 rounded-full" />
-                            <span className="relative">Contenido</span>
-                        </span>{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-sky-500">que Vende.</span>
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-teal-200 bg-white/80 backdrop-blur-md shadow-lg shadow-teal-100 mb-8">
+                        <span className="w-2 h-2 rounded-full bg-teal-500 animate-broadcast" />
+                        <span className="text-teal-700 text-xs font-black tracking-widest uppercase">Next-Gen Content Studio</span>
+                        <Waveform className="text-teal-400" />
+                    </div>
+
+                    {/* H1 */}
+                    <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-6 leading-[0.88] animate-glitch">
+                        <span className="block text-slate-900">Creamos</span>
+                        <span className="block relative">
+                            <span className="absolute -inset-3 blur-3xl bg-teal-300/20 rounded-full" aria-hidden />
+                            <span className="relative bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #0f172a 0%, #134e4a 40%, #0891b2 100%)' }}>
+                                Contenido
+                            </span>
+                        </span>
+                        <span className="block bg-clip-text text-transparent stat-shine">que Vende.</span>
                     </h1>
 
                     <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mb-10 font-light leading-relaxed">
                         Estrategia. Producción. Viralidad.<br className="hidden md:block" />
-                        <span className="text-slate-700 font-medium">Resultados desde el primer mes.</span>
+                        <span className="text-slate-700 font-semibold">Resultados desde el primer mes.</span>
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 items-center">
-                        <Link href="/contacto" className="group relative px-10 py-5 bg-slate-900 text-white font-bold text-lg rounded-xl overflow-hidden hover:scale-105 transition-all duration-300 shadow-xl shadow-slate-900/20">
-                            <span className="absolute inset-0 bg-gradient-to-r from-teal-500 to-sky-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <span className="relative flex items-center gap-3">Iniciar Proyecto <span className="text-xl">→</span></span>
+                    {/* CTAs */}
+                    <div className="flex flex-col sm:flex-row gap-4 items-center mb-20">
+                        <Link href="/contacto" className="group relative px-10 py-5 bg-slate-900 text-white font-bold text-lg rounded-2xl overflow-hidden hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-slate-900/30 animate-shimmer">
+                            <span className="absolute inset-0 bg-gradient-to-r from-teal-500 via-sky-500 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <span className="relative flex items-center gap-3">
+                                🎬 Iniciar Proyecto
+                                <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
+                            </span>
                         </Link>
-                        <Link href="#proceso" className="px-10 py-5 rounded-xl border-2 border-slate-200 hover:border-teal-300 hover:bg-teal-50 transition-all text-slate-700 font-semibold">
+                        <Link href="#proceso" className="px-10 py-5 rounded-2xl border-2 border-slate-200 bg-white/70 backdrop-blur-sm hover:border-teal-300 hover:bg-teal-50 transition-all text-slate-700 font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5">
                             Ver Proceso
                         </Link>
                     </div>
 
-                    {/* Stats row */}
-                    <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-3xl">
-                        {stats.map((s) => (
-                            <div key={s.label} className="text-center p-4 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="text-3xl font-black bg-gradient-to-br from-teal-600 to-sky-600 bg-clip-text text-transparent">{s.value}</div>
+                    {/* Stats grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
+                        {stats.map((s, i) => (
+                            <div key={s.label} className="card-lift text-center p-5 rounded-2xl bg-white border border-slate-100 shadow-md hover:shadow-xl hover:border-teal-200 transition-all" style={{ animationDelay: `${i * 0.1}s` }}>
+                                <div className="text-2xl mb-1">{s.icon}</div>
+                                <div className="text-2xl font-black stat-shine">{s.value}</div>
                                 <div className="text-xs text-slate-500 font-medium mt-1">{s.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Film strip at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-8 overflow-hidden pointer-events-none" aria-hidden>
+                    <div className="animate-film-scroll flex" style={{ width: '200%' }}>
+                        {Array.from({ length: 60 }).map((_, i) => (
+                            <div key={i} className="flex-shrink-0 w-12 h-8 border-r border-slate-200 odd:bg-slate-50 even:bg-white flex items-center justify-center">
+                                <div className="w-7 h-4 rounded-sm border border-slate-200 bg-slate-100" />
                             </div>
                         ))}
                     </div>
@@ -94,23 +167,51 @@ export default function ContentCreationPage() {
             </section>
 
             {/* ── SERVICIOS ─────────────────────────────────────────────────── */}
-            <section className="py-24 bg-white">
+            <section className="py-24 bg-white relative">
+                {/* Decorative waveform */}
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 opacity-10" aria-hidden>
+                    <Waveform className="text-teal-600 scale-[2]" />
+                </div>
+
                 <div className="container px-4 md:px-6 max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                        <span className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3 block">Lo que hacemos</span>
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Servicios de Contenido</h2>
-                        <p className="text-slate-500 text-lg max-w-xl mx-auto">Producción profesional en todos los formatos que dominan las plataformas de hoy.</p>
+                    {/* Clapperboard header */}
+                    <div className="flex flex-col items-center mb-16">
+                        <div className="relative inline-flex items-center gap-3 px-6 py-3 rounded-xl mb-6 overflow-hidden border border-slate-200 shadow-sm bg-white" aria-hidden>
+                            <div className="absolute inset-0 overflow-hidden opacity-10">
+                                <div className="animate-clap flex h-full" style={{ width: '200%' }}>
+                                    {Array.from({ length: 40 }).map((_, i) => (
+                                        <div key={i} className={`flex-shrink-0 w-7 h-full ${i % 2 === 0 ? 'bg-slate-900' : 'bg-white'} skew-x-[-8deg]`} />
+                                    ))}
+                                </div>
+                            </div>
+                            <span className="relative text-xs font-black tracking-widest text-slate-600 uppercase">Producción Audiovisual</span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 text-center">Servicios de Contenido</h2>
+                        <p className="text-slate-500 text-lg max-w-xl text-center">Producción profesional en todos los formatos que dominan las plataformas de hoy.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {services.map((s) => (
-                            <div key={s.title} className="group relative p-8 rounded-3xl border border-slate-100 bg-white hover:border-teal-200 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {services.map((s, i) => (
+                            <div key={s.title} className="card-lift group relative p-8 rounded-3xl border border-slate-100 bg-white hover:border-transparent hover:shadow-2xl transition-all duration-300 overflow-hidden" style={{ animationDelay: `${i * 0.08}s` }}>
+                                {/* Gradient border on hover */}
+                                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${s.color} opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none`} />
+                                <div className={`absolute inset-[1px] rounded-[22px] border border-transparent group-hover:border-transparent bg-white`} />
+
                                 <div className="relative z-10">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <span className="text-4xl">{s.icon}</span>
+                                    <div className="flex items-start justify-between mb-5">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-4xl">{s.icon}</span>
+                                            {/* Format tag like a camera display */}
+                                            <span className={`px-2.5 py-1 text-[9px] font-black tracking-widest rounded-md text-white bg-gradient-to-r ${s.color}`}>{s.tag}</span>
+                                        </div>
                                         <span className="text-xs font-bold text-teal-700 bg-teal-50 border border-teal-100 px-3 py-1 rounded-full">{s.stat}</span>
                                     </div>
+
+                                    {/* Waveform accent */}
+                                    <div className={`mb-4 opacity-20 group-hover:opacity-50 transition-opacity text-teal-500`}>
+                                        <Waveform />
+                                    </div>
+
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">{s.title}</h3>
                                     <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
                                 </div>
@@ -120,11 +221,19 @@ export default function ContentCreationPage() {
                 </div>
             </section>
 
-            {/* ── ROI CALCULATOR (interactive — isolated client component) ──── */}
-            <section className="py-24 bg-slate-50">
-                <div className="container px-4 md:px-6 max-w-5xl mx-auto">
+            {/* ── ROI CALCULATOR ────────────────────────────────────────────── */}
+            <section className="py-24 bg-slate-50 relative overflow-hidden">
+                {/* Aperture backdrop */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-5 text-teal-600 hidden lg:block pointer-events-none" aria-hidden>
+                    <CameraLens />
+                </div>
+
+                <div className="container px-4 md:px-6 max-w-5xl mx-auto relative z-10">
                     <div className="text-center mb-12">
-                        <span className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3 block">Calculadora</span>
+                        <div className="inline-flex items-center gap-2 mb-4">
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-rec" />
+                            <span className="text-xs font-black tracking-widest text-red-500 uppercase">En Vivo</span>
+                        </div>
                         <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Calcula tu ROI Potencial</h2>
                         <p className="text-slate-500 text-lg">Visualiza el impacto financiero de una estrategia de contenido profesional.</p>
                     </div>
@@ -133,36 +242,64 @@ export default function ContentCreationPage() {
             </section>
 
             {/* ── PROCESO ───────────────────────────────────────────────────── */}
-            <section id="proceso" className="py-32 bg-[#080c14] relative overflow-hidden">
+            <section id="proceso" className="py-32 bg-[#07090f] relative overflow-hidden">
+                {/* Background glows */}
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-500/5 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-violet-500/5 blur-[100px] rounded-full pointer-events-none" />
+
+                {/* Large camera lens watermark */}
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[350px] h-[350px] text-white/3 hidden xl:block pointer-events-none" aria-hidden>
+                    <CameraLens />
+                </div>
+
+                {/* Scanline overlay */}
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px)' }}
+                    aria-hidden
+                />
 
                 <div className="container px-4 md:px-6 max-w-4xl mx-auto relative z-10">
                     <div className="text-center mb-20">
-                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-400 text-xs font-bold tracking-widest uppercase mb-6">
-                            ⚡ Proceso Comprobado
-                        </span>
+                        {/* LIVE badge */}
+                        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-red-500/30 bg-red-500/10 mb-6 animate-live">
+                            <span className="w-2 h-2 rounded-full bg-red-400 animate-rec" />
+                            <span className="text-red-400 text-xs font-black tracking-widest uppercase">En Producción</span>
+                        </div>
+
                         <h2 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
                             De la idea al{' '}
                             <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">viral</span>
                         </h2>
                         <p className="text-slate-400 text-lg max-w-xl mx-auto">Nuestro pipeline de producción en 9 días. Sin improvisación.</p>
-                        <div className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full">
-                            <span className="text-white/70 text-sm">⏱ Entrega garantizada en <strong className="text-teal-400">9 días hábiles</strong></span>
+
+                        <div className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm">
+                            <span className="text-xl">⏱</span>
+                            <span className="text-white/70 text-sm">Entrega garantizada en <strong className="text-teal-400">9 días hábiles</strong></span>
                         </div>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         {steps.map((step, i) => (
-                            <div key={step.num} className="group flex gap-6 p-6 rounded-2xl border border-white/5 bg-white/2 hover:border-teal-500/20 hover:bg-white/5 transition-all duration-300">
-                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                                    <span className="text-white font-black text-sm">{step.num}</span>
+                            <div key={step.num} className="group flex gap-5 p-6 rounded-2xl border border-white/5 bg-white/2 hover:border-teal-500/25 hover:bg-white/5 transition-all duration-300 cursor-default">
+                                {/* Step number — film counter style */}
+                                <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex flex-col items-center justify-center flex-shrink-0 shadow-lg`}>
+                                    <span className="text-white/60 text-[8px] font-mono uppercase leading-none">TAKE</span>
+                                    <span className="text-white font-black text-lg leading-none">{step.num}</span>
                                 </div>
+
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-3 mb-1">
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">
+                                        <span className="text-lg">{step.glyph}</span>
                                         <h3 className="text-white font-bold text-lg">{step.title}</h3>
-                                        <span className="text-xs font-mono text-white/30">{step.time}</span>
+                                        <span className="text-[10px] font-mono text-white/25 border border-white/10 px-2 py-0.5 rounded">{step.time}</span>
                                     </div>
                                     <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+                                </div>
+
+                                {/* Waveform indicator on hover */}
+                                <div className="hidden md:flex items-center opacity-0 group-hover:opacity-40 transition-opacity text-teal-400 flex-shrink-0">
+                                    <Waveform />
                                 </div>
                             </div>
                         ))}
@@ -171,67 +308,182 @@ export default function ContentCreationPage() {
             </section>
 
             {/* ── TESTIMONIOS ───────────────────────────────────────────────── */}
-            <section className="py-24 bg-white">
-                <div className="container px-4 md:px-6 max-w-5xl mx-auto">
+            <section className="py-24 bg-white relative overflow-hidden">
+                {/* Film strip top */}
+                <div className="absolute top-0 left-0 right-0 h-6 overflow-hidden pointer-events-none border-b border-slate-100" aria-hidden>
+                    <div className="animate-film-scroll flex" style={{ width: '200%' }}>
+                        {Array.from({ length: 60 }).map((_, i) => (
+                            <div key={i} className="flex-shrink-0 w-10 h-6 border-r border-slate-100 flex items-center justify-center">
+                                <div className="w-6 h-3.5 rounded-sm border border-slate-200 bg-slate-50" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="container px-4 md:px-6 max-w-5xl mx-auto pt-6">
                     <div className="text-center mb-16">
-                        <span className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3 block">Clientes</span>
+                        <div className="inline-flex items-center gap-3 mb-4 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200">
+                            <span className="text-amber-500">★★★★★</span>
+                            <span className="text-amber-700 text-xs font-bold">4.9/5 · 120+ clientes</span>
+                        </div>
                         <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                            Números que <span className="bg-gradient-to-r from-teal-500 to-sky-500 bg-clip-text text-transparent">hablan solos</span>
+                            Números que{' '}
+                            <span className="bg-gradient-to-r from-teal-500 to-sky-500 bg-clip-text text-transparent">hablan solos</span>
                         </h2>
+                        <p className="text-slate-500 text-lg">Datos reales de campañas activas.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {testimonials.map((t) => (
-                            <div key={t.author} className="group p-8 rounded-3xl border border-slate-100 bg-white hover:border-teal-200 hover:shadow-xl transition-all duration-300">
+                        {testimonials.map((t, i) => (
+                            <div key={t.author} className="card-lift group relative p-8 rounded-3xl border border-slate-100 bg-gradient-to-b from-white to-slate-50 hover:border-teal-200 hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                                {/* Polaroid top bar */}
+                                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${t.color}`} />
+
+                                {/* Quote mark watermark */}
+                                <div className="absolute top-4 right-6 text-6xl font-black text-slate-100 leading-none select-none" aria-hidden>"</div>
+
+                                {/* Metric */}
                                 <div className="flex items-center justify-between mb-6">
-                                    <div className="flex gap-1">
-                                        {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-yellow-400 text-sm">★</span>)}
+                                    <div className="flex gap-0.5">
+                                        {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-amber-400 text-sm">★</span>)}
                                     </div>
-                                    <span className="text-2xl font-black text-teal-600">{t.metric} <span className="text-xs font-normal text-slate-400">{t.metricLabel}</span></span>
+                                    <span className="text-2xl font-black text-teal-600 stat-shine">{t.metric} <span className="text-xs font-normal text-slate-400 [background:none] [-webkit-text-fill-color:initial]" style={{ color: '#94a3b8' }}>{t.metricLabel}</span></span>
                                 </div>
+
                                 <p className="text-slate-600 text-sm leading-relaxed mb-6 italic">"{t.text}"</p>
-                                <div>
-                                    <div className="font-bold text-slate-900 text-sm">{t.author}</div>
-                                    <div className="text-slate-400 text-xs">{t.role}</div>
+
+                                {/* Author */}
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                                        {t.avatar}
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-slate-900 text-sm">{t.author}</div>
+                                        <div className="text-slate-400 text-xs">{t.role}</div>
+                                    </div>
                                 </div>
+
+                                {/* Waveform footer */}
+                                <div className="mt-4 opacity-10 group-hover:opacity-30 transition-opacity text-teal-500">
+                                    <Waveform />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Film strip bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-6 overflow-hidden pointer-events-none border-t border-slate-100" aria-hidden>
+                    <div className="animate-film-scroll flex" style={{ width: '200%', animationDirection: 'reverse' }}>
+                        {Array.from({ length: 60 }).map((_, i) => (
+                            <div key={i} className="flex-shrink-0 w-10 h-6 border-r border-slate-100 flex items-center justify-center">
+                                <div className="w-6 h-3.5 rounded-sm border border-slate-200 bg-slate-50" />
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* ── PRECIOS (interactive — isolated client component) ─────────── */}
-            <section className="py-24 bg-slate-50" id="precios">
+            {/* ── PRECIOS ───────────────────────────────────────────────────── */}
+            <section className="py-24 bg-slate-50 relative" id="precios">
+                {/* Broadcast tower decoration */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-10 pointer-events-none" aria-hidden>
+                    {[40, 28, 18, 10].map((w, i) => (
+                        <div key={i} className="border-t-2 border-teal-500 animate-broadcast" style={{ width: w, animationDelay: `${i * 0.3}s` }} />
+                    ))}
+                    <div className="w-0.5 h-8 bg-teal-500" />
+                </div>
+
                 <div className="container px-4 md:px-6 max-w-5xl mx-auto">
                     <div className="text-center mb-16">
                         <span className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3 block">Inversión</span>
                         <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Planes Flexibles</h2>
-                        <p className="text-slate-500 text-lg">Escoge el nivel de impacto que necesitas.</p>
+                        <p className="text-slate-500 text-lg">Escoge el nivel de impacto que necesitas para tu marca.</p>
                     </div>
                     <PricingClient />
+
+                    {/* Urgency bar */}
+                    <div className="mt-12 p-5 rounded-2xl border border-orange-200 bg-orange-50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <span className="text-2xl">🔥</span>
+                            <div>
+                                <p className="font-bold text-orange-700 text-sm">Oferta Limitada Esta Semana</p>
+                                <p className="text-orange-600 text-sm">Reserva tu llamada de estrategia y obtén <strong>2 Videos Extra</strong> en tu primer mes.</p>
+                            </div>
+                        </div>
+                        <Link href="/contacto" className="flex-shrink-0 px-6 py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition-colors text-sm">
+                            Reservar Ahora →
+                        </Link>
+                    </div>
                 </div>
             </section>
 
             {/* ── CTA FINAL ─────────────────────────────────────────────────── */}
-            <section className="py-32 bg-slate-900 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-950/50 via-slate-900 to-slate-900 pointer-events-none" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-transparent via-teal-500 to-transparent" />
+            <section className="py-32 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #07090f 0%, #0d1a1a 50%, #060d0d 100%)' }}>
+                {/* Spotlight beams */}
+                <div className="absolute top-0 left-1/4 w-[2px] h-full bg-gradient-to-b from-teal-400/20 via-transparent to-transparent animate-spotlight pointer-events-none" />
+                <div className="absolute top-0 right-1/4 w-[2px] h-full bg-gradient-to-b from-sky-400/20 via-transparent to-transparent animate-spotlight pointer-events-none" style={{ animationDelay: '3s' }} />
+
+                {/* Large lens watermark */}
+                <div className="absolute right-0 bottom-0 w-[500px] h-[500px] text-white/3 pointer-events-none hidden lg:block" aria-hidden>
+                    <CameraLens />
+                </div>
+
+                {/* Scanlines */}
+                <div
+                    className="absolute inset-0 pointer-events-none opacity-[0.03]"
+                    style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,1) 2px, rgba(255,255,255,1) 4px)' }}
+                    aria-hidden
+                />
+
+                {/* Channel number */}
+                <div className="absolute top-6 left-6 text-white/10 font-mono font-black text-6xl leading-none select-none hidden md:block" aria-hidden>
+                    CH.01
+                </div>
 
                 <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center relative z-10">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-400 text-xs font-bold tracking-widest uppercase mb-8">
-                        🚀 Solo 3 cupos esta semana
-                    </span>
+                    {/* LIVE on air badge */}
+                    <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-red-500/30 bg-red-500/10 mb-8 animate-live">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-rec" />
+                        <span className="text-red-400 text-xs font-black tracking-widest uppercase">Al Aire — Solo 3 Cupos Esta Semana</span>
+                    </div>
+
                     <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
-                        ¿Listo para escalar<br />tu contenido?
+                        ¿Listo para escalar<br />
+                        <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">tu contenido?</span>
                     </h2>
+
+                    {/* Waveform decoration */}
+                    <div className="flex justify-center mb-8 opacity-40">
+                        <Waveform className="text-teal-400 scale-150" />
+                    </div>
+
                     <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
-                        Agenda tu auditoría gratuita de 15 min. Te entregamos 3 ideas virales personalizadas — sin compromiso.
+                        Agenda tu auditoría gratuita de 15 min. Te entregamos <strong className="text-white">3 ideas virales personalizadas</strong> — sin compromiso.
                     </p>
-                    <Link href="/contacto" className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-teal-500 to-sky-500 text-white font-bold text-lg rounded-xl hover:scale-105 transition-all shadow-xl shadow-teal-500/25">
-                        Agendar Auditoría Gratis
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+
+                    <Link href="/contacto" className="group inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-teal-500 to-sky-500 text-white font-bold text-lg rounded-2xl hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-teal-500/30 animate-shimmer">
+                        🎬 Agendar Auditoría Gratis
+                        <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                     </Link>
-                    <p className="mt-6 text-slate-600 text-sm">Sin tarjeta de crédito · Respuesta en menos de 24h</p>
+
+                    <div className="mt-6 flex items-center justify-center gap-6 text-slate-500 text-sm">
+                        <span>✓ Sin tarjeta de crédito</span>
+                        <span>·</span>
+                        <span>✓ Respuesta en 24h</span>
+                        <span>·</span>
+                        <span>✓ 100% Gratis</span>
+                    </div>
+
+                    {/* Viewfinder corners */}
+                    {[
+                        'top-0 left-0 border-t-2 border-l-2',
+                        'top-0 right-0 border-t-2 border-r-2',
+                        'bottom-0 left-0 border-b-2 border-l-2',
+                        'bottom-0 right-0 border-b-2 border-r-2',
+                    ].map((cls, i) => (
+                        <div key={i} className={`absolute w-8 h-8 border-white/10 ${cls}`} aria-hidden />
+                    ))}
                 </div>
             </section>
         </main>
