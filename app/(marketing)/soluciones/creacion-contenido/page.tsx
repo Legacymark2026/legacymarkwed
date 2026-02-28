@@ -1,10 +1,12 @@
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import ContentHero from '@/components/content-creation/content-hero';
-import ContentShowcase from '@/components/content-creation/content-showcase';
-import RoiCalculator from '@/components/content-creation/roi-calculator';
-import SocialProofSection from '@/components/content-creation/social-proof-section';
-import PricingBuilder from '@/components/content-creation/pricing-builder';
-import ProcessWorkflow from '@/components/content-creation/process-workflow';
+// Lazily load components below the fold to improve initial page load (TTI & LCP)
+const ContentShowcase = dynamic(() => import('@/components/content-creation/content-showcase'), { ssr: true });
+const RoiCalculator = dynamic(() => import('@/components/content-creation/roi-calculator'), { ssr: true });
+const SocialProofSection = dynamic(() => import('@/components/content-creation/social-proof-section'), { ssr: true });
+const PricingBuilder = dynamic(() => import('@/components/content-creation/pricing-builder'), { ssr: true });
+const ProcessWorkflow = dynamic(() => import('@/components/content-creation/process-workflow'), { ssr: true });
 import '@/styles/content-animations.css';
 
 export const metadata: Metadata = {

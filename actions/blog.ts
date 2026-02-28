@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
 import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 
 // Helper to hash IP for privacy
 function hashIP(ip: string): string {
@@ -422,3 +422,37 @@ export async function getAllTags() {
         return [];
     }
 }
+
+// ==================== OPTIMIZED FORM FETCHERS ====================
+
+export const getCategoriesForForm = unstable_cache(
+    async () => {
+        try {
+            return await prisma.category.findMany({
+                select: { id: true, name: true },
+                orderBy: { name: 'asc' }
+            });
+        } catch (error) {
+            console.error("Error fetching categories for form:", error);
+            return [];
+        }
+    },
+    ['form-categories'],
+    { revalidate: 3600, tags: ['categories'] } // Cache for 1 hour, or revalidate on demand
+);
+
+export const getTagsForForm = unstable_cache(
+    async () => {
+        try {
+            return await prisma.tag.findMany({
+                select: { name: true },
+                orderBy: { name: 'asc' }
+            });
+        } catch (error) {
+            console.error("Error fetching tags for form:", error);
+            return [];
+        }
+    },
+    ['form-tags'],
+    { revalidate: 3600, tags: ['tags'] } // Cache for 1 hour, or revalidate on demand
+);
