@@ -15,13 +15,13 @@ const contactMethods = [
         color: 'from-violet-500 to-purple-600',
     },
     {
-        icon: '📱', label: 'WhatsApp', value: '+57 300 000 0000',
-        href: 'https://wa.me/573000000000', sub: 'Disponible L–V 8am–6pm',
+        icon: '📱', label: 'WhatsApp', value: '+57 322 304 7353',
+        href: 'https://wa.me/573223047353', sub: 'Disponible L–V 8am–6pm',
         color: 'from-teal-500 to-emerald-600',
     },
     {
-        icon: '📍', label: 'Oficina', value: 'Colombia · Bogotá',
-        href: '#', sub: 'Reuniones presenciales con cita',
+        icon: '📍', label: 'Oficina', value: 'Crr18a 22-21 Villa Linda, Girón, Santander',
+        href: '#', sub: 'NIT 902028722-3 · Colombia 687541',
         color: 'from-sky-500 to-blue-600',
     },
 ];
@@ -398,10 +398,10 @@ export default function ContactPage() {
                     <p className="text-slate-400 text-lg mb-8">Envíanos tu número y te contactamos en menos de 2 horas en días hábiles.</p>
 
                     <a
-                        href="https://wa.me/573000000000"
+                        href="https://wa.me/573223047353"
                         className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-lg rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-teal-500/30"
                     >
-                        💬 Escríbenos por WhatsApp →
+                        💬 +57 322 304 7353 — Escríbenos →
                     </a>
                     <p className="mt-4 text-slate-500 text-sm">Sin bots · Personas reales · Sin spam</p>
                 </div>
