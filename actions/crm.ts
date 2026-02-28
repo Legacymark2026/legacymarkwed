@@ -6,11 +6,17 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { rateLimit } from "@/lib/rate-limit";
 
-// Basic check for authenticated user (MVP)
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+
 async function checkAuth() {
     const session = await auth();
     if (!session?.user) return { error: "Unauthorized" };
     return null;
+}
+
+async function getUserId(): Promise<string> {
+    const session = await auth();
+    return session?.user?.id ?? "anonymous";
 }
 
 export interface TeamNode {
@@ -18,10 +24,10 @@ export interface TeamNode {
     name: string;
     parentId: string | null;
     children: TeamNode[];
-    _count?: {
-        members: number;
-    };
+    _count?: { members: number };
 }
+
+// ─── CRM DASHBOARD STATS ─────────────────────────────────────────────────────
 
 export async function getCRMStats() {
     const authCheck = await checkAuth();
@@ -29,37 +35,23 @@ export async function getCRMStats() {
 
     try {
         const [pipelineValue, activeDeals, wonDeals, lostDeals] = await Promise.all([
-            prisma.deal.aggregate({
-                _sum: { value: true },
-                where: { stage: { notIn: ["WON", "LOST"] } }
-            }),
-            prisma.deal.count({
-                where: { stage: { notIn: ["WON", "LOST"] } }
-            }),
-            prisma.deal.count({
-                where: { stage: "WON" }
-            }),
-            prisma.deal.count({
-                where: { stage: "LOST" }
-            })
+            prisma.deal.aggregate({ _sum: { value: true }, where: { stage: { notIn: ["WON", "LOST"] } } }),
+            prisma.deal.count({ where: { stage: { notIn: ["WON", "LOST"] } } }),
+            prisma.deal.count({ where: { stage: "WON" } }),
+            prisma.deal.count({ where: { stage: "LOST" } }),
         ]);
 
         const totalClosed = wonDeals + lostDeals;
         const winRate = totalClosed > 0 ? (wonDeals / totalClosed) * 100 : 0;
 
-        // Calculate Avg Deal Size (Won)
-        const wonValue = await prisma.deal.aggregate({
-            _sum: { value: true },
-            where: { stage: "WON" }
-        });
-
+        const wonValue = await prisma.deal.aggregate({ _sum: { value: true }, where: { stage: "WON" } });
         const avgDealSize = wonDeals > 0 ? (wonValue._sum.value || 0) / wonDeals : 0;
 
         return {
             pipelineValue: pipelineValue._sum.value || 0,
             activeDeals,
             winRate: Math.round(winRate),
-            avgDealSize: Math.round(avgDealSize)
+            avgDealSize: Math.round(avgDealSize),
         };
     } catch (error) {
         console.error("Failed to fetch CRM stats:", error);
@@ -68,7 +60,6 @@ export async function getCRMStats() {
 }
 
 export async function getSalesFunnel() {
-    // A-1 Fix: groupBy elimina el N+1 (5 queries → 1)
     const stages = ["NEW", "QUALIFIED", "PROPOSAL", "NEGOTIATION", "WON"] as const;
     try {
         const grouped = await prisma.deal.groupBy({
@@ -76,10 +67,7 @@ export async function getSalesFunnel() {
             _count: { stage: true },
             where: { stage: { in: [...stages] } },
         });
-        return stages.map((s) => ({
-            name: s,
-            value: grouped.find((g) => g.stage === s)?._count.stage ?? 0,
-        }));
+        return stages.map((s) => ({ name: s, value: grouped.find((g) => g.stage === s)?._count.stage ?? 0 }));
     } catch (error) {
         console.error(error);
         return [];
@@ -88,40 +76,17 @@ export async function getSalesFunnel() {
 
 export async function getRecentActivity() {
     try {
-        // Fetch recent leads and deals
         const [recentLeads, recentDeals] = await Promise.all([
-            prisma.lead.findMany({
-                orderBy: { createdAt: 'desc' },
-                take: 5,
-                select: { id: true, name: true, status: true, createdAt: true }
-            }),
-            prisma.deal.findMany({
-                orderBy: { updatedAt: 'desc' },
-                take: 5,
-                select: { id: true, title: true, stage: true, updatedAt: true, value: true }
-            })
+            prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 5, select: { id: true, name: true, status: true, createdAt: true } }),
+            prisma.deal.findMany({ orderBy: { updatedAt: "desc" }, take: 5, select: { id: true, title: true, stage: true, updatedAt: true, value: true } }),
         ]);
 
-        // Normalize and merge
-        const activities = [
-            ...recentLeads.map(l => ({
-                id: l.id,
-                type: 'LEAD',
-                title: `Nuevo lead: ${l.name}`,
-                desc: `Estado: ${l.status}`,
-                date: l.createdAt
-            })),
-            ...recentDeals.map(d => ({
-                id: d.id,
-                type: 'DEAL',
-                title: `Deal actualizado: ${d.title}`,
-                desc: `Etapa: ${d.stage} - $${d.value}`,
-                date: d.updatedAt
-            }))
-        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        return [
+            ...recentLeads.map((l) => ({ id: l.id, type: "LEAD", title: `Nuevo lead: ${l.name}`, desc: `Estado: ${l.status}`, date: l.createdAt })),
+            ...recentDeals.map((d) => ({ id: d.id, type: "DEAL", title: `Deal actualizado: ${d.title}`, desc: `Etapa: ${d.stage} - $${d.value}`, date: d.updatedAt })),
+        ]
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             .slice(0, 10);
-
-        return activities;
     } catch (error) {
         console.error(error);
         return [];
@@ -130,22 +95,12 @@ export async function getRecentActivity() {
 
 export async function getTopDeals() {
     try {
-        const deals = await prisma.deal.findMany({
-            where: {
-                stage: { notIn: ["WON", "LOST"] }
-            },
-            orderBy: { value: 'desc' },
+        return await prisma.deal.findMany({
+            where: { stage: { notIn: ["WON", "LOST"] } },
+            orderBy: { value: "desc" },
             take: 5,
-            select: {
-                id: true,
-                title: true,
-                value: true,
-                stage: true,
-                probability: true,
-                expectedClose: true
-            }
+            select: { id: true, title: true, value: true, stage: true, probability: true, expectedClose: true },
         });
-        return deals;
     } catch (error) {
         console.error(error);
         return [];
@@ -162,62 +117,19 @@ export async function getHighPerformanceStats() {
         const lastMonthStart = startOfMonth(subDays(today, 30));
         const lastMonthEnd = endOfMonth(subDays(today, 30));
 
-        // A-3 Fix: Agrupar queries independientes en Promise.all
-        // Bloque 1: Todas las métricas que no tienen dependencias entre sí
-        const [
-            wonDealsCount,
-            lostDealsCount,
-            wonDealsData,
-            stagnantDealsCount,
-            leadSources,
-            lostReasons,
-            currentPipeline,
-            lastMonthPipeline,
-            recentActivitiesCount,
-            leaderboardData,
-        ] = await Promise.all([
+        const [wonDealsCount, lostDealsCount, wonDealsData, stagnantDealsCount, leadSources, lostReasons, currentPipeline, lastMonthPipeline, recentActivitiesCount, leaderboardData] = await Promise.all([
             prisma.deal.count({ where: { stage: "WON" } }),
             prisma.deal.count({ where: { stage: "LOST" } }),
-            prisma.deal.findMany({
-                where: { stage: "WON" },
-                select: { createdAt: true, updatedAt: true, value: true },
-            }),
-            prisma.deal.count({
-                where: { stage: { notIn: ["WON", "LOST"] }, updatedAt: { lt: thirtyDaysAgo } },
-            }),
-            prisma.lead.groupBy({
-                by: ["source"],
-                _count: { source: true },
-                orderBy: { _count: { source: "desc" } },
-                take: 5,
-            }),
-            prisma.deal.groupBy({
-                by: ["lostReason"],
-                where: { stage: "LOST", lostReason: { not: null } },
-                _count: { lostReason: true },
-                orderBy: { _count: { lostReason: "desc" } },
-            }),
-            prisma.deal.aggregate({
-                _sum: { value: true },
-                where: { createdAt: { gte: startOfMonth(today) } },
-            }),
-            prisma.deal.aggregate({
-                _sum: { value: true },
-                where: { createdAt: { gte: lastMonthStart, lte: lastMonthEnd } },
-            }),
-            prisma.cRMActivity.count({
-                where: { createdAt: { gte: subDays(today, 7) } },
-            }),
-            prisma.user.findMany({
-                where: { assignedDeals: { some: { stage: "WON" } } },
-                select: {
-                    name: true,
-                    assignedDeals: { where: { stage: "WON" }, select: { value: true } },
-                },
-            }),
+            prisma.deal.findMany({ where: { stage: "WON" }, select: { createdAt: true, updatedAt: true, value: true } }),
+            prisma.deal.count({ where: { stage: { notIn: ["WON", "LOST"] }, updatedAt: { lt: thirtyDaysAgo } } }),
+            prisma.lead.groupBy({ by: ["source"], _count: { source: true }, orderBy: { _count: { source: "desc" } }, take: 5 }),
+            prisma.deal.groupBy({ by: ["lostReason"], where: { stage: "LOST", lostReason: { not: null } }, _count: { lostReason: true }, orderBy: { _count: { lostReason: "desc" } } }),
+            prisma.deal.aggregate({ _sum: { value: true }, where: { createdAt: { gte: startOfMonth(today) } } }),
+            prisma.deal.aggregate({ _sum: { value: true }, where: { createdAt: { gte: lastMonthStart, lte: lastMonthEnd } } }),
+            prisma.cRMActivity.count({ where: { createdAt: { gte: subDays(today, 7) } } }),
+            prisma.user.findMany({ where: { assignedDeals: { some: { stage: "WON" } } }, select: { name: true, assignedDeals: { where: { stage: "WON" }, select: { value: true } } } }),
         ]);
 
-        // 2. Revenue Forecast (Next 3 Months Weighted — en paralelo)
         const next3Months = [
             { start: startOfMonth(today), end: endOfMonth(today), name: format(today, "MMM") },
             { start: startOfMonth(subDays(today, -30)), end: endOfMonth(subDays(today, -30)), name: format(subDays(today, -30), "MMM") },
@@ -226,57 +138,35 @@ export async function getHighPerformanceStats() {
 
         const forecastData = await Promise.all(
             next3Months.map(async (month) => {
-                const deals = await prisma.deal.findMany({
-                    where: { stage: { notIn: ["WON", "LOST"] }, expectedClose: { gte: month.start, lte: month.end } },
-                    select: { value: true, probability: true },
-                });
+                const deals = await prisma.deal.findMany({ where: { stage: { notIn: ["WON", "LOST"] }, expectedClose: { gte: month.start, lte: month.end } }, select: { value: true, probability: true } });
                 const weighted = deals.reduce((acc, d) => acc + d.value * (d.probability / 100), 0);
                 const total = deals.reduce((acc, d) => acc + d.value, 0);
                 return { name: month.name, weighted: Math.round(weighted), total: Math.round(total) };
             })
         );
 
-        // 3. Calcular métricas derivadas
         const forecastValue = forecastData.reduce((acc, d) => acc + d.weighted, 0);
         const currentVal = currentPipeline._sum.value || 0;
         const lastVal = lastMonthPipeline._sum.value || 0;
         const momGrowth = lastVal === 0 ? 100 : ((currentVal - lastVal) / lastVal) * 100;
-
-        const totalDays = wonDealsData.reduce((acc, deal) => {
-            const diffTime = Math.abs(deal.updatedAt.getTime() - deal.createdAt.getTime());
-            return acc + Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }, 0);
+        const totalDays = wonDealsData.reduce((acc, deal) => { const diff = Math.abs(deal.updatedAt.getTime() - deal.createdAt.getTime()); return acc + Math.ceil(diff / 86400000); }, 0);
         const avgDaysToClose = wonDealsData.length > 0 ? Math.round(totalDays / wonDealsData.length) : 0;
         const wonValue = wonDealsData.reduce((acc, deal) => acc + deal.value, 0);
-
-        // B-3 Fix: monthlyTarget desde env var (no hardcodeado)
         const monthlyTarget = parseInt(process.env.MONTHLY_SALES_TARGET ?? "50000", 10);
         const goalProgress = (wonValue / monthlyTarget) * 100;
-
         const rankedLeaderboard = leaderboardData
-            .map((user) => ({
-                name: user.name || "Unknown",
-                wonValue: user.assignedDeals.reduce((sum, deal) => sum + (deal.value || 0), 0),
-            }))
+            .map((user) => ({ name: user.name || "Unknown", wonValue: user.assignedDeals.reduce((sum, deal) => sum + (deal.value || 0), 0) }))
             .sort((a, b) => b.wonValue - a.wonValue)
             .slice(0, 5);
 
         return {
-            forecastValue: Math.round(forecastValue),
-            forecastData,
+            forecastValue: Math.round(forecastValue), forecastData,
             leadSources: leadSources.map((ls) => ({ name: ls.source, value: ls._count.source })),
             lostReasons: lostReasons.map((lr) => ({ reason: lr.lostReason || "Other", count: lr._count.lostReason })),
-            stagnantDealsCount,
-            momGrowth: Math.round(momGrowth),
-            avgDaysToClose,
-            wonValue: Math.round(wonValue),
-            monthlyTarget,
-            goalProgress: Math.min(100, Math.round(goalProgress)),
+            stagnantDealsCount, momGrowth: Math.round(momGrowth), avgDaysToClose,
+            wonValue: Math.round(wonValue), monthlyTarget, goalProgress: Math.min(100, Math.round(goalProgress)),
             activityIntensity: recentActivitiesCount,
-            winRate:
-                wonDealsCount + lostDealsCount > 0
-                    ? Math.round((wonDealsCount / (wonDealsCount + lostDealsCount)) * 100)
-                    : 0,
+            winRate: wonDealsCount + lostDealsCount > 0 ? Math.round((wonDealsCount / (wonDealsCount + lostDealsCount)) * 100) : 0,
             leaderboard: rankedLeaderboard,
         };
     } catch (error) {
@@ -285,46 +175,30 @@ export async function getHighPerformanceStats() {
     }
 }
 
+// ─── DEAL ACTIONS ─────────────────────────────────────────────────────────────
 
 export async function updateDealStage(dealId: string, stage: string) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
-
     try {
-        await prisma.deal.update({
-            where: { id: dealId },
-            data: {
-                stage,
-                updatedAt: new Date()
-            }
-        });
-
-        revalidatePath('/dashboard/admin/crm');
+        await prisma.deal.update({ where: { id: dealId }, data: { stage, updatedAt: new Date() } });
+        revalidatePath("/dashboard/admin/crm");
         return { success: true };
     } catch (error) {
-        console.error("Failed to update deal stage:", error);
+        console.error(error);
         return { error: "Failed to update deal" };
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function updateDeal(dealId: string, data: any) {
+export async function updateDeal(dealId: string, data: Record<string, unknown>) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
-
     try {
-        await prisma.deal.update({
-            where: { id: dealId },
-            data: {
-                ...data,
-                updatedAt: new Date()
-            }
-        });
-
-        revalidatePath('/dashboard/admin/crm');
+        await prisma.deal.update({ where: { id: dealId }, data: { ...data, updatedAt: new Date() } });
+        revalidatePath("/dashboard/admin/crm");
         return { success: true };
     } catch (error) {
-        console.error("Failed to update deal:", error);
+        console.error(error);
         return { error: "Failed to update deal" };
     }
 }
@@ -332,95 +206,349 @@ export async function updateDeal(dealId: string, data: any) {
 export async function deleteDeal(dealId: string) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
-
     try {
-        await prisma.deal.delete({
-            where: { id: dealId }
-        });
-
-        revalidatePath('/dashboard/admin/crm');
+        await prisma.deal.delete({ where: { id: dealId } });
+        revalidatePath("/dashboard/admin/crm");
         return { success: true };
     } catch (error) {
-        console.error("Failed to delete deal:", error);
+        console.error(error);
         return { error: "Failed to delete deal" };
     }
 }
 
-export async function createTeam(name: string, companyId: string, parentId?: string) {
+export async function createDeal(data: Record<string, unknown>) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
-
-    try {
-        await prisma.team.create({
-            data: {
-                name,
-                companyId,
-                parentId: parentId || null
-            }
-        });
-
-        revalidatePath('/dashboard/admin/crm');
-        return { success: true };
-    } catch (error) {
-        console.error("Failed to create team:", error);
-        return { error: "Failed to create team" };
-    }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createDeal(data: any) {
-    const authCheck = await checkAuth();
-    if (authCheck) return { error: "Unauthorized" };
-
-    // A-5 Fix: Rate limiting — máximo 5 creaciones de deal por minuto por usuario
-    const session = await auth();
-    const userId = session?.user?.id ?? "anonymous";
+    const userId = await getUserId();
     const allowed = rateLimit(`create_deal:${userId}`, 5, 60_000);
-    if (!allowed) return { error: "Demasiadas peticiones. Espera un momento antes de crear otro deal." };
-
+    if (!allowed) return { error: "Demasiadas peticiones. Espera un momento." };
     try {
-        await prisma.deal.create({
+        const deal = await prisma.deal.create({
             data: {
-                title: data.title,
-                value: data.value,
-                stage: data.stage,
-                priority: data.priority,
-                contactName: data.contactName,
-                contactEmail: data.contactEmail,
-                companyId: data.companyId,
-                // Add other fields if needed or spread data if safe
+                title: data.title as string,
+                value: data.value as number,
+                stage: (data.stage as string) || "NEW",
+                priority: (data.priority as string) || "MEDIUM",
+                probability: (data.probability as number) || 10,
+                contactName: data.contactName as string | undefined,
+                contactEmail: data.contactEmail as string | undefined,
+                companyId: data.companyId as string,
+                notes: data.notes as string | undefined,
+                expectedClose: data.expectedClose ? new Date(data.expectedClose as string) : undefined,
+                source: (data.source as string) || "MANUAL",
                 createdAt: new Date(),
-                updatedAt: new Date()
-            }
+                updatedAt: new Date(),
+            },
         });
-
-        revalidatePath('/dashboard/admin/crm');
-        return { success: true };
+        revalidatePath("/dashboard/admin/crm");
+        return { success: true, id: deal.id };
     } catch (error) {
-        console.error("Failed to create deal:", error);
+        console.error(error);
         return { error: "Failed to create deal" };
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createCustomObjectDefinition(data: any) {
+// ─── LEAD ACTIONS ─────────────────────────────────────────────────────────────
+
+export interface LeadFilters {
+    status?: string;
+    source?: string;
+    scoreMin?: number;
+    scoreMax?: number;
+    assignedTo?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}
+
+export async function getLeads(companyId: string, filters: LeadFilters = {}) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
+    const { status, source, scoreMin = 0, scoreMax = 100, search, page = 1, pageSize = 20, sortBy = "createdAt", sortOrder = "desc" } = filters;
 
     try {
-        await prisma.customObjectDefinition.create({
-            data: {
-                name: data.name,
-                label: data.label ?? data.name,
-                description: data.description,
-                companyId: data.companyId,
-            }
-        });
+        const where = {
+            companyId,
+            ...(status && { status }),
+            ...(source && { source }),
+            score: { gte: scoreMin, lte: scoreMax },
+            ...(search && {
+                OR: [
+                    { name: { contains: search, mode: "insensitive" as const } },
+                    { email: { contains: search, mode: "insensitive" as const } },
+                    { company: { contains: search, mode: "insensitive" as const } },
+                ],
+            }),
+        };
 
-        revalidatePath('/dashboard/admin/crm');
+        const [leads, total] = await Promise.all([
+            prisma.lead.findMany({
+                where,
+                orderBy: { [sortBy]: sortOrder },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+                select: {
+                    id: true, name: true, email: true, phone: true, company: true,
+                    status: true, source: true, score: true, assignedTo: true,
+                    createdAt: true, updatedAt: true, tags: true,
+                    utmSource: true, utmCampaign: true, convertedAt: true,
+                },
+            }),
+            prisma.lead.count({ where }),
+        ]);
+
+        return { leads, total, pages: Math.ceil(total / pageSize), page };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to fetch leads" };
+    }
+}
+
+export async function getLeadById(id: string) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        const lead = await prisma.lead.findUnique({
+            where: { id },
+            include: {
+                campaign: { select: { id: true, name: true, platform: true, code: true } },
+                conversations: { take: 5, orderBy: { lastMessageAt: "desc" }, select: { id: true, channel: true, status: true, lastMessageAt: true, lastMessagePreview: true } },
+                marketingEvents: { take: 10, orderBy: { createdAt: "desc" }, select: { id: true, eventType: true, eventName: true, url: true, createdAt: true } },
+            },
+        });
+        if (!lead) return { error: "Lead not found" };
+        return { lead };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to fetch lead" };
+    }
+}
+
+export async function updateLead(id: string, data: Record<string, unknown>) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        await prisma.lead.update({ where: { id }, data: { ...data, updatedAt: new Date() } });
+        revalidatePath(`/dashboard/admin/crm/leads/${id}`);
+        revalidatePath("/dashboard/admin/crm/leads");
         return { success: true };
     } catch (error) {
-        console.error("Failed to create custom object definition:", error);
-        return { error: "Failed to create object definition" };
+        console.error(error);
+        return { error: "Failed to update lead" };
+    }
+}
+
+export async function bulkUpdateLeads(ids: string[], data: Record<string, unknown>) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        await prisma.lead.updateMany({ where: { id: { in: ids } }, data: { ...data, updatedAt: new Date() } });
+        revalidatePath("/dashboard/admin/crm/leads");
+        return { success: true, count: ids.length };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to bulk update leads" };
+    }
+}
+
+export async function convertLeadToDeal(leadId: string, dealData: { title: string; value: number; companyId: string; probability?: number; expectedClose?: string }) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { name: true, email: true, phone: true } });
+        if (!lead) return { error: "Lead not found" };
+
+        const [deal] = await prisma.$transaction([
+            prisma.deal.create({
+                data: {
+                    title: dealData.title,
+                    value: dealData.value,
+                    stage: "QUALIFIED",
+                    probability: dealData.probability ?? 30,
+                    contactName: lead.name ?? undefined,
+                    contactEmail: lead.email,
+                    companyId: dealData.companyId,
+                    source: "LEAD_CONVERTED",
+                    expectedClose: dealData.expectedClose ? new Date(dealData.expectedClose) : undefined,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            }),
+            prisma.lead.update({
+                where: { id: leadId },
+                data: { status: "CONVERTED", convertedAt: new Date(), updatedAt: new Date() },
+            }),
+        ]);
+
+        revalidatePath("/dashboard/admin/crm/leads");
+        revalidatePath("/dashboard/admin/crm/pipeline");
+        return { success: true, dealId: deal.id };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to convert lead to deal" };
+    }
+}
+
+export async function createLead(data: {
+    email: string; name?: string; phone?: string; company?: string;
+    source: string; message?: string; companyId: string;
+    utmSource?: string; utmMedium?: string; utmCampaign?: string;
+    formData?: Record<string, unknown>;
+}) {
+    try {
+        const lead = await prisma.lead.create({
+            data: {
+                email: data.email, name: data.name, phone: data.phone,
+                company: data.company, source: data.source, message: data.message,
+                companyId: data.companyId,
+                utmSource: data.utmSource, utmMedium: data.utmMedium, utmCampaign: data.utmCampaign,
+                formData: (data.formData ?? {}) as import("@prisma/client").Prisma.InputJsonValue,
+                status: "NEW", score: 0,
+            },
+        });
+        revalidatePath("/dashboard/admin/crm/leads");
+        return { success: true, id: lead.id };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to create lead" };
+    }
+}
+
+// ─── ACTIVITY ACTIONS ─────────────────────────────────────────────────────────
+
+export async function createDealActivity(dealId: string, type: string, content: string) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    const userId = await getUserId();
+    try {
+        await prisma.cRMActivity.create({ data: { dealId, type, content, userId, createdAt: new Date(), updatedAt: new Date() } });
+        revalidatePath("/dashboard/admin/crm");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to create activity" };
+    }
+}
+
+export async function getDealActivities(dealId: string) {
+    const authCheck = await checkAuth();
+    if (authCheck) return [];
+    try {
+        return await prisma.cRMActivity.findMany({
+            where: { dealId },
+            orderBy: { createdAt: "desc" },
+            include: { user: { select: { name: true, image: true } } },
+        });
+    } catch {
+        return [];
+    }
+}
+
+// ─── CAMPAIGN ACTIONS ─────────────────────────────────────────────────────────
+
+export async function getCampaigns(companyId: string) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        const campaigns = await prisma.campaign.findMany({
+            where: { companyId },
+            orderBy: { createdAt: "desc" },
+            include: { _count: { select: { leads: true } } },
+        });
+
+        return campaigns.map((c) => {
+            const cpl = c.conversions > 0 && c.spend > 0 ? c.spend / c.conversions : 0;
+            const revenue = c._count.leads * 150; // avg lead value
+            const roas = c.spend > 0 ? revenue / c.spend : 0;
+            const ctr = c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0;
+            return { ...c, leadCount: c._count.leads, cpl: Math.round(cpl), roas: parseFloat(roas.toFixed(2)), ctr: parseFloat(ctr.toFixed(2)) };
+        });
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to fetch campaigns" };
+    }
+}
+
+export async function createCampaign(data: {
+    name: string; code: string; platform: string; budget?: number;
+    startDate?: string; endDate?: string; description?: string; companyId: string;
+}) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        const campaign = await prisma.campaign.create({
+            data: {
+                name: data.name,
+                code: data.code.toUpperCase().replace(/\s+/g, "-"),
+                platform: data.platform,
+                budget: data.budget,
+                startDate: data.startDate ? new Date(data.startDate) : undefined,
+                endDate: data.endDate ? new Date(data.endDate) : undefined,
+                description: data.description,
+                companyId: data.companyId,
+                status: "ACTIVE",
+            },
+        });
+        revalidatePath("/dashboard/admin/crm/campaigns");
+        return { success: true, id: campaign.id };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to create campaign" };
+    }
+}
+
+export async function updateCampaignMetrics(id: string, metrics: { impressions?: number; clicks?: number; conversions?: number; spend?: number }) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        await prisma.campaign.update({ where: { id }, data: { ...metrics, updatedAt: new Date() } });
+        revalidatePath("/dashboard/admin/crm/campaigns");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to update metrics" };
+    }
+}
+
+export async function updateCampaignStatus(id: string, status: "ACTIVE" | "PAUSED" | "COMPLETED") {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        await prisma.campaign.update({ where: { id }, data: { status, updatedAt: new Date() } });
+        revalidatePath("/dashboard/admin/crm/campaigns");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to update campaign status" };
+    }
+}
+
+// ─── MISC ─────────────────────────────────────────────────────────────────────
+
+export async function createTeam(name: string, companyId: string, parentId?: string) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        await prisma.team.create({ data: { name, companyId, parentId: parentId || null } });
+        revalidatePath("/dashboard/admin/crm");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to create team" };
+    }
+}
+
+export async function createCustomObjectDefinition(data: { name: string; label?: string; description?: string; companyId: string; apiName?: string }) {
+    const authCheck = await checkAuth();
+    if (authCheck) return { error: "Unauthorized" };
+    try {
+        await prisma.customObjectDefinition.create({ data: { name: data.name, label: data.label ?? data.name, description: data.description, companyId: data.companyId } });
+        revalidatePath("/dashboard/admin/crm");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: "Failed to create custom object definition" };
     }
 }
