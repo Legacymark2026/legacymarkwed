@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import dynamic from 'next/dynamic';
 import { ArrowDown, Play } from "lucide-react";
@@ -12,6 +12,7 @@ const ParticlesCanvas = dynamic(() => import('./particles-canvas'), {
 import { useMousePosition } from "@/hooks/use-mouse-position";
 
 export default function ContentHero() {
+    const [mounted, setMounted] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollY } = useScroll();
     const y1 = useTransform(scrollY, [0, 500], [0, 200]);
@@ -19,13 +20,17 @@ export default function ContentHero() {
 
     const mousePos = useMousePosition();
 
-    // Parallax calc
-    const mouseX = (mousePos.x / (typeof window !== 'undefined' ? window.innerWidth : 1000)) - 0.5;
-    const mouseY = (mousePos.y / (typeof window !== 'undefined' ? window.innerHeight : 1000)) - 0.5;
+    useEffect(() => { setMounted(true); }, []);
 
+    // Only compute window-dependent values client-side after mount
     const springConfig = { damping: 25, stiffness: 150 };
-    const rotateX = useSpring(useTransform(scrollY, [0, 500], [0, 5]), springConfig); // mild tilt on scroll
-    const rotateY = useSpring(mouseX * 10, springConfig); // tilt on mouse x
+    const rotateX = useSpring(useTransform(scrollY, [0, 500], [0, 5]), springConfig);
+    // Use 0 as safe default for SSR — no hydration mismatch
+    const rotateY = useSpring(0, springConfig);
+
+    // Mouse spotlight position — only valid client-side
+    const spotlightX = mounted ? mousePos.x - 400 : -400;
+    const spotlightY = mounted ? mousePos.y - 400 : -400;
 
     return (
         <div ref={containerRef} className="relative h-screen w-full flex items-center justify-center overflow-hidden neural-bg">
@@ -38,8 +43,8 @@ export default function ContentHero() {
             <div
                 className="absolute w-[800px] h-[800px] bg-teal-500/5 rounded-full blur-[100px] pointer-events-none mix-blend-multiply"
                 style={{
-                    left: mousePos.x - 400,
-                    top: mousePos.y - 400,
+                    left: spotlightX,
+                    top: spotlightY,
                     transition: 'transform 0.05s ease-out'
                 }}
             />
