@@ -3,7 +3,7 @@ import {
     LayoutDashboard, Users, Settings, FileText, LogOut,
     Shield, BookOpen, Briefcase, BarChart2, Workflow,
     MessageSquare, Target, TrendingUp, Link2, Building2,
-    Lock, UserCog, DollarSign,
+    Lock, UserCog, DollarSign, CheckSquare, Zap, Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth";
@@ -66,8 +66,12 @@ const NAV_GROUPS: NavGroup[] = [
         accent: "text-amber-600",
         items: [
             { href: "/dashboard/admin/crm", label: "CRM Overview", icon: <TrendingUp size={18} className="text-amber-500" /> },
-            { href: "/dashboard/admin/crm/pipeline", label: "Pipeline", icon: <Briefcase size={18} className="text-amber-500" /> },
             { href: "/dashboard/admin/crm/leads", label: "Leads", icon: <Users size={18} className="text-amber-500" /> },
+            { href: "/dashboard/admin/crm/pipeline", label: "Pipeline", icon: <Briefcase size={18} className="text-amber-500" /> },
+            { href: "/dashboard/admin/crm/tasks", label: "Tareas", icon: <CheckSquare size={18} className="text-sky-500" /> },
+            { href: "/dashboard/admin/crm/reports", label: "Reportes CRM", icon: <BarChart2 size={18} className="text-violet-500" /> },
+            { href: "/dashboard/admin/crm/templates", label: "Templates Email", icon: <Mail size={18} className="text-teal-500" /> },
+            { href: "/dashboard/admin/crm/scoring", label: "Lead Scoring", icon: <Zap size={18} className="text-amber-500" /> },
         ],
     },
 ];

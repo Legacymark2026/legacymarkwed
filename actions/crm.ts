@@ -319,10 +319,19 @@ export async function getLeadById(id: string) {
         if (!lead) return { error: "Lead not found" };
         return { lead };
     } catch (error) {
-        console.error(error);
-        return { error: "Failed to fetch lead" };
+        console.error("[getLeadById] Full query failed, trying simple query:", error);
+        // Fallback: skip optional relations that may be causing issues
+        try {
+            const lead = await prisma.lead.findUnique({ where: { id } });
+            if (!lead) return { error: "Lead not found" };
+            return { lead: { ...lead, campaign: null, conversations: [], marketingEvents: [] } };
+        } catch (fallbackError) {
+            console.error("[getLeadById] Fallback query also failed:", fallbackError);
+            return { error: "Failed to fetch lead" };
+        }
     }
 }
+
 
 export async function updateLead(id: string, data: Record<string, unknown>) {
     const authCheck = await checkAuth();
