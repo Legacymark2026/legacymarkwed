@@ -62,8 +62,8 @@ jobs:
       - name: Install dependencies
         run: npm install --prefer-offline
       
-      - name: Apply database schema
-        run: npx prisma db push --accept-data-loss
+      # NOTE: Schema changes are applied locally with 'prisma db push' before committing.
+      # GitHub Actions runners cannot reach the production DB (IP-restricted).
       
       - name: Deploy to Vercel
         run: |
