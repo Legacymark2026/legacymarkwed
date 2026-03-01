@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getLeadById, getDealActivities } from "@/actions/crm";
 import { prisma } from "@/lib/prisma";
 import { ConvertToDealDialog } from "@/components/crm/convert-to-deal-dialog";
-import { DealActivityTimeline } from "@/components/crm/deal-activity-timeline";
 import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Tag, Calendar, TrendingUp } from "lucide-react";
@@ -24,10 +22,48 @@ const SOURCE_ICONS: Record<string, string> = {
 interface PageProps { params: { id: string } }
 
 export default async function LeadDetailPage({ params }: PageProps) {
-    const [result, company] = await Promise.all([getLeadById(params.id), prisma.company.findFirst()]);
+    // Direct Prisma query — no server action intermediary to hide errors
+    let lead;
+    let company;
+    let conversations: { id: string; channel: string; status: string }[] = [];
+    let marketingEvents: { id: string; eventType: string; eventName: string | null; url: string | null; createdAt: Date }[] = [];
 
-    if ("error" in result || !result.lead) return notFound();
-    const { lead } = result;
+    try {
+        [lead, company] = await Promise.all([
+            prisma.lead.findUnique({
+                where: { id: params.id },
+                include: {
+                    campaign: { select: { id: true, name: true, platform: true, code: true } },
+                },
+            }),
+            prisma.company.findFirst(),
+        ]);
+    } catch (err) {
+        console.error("[LeadDetailPage] Core query failed:", err);
+        return notFound();
+    }
+
+    if (!lead) return notFound();
+
+    // Optional relations — fetched separately so they never cause a 404
+    try {
+        conversations = await prisma.conversation.findMany({
+            where: { leadId: params.id },
+            take: 5,
+            orderBy: { updatedAt: "desc" },
+            select: { id: true, channel: true, status: true },
+        });
+    } catch (err) { console.warn("[LeadDetailPage] conversations query failed:", err); }
+
+    try {
+        marketingEvents = await prisma.marketingEvent.findMany({
+            where: { leadId: params.id },
+            take: 10,
+            orderBy: { createdAt: "desc" },
+            select: { id: true, eventType: true, eventName: true, url: true, createdAt: true },
+        });
+    } catch (err) { console.warn("[LeadDetailPage] marketingEvents query failed:", err); }
+
     const status = STATUS_CONFIG[lead.status] ?? STATUS_CONFIG["NEW"];
     const scoreColor = lead.score >= 70 ? "from-emerald-500 to-teal-500" : lead.score >= 40 ? "from-amber-500 to-orange-500" : "from-red-500 to-rose-500";
 
@@ -73,6 +109,11 @@ export default async function LeadDetailPage({ params }: PageProps) {
                                                 <Phone className="w-3.5 h-3.5" /> {lead.phone}
                                             </a>
                                         )}
+                                        {lead.phone && (
+                                            <a href={`https://wa.me/${lead.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition-all">
+                                                💬 WhatsApp
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -87,7 +128,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
                     </div>
 
                     {/* UTM Attribution */}
-                    {(lead.utmSource || lead.utmCampaign || lead.utmMedium) && (
+                    {(lead.utmSource || lead.utmCampaign || lead.utmMedium || lead.source) && (
                         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
                             <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
                                 <Globe className="w-4 h-4 text-teal-500" /> Atribución de Campaña
@@ -104,18 +145,17 @@ export default async function LeadDetailPage({ params }: PageProps) {
                                     <div key={item.label} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{item.label}</p>
                                         <p className="text-sm font-bold text-slate-900 truncate">
-                                            {item.icon && <span className="mr-1">{item.icon}</span>}
-                                            {item.value}
+                                            {item.icon && <span className="mr-1">{item.icon}</span>}{item.value}
                                         </p>
                                     </div>
                                 ))}
                             </div>
-                            {lead.campaign && (
+                            {(lead as any).campaign && (
                                 <div className="mt-4 flex items-center gap-3 p-3 bg-violet-50 border border-violet-100 rounded-xl">
                                     <span className="text-xl">📊</span>
                                     <div>
                                         <p className="text-xs font-bold text-violet-700">Campaña Vinculada</p>
-                                        <p className="text-sm font-bold text-slate-900">{lead.campaign.name} <span className="text-xs font-mono text-slate-400">({lead.campaign.platform})</span></p>
+                                        <p className="text-sm font-bold text-slate-900">{(lead as any).campaign.name} <span className="text-xs font-mono text-slate-400">({(lead as any).campaign.platform})</span></p>
                                     </div>
                                 </div>
                             )}
@@ -137,14 +177,24 @@ export default async function LeadDetailPage({ params }: PageProps) {
                         </div>
                     )}
 
-                    {/* Activity Timeline */}
+                    {/* Conversations */}
                     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                        <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-5">📅 Actividad</h2>
-                        {/* A deal activity timeline-like component for leads — using deal activities would require a deal, so show a simple placeholder for now */}
-                        <div className="text-sm text-slate-400 text-center py-8">
-                            <p>Las actividades de este lead aparecerán aquí.</p>
-                            <p className="mt-2 text-xs">Convierte este lead en un Deal para registrar notas, llamadas y emails.</p>
-                        </div>
+                        <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-5">💬 Conversaciones & Actividad</h2>
+                        {conversations.length > 0 ? (
+                            <div className="space-y-2">
+                                {conversations.map((conv) => (
+                                    <Link key={conv.id} href={`/dashboard/inbox/${conv.id}`} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                                        <span className="text-sm font-bold text-slate-700">{conv.channel}</span>
+                                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${conv.status === "OPEN" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-500"}`}>{conv.status}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-slate-400">
+                                <p className="text-sm">No hay conversaciones aún para este lead.</p>
+                                <p className="text-xs mt-1">Convierte este lead en un Deal para registrar notas, llamadas y emails.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -159,7 +209,7 @@ export default async function LeadDetailPage({ params }: PageProps) {
                             <span className="text-3xl font-black text-slate-900">{lead.score}</span>
                         </div>
                         <div className="h-3 bg-slate-100 rounded-full overflow-hidden mb-2">
-                            <div className={`h-full rounded-full bg-gradient-to-r ${scoreColor} transition-all`} style={{ width: `${lead.score}%` }} />
+                            <div className={`h-full rounded-full bg-gradient-to-r ${scoreColor} transition-all`} style={{ width: `${Math.max(lead.score, 3)}%` }} />
                         </div>
                         <p className="text-xs text-slate-400 text-right">{lead.score >= 70 ? "🟢 Lead caliente" : lead.score >= 40 ? "🟡 Lead tibio" : "🔴 Lead frío"}</p>
                     </div>
@@ -182,11 +232,11 @@ export default async function LeadDetailPage({ params }: PageProps) {
                         </div>
                     )}
 
-                    {/* Meta */}
+                    {/* Meta Details */}
                     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-4">
                         <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">Detalles</h3>
                         {[
-                            { icon: <Calendar className="w-4 h-4" />, label: "Creado", value: format(new Date(lead.createdAt), "d MMM yyyy", { locale: es }) },
+                            { icon: <Calendar className="w-4 h-4" />, label: "Creado", value: format(new Date(lead.createdAt), "d MMM yyyy · HH:mm", { locale: es }) },
                             { icon: <Calendar className="w-4 h-4" />, label: "Actualizado", value: formatDistanceToNow(new Date(lead.updatedAt), { addSuffix: true, locale: es }) },
                             { icon: <MapPin className="w-4 h-4" />, label: "País", value: lead.country || "—" },
                             { icon: <MapPin className="w-4 h-4" />, label: "Ciudad", value: lead.city || "—" },
@@ -213,16 +263,16 @@ export default async function LeadDetailPage({ params }: PageProps) {
                         </div>
                     )}
 
-                    {/* Conversations */}
-                    {lead.conversations && lead.conversations.length > 0 && (
+                    {/* Marketing Events */}
+                    {marketingEvents.length > 0 && (
                         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">💬 Conversaciones</h3>
+                            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-3">📈 Eventos</h3>
                             <div className="space-y-2">
-                                {lead.conversations.map((conv) => (
-                                    <Link key={conv.id} href={`/dashboard/inbox/${conv.id}`} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                                        <span className="text-xs font-bold text-slate-700">{conv.channel}</span>
-                                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${conv.status === "OPEN" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-500"}`}>{conv.status}</span>
-                                    </Link>
+                                {marketingEvents.map((ev) => (
+                                    <div key={ev.id} className="flex items-center gap-2 text-xs">
+                                        <span className="font-bold text-slate-600">{ev.eventType}</span>
+                                        {ev.eventName && <span className="text-slate-400">· {ev.eventName}</span>}
+                                    </div>
                                 ))}
                             </div>
                         </div>
