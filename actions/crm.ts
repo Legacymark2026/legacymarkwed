@@ -307,30 +307,46 @@ export async function getLeads(companyId: string, filters: LeadFilters = {}) {
 
 export async function getLeadById(id: string) {
     // Auth is handled at the dashboard middleware level — no redundant checkAuth here
+    // Fetch the core lead first (guaranteed to succeed if the lead exists)
     try {
         const lead = await prisma.lead.findUnique({
             where: { id },
             include: {
                 campaign: { select: { id: true, name: true, platform: true, code: true } },
-                conversations: { take: 5, orderBy: { lastMessageAt: "desc" }, select: { id: true, channel: true, status: true, lastMessageAt: true, lastMessagePreview: true } },
-                marketingEvents: { take: 10, orderBy: { createdAt: "desc" }, select: { id: true, eventType: true, eventName: true, url: true, createdAt: true } },
             },
         });
         if (!lead) return { error: "Lead not found" };
-        return { lead };
-    } catch (error) {
-        console.error("[getLeadById] Full query failed, trying simple query:", error);
-        // Fallback: skip optional relations that may be causing issues
+
+        // Fetch optional relations independently — any failure here is non-fatal
+        let conversations: { id: string; channel: string; status: string; lastMessageAt: Date | null; lastMessagePreview: string | null }[] = [];
+        let marketingEvents: { id: string; eventType: string; eventName: string | null; url: string | null; createdAt: Date }[] = [];
+
         try {
-            const lead = await prisma.lead.findUnique({ where: { id } });
-            if (!lead) return { error: "Lead not found" };
-            return { lead: { ...lead, campaign: null, conversations: [], marketingEvents: [] } };
-        } catch (fallbackError) {
-            console.error("[getLeadById] Fallback query also failed:", fallbackError);
-            return { error: "Failed to fetch lead" };
-        }
+            conversations = await prisma.conversation.findMany({
+                where: { leadId: id },
+                take: 5,
+                orderBy: { updatedAt: "desc" },
+                select: { id: true, channel: true, status: true, lastMessageAt: true, lastMessagePreview: true },
+            });
+        } catch { /* conversations unavailable — ignore */ }
+
+        try {
+            marketingEvents = await prisma.marketingEvent.findMany({
+                where: { leadId: id },
+                take: 10,
+                orderBy: { createdAt: "desc" },
+                select: { id: true, eventType: true, eventName: true, url: true, createdAt: true },
+            });
+        } catch { /* marketingEvents unavailable — ignore */ }
+
+        return { lead: { ...lead, conversations, marketingEvents } };
+    } catch (error) {
+        console.error("[getLeadById] Failed:", error);
+        return { error: "Failed to fetch lead" };
     }
 }
+
+
 
 
 export async function updateLead(id: string, data: Record<string, unknown>) {
