@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { InboxCommandMenu } from "@/components/inbox/inbox-command-menu";
 import { toast } from "sonner";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface InboxLayoutProps {
     children: React.ReactNode;
@@ -25,6 +26,18 @@ interface InboxLayoutProps {
 export function InboxLayout({ children, conversationList, leadProfile, currentUser, metrics }: InboxLayoutProps) {
     const [isFoldersOpen, setIsFoldersOpen] = useState(true);
     const [isProfileOpen, setIsProfileOpen] = useState(true);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const currentFolder = searchParams.get('folder');
+    const currentTag = searchParams.get('tag');
+
+    const handleNavigation = (type: 'folder' | 'tag', value: string) => {
+        if (type === 'folder') {
+            router.push(`/dashboard/inbox?folder=${value}`);
+        } else {
+            router.push(`/dashboard/inbox?tag=${value}`);
+        }
+    };
 
     return (
         <TooltipProvider>
@@ -46,18 +59,19 @@ export function InboxLayout({ children, conversationList, leadProfile, currentUs
                         {/* Status Folders */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Vistas</p>}
-                            <NavItem icon={Inbox} label="Sin Asignar" count={metrics?.unassigned || 0} active isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => toast.info('Filtrando vista: Sin Asignar')} />
-                            <NavItem icon={MessageSquare} label="Mis Chats" count={metrics?.mine || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Mis Chats')} />
-                            <NavItem icon={Clock} label="Pendientes" count={metrics?.pending || 0} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" onClick={() => toast.info('Filtrando vista: Pendientes')} />
-                            <NavItem icon={CheckCircle2} label="Resueltos" count={metrics?.resolved || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Resueltos')} />
+                            <NavItem icon={Inbox} label="Sin Asignar" count={metrics?.unassigned || 0} active={currentFolder === 'unassigned'} isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => handleNavigation('folder', 'unassigned')} />
+                            <NavItem icon={MessageSquare} label="Mis Chats" count={metrics?.mine || 0} active={currentFolder === 'mine'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'mine')} />
+                            <NavItem icon={Clock} label="Pendientes" count={metrics?.pending || 0} active={currentFolder === 'pending'} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" onClick={() => handleNavigation('folder', 'pending')} />
+                            <NavItem icon={CheckCircle2} label="Resueltos" count={metrics?.resolved || 0} active={currentFolder === 'resolved'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'resolved')} />
+                            <NavItem icon={MessageSquare} label="Todos" active={!currentFolder && !currentTag} isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => router.push('/dashboard/inbox')} />
                         </div>
 
                         {/* Tags */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Etiquetas</p>}
-                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={metrics?.vip || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Soporte VIP')} />
-                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={metrics?.sales || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Ventas')} />
-                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" count={metrics?.questions || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Dudas')} />
+                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={metrics?.vip || 0} active={currentTag === 'Soporte VIP'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Soporte VIP')} />
+                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={metrics?.sales || 0} active={currentTag === 'Ventas'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Ventas')} />
+                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" count={metrics?.questions || 0} active={currentTag === 'Dudas'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Dudas')} />
                         </div>
 
                         {/* Other */}

@@ -5,7 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Search, Filter, SlidersHorizontal, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChannelIcon } from './channel-icon';
@@ -30,11 +30,15 @@ interface Conversation {
         image?: string;
     } | null;
     assignedTo?: string | null;
+    tags?: any;
 }
 
 export function ConversationList({ conversations, currentUser }: { conversations: Conversation[], currentUser?: any }) {
     const router = useRouter();
     const params = useParams();
+    const searchParams = useSearchParams();
+    const folderParam = searchParams.get('folder');
+    const tagParam = searchParams.get('tag');
     const activeId = params?.conversationId;
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('all'); // all, mine, unassigned
@@ -64,7 +68,16 @@ export function ConversationList({ conversations, currentUser }: { conversations
 
         const matchesChannel = activeChannel === 'ALL' ? true : convo.channel === activeChannel;
 
-        return matchesSearch && matchesStatus && matchesTab && matchesChannel;
+        let matchesFolder = true;
+        if (folderParam === 'unassigned') matchesFolder = !convo.assignedTo;
+        if (folderParam === 'mine') matchesFolder = convo.assignedTo === mockUserId;
+        if (folderParam === 'pending') matchesFolder = convo.status === 'OPEN';
+        if (folderParam === 'resolved') matchesFolder = convo.status === 'CLOSED';
+
+        let matchesTag = true;
+        if (tagParam) matchesTag = (convo.tags as string[])?.includes(tagParam);
+
+        return matchesSearch && matchesStatus && matchesTab && matchesChannel && matchesFolder && matchesTag;
     });
 
     const toggleSelection = (id: string) => {

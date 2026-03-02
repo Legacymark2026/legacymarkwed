@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
     Send, Paperclip, Smile, Image as ImageIcon,
     Phone, Video, MoreHorizontal, Check, CheckCheck,
-    Reply, Forward, Trash2, Copy, Clock, Sparkles, Download, Timer
+    Reply, Forward, Trash2, Copy, Clock, Sparkles, Download, Timer, Volume2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +37,39 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [isPrivateNote, setIsPrivateNote] = useState(false); // Internal Private Notes Toggle
 
     const [showBackgroundAlert, setShowBackgroundAlert] = useState(false);
+
+    // Call UI State
+    const [activeCall, setActiveCall] = useState<'video' | 'audio' | null>(null);
+    const [callDuration, setCallDuration] = useState(0);
+    const [recordDuration, setRecordDuration] = useState(0);
+
+    // Effect for call duration
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (activeCall) {
+            interval = setInterval(() => setCallDuration(p => p + 1), 1000);
+        } else {
+            setCallDuration(0);
+        }
+        return () => clearInterval(interval);
+    }, [activeCall]);
+
+    // Effect for record duration
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isRecording) {
+            interval = setInterval(() => setRecordDuration(p => p + 1), 1000);
+        } else {
+            setRecordDuration(0);
+        }
+        return () => clearInterval(interval);
+    }, [isRecording]);
+
+    const formatDuration = (seconds: number) => {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
 
     // Simulate typing effect for demo
     useEffect(() => {
@@ -87,7 +120,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
         if (!newItem.trim() && !isRecording) return; // Allow sending if recording (mock)
 
         setIsSending(true);
-        const content = isRecording ? "🎤 Voice Message (0:14)" : newItem;
+        const content = isRecording ? `🎤 Nota de Voz (${formatDuration(recordDuration)})` : newItem;
 
         const optimisticMsg = {
             id: 'temp-' + Date.now(),
@@ -188,10 +221,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
                     <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
 
-                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => toast.info('Starting voice call...')}>
+                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => setActiveCall('audio')}>
                         <Phone size={18} />
                     </Button>
-                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => toast.info('Starting video call...')}>
+                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => setActiveCall('video')}>
                         <Video size={18} />
                     </Button>
                     <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
@@ -237,6 +270,56 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                         <div className="flex flex-col">
                             <span className="text-xs font-semibold text-slate-100">Nuevo mensaje de WhatsApp</span>
                             <span className="text-[11px] text-slate-300">Carlos Díaz: "¡Listo, gracias!"</span>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Active Call Overlay */}
+            <AnimatePresence>
+                {activeCall && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="absolute inset-0 z-50 bg-slate-900/95 backdrop-blur-xl flex flex-col items-center justify-center text-white"
+                    >
+                        <div className="relative mb-8">
+                            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-5xl font-bold shadow-2xl ring-4 ring-indigo-500/30 animate-pulse">
+                                {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                            </div>
+                            {activeCall === 'video' && (
+                                <div className="absolute -bottom-2 -right-2 bg-slate-800 p-3 rounded-full ring-4 ring-slate-900 shadow-lg">
+                                    <Video size={24} className="text-white" />
+                                </div>
+                            )}
+                        </div>
+                        <h2 className="text-2xl font-bold mb-2">{conversation.lead?.name || 'Unknown Lead'}</h2>
+                        <p className="text-slate-400 font-mono text-lg mb-12 flex items-center gap-3">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></span>
+                            {formatDuration(callDuration)}
+                        </p>
+
+                        <div className="flex items-center gap-6">
+                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white" onClick={() => toast.info('Micrófono silenciado')}>
+                                <Mic className="w-6 h-6" />
+                            </Button>
+                            <Button variant="primary" size="icon" className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20" onClick={() => {
+                                setActiveCall(null);
+                                setMessages((prev: any) => [...prev, {
+                                    id: 'call-' + Date.now(),
+                                    content: `📞 ${activeCall === 'video' ? 'Video' : ''} Llamada finalizada (${formatDuration(callDuration)})`,
+                                    direction: 'INTERNAL',
+                                    status: 'SENT',
+                                    createdAt: new Date(),
+                                    senderId: currentUserId
+                                }]);
+                            }}>
+                                <Phone className="w-7 h-7 rotate-[135deg]" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white" onClick={() => toast.info('Altavoz activado')}>
+                                <Volume2 className="w-6 h-6" />
+                            </Button>
                         </div>
                     </motion.div>
                 )}
@@ -394,26 +477,40 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.loading('IA Sugiriendo respuesta...', { duration: 1500 }); setTimeout(() => setNewItem('Te enviaré la información de inmediato.'), 1500); }}>Sugerir Respuesta</button>
                         </div>
 
-                        <textarea
-                            ref={textareaRef}
-                            value={newItem}
-                            onChange={(e) => {
-                                const val = e.target.value;
-                                setNewItem(val);
-                                if (val.endsWith('/')) setShowQuickReplies(true);
-                                else if (!val.includes('/')) setShowQuickReplies(false); // simple check
-                                adjustHeight();
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSend();
-                                }
-                            }}
-                            placeholder="Type your message..."
-                            className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-3 px-3 min-h-[44px] max-h-32 text-gray-800 placeholder:text-gray-400"
-                            rows={1}
-                        />
+                        {/* Audio Recording UI or Textarea */}
+                        {isRecording ? (
+                            <div className="w-full bg-red-50/80 border border-red-100 rounded-xl py-2.5 px-4 min-h-[44px] flex items-center justify-between shadow-inner">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-3 h-3 rounded-full bg-red-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></span>
+                                    <span className="text-red-600 font-mono font-bold text-base">{formatDuration(recordDuration)}</span>
+                                    <span className="text-red-500/80 text-sm hidden sm:inline ml-2 font-medium">Grabando audio...</span>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-100/50 h-8 font-semibold" onClick={() => { setIsRecording(false); setRecordDuration(0); toast.info('Grabación cancelada'); }}>
+                                    Cancelar
+                                </Button>
+                            </div>
+                        ) : (
+                            <textarea
+                                ref={textareaRef}
+                                value={newItem}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setNewItem(val);
+                                    if (val.endsWith('/')) setShowQuickReplies(true);
+                                    else if (!val.includes('/')) setShowQuickReplies(false); // simple check
+                                    adjustHeight();
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSend();
+                                    }
+                                }}
+                                placeholder="Type your message..."
+                                className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-3 px-3 min-h-[44px] max-h-32 text-gray-800 placeholder:text-gray-400"
+                                rows={1}
+                            />
+                        )}
 
                         {/* Rich Text Toolbar (Phase 3) */}
                         <div className="flex pb-2 pr-1 gap-1 items-center border-t border-gray-100 pt-1 mx-2">
