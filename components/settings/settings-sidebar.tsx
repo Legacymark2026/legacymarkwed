@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Shield, Blocks, Bell, CreditCard, Palette, Server, ArrowLeft } from "lucide-react";
+import { User, Shield, Blocks, Bell, Palette, ArrowLeft } from "lucide-react";
 
 const NAV_ITEMS = [
     { name: "Perfil y Cuenta", href: "/dashboard/settings/profile", icon: User },
@@ -10,8 +10,6 @@ const NAV_ITEMS = [
     { name: "Seguridad y Accesos", href: "/dashboard/settings/security", icon: Shield },
     { name: "Notificaciones", href: "/dashboard/settings/notifications", icon: Bell },
     { name: "Integraciones", href: "/dashboard/settings/integrations", icon: Blocks },
-    { name: "Facturación (Billing)", href: "/dashboard/settings/billing", icon: CreditCard },
-    { name: "Desarrollador (API)", href: "/dashboard/settings/developer", icon: Server },
 ];
 
 export function SettingsSidebar() {
@@ -34,8 +32,8 @@ export function SettingsSidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap ${isActive
-                                    ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
-                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
+                                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                                 }`}
                         >
                             <item.icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
