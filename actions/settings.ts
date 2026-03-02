@@ -19,7 +19,7 @@ export async function getSettings() {
         if (!user) return null;
 
         // Parse preferences from JSON, ensuring type safety
-        let preferences = { theme: "system", notifications: { email: true } };
+        let preferences = { theme: "system", notifications: { email: true }, timezone: "America/Bogota", currency: "USD" };
         if (user.profile?.preferences) {
             try {
                 const prefs = typeof user.profile.preferences === 'string'
@@ -62,12 +62,15 @@ export async function getSettings() {
             firstName: user.firstName || "",
             lastName: user.lastName || "",
             phone: user.phone || "",
+            image: user.image || "",
             jobTitle: user.profile?.jobTitle || "",
             bio: user.profile?.bio || "",
             linkedin: socialLinks.linkedin || "",
             github: socialLinks.github || "",
             theme: (["light", "dark", "system"].includes(preferences.theme) ? preferences.theme : "system") as "light" | "dark" | "system",
             emailNotifications: preferences.notifications?.email ?? true,
+            timezone: preferences.timezone || "America/Bogota",
+            currency: preferences.currency || "USD",
             gaPropertyId: gaConfig.propertyId || "",
             gaClientEmail: gaConfig.clientEmail || "",
             gaPrivateKey: gaConfig.privateKey || "",
@@ -123,8 +126,8 @@ export async function updateSettings(data: SettingsFormData) {
     const {
         firstName, lastName, phone,
         jobTitle, bio,
-        linkedin, github,
-        theme, emailNotifications
+        linkedin, github, image,
+        theme, emailNotifications, timezone, currency
     } = validated.data;
 
     try {
@@ -135,6 +138,7 @@ export async function updateSettings(data: SettingsFormData) {
                 firstName,
                 lastName,
                 phone,
+                ...(image !== undefined ? { image } : {})
             }
         });
 
@@ -146,13 +150,13 @@ export async function updateSettings(data: SettingsFormData) {
                 jobTitle,
                 bio,
                 socialLinks: { linkedin, github },
-                preferences: { theme, notifications: { email: emailNotifications } }
+                preferences: { theme, notifications: { email: emailNotifications }, timezone, currency }
             },
             update: {
                 jobTitle,
                 bio,
                 socialLinks: { linkedin, github },
-                preferences: { theme, notifications: { email: emailNotifications } }
+                preferences: { theme, notifications: { email: emailNotifications }, timezone, currency }
             }
         });
 

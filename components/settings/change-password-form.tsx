@@ -6,13 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import {
     Lock,
     Eye,
     EyeOff,
@@ -145,92 +138,88 @@ export function ChangePasswordForm() {
     }, [state?.success]);
 
     return (
-        <Card className="border border-slate-200 shadow-sm">
-            <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-teal-50 border border-teal-100">
-                        <ShieldCheck className="w-5 h-5 text-teal-600" />
-                    </div>
-                    <div>
-                        <CardTitle className="text-lg">Cambiar Contraseña</CardTitle>
-                        <CardDescription className="text-sm text-slate-500 mt-0.5">
-                            Usa una contraseña fuerte y única para proteger tu cuenta.
-                        </CardDescription>
-                    </div>
+        <div className="w-full">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2.5 rounded-xl bg-teal-50 border border-teal-100">
+                    <ShieldCheck className="w-5 h-5 text-teal-600" />
                 </div>
-            </CardHeader>
+                <div>
+                    <h3 className="text-lg font-bold text-slate-900">Cambiar Contraseña</h3>
+                    <p className="text-sm text-slate-500 mt-0.5">
+                        Usa una contraseña fuerte y única para proteger tu cuenta.
+                    </p>
+                </div>
+            </div>
 
-            <CardContent>
-                <form ref={formRef} action={action} className="space-y-5 max-w-md">
-                    {/* Current password */}
+            <form ref={formRef} action={action} className="space-y-5 max-w-md">
+                {/* Current password */}
+                <PasswordInput
+                    id="currentPassword"
+                    name="currentPassword"
+                    label="Contraseña actual"
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                />
+
+                <div className="border-t border-slate-100 pt-4">
+                    {/* New password */}
                     <PasswordInput
-                        id="currentPassword"
-                        name="currentPassword"
-                        label="Contraseña actual"
-                        placeholder="••••••••"
-                        autoComplete="current-password"
-                    />
-
-                    <div className="border-t border-slate-100 pt-4">
-                        {/* New password */}
-                        <PasswordInput
-                            id="newPassword"
-                            name="newPassword"
-                            label="Nueva contraseña"
-                            placeholder="Mínimo 8 caracteres"
-                            value={newPassword}
-                            onChange={setNewPassword}
-                            autoComplete="new-password"
-                        />
-                        <PasswordStrengthMeter password={newPassword} />
-                    </div>
-
-                    {/* Confirm */}
-                    <PasswordInput
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        label="Confirmar nueva contraseña"
-                        placeholder="Repite tu nueva contraseña"
+                        id="newPassword"
+                        name="newPassword"
+                        label="Nueva contraseña"
+                        placeholder="Mínimo 8 caracteres"
+                        value={newPassword}
+                        onChange={setNewPassword}
                         autoComplete="new-password"
                     />
+                    <PasswordStrengthMeter password={newPassword} />
+                </div>
 
-                    {/* Feedback messages */}
-                    {state?.error && (
-                        <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-red-50 border border-red-100 text-red-700 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
-                            <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                            <span>{state.error}</span>
-                        </div>
+                {/* Confirm */}
+                <PasswordInput
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    label="Confirmar nueva contraseña"
+                    placeholder="Repite tu nueva contraseña"
+                    autoComplete="new-password"
+                />
+
+                {/* Feedback messages */}
+                {state?.error && (
+                    <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-red-50 border border-red-100 text-red-700 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
+                        <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                        <span>{state.error}</span>
+                    </div>
+                )}
+
+                {state?.success && (
+                    <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
+                        <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                        <span>
+                            ✅ <strong>Contraseña actualizada.</strong> La próxima vez que inicies sesión
+                            usa tu nueva contraseña.
+                        </span>
+                    </div>
+                )}
+
+                <Button
+                    type="submit"
+                    disabled={isPending}
+                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold h-10 transition-all duration-200 disabled:opacity-60"
+                >
+                    {isPending ? (
+                        <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Actualizando…
+                        </>
+                    ) : (
+                        <>
+                            <ShieldCheck className="w-4 h-4 mr-2" />
+                            Actualizar Contraseña
+                        </>
                     )}
-
-                    {state?.success && (
-                        <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
-                            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                            <span>
-                                ✅ <strong>Contraseña actualizada.</strong> La próxima vez que inicies sesión
-                                usa tu nueva contraseña.
-                            </span>
-                        </div>
-                    )}
-
-                    <Button
-                        type="submit"
-                        disabled={isPending}
-                        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold h-10 transition-all duration-200 disabled:opacity-60"
-                    >
-                        {isPending ? (
-                            <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Actualizando…
-                            </>
-                        ) : (
-                            <>
-                                <ShieldCheck className="w-4 h-4 mr-2" />
-                                Actualizar Contraseña
-                            </>
-                        )}
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+                </Button>
+            </form>
+        </div>
     );
 }

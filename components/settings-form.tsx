@@ -11,8 +11,9 @@ import { SettingsSchema } from "@/lib/schemas";
 import { Loader2, User, Globe, Bell, Palette, Languages } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { Modal } from "@/components/ui/modal";
 import { useFacebookPixel } from "@/hooks/use-facebook-pixel";
+import ImageUpload from "@/components/ui/image-upload";
+import { toast } from "sonner";
 
 interface SettingsFormProps {
     initialData: {
@@ -26,6 +27,9 @@ interface SettingsFormProps {
         theme: "light" | "dark" | "system";
         language: "es" | "en" | "pt";
         emailNotifications: boolean;
+        image?: string | null;
+        timezone?: string;
+        currency?: string;
     };
 }
 
@@ -34,10 +38,6 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
     const { update } = useSession();
     const { setTheme: setSystemTheme, theme: currentSystemTheme } = useTheme();
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [showModal, setShowModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState("");
     const { trackCustom } = useFacebookPixel();
 
     const form = useForm({
@@ -52,80 +52,48 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
             linkedin: initialData.linkedin || "",
             github: initialData.github || "",
             language: initialData.language || "es",
+            image: initialData.image || null,
+            timezone: initialData.timezone || "America/Bogota",
+            currency: initialData.currency || "USD",
         },
     });
 
     const onSubmit = async (data: any) => {
         setLoading(true);
-        setError(null);
-        setSuccess(null);
+        const toastId = toast.loading("Guardando cambios...");
         try {
             const result = await updateSettings(data);
             trackCustom("SaveSettings", { section: "Profile" });
 
             if (result.success) {
-                // Force session update to reflect any name changes in UI
-                await update();
+                await update(); // Force session update
 
-                // Update system theme visually if changed
                 if (data.theme) {
                     setSystemTheme(data.theme);
                 }
 
-                setModalMessage(getSuccessMessage(data));
-                setShowModal(true);
+                toast.success("Perfil actualizado", {
+                    id: toastId,
+                    description: "Tus ajustes han sido guardados exitosamente."
+                });
                 router.refresh();
             } else {
-                setError(result.error || "Ocurrió un error al guardar.");
+                toast.error("Error al guardar", { id: toastId, description: result.error });
             }
         } catch (e) {
-            setError("Error inesperado de conexión.");
+            toast.error("Error de conexión", { id: toastId });
         } finally {
             setLoading(false);
         }
     };
 
-    // Helper to generate context-aware success message
-    const getSuccessMessage = (data: any) => {
-        const msgs = [];
-        if (data.theme !== initialData.theme) msgs.push("el tema visual");
-        if (data.firstName !== initialData.firstName) msgs.push("tu nombre");
-
-        if (msgs.length > 0) {
-            return `Hemos actualizado ${msgs.join(" y ")}. Revisa los cambios reflejados en la interfaz.`;
-        }
-        return "Tus cambios se han guardado exitosamente.";
-    };
-
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <Modal
-                isOpen={showModal}
-                onClose={() => setShowModal(false)}
-                title="¡Cambios Guardados!"
-                description={modalMessage}
-            >
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-sm md:text-base">
-                    <p className="flex items-center gap-2">
-                        👉 Verifica tu nombre en la <span className="font-semibold text-black">barra lateral</span>.
-                    </p>
-                    <p className="flex items-center gap-2 mt-2">
-                        👉 El <span className="font-semibold text-black">tema visual</span> se aplica globalmente.
-                    </p>
-                </div>
-            </Modal>
-
             <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Perfil y Preferencias</h2>
             </div>
 
             <div className="p-6">
-                {(success || error) && (
-                    <div className={`p-4 rounded-lg mb-6 text-sm ${success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                        {success || error}
-                    </div>
-                )}
-
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
                     {/* Sección: Información Personal */}
@@ -134,6 +102,32 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
                             <User size={18} className="text-gray-500" />
                             <h3>Información Personal</h3>
                         </div>
+
+                        {/* Avatar Upload */}
+                        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 border border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+                            <div className="shrink-0">
+                                {form.watch("image") ? (
+                                    <img src={form.watch("image")!} alt="Avatar" className="w-20 h-20 rounded-full object-cover border border-gray-200 shadow-sm" />
+                                ) : (
+                                    <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center border border-slate-300">
+                                        <User className="w-8 h-8 text-slate-400" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="w-full sm:w-auto flex-1 max-w-sm">
+                                <label className="text-sm font-semibold mb-2 block">Foto de Perfil</label>
+                                <ImageUpload
+                                    value={form.watch("image") ? [form.watch("image")!] : []}
+                                    onChange={(url) => {
+                                        form.setValue("image", url, { shouldDirty: true });
+                                        // Auto-save just the image change for better UX
+                                        onSubmit(form.getValues());
+                                    }}
+                                    onRemove={() => form.setValue("image", null, { shouldDirty: true })}
+                                />
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Nombre</label>
@@ -252,15 +246,47 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
 
                     <hr className="border-gray-100" />
 
-                    {/* Sección: Idioma del Sistema */}
+                    {/* Sección: Moneda y Zona Horaria */}
                     <div>
                         <div className="flex items-center gap-2 mb-4 text-gray-900 font-medium">
                             <Languages size={18} className="text-gray-500" />
-                            <h3>Idioma del Sistema</h3>
+                            <h3>Localización y Preferencias Regionales</h3>
                         </div>
                         <p className="text-sm text-gray-500 mb-4">
-                            Selecciona el idioma en el que deseas ver la interfaz del sistema.
+                            Configura cómo quieres que se muestren los datos en tu sistema.
                         </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Zona Horaria (Timezone)</label>
+                                <select
+                                    {...form.register("timezone")}
+                                    className="w-full p-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black text-sm bg-white"
+                                >
+                                    <option value="America/Bogota">Bogotá (GMT-5)</option>
+                                    <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
+                                    <option value="America/Argentina/Buenos_Aires">Buenos Aires (GMT-3)</option>
+                                    <option value="Europe/Madrid">Madrid (GMT+1)</option>
+                                    <option value="America/New_York">New York (EST)</option>
+                                    <option value="UTC">UTC Universal</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Moneda Predeterminada</label>
+                                <select
+                                    {...form.register("currency")}
+                                    className="w-full p-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black text-sm bg-white"
+                                >
+                                    <option value="USD">Dólar Estadounidense (USD)</option>
+                                    <option value="EUR">Euro (EUR)</option>
+                                    <option value="COP">Peso Colombiano (COP)</option>
+                                    <option value="MXN">Peso Mexicano (MXN)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label className="text-sm font-medium mb-3 block">Idioma de la Interfaz</label>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <label
                                 htmlFor="lang-es"

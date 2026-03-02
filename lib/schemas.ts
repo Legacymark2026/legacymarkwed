@@ -86,6 +86,9 @@ export const SettingsSchema = z.object({
     theme: z.enum(["light", "dark", "system"]).default("system"),
     language: z.enum(["es", "en", "pt"]).default("es"),
     emailNotifications: z.boolean().default(true),
+    image: z.string().optional().nullable(),
+    timezone: z.string().optional().default("America/Bogota"),
+    currency: z.string().optional().default("USD"),
 });
 
 export const IntegrationsSchema = z.object({
