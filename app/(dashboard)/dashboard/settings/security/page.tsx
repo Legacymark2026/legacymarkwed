@@ -1,6 +1,10 @@
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { TwoFactorToggle } from "@/components/settings/two-factor-toggle";
 import { SessionManagementTable } from "@/components/settings/session-management-table";
+import { DangerZone } from "@/components/settings/danger-zone";
+import { LoginHistoryTable } from "@/components/settings/login-history-table";
+import { BackupCodesModal } from "@/components/settings/backup-codes-modal";
+import { PasswordPolicies } from "@/components/settings/password-policies";
 
 export const dynamic = 'force-dynamic';
 
@@ -21,16 +25,26 @@ export default function SettingsSecurityPage() {
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
                     <ChangePasswordForm />
                 </div>
+                <PasswordPolicies />
             </section>
 
             <section className="space-y-4">
                 <h3 className="font-semibold text-slate-900 text-sm uppercase tracking-wider">Doble Autenticación</h3>
                 <TwoFactorToggle />
+                <BackupCodesModal />
             </section>
 
             <section className="space-y-4">
                 <h3 className="font-semibold text-slate-900 text-sm uppercase tracking-wider">Sesiones Activas</h3>
                 <SessionManagementTable />
+            </section>
+
+            <section className="space-y-4 pt-4">
+                <LoginHistoryTable />
+            </section>
+
+            <section className="space-y-4 pt-8">
+                <DangerZone />
             </section>
         </div>
     );

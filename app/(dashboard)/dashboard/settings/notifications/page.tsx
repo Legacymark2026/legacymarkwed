@@ -1,5 +1,6 @@
-import { Bell, Mail, MessageSquare, Phone } from "lucide-react";
+import { Bell, Mail, MessageSquare, Phone, Volume2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { SLAAlertSettings } from "@/components/settings/sla-alert-settings";
 
 export const dynamic = 'force-dynamic';
 
@@ -62,6 +63,30 @@ export default function SettingsNotificationsPage() {
                         <p className="text-sm text-slate-500 mt-1">Alertas instantáneas directo a tu WhatsApp.</p>
                     </div>
                     <Switch disabled />
+                </div>
+            </div>
+
+            <section className="space-y-4 pt-4">
+                <SLAAlertSettings />
+            </section>
+
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <Volume2 className="w-5 h-5 text-indigo-500" /> Experiencia de Usuario (UI)
+                        </h3>
+                        <p className="text-sm text-slate-500 mt-1">Ajustes sensoriales de la plataforma.</p>
+                    </div>
+                </div>
+                <div className="p-6 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <label className="text-sm font-medium text-slate-900">Efectos de Sonido In-App</label>
+                            <p className="text-xs text-slate-500">Reproducir sutiles 'pips' o 'pops' al completar acciones o recibir leads.</p>
+                        </div>
+                        <Switch defaultChecked />
+                    </div>
                 </div>
             </div>
         </div>

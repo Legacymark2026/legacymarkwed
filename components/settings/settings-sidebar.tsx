@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Shield, Blocks, Bell, Palette, ArrowLeft } from "lucide-react";
+import { User, Shield, Blocks, Bell, Palette, ArrowLeft, Building2, Users } from "lucide-react";
 
 const NAV_ITEMS = [
     { name: "Perfil y Cuenta", href: "/dashboard/settings/profile", icon: User },
     { name: "Apariencia", href: "/dashboard/settings/appearance", icon: Palette },
+    { name: "Compañía y Marca Blanca", href: "/dashboard/settings/company", icon: Building2 },
     { name: "Seguridad y Accesos", href: "/dashboard/settings/security", icon: Shield },
+    { name: "Equipo y Roles", href: "/dashboard/settings/members", icon: Users },
     { name: "Notificaciones", href: "/dashboard/settings/notifications", icon: Bell },
     { name: "Integraciones", href: "/dashboard/settings/integrations", icon: Blocks },
 ];
