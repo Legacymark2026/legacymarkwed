@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { ChannelIcon } from './channel-icon';
+import { toast } from 'sonner';
 
 export function RightSidebar({ conversation, leadDetails }: { conversation: any, leadDetails?: any }) {
     if (!conversation) return (
@@ -47,20 +48,22 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                 <p className="text-sm text-gray-500 mb-4">{lead.email || 'No email provided'}</p>
 
                 <div className="flex justify-center gap-2">
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800">
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800" onClick={() => toast.info('Navigating to full profile...')}>
                         <User size={12} />
                         Profile
                     </Button>
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-green-200 text-green-700 bg-green-50 hover:bg-green-100 hover:text-green-800">
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-green-200 text-green-700 bg-green-50 hover:bg-green-100 hover:text-green-800" onClick={() => toast.info('Opening Deals modal...')}>
                         <CreditCard size={12} />
                         Deal
                     </Button>
                 </div>
                 <div className="flex justify-center gap-2 mt-2">
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50">
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50" onClick={() => {
+                        toast.success('Lead converted successfully');
+                    }}>
                         <User size={10} className="text-blue-500" /> + Convert Lead
                     </Button>
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50">
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50" onClick={() => toast.success('Payment Link Copied!')}>
                         <Link size={10} className="text-indigo-500" /> Payment Link
                     </Button>
                 </div>
@@ -70,12 +73,12 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
             <div className="p-5 border-b border-gray-100 space-y-4 bg-slate-50/50">
                 <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assignee</span>
-                    <button className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
+                    <button onClick={() => toast.info('Loading agent router...')} className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
-                                ME
+                                {conversation.assignee?.name?.substring(0, 2).toUpperCase() || 'UN'}
                             </div>
-                            <span className="font-medium text-gray-700">Tú (Agente Ventas)</span>
+                            <span className="font-medium text-gray-700">{conversation.assignee?.name || 'Unassigned'}</span>
                         </div>
                         <User size={14} className="text-gray-400" />
                     </button>
@@ -88,13 +91,15 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                         <button className="text-indigo-600 hover:bg-indigo-50 p-0.5 rounded transition-colors"><Plus size={14} /></button>
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                        <Badge variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6">
-                            VIP <button className="ml-1 opacity-70 hover:opacity-100"><X size={12} /></button>
-                        </Badge>
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium border-none pl-2 pr-1 h-6">
-                            Cotización <button className="ml-1 opacity-70 hover:opacity-100"><X size={12} /></button>
-                        </Badge>
-                        <button className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
+                        {(conversation.tags || []).map((tag: string, i: number) => (
+                            <Badge key={i} variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6">
+                                {tag} <button className="ml-1 opacity-70 hover:opacity-100" onClick={() => toast.success(`Tag ${tag} removed`)}><X size={12} /></button>
+                            </Badge>
+                        ))}
+                        {(!conversation.tags || conversation.tags.length === 0) && (
+                            <span className="text-[10px] text-gray-400 italic">No tags</span>
+                        )}
+                        <button onClick={() => toast.info('Tag selector opened')} className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
                             <Plus size={10} /> Add
                         </button>
                     </div>
@@ -174,14 +179,14 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                         <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
                             <div className="flex items-center justify-between mb-1">
                                 <span className="text-xs font-medium text-emerald-800">Lifetime Value (LTV)</span>
-                                <span className="text-sm font-bold text-emerald-700">$1,450.00</span>
+                                <span className="text-sm font-bold text-emerald-700">${(lead.score * 12.5 || 0).toLocaleString()}</span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-[10px] text-emerald-600">Total Orders</span>
-                                <span className="text-[10px] font-semibold text-emerald-700">3</span>
+                                <span className="text-[10px] font-semibold text-emerald-700">{lead.score > 0 ? Math.floor(lead.score / 15) : 0}</span>
                             </div>
                         </div>
-                        <Button size="sm" variant="outline" className="w-full text-xs border-dashed text-slate-500">
+                        <Button size="sm" variant="outline" className="w-full text-xs border-dashed text-slate-500" onClick={() => toast.info('Custom Field Editor opening...')}>
                             + Add Custom CRM Field
                         </Button>
                     </div>

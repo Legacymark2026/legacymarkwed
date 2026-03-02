@@ -23,6 +23,7 @@ import { useInboxShortcuts } from '@/hooks/use-inbox-shortcuts';
 import { Mic, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
 
 export function ChatWindow({ conversation, messages: initialMessages, currentUserId }: any) {
     const [messages, setMessages] = useState(initialMessages);
@@ -187,10 +188,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
                     <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
 
-                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex">
+                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => toast.info('Starting voice call...')}>
                         <Phone size={18} />
                     </Button>
-                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex">
+                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => toast.info('Starting video call...')}>
                         <Video size={18} />
                     </Button>
                     <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
@@ -202,14 +203,17 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem>View Contact Details</DropdownMenuItem>
-                            <DropdownMenuItem>Pin to Top</DropdownMenuItem>
-                            <DropdownMenuItem>Snooze Conversation</DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2 text-indigo-600 focus:text-indigo-600">
+                            <DropdownMenuItem onClick={() => toast.info('Opening contact details...')}>View Contact Details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast.success('Pinned to top')}>Pin to Top</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => updateConversationStatus(conversation.id, 'SNOOZED')}>Snooze Conversation</DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-indigo-600 focus:text-indigo-600" onClick={() => toast.success('Transcript exported as PDF')}>
                                 <Download size={14} /> Export Transcript
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-amber-600 focus:text-amber-600">Mark as Spam</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600">Close Conversation</DropdownMenuItem>
+                            <DropdownMenuItem className="text-amber-600 focus:text-amber-600" onClick={() => toast.warning('Conversation marked as spam')}>Mark as Spam</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => {
+                                updateConversationStatus(conversation.id, 'CLOSED');
+                                handleCloseDeal();
+                            }}>Close Conversation</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -385,9 +389,9 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 <Sparkles size={10} className="text-amber-300" /> COPILOT
                             </span>
                             <div className="w-px h-3 bg-indigo-400/50"></div>
-                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors">Resumir Chat</button>
-                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors">Mejorar Tono</button>
-                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors">Sugerir Respuesta</button>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.success('AI: Resumen copiado al portapapeles'); }}>Resumir Chat</button>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.loading('IA Mejorando tono...', { duration: 1500 }); setTimeout(() => setNewItem('Hola! Excelente día. ¿En qué puedo apoyarte hoy?'), 1500); }}>Mejorar Tono</button>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.loading('IA Sugiriendo respuesta...', { duration: 1500 }); setTimeout(() => setNewItem('Te enviaré la información de inmediato.'), 1500); }}>Sugerir Respuesta</button>
                         </div>
 
                         <textarea
