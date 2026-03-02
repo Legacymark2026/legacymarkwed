@@ -444,7 +444,11 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => setIsRecording(!isRecording)}
+                                onClick={() => {
+                                    setIsRecording(!isRecording);
+                                    if (!isRecording) toast.success('Grabando nota de voz...');
+                                    else toast.info('Grabación cancelada');
+                                }}
                                 className={cn(
                                     "h-8 w-8 rounded-lg transition-all",
                                     isRecording ? "text-red-500 bg-red-50 animate-pulse" : "text-gray-400 hover:text-red-500"
@@ -458,24 +462,24 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                     <div className="flex shadow-md rounded-xl">
                         <Button
                             onClick={handleSend}
-                            disabled={!newItem.trim() || isSending}
+                            disabled={(!newItem.trim() && !isRecording) || isSending}
                             className={cn(
                                 "h-11 px-4 shrink-0 rounded-l-xl rounded-r-none transition-all border-r border-white/20",
-                                newItem.trim()
+                                (newItem.trim() || isRecording)
                                     ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
                                     : "bg-gray-100 text-gray-300 shadow-none"
                             )}
                         >
-                            <Send size={18} className={cn("transition-transform", newItem.trim() ? "translate-x-0.5 mr-1" : "")} />
+                            <Send size={18} className={cn("transition-transform", (newItem.trim() || isRecording) ? "translate-x-0.5 mr-1" : "")} />
                             <span className="font-semibold text-sm">{isPrivateNote ? 'Save' : 'Send'}</span>
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    disabled={!newItem.trim() || isSending}
+                                    disabled={(!newItem.trim() && !isRecording) || isSending}
                                     className={cn(
                                         "h-11 w-8 px-0 shrink-0 rounded-l-none rounded-r-xl transition-all shadow-none",
-                                        newItem.trim()
+                                        (newItem.trim() || isRecording)
                                             ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
                                             : "bg-gray-100 text-gray-300 shadow-none border-l border-gray-200"
                                     )}

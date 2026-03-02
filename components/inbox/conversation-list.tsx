@@ -14,6 +14,7 @@ import { ChannelType } from '@/types/inbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User, Users, UserX } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Mock types for props - replace with actual types later
 interface Conversation {
@@ -78,7 +79,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
             <div className="p-4 border-b border-gray-100 space-y-3">
                 <div className="flex items-center justify-between">
                     <h2 className="font-bold text-xl text-gray-900 tracking-tight">Inbox</h2>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900">
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900" onClick={() => toast.info('Iniciando nueva conversación...')}>
                         <Plus size={20} />
                     </Button>
                 </div>
@@ -164,7 +165,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-2 flex items-center justify-between animate-in slide-in-from-top-2">
                         <span className="text-xs font-semibold text-blue-700 ml-1">{selectedIds.length} selected</span>
                         <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-blue-100 rounded text-blue-600">
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-blue-100 rounded text-blue-600" onClick={() => toast.info('Abriendo filtros avanzados...')}>
                                 <Filter size={14} />
                             </Button>
                         </div>

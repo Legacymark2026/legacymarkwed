@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { InboxCommandMenu } from "@/components/inbox/inbox-command-menu";
+import { toast } from "sonner";
 
 interface InboxLayoutProps {
     children: React.ReactNode;
@@ -43,26 +44,26 @@ export function InboxLayout({ children, conversationList, leadProfile }: InboxLa
                         {/* Status Folders */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Vistas</p>}
-                            <NavItem icon={Inbox} label="Sin Asignar" count={12} active isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" />
-                            <NavItem icon={MessageSquare} label="Mis Chats" count={5} isOpen={isFoldersOpen} />
-                            <NavItem icon={Clock} label="Pendientes" count={3} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" />
-                            <NavItem icon={CheckCircle2} label="Resueltos" isOpen={isFoldersOpen} />
+                            <NavItem icon={Inbox} label="Sin Asignar" count={12} active isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => toast.info('Filtrando vista: Sin Asignar')} />
+                            <NavItem icon={MessageSquare} label="Mis Chats" count={5} isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Mis Chats')} />
+                            <NavItem icon={Clock} label="Pendientes" count={3} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" onClick={() => toast.info('Filtrando vista: Pendientes')} />
+                            <NavItem icon={CheckCircle2} label="Resueltos" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Resueltos')} />
                         </div>
 
                         {/* Tags */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Etiquetas</p>}
-                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={2} isOpen={isFoldersOpen} />
-                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={8} isOpen={isFoldersOpen} />
-                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" isOpen={isFoldersOpen} />
+                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={2} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Soporte VIP')} />
+                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={8} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Ventas')} />
+                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Dudas')} />
                         </div>
 
                         {/* Other */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Otros</p>}
-                            <NavItem icon={Star} label="Destacados" isOpen={isFoldersOpen} />
-                            <NavItem icon={Archive} label="Archivados" isOpen={isFoldersOpen} />
-                            <NavItem icon={AlertCircle} label="Spam" isOpen={isFoldersOpen} />
+                            <NavItem icon={Star} label="Destacados" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Destacados')} />
+                            <NavItem icon={Archive} label="Archivados" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Archivados')} />
+                            <NavItem icon={AlertCircle} label="Spam" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Spam')} />
                         </div>
                     </div>
 
@@ -140,14 +141,15 @@ interface NavItemProps {
     isOpen?: boolean;
     badgeColor?: string;
     iconColor?: string;
+    onClick?: () => void;
 }
 
-function NavItem({ icon: Icon, label, count, active, isOpen, badgeColor, iconColor }: NavItemProps) {
+function NavItem({ icon: Icon, label, count, active, isOpen, badgeColor, iconColor, onClick }: NavItemProps) {
     if (!isOpen) {
         return (
             <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn(
+                    <Button variant="ghost" size="icon" onClick={onClick} className={cn(
                         "rounded-xl w-10 h-10 mb-2 relative",
                         active ? "bg-blue-50 text-blue-600" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900",
                         iconColor
@@ -166,7 +168,7 @@ function NavItem({ icon: Icon, label, count, active, isOpen, badgeColor, iconCol
     }
 
     return (
-        <button className={cn(
+        <button onClick={onClick} className={cn(
             "w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-colors group",
             active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         )}>
