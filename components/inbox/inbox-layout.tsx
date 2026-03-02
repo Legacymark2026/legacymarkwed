@@ -77,9 +77,9 @@ export function InboxLayout({ children, conversationList, leadProfile, currentUs
                         {/* Other */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Otros</p>}
-                            <NavItem icon={Star} label="Destacados" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Destacados')} />
-                            <NavItem icon={Archive} label="Archivados" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Archivados')} />
-                            <NavItem icon={AlertCircle} label="Spam" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Spam')} />
+                            <NavItem icon={Star} label="Destacados" active={currentFolder === 'starred'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'starred')} />
+                            <NavItem icon={Archive} label="Archivados" active={currentFolder === 'archived'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'archived')} />
+                            <NavItem icon={AlertCircle} label="Spam" active={currentFolder === 'spam'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'spam')} />
                         </div>
                     </div>
 

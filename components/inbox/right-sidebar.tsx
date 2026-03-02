@@ -13,6 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { ChannelIcon } from './channel-icon';
 import { toast } from 'sonner';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function RightSidebar({ conversation, leadDetails }: { conversation: any, leadDetails?: any }) {
     if (!conversation) return (
@@ -73,35 +79,70 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
             <div className="p-5 border-b border-gray-100 space-y-4 bg-slate-50/50">
                 <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assignee</span>
-                    <button onClick={() => toast.info('Loading agent router...')} className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
-                        <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
-                                {conversation.assignee?.name?.substring(0, 2).toUpperCase() || 'UN'}
-                            </div>
-                            <span className="font-medium text-gray-700">{conversation.assignee?.name || 'Unassigned'}</span>
-                        </div>
-                        <User size={14} className="text-gray-400" />
-                    </button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
+                                        {conversation.assignee?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                                    </div>
+                                    <span className="font-medium text-gray-700">{conversation.assignee?.name || 'Unassigned'}</span>
+                                </div>
+                                <User size={14} className="text-gray-400" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-[calc(100vw-3rem)] sm:w-64 z-50">
+                            <DropdownMenuItem className="flex gap-2 items-center" onClick={() => toast.success('Asignado a: Sarah Connor')}>
+                                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">SC</div>
+                                Sarah Connor
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2 items-center" onClick={() => toast.success('Asignado a: John Doe')}>
+                                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-[10px] font-bold">JD</div>
+                                John Doe
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2 items-center text-red-600 focus:text-red-700" onClick={() => toast.info('Desasignado')}>
+                                <X size={14} /> Desasignar
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <p className="text-[10px] text-gray-400 pl-1">Route to another agent</p>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center justify-between">
                         Chat Tags
-                        <button className="text-indigo-600 hover:bg-indigo-50 p-0.5 rounded transition-colors"><Plus size={14} /></button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="text-indigo-600 hover:bg-indigo-50 p-0.5 rounded transition-colors"><Plus size={14} /></button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Ventas')}>Ventas</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Soporte VIP')}>Soporte VIP</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Dudas')}>Dudas</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                        {(conversation.tags || []).map((tag: string, i: number) => (
+                        {conversation.tags ? conversation.tags.map((tag: string, i: number) => (
                             <Badge key={i} variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6">
                                 {tag} <button className="ml-1 opacity-70 hover:opacity-100" onClick={() => toast.success(`Tag ${tag} removed`)}><X size={12} /></button>
                             </Badge>
-                        ))}
+                        )) : null}
                         {(!conversation.tags || conversation.tags.length === 0) && (
                             <span className="text-[10px] text-gray-400 italic">No tags</span>
                         )}
-                        <button onClick={() => toast.info('Tag selector opened')} className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
-                            <Plus size={10} /> Add
-                        </button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
+                                    <Plus size={10} /> Add
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start">
+                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Ventas')}>Ventas</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Soporte VIP')}>Soporte VIP</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: URGENTE')}>URGENTE</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>

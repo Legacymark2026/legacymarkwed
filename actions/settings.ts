@@ -108,6 +108,15 @@ export async function getSettings() {
                 }
                 return "";
             })(),
+            coverImage: (() => {
+                if (user.profile?.metadata) {
+                    try {
+                        const meta = typeof user.profile.metadata === 'string' ? JSON.parse(user.profile.metadata) : user.profile.metadata;
+                        return meta?.coverImage || null;
+                    } catch { }
+                }
+                return null;
+            })(),
         };
     } catch (error) {
         console.error("Failed to fetch settings:", error);
@@ -127,7 +136,7 @@ export async function updateSettings(data: SettingsFormData) {
     const {
         firstName, lastName, phone,
         jobTitle, bio,
-        linkedin, github, image,
+        linkedin, github, image, coverImage,
         theme, language, emailNotifications, timezone, currency
     } = validated.data;
 
@@ -151,13 +160,15 @@ export async function updateSettings(data: SettingsFormData) {
                 jobTitle,
                 bio,
                 socialLinks: { linkedin, github },
-                preferences: { theme, language, notifications: { email: emailNotifications }, timezone, currency }
+                preferences: { theme, language, notifications: { email: emailNotifications }, timezone, currency },
+                metadata: { coverImage }
             },
             update: {
                 jobTitle,
                 bio,
                 socialLinks: { linkedin, github },
-                preferences: { theme, language, notifications: { email: emailNotifications }, timezone, currency }
+                preferences: { theme, language, notifications: { email: emailNotifications }, timezone, currency },
+                metadata: { coverImage }
             }
         });
 

@@ -20,7 +20,7 @@ import {
 import { format } from 'date-fns';
 import { QuickReplies } from './quick-replies';
 import { useInboxShortcuts } from '@/hooks/use-inbox-shortcuts';
-import { Mic, CheckCircle2 } from 'lucide-react';
+import { Mic, CheckCircle2, Maximize2, Minimize2, MonitorUp, UserPlus, MicOff, VideoOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
@@ -35,6 +35,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [isRecording, setIsRecording] = useState(false); // Visual state for Voice Note
     const [isTyping, setIsTyping] = useState(false); // Simulated typing state
     const [isPrivateNote, setIsPrivateNote] = useState(false); // Internal Private Notes Toggle
+    const isAdmin = true; // Simulate Admin check for deletion
 
     const [showBackgroundAlert, setShowBackgroundAlert] = useState(false);
 
@@ -42,6 +43,9 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [activeCall, setActiveCall] = useState<'video' | 'audio' | null>(null);
     const [callDuration, setCallDuration] = useState(0);
     const [recordDuration, setRecordDuration] = useState(0);
+    const [isCallMinimized, setIsCallMinimized] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isVideoOff, setIsVideoOff] = useState(false);
 
     // Effect for call duration
     useEffect(() => {
@@ -247,6 +251,14 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 updateConversationStatus(conversation.id, 'CLOSED');
                                 handleCloseDeal();
                             }}>Close Conversation</DropdownMenuItem>
+                            {isAdmin && (
+                                <>
+                                    <div className="h-px bg-gray-200 my-1" />
+                                    <DropdownMenuItem className="text-red-700 bg-red-50 focus:text-white focus:bg-red-600 font-bold gap-2" onClick={() => toast.success('Chat deleted permanently')}>
+                                        <Trash2 size={14} /> Delete Chat (Admin)
+                                    </DropdownMenuItem>
+                                </>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -277,35 +289,84 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
             {/* Active Call Overlay */}
             <AnimatePresence>
-                {activeCall && (
+                {activeCall && !isCallMinimized && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="absolute inset-0 z-50 bg-slate-900/95 backdrop-blur-xl flex flex-col items-center justify-center text-white"
+                        className="absolute inset-0 z-50 bg-slate-900/95 backdrop-blur-xl flex flex-col items-center justify-center text-white p-6"
                     >
-                        <div className="relative mb-8">
-                            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-5xl font-bold shadow-2xl ring-4 ring-indigo-500/30 animate-pulse">
-                                {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                        {/* Top Bar for Call */}
+                        <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
+                            <div className="flex items-center gap-2 bg-red-500/20 text-red-100 px-3 py-1.5 rounded-full border border-red-500/30">
+                                <span className="w-2 h-2 rounded-full bg-red-500 animate-[pulse_2s_ease-in-out_infinite]"></span>
+                                <span className="text-xs font-bold tracking-widest">REC</span>
                             </div>
-                            {activeCall === 'video' && (
-                                <div className="absolute -bottom-2 -right-2 bg-slate-800 p-3 rounded-full ring-4 ring-slate-900 shadow-lg">
-                                    <Video size={24} className="text-white" />
-                                </div>
-                            )}
+                            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={() => setIsCallMinimized(true)}>
+                                <Minimize2 size={20} />
+                            </Button>
                         </div>
-                        <h2 className="text-2xl font-bold mb-2">{conversation.lead?.name || 'Unknown Lead'}</h2>
-                        <p className="text-slate-400 font-mono text-lg mb-12 flex items-center gap-3">
-                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></span>
+
+                        {activeCall === 'video' ? (
+                            <div className="w-full max-w-4xl flex-1 flex gap-4 mt-12 mb-8">
+                                {/* Agent Camera */}
+                                <div className="flex-1 rounded-2xl bg-black border border-slate-700 overflow-hidden relative shadow-2xl">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                        {isVideoOff ? (
+                                            <div className="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-3xl font-bold">AG</div>
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-t from-slate-900 to-slate-800 flex items-center justify-center">
+                                                <span className="text-slate-500 font-medium">Camera Active</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded-lg text-sm font-medium">Tú (Agente)</div>
+                                    {isMuted && <div className="absolute top-4 right-4 bg-red-500 p-1.5 rounded-full"><MicOff size={16} /></div>}
+                                </div>
+                                {/* Client Camera */}
+                                <div className="flex-1 rounded-2xl bg-slate-800 border border-slate-700 overflow-hidden relative shadow-2xl">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900/50 to-purple-900/50">
+                                        <div className="w-32 h-32 rounded-full bg-indigo-500/20 flex items-center justify-center text-5xl font-bold text-indigo-200">
+                                            {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                                        </div>
+                                    </div>
+                                    <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded-lg text-sm font-medium">{conversation.lead?.name || 'Cliente'}</div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="relative mb-8 mt-12">
+                                <div className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping" style={{ animationDuration: '3s' }}></div>
+                                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-6xl font-bold shadow-2xl ring-4 ring-indigo-500/30 relative z-10">
+                                    {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeCall === 'audio' && (
+                            <h2 className="text-3xl font-bold mb-2">{conversation.lead?.name || 'Unknown Lead'}</h2>
+                        )}
+                        <p className="text-slate-300 font-mono text-xl mb-12 flex items-center gap-3 bg-slate-800/50 px-4 py-1.5 rounded-full">
                             {formatDuration(callDuration)}
                         </p>
 
-                        <div className="flex items-center gap-6">
-                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white" onClick={() => toast.info('Micrófono silenciado')}>
-                                <Mic className="w-6 h-6" />
+                        <div className="flex items-center gap-4 bg-slate-800/80 backdrop-blur p-4 rounded-3xl border border-slate-700">
+                            <Button variant="outline" size="icon" className={cn("w-14 h-14 rounded-full border-transparent transition-all", isMuted ? "bg-red-500/20 text-red-500 hover:bg-red-500/30" : "bg-slate-700 hover:bg-slate-600 text-white")} onClick={() => setIsMuted(!isMuted)}>
+                                {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
                             </Button>
-                            <Button variant="primary" size="icon" className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20" onClick={() => {
+
+                            {activeCall === 'video' && (
+                                <Button variant="outline" size="icon" className={cn("w-14 h-14 rounded-full border-transparent transition-all", isVideoOff ? "bg-red-500/20 text-red-500 hover:bg-red-500/30" : "bg-slate-700 hover:bg-slate-600 text-white")} onClick={() => setIsVideoOff(!isVideoOff)}>
+                                    {isVideoOff ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
+                                </Button>
+                            )}
+
+                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-transparent bg-slate-700 hover:bg-slate-600 text-white" onClick={() => toast.info('Selecciona qué pantalla compartir')}>
+                                <MonitorUp className="w-6 h-6" />
+                            </Button>
+
+                            <Button variant="primary" size="icon" className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20 mx-2" onClick={() => {
                                 setActiveCall(null);
+                                setIsCallMinimized(false);
                                 setMessages((prev: any) => [...prev, {
                                     id: 'call-' + Date.now(),
                                     content: `📞 ${activeCall === 'video' ? 'Video' : ''} Llamada finalizada (${formatDuration(callDuration)})`,
@@ -317,8 +378,48 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             }}>
                                 <Phone className="w-7 h-7 rotate-[135deg]" />
                             </Button>
-                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white" onClick={() => toast.info('Altavoz activado')}>
-                                <Volume2 className="w-6 h-6" />
+
+                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-transparent bg-slate-700 hover:bg-slate-600 text-white" onClick={() => toast.info('Añadir participante...')}>
+                                <UserPlus className="w-6 h-6" />
+                            </Button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Minimized Call Widget (PIP) */}
+            <AnimatePresence>
+                {activeCall && isCallMinimized && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        className="absolute bottom-24 right-6 z-50 bg-slate-900 text-white p-3 rounded-2xl shadow-2xl flex items-center gap-4 border border-slate-700 cursor-move"
+                        drag
+                        dragMomentum={false}
+                    >
+                        <div className="relative">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold">
+                                {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                            </div>
+                            <div className="absolute -top-1 -right-1 bg-red-500 w-3 h-3 rounded-full animate-pulse border-2 border-slate-900"></div>
+                        </div>
+                        <div className="flex flex-col flex-1 min-w-[100px]">
+                            <span className="text-sm font-semibold truncate">{conversation.lead?.name || 'Llamada Activa'}</span>
+                            <span className="text-xs text-indigo-300 font-mono">{formatDuration(callDuration)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-slate-800 text-slate-300" onClick={() => setIsCallMinimized(false)}>
+                                <Maximize2 size={16} />
+                            </Button>
+                            <Button variant="ghost" size="icon" className={cn("h-8 w-8 rounded-full hover:bg-slate-800", isMuted ? "text-red-400" : "text-slate-300")} onClick={() => setIsMuted(!isMuted)}>
+                                {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-red-500/20 text-red-500 bg-red-500/10" onClick={() => {
+                                setActiveCall(null);
+                                setIsCallMinimized(false);
+                            }}>
+                                <Phone className="w-4 h-4 rotate-[135deg]" />
                             </Button>
                         </div>
                     </motion.div>
@@ -370,7 +471,28 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                             ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl rounded-br-sm"
                                             : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm"
                                     )}>
-                                        <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                        {msg.content.startsWith('🎤 Nota de Voz') ? (
+                                            <div className="flex items-center gap-2 min-w-[200px]">
+                                                <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-white/20 hover:bg-white/30 text-current" onClick={() => toast.info('Reproduciendo audio')}>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                                                </Button>
+                                                <div className="flex-1 h-1.5 bg-black/10 rounded-full relative">
+                                                    <div className="absolute left-0 top-0 h-full w-1/3 bg-current rounded-full" />
+                                                    <div className="absolute left-1/3 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-[10px] font-mono opacity-80">{msg.content.split('(')[1]?.replace(')', '') || '0:00'}</span>
+                                                    <Button variant="ghost" size="sm" className="h-5 px-1 text-[10px] font-bold rounded bg-black/5 hover:bg-black/10 text-current ml-1" onClick={(e) => {
+                                                        const btn = e.currentTarget;
+                                                        if (btn.textContent === '1x') btn.textContent = '1.5x';
+                                                        else if (btn.textContent === '1.5x') btn.textContent = '2x';
+                                                        else btn.textContent = '1x';
+                                                    }}>1x</Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                        )}
 
                                         <div className={cn(
                                             "text-[10px] mt-1.5 flex items-center gap-1.5 opacity-80",
@@ -392,9 +514,11 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full bg-white shadow-sm hover:bg-gray-50 border border-gray-100 text-gray-500">
                                                 <Reply size={12} />
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full bg-white shadow-sm hover:bg-gray-50 border border-gray-100 text-gray-500">
-                                                <Trash2 size={12} />
-                                            </Button>
+                                            {isAdmin && (
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full bg-white shadow-sm hover:bg-red-50 hover:text-red-500 border border-gray-100 text-gray-500" onClick={() => setMessages((prev: any) => prev.filter((m: any) => m.id !== msg.id))}>
+                                                    <Trash2 size={12} />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

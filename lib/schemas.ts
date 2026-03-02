@@ -87,6 +87,7 @@ export const SettingsSchema = z.object({
     language: z.enum(["es", "en", "pt"]).default("es"),
     emailNotifications: z.boolean().default(true),
     image: z.string().optional().nullable(),
+    coverImage: z.string().optional().nullable(),
     timezone: z.string().optional().default("America/Bogota"),
     currency: z.string().optional().default("USD"),
 });
