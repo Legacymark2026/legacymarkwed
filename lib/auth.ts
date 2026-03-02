@@ -111,7 +111,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return true;
         },
 
-        async jwt({ token, user, account }) {
+        async jwt({ token, user, account, trigger, session }) {
+            if (trigger === "update") {
+                const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+                if (dbUser) {
+                    token.name = dbUser.name;
+                    token.email = dbUser.email;
+                    token.picture = dbUser.image;
+                    token.role = dbUser.role as UserRole;
+                }
+            }
             // Solo en el sign-in inicial (cuando `user` está presente)
             if (user) {
                 logger.auth("JWT Callback — Initial sign-in, resolving DB user...");

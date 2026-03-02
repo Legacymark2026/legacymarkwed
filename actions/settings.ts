@@ -19,7 +19,7 @@ export async function getSettings() {
         if (!user) return null;
 
         // Parse preferences from JSON, ensuring type safety
-        let preferences = { theme: "system", notifications: { email: true }, timezone: "America/Bogota", currency: "USD" };
+        let preferences: any = { theme: "system", language: "es", notifications: { email: true }, timezone: "America/Bogota", currency: "USD" };
         if (user.profile?.preferences) {
             try {
                 const prefs = typeof user.profile.preferences === 'string'
@@ -68,6 +68,7 @@ export async function getSettings() {
             linkedin: socialLinks.linkedin || "",
             github: socialLinks.github || "",
             theme: (["light", "dark", "system"].includes(preferences.theme) ? preferences.theme : "system") as "light" | "dark" | "system",
+            language: (["es", "en", "pt"].includes(preferences.language) ? preferences.language : "es") as "es" | "en" | "pt",
             emailNotifications: preferences.notifications?.email ?? true,
             timezone: preferences.timezone || "America/Bogota",
             currency: preferences.currency || "USD",
@@ -127,7 +128,7 @@ export async function updateSettings(data: SettingsFormData) {
         firstName, lastName, phone,
         jobTitle, bio,
         linkedin, github, image,
-        theme, emailNotifications, timezone, currency
+        theme, language, emailNotifications, timezone, currency
     } = validated.data;
 
     try {
@@ -150,13 +151,13 @@ export async function updateSettings(data: SettingsFormData) {
                 jobTitle,
                 bio,
                 socialLinks: { linkedin, github },
-                preferences: { theme, notifications: { email: emailNotifications }, timezone, currency }
+                preferences: { theme, language, notifications: { email: emailNotifications }, timezone, currency }
             },
             update: {
                 jobTitle,
                 bio,
                 socialLinks: { linkedin, github },
-                preferences: { theme, notifications: { email: emailNotifications }, timezone, currency }
+                preferences: { theme, language, notifications: { email: emailNotifications }, timezone, currency }
             }
         });
 

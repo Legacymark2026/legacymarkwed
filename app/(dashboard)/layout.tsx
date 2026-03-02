@@ -28,6 +28,7 @@ export default async function DashboardLayout({
                 role={role}
                 name={session.user.name}
                 email={session.user.email}
+                image={session.user.image}
             />
 
             {/* Main Content */}
