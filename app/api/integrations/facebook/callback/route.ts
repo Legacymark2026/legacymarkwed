@@ -109,6 +109,18 @@ export async function GET(req: NextRequest) {
 
         const finalToken = longLivedData.access_token || shortLivedToken;
 
+        // 3.5. Fetch the real Facebook User ID
+        const meRes = await fetch(`https://graph.facebook.com/v19.0/me?fields=id,name&access_token=${finalToken}`);
+        const meData = await meRes.json();
+
+        if (meData.error || !meData.id) {
+            console.error("[Facebook Callback] Failed to fetch user ID from /me:", meData.error);
+            throw new Error("Could not retrieve Facebook User ID.");
+        }
+
+        const facebookUserId = meData.id;
+        console.log(`[Facebook Callback] Fetched User ID: ${facebookUserId}`);
+
         // 4. Save to DB (Configuration)
         await updateIntegrationConfig('facebook', {
             ...config,
@@ -122,7 +134,7 @@ export async function GET(req: NextRequest) {
                 where: {
                     provider_providerAccountId: {
                         provider: 'facebook',
-                        providerAccountId: tokenData.user_id || config.appId // fallback to app ID if user_id missing, though it shouldn't be
+                        providerAccountId: facebookUserId
                     }
                 },
                 update: {
@@ -134,7 +146,7 @@ export async function GET(req: NextRequest) {
                     userId: session.user.id,
                     type: 'oauth',
                     provider: 'facebook',
-                    providerAccountId: tokenData.user_id || config.appId,
+                    providerAccountId: facebookUserId,
                     access_token: finalToken,
                     expires_at: Math.floor(Date.now() / 1000) + (longLivedData.expires_in || 5184000),
                     token_type: 'bearer',

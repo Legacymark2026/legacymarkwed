@@ -25,17 +25,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 
-function AudioPlayer({ durationText }: { durationText: string }) {
+function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSrc?: string }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const fallbackTimer = useRef<NodeJS.Timeout | null>(null);
 
     const togglePlay = () => {
         if (!audioRef.current) return;
         if (isPlaying) {
             audioRef.current.pause();
-            if (fallbackTimer.current) clearInterval(fallbackTimer.current);
             setIsPlaying(false);
         } else {
             const playPromise = audioRef.current.play();
@@ -44,19 +42,7 @@ function AudioPlayer({ durationText }: { durationText: string }) {
                     setIsPlaying(true);
                 }).catch(error => {
                     console.error("Audio playback prevented:", error);
-                    // Fallback visual simulation if browser blocks media or CORS fails
-                    setIsPlaying(true);
-                    let fakeProgress = progress;
-                    fallbackTimer.current = setInterval(() => {
-                        fakeProgress += 2;
-                        if (fakeProgress >= 100) {
-                            clearInterval(fallbackTimer.current!);
-                            setIsPlaying(false);
-                            setProgress(0);
-                        } else {
-                            setProgress(fakeProgress);
-                        }
-                    }, 500);
+                    toast.error("No se pudo reproducir el audio. Verifica tu conexión o formato.");
                 });
             } else {
                 setIsPlaying(true);
@@ -65,7 +51,7 @@ function AudioPlayer({ durationText }: { durationText: string }) {
     };
 
     const handleTimeUpdate = () => {
-        if (audioRef.current && isPlaying && !fallbackTimer.current) {
+        if (audioRef.current && isPlaying) {
             setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
         }
     };
@@ -74,9 +60,9 @@ function AudioPlayer({ durationText }: { durationText: string }) {
         <div className="flex items-center gap-3 min-w-[200px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
-                src="https://actions.google.com/sounds/v1/water/glass_water_pour.ogg"
+                src={audioSrc || "https://actions.google.com/sounds/v1/water/glass_water_pour.ogg"}
                 onTimeUpdate={handleTimeUpdate}
-                onEnded={() => { setIsPlaying(false); setProgress(0); if (fallbackTimer.current) clearInterval(fallbackTimer.current); }}
+                onEnded={() => { setIsPlaying(false); setProgress(0); }}
             />
             <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-blue-500 hover:bg-blue-600 text-white shadow-md border-transparent flex items-center justify-center transition-all" onClick={togglePlay}>
                 {isPlaying ? <Pause width="14" height="14" className="fill-current ml-0.5" /> : <Play width="14" height="14" className="fill-current ml-0.5" />}
@@ -129,6 +115,70 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [isSharingScreen, setIsSharingScreen] = useState(false);
     const [showAddParticipant, setShowAddParticipant] = useState(false);
     const [newParticipant, setNewParticipant] = useState('');
+
+    // Real Media Streams
+    const localVideoRef = useRef<HTMLVideoElement>(null);
+    const screenVideoRef = useRef<HTMLVideoElement>(null);
+    const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+    const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
+
+    // WebRTC Real Media Controls
+    useEffect(() => {
+        let stream: MediaStream | null = null;
+        if (activeCall === 'video' && !isVideoOff) {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(s => {
+                    stream = s;
+                    setLocalStream(s);
+                    if (localVideoRef.current) localVideoRef.current.srcObject = s;
+                })
+                .catch(err => {
+                    console.error("Camera access denied or failed", err);
+                    toast.error("No se pudo acceder a la cámara o micrófono.");
+                    setIsVideoOff(true);
+                });
+        }
+        return () => {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            setLocalStream(null);
+        };
+    }, [activeCall, isVideoOff]);
+
+    useEffect(() => {
+        let stream: MediaStream | null = null;
+        if (isSharingScreen) {
+            navigator.mediaDevices.getDisplayMedia({ video: true })
+                .then(s => {
+                    stream = s;
+                    setScreenStream(s);
+                    if (screenVideoRef.current) screenVideoRef.current.srcObject = s;
+
+                    // Listen for native "stop sharing" button in the browser UI
+                    s.getVideoTracks()[0].onended = () => {
+                        setIsSharingScreen(false);
+                    };
+                })
+                .catch(err => {
+                    console.error("Screen share denied or failed", err);
+                    toast.error("No se pudo compartir la pantalla.");
+                    setIsSharingScreen(false);
+                });
+        }
+        return () => {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            setScreenStream(null);
+        };
+    }, [isSharingScreen]);
+
+    // Handle Mute State
+    useEffect(() => {
+        if (localStream) {
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = !isMuted;
+            });
+        }
+    }, [isMuted, localStream]);
+
 
     // Advanced Chat Features State
     const [pendingFiles, setPendingFiles] = useState<{ name: string, type: string }[]>([]);
@@ -409,24 +459,15 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                                     Transmitting Screen: Application Window
                                                 </div>
                                             </div>
-                                            {/* Mock Desktop Screen Content */}
-                                            <div className="w-full h-full p-4 bg-slate-100 flex flex-col">
-                                                <div className="w-full h-12 bg-white rounded-t-lg shadow-sm border-b border-slate-200 flex items-center px-4 gap-4">
-                                                    <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-red-400"></div><div className="w-3 h-3 rounded-full bg-amber-400"></div><div className="w-3 h-3 rounded-full bg-green-400"></div></div>
-                                                    <div className="w-1/2 h-6 bg-slate-100 rounded text-[10px] text-slate-400 flex items-center pl-2 font-mono">dashboard.legacymark.com/analytics</div>
-                                                </div>
-                                                <div className="flex-1 bg-slate-50 border-x border-b border-slate-200 p-8 grid grid-cols-3 gap-6">
-                                                    <div className="col-span-2 h-full bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
-                                                        <div className="w-48 h-6 bg-slate-200 rounded animate-pulse"></div>
-                                                        <div className="flex-1 bg-slate-50 rounded-lg border border-slate-100 mt-4 relative overflow-hidden">
-                                                            <svg className="absolute w-full h-full bottom-0 text-indigo-50" preserveAspectRatio="none" viewBox="0 0 100 100"><path d="M0 100 C 20 0 50 0 100 100 Z" fill="currentColor" /></svg>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-span-1 h-full flex flex-col gap-4">
-                                                        <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-sm p-4"><div className="w-24 h-4 bg-slate-200 rounded animate-pulse mb-4"></div><div className="space-y-3"><div className="w-full h-12 bg-indigo-50 rounded-lg"></div><div className="w-full h-12 bg-slate-50 rounded-lg"></div></div></div>
-                                                        <div className="flex-[0.5] bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-sm border border-slate-100 p-4 relative overflow-hidden"><div className="w-32 h-32 rounded-full bg-white/10 absolute -top-10 -right-10"></div></div>
-                                                    </div>
-                                                </div>
+                                            {/* Real Desktop Screen Content */}
+                                            <div className="w-full h-full bg-slate-100 flex flex-col relative">
+                                                <video
+                                                    ref={screenVideoRef}
+                                                    autoPlay
+                                                    playsInline
+                                                    muted
+                                                    className="w-full h-full object-contain bg-black"
+                                                />
                                             </div>
                                             <div className="absolute inset-0 bg-transparent ring-inset ring-2 ring-indigo-500 pointer-events-none rounded-2xl z-20 transition-all opacity-0 group-hover:opacity-100 duration-500"></div>
                                         </div>
@@ -448,10 +489,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                                     {isVideoOff ? (
                                                         <div className="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-3xl font-bold border-2 border-slate-700 text-slate-400">AG</div>
                                                     ) : (
-                                                        <div className="w-full h-full bg-slate-800 flex items-center justify-center relative shadow-[inset_0_0_50px_rgba(0,0,0,0.8)]">
-                                                            {/* Simulated webcam feed overlay */}
-                                                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80')] bg-cover bg-center opacity-70 mix-blend-screen transition-opacity duration-300"></div>
-                                                            <span className="text-white/30 font-medium z-10 font-mono text-xs tracking-widest absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none mix-blend-overlay">LIVE</span>
+                                                        <div className="w-full h-full bg-slate-800 flex items-center justify-center relative shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
+                                                            {/* Real webcam feed */}
+                                                            <video ref={localVideoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover transform -scale-x-100" />
+                                                            <span className="bg-black/40 px-2 py-0.5 rounded text-white font-medium z-10 font-mono text-[10px] tracking-widest absolute top-2 right-2 backdrop-blur-sm pointer-events-none border border-white/10">LIVE</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -469,10 +510,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                                 {isVideoOff ? (
                                                     <div className="w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-4xl font-bold text-slate-500 border-2 border-slate-800 shadow-inner">AG</div>
                                                 ) : (
-                                                    <div className="w-full h-full bg-slate-800 flex items-center justify-center relative">
-                                                        {/* Simulated webcam feed overlay */}
-                                                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80')] bg-cover bg-center opacity-80 transition-opacity duration-500"></div>
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10"></div>
+                                                    <div className="w-full h-full bg-slate-800 flex items-center justify-center relative overflow-hidden">
+                                                        {/* Real webcam feed */}
+                                                        <video ref={localVideoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover transform -scale-x-100" />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10 pointer-events-none"></div>
                                                     </div>
                                                 )}
                                             </div>
@@ -643,7 +684,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                             : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm"
                                     )}>
                                         {msg.content.startsWith('🎤 Nota de Voz') ? (
-                                            <AudioPlayer durationText={msg.content.split('(')[1]?.replace(')', '') || '0:00'} />
+                                            <AudioPlayer
+                                                durationText={msg.content.split('(')[1]?.replace(')', '') || '0:00'}
+                                                audioSrc={(msg as any).metadata?.mediaUrl || (msg as any).mediaUrl}
+                                            />
                                         ) : (
                                             <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                         )}
