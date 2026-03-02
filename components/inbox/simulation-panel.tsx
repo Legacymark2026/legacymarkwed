@@ -16,7 +16,7 @@ import { simulateIncomingMessage } from '@/actions/inbox';
 import { toast } from 'sonner';
 import { ChannelType } from '@/types/inbox';
 
-export function SimulationPanel() {
+export function SimulationPanel({ companyId = "default-company-id" }: { companyId?: string }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,6 @@ export function SimulationPanel() {
     const handleSimulate = async () => {
         setLoading(true);
         try {
-            const companyId = "default-company-id"; // Mock
 
             const result = await simulateIncomingMessage({
                 channel,
@@ -133,7 +132,6 @@ export function SimulationPanel() {
                         onClick={async () => {
                             setLoading(true);
                             try {
-                                const companyId = "default-company-id";
                                 // Seed Instagram
                                 await simulateIncomingMessage({
                                     channel: 'INSTAGRAM',

@@ -5,24 +5,44 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import Image from "next/image";
+import { updateWhiteLabeling } from "@/app/actions/settings";
 
-export function WhiteLabelingSettings() {
-    const [logoUrl, setLogoUrl] = useState<string | null>("/logo.png");
-    const [primaryColor, setPrimaryColor] = useState("#0f766e"); // teal-600
+export function WhiteLabelingSettings({ initialData }: { initialData?: any }) {
+    const [logoUrl, setLogoUrl] = useState<string | null>(initialData?.logoUrl || "/logo.png");
+    const [primaryColor, setPrimaryColor] = useState(initialData?.whiteLabeling?.primaryColor || "#0f766e"); // teal-600
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleLogoUpload = () => {
-        toast.info("Abre el selector de archivos del sistema");
-        setTimeout(() => {
-            toast.success("Logo corporativo actualizado.");
-            // mock update
+    const handleLogoUpload = async () => {
+        toast.info("Simulando proceso de Subida (S3/R2)...");
+        setIsSaving(true);
+        setTimeout(async () => {
+            const result = await updateWhiteLabeling({ logoUrl: "/logo.png", primaryColor });
+            if (result.success) {
+                setLogoUrl("/logo.png");
+                toast.success("Logo corporativo actualizado y guardado en la base de datos.");
+            } else {
+                toast.error("Error al guardar logo.");
+            }
+            setIsSaving(false);
         }, 1500);
     };
 
-    const handleSavePrimaryColor = () => {
+    const handleSavePrimaryColor = async () => {
+        setIsSaving(true);
         const toastId = toast.loading("Aplicando color primario...");
-        setTimeout(() => {
-            toast.success("Color corporativo aplicado con éxito.", { id: toastId });
-        }, 1000);
+
+        try {
+            const result = await updateWhiteLabeling({ logoUrl, primaryColor });
+            if (result.success) {
+                toast.success("Color corporativo aplicado con éxito.", { id: toastId });
+            } else {
+                toast.error(result.error || "Ocurrió un error", { id: toastId });
+            }
+        } catch (e) {
+            toast.error("Fallo inesperado al guardar", { id: toastId });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -54,7 +74,7 @@ export function WhiteLabelingSettings() {
                                 <>
                                     <Image src={logoUrl} alt="Company Logo" fill className="object-contain p-2" />
                                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button size="sm" variant="secondary" onClick={handleLogoUpload}>
+                                        <Button size="sm" variant="secondary" onClick={handleLogoUpload} disabled={isSaving}>
                                             Cambiar
                                         </Button>
                                     </div>
@@ -95,8 +115,8 @@ export function WhiteLabelingSettings() {
 
                         <div className="mt-2 flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <span className="text-sm font-medium text-slate-600">Previsualización del Botón:</span>
-                            <Button style={{ backgroundColor: primaryColor }} onClick={handleSavePrimaryColor}>
-                                Guardar Preferencia
+                            <Button style={{ backgroundColor: primaryColor }} onClick={handleSavePrimaryColor} disabled={isSaving}>
+                                {isSaving ? "Guardando..." : "Guardar Preferencia"}
                             </Button>
                         </div>
                     </div>

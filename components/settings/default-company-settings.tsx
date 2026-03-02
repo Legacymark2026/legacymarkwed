@@ -4,18 +4,32 @@ import { DollarSign, Globe, Hash, Clock, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import { updateCompanyDefaultSettings } from "@/app/actions/settings";
 
-export function DefaultCompanySettings() {
-    const [currency, setCurrency] = useState("USD");
-    const [timezone, setTimezone] = useState("America/Bogota");
-    const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
-    const [language, setLanguage] = useState("es");
+export function DefaultCompanySettings({ initialData }: { initialData?: any }) {
+    const [currency, setCurrency] = useState(initialData?.currency || "USD");
+    const [timezone, setTimezone] = useState(initialData?.timezone || "America/Bogota");
+    const [dateFormat, setDateFormat] = useState(initialData?.dateFormat || "DD/MM/YYYY");
+    const [language, setLanguage] = useState(initialData?.language || "es");
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        setIsSaving(true);
         const toastId = toast.loading("Guardando configuraciones por defecto...");
-        setTimeout(() => {
+
+        const result = await updateCompanyDefaultSettings({
+            currency,
+            timezone,
+            dateFormat,
+            language
+        });
+
+        if (result.success) {
             toast.success("Ajustes globales guardados correctamente.", { id: toastId });
-        }, 1200);
+        } else {
+            toast.error(result.error || "Ocurrió un grave error al guardar", { id: toastId });
+        }
+        setIsSaving(false);
     };
 
     return (
@@ -30,8 +44,8 @@ export function DefaultCompanySettings() {
                         Establece las preferencias predeterminadas que aplicarán para los nuevos miembros del equipo globalmente.
                     </p>
                 </div>
-                <Button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0">
-                    Guardar Ajustes
+                <Button disabled={isSaving} onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0">
+                    {isSaving ? "Guardando..." : "Guardar Ajustes"}
                 </Button>
             </div>
 

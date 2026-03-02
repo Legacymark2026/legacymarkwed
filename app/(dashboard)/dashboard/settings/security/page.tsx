@@ -5,10 +5,12 @@ import { DangerZone } from "@/components/settings/danger-zone";
 import { LoginHistoryTable } from "@/components/settings/login-history-table";
 import { BackupCodesModal } from "@/components/settings/backup-codes-modal";
 import { PasswordPolicies } from "@/components/settings/password-policies";
+import { fetchSecuritySettings } from "@/app/actions/settings";
 
 export const dynamic = 'force-dynamic';
 
-export default function SettingsSecurityPage() {
+export default async function SettingsSecurityPage() {
+    const securityData = await fetchSecuritySettings();
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">
             <div>
@@ -25,13 +27,13 @@ export default function SettingsSecurityPage() {
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
                     <ChangePasswordForm />
                 </div>
-                <PasswordPolicies />
+                <PasswordPolicies initialData={securityData?.passwordPolicy} />
             </section>
 
             <section className="space-y-4">
                 <h3 className="font-semibold text-slate-900 text-sm uppercase tracking-wider">Doble Autenticación</h3>
-                <TwoFactorToggle />
-                <BackupCodesModal />
+                <TwoFactorToggle initialData={securityData} />
+                <BackupCodesModal initialData={securityData} />
             </section>
 
             <section className="space-y-4">

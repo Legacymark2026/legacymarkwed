@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { requestDataExport, deleteAccount } from "@/app/actions/settings";
 
 export function DangerZone() {
     const [isDeleting, setIsDeleting] = useState(false);
@@ -15,14 +16,17 @@ export function DangerZone() {
         setIsExporting(true);
         const toastId = toast.loading("Preparando exportación de datos...");
 
-        // Simular generación de ZIP
-        setTimeout(() => {
+        const result = await requestDataExport();
+
+        if (result.success) {
             toast.success("Archivo listo para descarga", {
                 id: toastId,
-                description: "Se ha enviado un enlace de descarga segura a tu correo electrónico."
+                description: result.message || "Se ha enviado un enlace de descarga segura a tu correo electrónico."
             });
-            setIsExporting(false);
-        }, 2500);
+        } else {
+            toast.error(result.error || "Ocurrió un error al exportar", { id: toastId });
+        }
+        setIsExporting(false);
     };
 
     const handleDelete = async () => {
@@ -33,15 +37,19 @@ export function DangerZone() {
 
         const toastId = toast.loading("Procesando solicitud de eliminación...");
 
-        // Simular llamada a API
-        setTimeout(() => {
+        const result = await deleteAccount();
+
+        // Simulate rejection or success based on admin status
+        if (result.success) {
+            toast.success("Cuenta eliminada exitosamente", { id: toastId });
+        } else {
             toast.error("Operación bloqueada", {
                 id: toastId,
-                description: "La eliminación de cuentas activas requiere autorización de un Administrador de Workspaces."
+                description: result.error || "La eliminación de cuentas activas requiere autorización de un Administrador."
             });
             setIsDeleting(false);
             setConfirmText("");
-        }, 1500);
+        }
     };
 
     return (

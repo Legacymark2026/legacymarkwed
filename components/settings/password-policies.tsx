@@ -5,17 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 import { toast } from "sonner";
+import { updatePasswordPolicy } from "@/app/actions/settings";
 
-export function PasswordPolicies() {
-    const [policyActive, setPolicyActive] = useState(false);
-    const [expirationDays, setExpirationDays] = useState("90");
-    const [historyCount, setHistoryCount] = useState("3");
+export function PasswordPolicies({ initialData }: { initialData?: any }) {
+    const [policyActive, setPolicyActive] = useState(initialData?.active || false);
+    const [expirationDays, setExpirationDays] = useState(initialData?.expirationDays || "90");
+    const [historyCount, setHistoryCount] = useState(initialData?.historyCount || "3");
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        setIsSaving(true);
         const toastId = toast.loading("Actualizando políticas de seguridad...");
-        setTimeout(() => {
+
+        const result = await updatePasswordPolicy({
+            active: policyActive,
+            expirationDays: parseInt(expirationDays, 10),
+            historyCount: parseInt(historyCount, 10)
+        });
+
+        if (result.success) {
             toast.success("Políticas de contraseña aplicadas a todo el equipo.", { id: toastId });
-        }, 1000);
+        } else {
+            toast.error(result.error || "Ocurrió un error al guardar", { id: toastId });
+        }
+        setIsSaving(false);
     };
 
     return (
@@ -89,8 +102,12 @@ export function PasswordPolicies() {
                             <KeyRound className="w-4 h-4" />
                             Requiere 1 mayúscula, 1 número y longitud mínima de 8 caracteres por defecto.
                         </div>
-                        <Button onClick={handleSave} className="bg-slate-900 hover:bg-slate-800 text-white">
-                            Guardar Políticas
+                        <Button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="bg-slate-900 hover:bg-slate-800 text-white"
+                        >
+                            {isSaving ? "Guardando..." : "Guardar Políticas"}
                         </Button>
                     </div>
                 </div>

@@ -4,15 +4,7 @@ import { Users, Search, MoreHorizontal, UserPlus, Filter, Download } from "lucid
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const MOCK_USERS = [
-    { id: 1, name: "Ana Martínez", email: "ana@legacymark.com", role: "admin", status: "active", lastLogin: "Hoy, 10:00 AM" },
-    { id: 2, name: "Carlos Ruiz", email: "carlos@legacymark.com", role: "manager", status: "active", lastLogin: "Ayer, 16:30 PM" },
-    { id: 3, name: "Laura Gómez", email: "laura@legacymark.com", role: "agent", status: "invited", lastLogin: "Nunca" },
-    { id: 4, name: "Diego Torres", email: "diego@legacymark.com", role: "agent", status: "active", lastLogin: "Hace 2 días" },
-    { id: 5, name: "Sofía Blanco", email: "sofia@legacymark.com", role: "viewer", status: "inactive", lastLogin: "Hace 1 mes" },
-];
-
-export function AdvancedUserDirectory() {
+export function AdvancedUserDirectory({ initialUsers }: { initialUsers: any[] }) {
     return (
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden mt-6">
             <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -59,46 +51,50 @@ export function AdvancedUserDirectory() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                        {MOCK_USERS.map((user) => (
-                            <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold border border-slate-300">
-                                            {user.name.charAt(0)}
+                        {initialUsers.map((user) => {
+                            const status = user.deactivatedAt ? 'inactive' : (user.emailVerified ? 'active' : 'invited');
+
+                            return (
+                                <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold border border-slate-300">
+                                                {user.name?.charAt(0) || "U"}
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-slate-900 text-sm">{user.name || "Sin Nombre"}</p>
+                                                <p className="text-xs text-slate-500">{user.email}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-semibold text-slate-900 text-sm">{user.name}</p>
-                                            <p className="text-xs text-slate-500">{user.email}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 capitalize border border-slate-200">
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' :
-                                            user.status === 'invited' ? 'bg-amber-50 text-amber-700 border border-amber-200/50' :
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 capitalize border border-slate-200">
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' :
+                                            status === 'invited' ? 'bg-amber-50 text-amber-700 border border-amber-200/50' :
                                                 'bg-slate-100 text-slate-600 border border-slate-200'
-                                        }`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-emerald-500' :
-                                                user.status === 'invited' ? 'bg-amber-500' :
+                                            }`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-emerald-500' :
+                                                status === 'invited' ? 'bg-amber-500' :
                                                     'bg-slate-400'
-                                            }`} />
-                                        {user.status === 'active' ? 'Activo' : user.status === 'invited' ? 'Invitación Pndte.' : 'Inactivo'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-slate-500">
-                                    {user.lastLogin}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
-                                        <MoreHorizontal className="w-4 h-4" />
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
+                                                }`} />
+                                            {status === 'active' ? 'Activo' : status === 'invited' ? 'Invitación Pndte.' : 'Inactivo'}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-slate-500">
+                                        {user._count?.sessions > 0 ? `${user._count.sessions} sesiones` : 'Nunca'}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
+                                            <MoreHorizontal className="w-4 h-4" />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>

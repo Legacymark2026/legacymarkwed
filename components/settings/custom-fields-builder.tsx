@@ -4,22 +4,24 @@ import { ListPlus, LayoutTemplate, Settings2, GripVertical, Trash2, Plus } from 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { updateCustomFields } from "@/app/actions/crm-settings";
 
-// Mock de campos
-const INITIAL_FIELDS = [
-    { id: "f1", name: "Presupuesto Mensual", type: "Moneda", required: true },
-    { id: "f2", name: "Fecha de Proyecto", type: "Fecha", required: false },
-    { id: "f3", name: "Industria", type: "Desplegable", required: true },
-];
+export function CustomFieldsBuilder({ initialData }: { initialData?: any[] }) {
+    const [fields, setFields] = useState<any[]>(initialData || []);
+    const [isSaving, setIsSaving] = useState(false);
 
-export function CustomFieldsBuilder() {
-    const [fields, setFields] = useState(INITIAL_FIELDS);
-
-    const handleSave = () => {
+    const handleSave = async () => {
+        setIsSaving(true);
         const toastId = toast.loading("Guardando esquema de datos...");
-        setTimeout(() => {
+
+        const result = await updateCustomFields(fields);
+
+        if (result.success) {
             toast.success("Campos personalizados actualizados en la base de datos.", { id: toastId });
-        }, 1200);
+        } else {
+            toast.error(result.error || "Ocurrió un error al guardar", { id: toastId });
+        }
+        setIsSaving(false);
     };
 
     const handleDelete = (id: string) => {
@@ -43,16 +45,18 @@ export function CustomFieldsBuilder() {
                         </p>
                     </div>
                 </div>
-                <Button onClick={handleSave} className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white">
+                <Button onClick={handleSave} disabled={isSaving} className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white">
                     <Settings2 className="w-4 h-4 mr-2" />
-                    Guardar Esquema
+                    {isSaving ? "Guardando..." : "Guardar Esquema"}
                 </Button>
             </div>
 
             <div className="p-6 bg-slate-50/50">
                 <div className="flex items-center justify-between mb-4">
                     <h4 className="font-semibold text-slate-700 text-sm">Estructura Actual</h4>
-                    <Button variant="outline" size="sm" className="bg-white">
+                    <Button variant="outline" size="sm" className="bg-white" onClick={() => {
+                        setFields([...fields, { id: `new_${Date.now()}`, name: "Nuevo Campo", type: "Texto", required: false }]);
+                    }}>
                         <Plus className="w-4 h-4 mr-2" />
                         Añadir Campo
                     </Button>

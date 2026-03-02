@@ -5,17 +5,30 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
+import { updateSlaAlerts } from "@/app/actions/crm-settings";
 
-export function SLAAlertSettings() {
-    const [slaActive, setSlaActive] = useState(true);
-    const [responseTime, setResponseTime] = useState("24"); // horas
-    const [escalationTime, setEscalationTime] = useState("48"); // horas
+export function SLAAlertSettings({ initialData }: { initialData?: any }) {
+    const [slaActive, setSlaActive] = useState(initialData?.active ?? true);
+    const [responseTime, setResponseTime] = useState(initialData?.responseTime?.toString() || "24"); // horas
+    const [escalationTime, setEscalationTime] = useState(initialData?.escalationTime?.toString() || "48"); // horas
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        setIsSaving(true);
         const toastId = toast.loading("Actualizando políticas de SLA...");
-        setTimeout(() => {
+
+        const result = await updateSlaAlerts({
+            active: slaActive,
+            responseTime: parseInt(responseTime, 10),
+            escalationTime: parseInt(escalationTime, 10)
+        });
+
+        if (result.success) {
             toast.success("SLA configurado correctamente.", { id: toastId });
-        }, 1000);
+        } else {
+            toast.error(result.error || "Error al actualizar", { id: toastId });
+        }
+        setIsSaving(false);
     };
 
     return (
@@ -87,9 +100,9 @@ export function SLAAlertSettings() {
                             <Settings2 className="w-4 h-4 mr-2" />
                             Ajustes Avanzados
                         </Button>
-                        <Button onClick={handleSave} className="bg-slate-900 hover:bg-slate-800 text-white">
+                        <Button onClick={handleSave} disabled={isSaving} className="bg-slate-900 hover:bg-slate-800 text-white">
                             <Save className="w-4 h-4 mr-2" />
-                            Guardar SLA
+                            {isSaving ? "Guardando..." : "Guardar SLA"}
                         </Button>
                     </div>
                 </div>

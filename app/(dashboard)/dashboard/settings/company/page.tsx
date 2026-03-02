@@ -2,10 +2,13 @@ import { WhiteLabelingSettings } from "@/components/settings/white-labeling-sett
 import { DefaultCompanySettings } from "@/components/settings/default-company-settings";
 import { GlobalEmailTemplates } from "@/components/settings/global-email-templates";
 import { CustomDomainSettings } from "@/components/settings/custom-domain-settings";
+import { fetchCompanySettings } from "@/app/actions/settings";
 
 export const dynamic = 'force-dynamic';
 
-export default function SettingsCompanyPage() {
+export default async function SettingsCompanyPage() {
+    const companyData = await fetchCompanySettings();
+
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">
             <div>
@@ -18,11 +21,11 @@ export default function SettingsCompanyPage() {
             </div>
 
             <section className="space-y-4">
-                <WhiteLabelingSettings />
+                <WhiteLabelingSettings initialData={companyData} />
             </section>
 
             <section className="space-y-4 pt-4">
-                <DefaultCompanySettings />
+                <DefaultCompanySettings initialData={companyData?.defaultSettings} />
             </section>
 
             <section className="space-y-4 pt-4">

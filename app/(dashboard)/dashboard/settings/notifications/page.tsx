@@ -1,10 +1,13 @@
 import { Bell, Mail, MessageSquare, Phone, Volume2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { SLAAlertSettings } from "@/components/settings/sla-alert-settings";
+import { fetchCompanySettings } from "@/app/actions/settings";
 
 export const dynamic = 'force-dynamic';
 
-export default function SettingsNotificationsPage() {
+export default async function SettingsNotificationsPage() {
+    const companyData = await fetchCompanySettings();
+
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">
             <div>
@@ -67,7 +70,7 @@ export default function SettingsNotificationsPage() {
             </div>
 
             <section className="space-y-4 pt-4">
-                <SLAAlertSettings />
+                <SLAAlertSettings initialData={(companyData?.defaultSettings as Record<string, any>)?.sla} />
             </section>
 
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">

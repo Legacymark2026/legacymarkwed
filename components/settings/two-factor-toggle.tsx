@@ -4,17 +4,18 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Smartphone, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { toggleTwoFactor } from "@/app/actions/settings";
 
-export function TwoFactorToggle() {
-    const [isEnabled, setIsEnabled] = useState(false);
+export function TwoFactorToggle({ initialData }: { initialData?: any }) {
+    const [isEnabled, setIsEnabled] = useState(initialData?.mfaEnabled || false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleToggle = () => {
+    const handleToggle = async () => {
         setIsLoading(true);
-        // Mock API call
-        setTimeout(() => {
+        const result = await toggleTwoFactor(!isEnabled);
+
+        if (result.success) {
             setIsEnabled(!isEnabled);
-            setIsLoading(false);
             if (!isEnabled) {
                 toast.success("Autenticación de Dos Factores activada", {
                     description: "Tu cuenta ahora es mucho más segura."
@@ -24,7 +25,10 @@ export function TwoFactorToggle() {
                     description: "Recomendamos mantenerla activada para mayor seguridad."
                 });
             }
-        }, 1000);
+        } else {
+            toast.error(result.error || "Ocurrió un error");
+        }
+        setIsLoading(false);
     };
 
     return (

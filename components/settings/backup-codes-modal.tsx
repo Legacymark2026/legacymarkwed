@@ -4,30 +4,43 @@ import { Download, Key, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { generateBackupCodes } from "@/app/actions/settings";
 
-// Códigos generados simulados
-const MOCK_BACKUP_CODES = [
-    "A7B2-C9X4", "F3M1-P8K5", "L9Z6-W2R7", "T4H8-N5V3", "E1D7-Q0Y6",
-    "U8J2-M3F9", "G5C4-S1P2", "B6X9-K7T0", "V2N5-R8H1", "Y0W3-L4Z9"
-];
-
-export function BackupCodesModal() {
+export function BackupCodesModal({ initialData }: { initialData?: any }) {
     const [codesVisible, setCodesVisible] = useState(false);
+    const [backupCodes, setBackupCodes] = useState<string[]>(initialData?.backupCodes || []);
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
         const toastId = toast.loading("Generando nuevos códigos seguros...");
-        setTimeout(() => {
+
+        const result = await generateBackupCodes();
+
+        if (result.success && result.codes) {
+            setBackupCodes(result.codes);
             setCodesVisible(true);
             toast.success("Códigos generados", {
                 id: toastId,
                 description: "Por favor guárdalos en un lugar seguro."
             });
-        }, 1200);
+        } else {
+            toast.error(result.error || "Ocurrió un error al generar códigos", { id: toastId });
+        }
     };
 
     const handleDownload = () => {
-        toast.success("Descargando códigos de respaldo...", {
-            description: "El archivo legacymark-backup-codes.txt se guardará en tus descargas."
+        const content = backupCodes.join('\n');
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'legacymark-backup-codes.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast.success("Códigos de respaldo descargados", {
+            description: "El archivo legacymark-backup-codes.txt se guardó en tus descargas."
         });
     };
 
@@ -66,7 +79,7 @@ export function BackupCodesModal() {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                        {MOCK_BACKUP_CODES.map((code, idx) => (
+                        {backupCodes.map((code, idx) => (
                             <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-white text-center font-mono text-sm tracking-wider font-semibold text-slate-700 shadow-sm select-all">
                                 {code}
                             </div>

@@ -50,6 +50,7 @@ model User {
   // Security
   mfaEnabled Boolean @default(false) @map("mfa_enabled")
   mfaSecret  String? @map("mfa_secret")
+  backupCodes Json?  @map("backup_codes") // Array of hashed backup codes
 
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
@@ -174,6 +175,11 @@ model Company {
   tasks           Task[]
   emailTemplates  EmailTemplate[]
   scoringRules    LeadScoringRule[]
+
+  // Application Settings
+  passwordPolicy Json? @map("password_policy")
+  whiteLabeling  Json? @map("white_labeling")
+  defaultCompanySettings Json? @map("default_settings")
 
   createdAt DateTime @default(now()) @map("created_at")
 
