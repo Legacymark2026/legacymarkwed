@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
     User, MapPin, Mail, Phone, Tag, Clock,
-    CreditCard, TrendingUp, AlertCircle, Plus, X, Link, DollarSign
+    CreditCard, TrendingUp, AlertCircle, Plus, X, Link, DollarSign, CheckCircle, Copy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +35,16 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
     const tempColor = leadScore > 70 ? 'text-red-600' : leadScore > 40 ? 'text-amber-600' : 'text-blue-600';
     const tempBg = leadScore > 70 ? 'bg-red-50' : leadScore > 40 ? 'bg-amber-50' : 'bg-blue-50';
 
+    // Interactive States
+    const [isConverted, setIsConverted] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
+    const [noteDraft, setNoteDraft] = useState('');
+    const [savedNotes, setSavedNotes] = useState<string[]>(
+        lead.notes ? [lead.notes] : []
+    );
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [showDealModal, setShowDealModal] = useState(false);
+
     return (
         <div className="w-full h-full bg-white flex flex-col overflow-y-auto">
             {/* Lead Header */}
@@ -54,23 +64,41 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                 <p className="text-sm text-gray-500 mb-4">{lead.email || 'No email provided'}</p>
 
                 <div className="flex justify-center gap-2">
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800" onClick={() => toast.info('Navigating to full profile...')}>
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800" onClick={() => setShowProfileModal(true)}>
                         <User size={12} />
                         Profile
                     </Button>
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-green-200 text-green-700 bg-green-50 hover:bg-green-100 hover:text-green-800" onClick={() => toast.info('Opening Deals modal...')}>
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-green-200 text-green-700 bg-green-50 hover:bg-green-100 hover:text-green-800" onClick={() => setShowDealModal(true)}>
                         <CreditCard size={12} />
                         Deal
                     </Button>
                 </div>
                 <div className="flex justify-center gap-2 mt-2">
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50" onClick={() => {
-                        toast.success('Lead converted successfully');
-                    }}>
-                        <User size={10} className="text-blue-500" /> + Convert Lead
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className={cn("h-8 rounded-full text-[10px] gap-1 border-slate-200 transition-colors", isConverted ? "bg-green-50 text-green-700 border-green-200" : "text-slate-700 hover:bg-slate-50")}
+                        onClick={() => {
+                            setIsConverted(true);
+                            toast.success('Lead converted successfully');
+                        }}
+                        disabled={isConverted}
+                    >
+                        {isConverted ? <CheckCircle size={10} className="text-green-500" /> : <User size={10} className="text-blue-500" />}
+                        {isConverted ? 'Converted' : '+ Convert Lead'}
                     </Button>
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50" onClick={() => toast.success('Payment Link Copied!')}>
-                        <Link size={10} className="text-indigo-500" /> Payment Link
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className={cn("h-8 rounded-full text-[10px] gap-1 border-slate-200 transition-all w-28", linkCopied ? "bg-indigo-50 text-indigo-700 border-indigo-200" : "text-slate-700 hover:bg-slate-50")}
+                        onClick={() => {
+                            setLinkCopied(true);
+                            toast.success('Payment Link Copied!');
+                            setTimeout(() => setLinkCopied(false), 2000);
+                        }}
+                    >
+                        {linkCopied ? <Copy size={10} className="text-indigo-500" /> : <Link size={10} className="text-indigo-500" />}
+                        {linkCopied ? 'Copied!' : 'Payment Link'}
                     </Button>
                 </div>
             </div>
@@ -254,17 +282,95 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                     </div>
                 </TabsContent>
 
-                <TabsContent value="notes" className="p-5">
-                    <div className="bg-yellow-50/50 border border-yellow-100 rounded-lg p-3 text-sm text-gray-700 mb-4 whitespace-pre-wrap">
-                        {lead.notes || "No notes yet."}
+                <TabsContent value="notes" className="p-5 flex flex-col h-[400px]">
+                    <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-4">
+                        {savedNotes.length > 0 ? (
+                            savedNotes.map((note, idx) => (
+                                <div key={idx} className="bg-yellow-50/50 border border-yellow-100 rounded-lg p-3 text-sm text-gray-700 whitespace-pre-wrap relative group">
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-[9px] text-yellow-600 font-medium">Just now</span>
+                                    </div>
+                                    {note}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-sm text-gray-400 italic text-center py-4">No notes yet.</div>
+                        )}
                     </div>
-                    <textarea
-                        className="w-full text-sm border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 min-h-[100px] resize-none p-3 bg-gray-50"
-                        placeholder="Update notes..."
-                    />
-                    <Button size="sm" className="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white">Save Note</Button>
+                    <div className="shrink-0">
+                        <textarea
+                            className="w-full text-sm border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 min-h-[80px] resize-none p-3 bg-gray-50 mb-2"
+                            placeholder="Type a new internal note..."
+                            value={noteDraft}
+                            onChange={(e) => setNoteDraft(e.target.value)}
+                        />
+                        <Button
+                            size="sm"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm"
+                            disabled={!noteDraft.trim()}
+                            onClick={() => {
+                                setSavedNotes(prev => [...prev, noteDraft]);
+                                setNoteDraft('');
+                                toast.success('Note saved securely');
+                            }}
+                        >
+                            Save Note
+                        </Button>
+                    </div>
                 </TabsContent>
             </Tabs>
+
+            {/* Modals Overlay Simulation */}
+            {showProfileModal && (
+                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h3 className="font-bold text-gray-900">Extensive CRM Profile</h3>
+                            <button onClick={() => setShowProfileModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+                        </div>
+                        <div className="p-6 text-center space-y-4">
+                            <div className="w-16 h-16 mx-auto rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl font-bold">
+                                {lead.name?.substring(0, 2).toUpperCase() || 'UN'}
+                            </div>
+                            <div>
+                                <p className="font-bold text-lg">{lead.name}</p>
+                                <p className="text-sm text-gray-500">{lead.email}</p>
+                            </div>
+                            <Button className="w-full" onClick={() => setShowProfileModal(false)}>Close Full Profile View</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDealModal && (
+                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-green-50">
+                            <h3 className="font-bold text-green-900 flex items-center gap-2"><CreditCard size={16} /> Create Deal</h3>
+                            <button onClick={() => setShowDealModal(false)} className="text-green-600 hover:text-green-800"><X size={16} /></button>
+                        </div>
+                        <div className="p-5 space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">Deal Value ($)</label>
+                                <input type="number" className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-green-500 focus:border-green-500" placeholder="e.g. 5000" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">Pipeline Stage</label>
+                                <select className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-green-500 focus:border-green-500">
+                                    <option>Prospecting</option>
+                                    <option>Qualification</option>
+                                    <option>Proposal Made</option>
+                                    <option>In Negotiation</option>
+                                </select>
+                            </div>
+                            <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => {
+                                toast.success('Deal Created Successfully');
+                                setShowDealModal(false);
+                            }}>Save Deal</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

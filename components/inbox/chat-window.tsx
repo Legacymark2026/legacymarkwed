@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
     Send, Paperclip, Smile, Image as ImageIcon,
     Phone, Video, MoreHorizontal, Check, CheckCheck,
-    Reply, Forward, Trash2, Copy, Clock, Sparkles, Download, Timer, Volume2
+    Reply, Forward, Trash2, Copy, Clock, Sparkles, Download, Timer, Volume2, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +46,12 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [isCallMinimized, setIsCallMinimized] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [isVideoOff, setIsVideoOff] = useState(false);
+
+    // Advanced Chat Features State
+    const [pendingFiles, setPendingFiles] = useState<{ name: string, type: string }[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [showSendLaterModal, setShowSendLaterModal] = useState(false);
+    const [sendLaterDate, setSendLaterDate] = useState('');
 
     // Effect for call duration
     useEffect(() => {
@@ -140,6 +146,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
         setShowQuickReplies(false);
         setIsRecording(false);
         setIsPrivateNote(false);
+        setPendingFiles([]); // Clear pending files
         if (textareaRef.current) textareaRef.current.style.height = '44px'; // Reset height
 
         // Call Server Action
@@ -548,6 +555,18 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                 <div className="flex gap-2 items-end max-w-4xl mx-auto">
 
                     {/* Attachments */}
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        multiple
+                        onChange={(e) => {
+                            if (e.target.files) {
+                                const newFiles = Array.from(e.target.files).map(f => ({ name: f.name, type: f.type }));
+                                setPendingFiles(prev => [...prev, ...newFiles]);
+                            }
+                        }}
+                    />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="icon" className="h-11 w-11 shrink-0 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 border-gray-200">
@@ -555,10 +574,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-48 p-2">
-                            <DropdownMenuItem className="gap-2 cursor-pointer">
+                            <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                 <ImageIcon size={16} className="text-purple-500" /> Image
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2 cursor-pointer">
+                            <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                 <Paperclip size={16} className="text-blue-500" /> Document
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -567,11 +586,24 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
                     {/* Input Container */}
                     <div className={cn(
-                        "flex-1 relative border rounded-xl transition-all flex items-end p-1",
+                        "flex-1 relative border rounded-xl transition-all flex flex-col p-1",
                         isPrivateNote
                             ? "bg-amber-50/50 border-amber-200 hover:border-amber-400 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20"
                             : "bg-gray-50 border-gray-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10"
                     )}>
+
+                        {/* Pending Attachments UI */}
+                        {pendingFiles.length > 0 && (
+                            <div className="flex flex-wrap gap-2 px-3 pt-2">
+                                {pendingFiles.map((file, idx) => (
+                                    <div key={idx} className="bg-white border top-2 border-gray-200 rounded-lg px-2 py-1 text-xs flex items-center gap-2 shadow-sm animate-in zoom-in-95">
+                                        {file.type.includes('image') ? <ImageIcon size={12} className="text-purple-500" /> : <Paperclip size={12} className="text-blue-500" />}
+                                        <span className="max-w-[100px] truncate font-medium text-gray-700">{file.name}</span>
+                                        <button className="text-gray-400 hover:text-red-500" onClick={() => setPendingFiles(prev => prev.filter((_, i) => i !== idx))}><X size={12} /></button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {/* Private Note Toggle Label */}
                         {isPrivateNote && (
@@ -683,24 +715,24 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                     <div className="flex shadow-md rounded-xl">
                         <Button
                             onClick={handleSend}
-                            disabled={(!newItem.trim() && !isRecording) || isSending}
+                            disabled={(!newItem.trim() && !isRecording && pendingFiles.length === 0) || isSending}
                             className={cn(
                                 "h-11 px-4 shrink-0 rounded-l-xl rounded-r-none transition-all border-r border-white/20",
-                                (newItem.trim() || isRecording)
+                                (newItem.trim() || isRecording || pendingFiles.length > 0)
                                     ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
                                     : "bg-gray-100 text-gray-300 shadow-none"
                             )}
                         >
-                            <Send size={18} className={cn("transition-transform", (newItem.trim() || isRecording) ? "translate-x-0.5 mr-1" : "")} />
+                            <Send size={18} className={cn("transition-transform", (newItem.trim() || isRecording || pendingFiles.length > 0) ? "translate-x-0.5 mr-1" : "")} />
                             <span className="font-semibold text-sm">{isPrivateNote ? 'Save' : 'Send'}</span>
                         </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    disabled={(!newItem.trim() && !isRecording) || isSending}
+                                    disabled={(!newItem.trim() && !isRecording && pendingFiles.length === 0) || isSending}
                                     className={cn(
                                         "h-11 w-8 px-0 shrink-0 rounded-l-none rounded-r-xl transition-all shadow-none",
-                                        (newItem.trim() || isRecording)
+                                        (newItem.trim() || isRecording || pendingFiles.length > 0)
                                             ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
                                             : "bg-gray-100 text-gray-300 shadow-none border-l border-gray-200"
                                     )}
@@ -709,8 +741,12 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem className="gap-2"><Clock size={14} className="text-blue-500" /> Send Later...</DropdownMenuItem>
-                                <DropdownMenuItem className="gap-2"><CheckCheck size={14} className="text-green-500" /> Send & Mark Resolved</DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2" onClick={() => setShowSendLaterModal(true)}><Clock size={14} className="text-blue-500" /> Send Later...</DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2" onClick={() => {
+                                    handleSend();
+                                    handleCloseDeal();
+                                    updateConversationStatus(conversation.id, 'CLOSED');
+                                }}><CheckCheck size={14} className="text-green-500" /> Send & Mark Resolved</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -719,6 +755,39 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                     Powered by <span className="text-indigo-500">LegacyMark OmniChannel</span>
                 </div>
             </div>
+
+            {/* Send Later Modal Simulation */}
+            {showSendLaterModal && (
+                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-xs overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-blue-50 text-blue-900">
+                            <h3 className="font-bold flex items-center gap-2"><Clock size={16} /> Schedule Message</h3>
+                            <button onClick={() => setShowSendLaterModal(false)} className="text-blue-400 hover:text-blue-600"><X size={16} /></button>
+                        </div>
+                        <div className="p-5 space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">Select Date & Time</label>
+                                <input
+                                    type="datetime-local"
+                                    className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                    value={sendLaterDate}
+                                    onChange={(e) => setSendLaterDate(e.target.value)}
+                                />
+                            </div>
+                            <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => {
+                                if (!sendLaterDate) {
+                                    toast.error('Please select a date');
+                                    return;
+                                }
+                                toast.success(`Message scheduled for ${new Date(sendLaterDate).toLocaleString()}`);
+                                setShowSendLaterModal(false);
+                                setNewItem('');
+                                setPendingFiles([]);
+                            }}>Schedule Send</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }

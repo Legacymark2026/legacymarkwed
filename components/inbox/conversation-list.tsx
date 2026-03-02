@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Search, Filter, SlidersHorizontal, Plus } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, Plus, X, Send } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -47,6 +47,10 @@ export function ConversationList({ conversations, currentUser }: { conversations
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const mockUserId = currentUser?.id; // Real user ID
     const [activeChannel, setActiveChannel] = useState<ChannelType | 'ALL'>('ALL'); // Channel Filter
+
+    // Interactive Modal States
+    const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
     // Real-time Polling (Phase 1 Improvement)
     useEffect(() => {
@@ -92,7 +96,7 @@ export function ConversationList({ conversations, currentUser }: { conversations
             <div className="p-4 border-b border-gray-100 space-y-3">
                 <div className="flex items-center justify-between">
                     <h2 className="font-bold text-xl text-gray-900 tracking-tight">Inbox</h2>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900" onClick={() => toast.info('Iniciando nueva conversación...')}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900" onClick={() => setShowNewMessageModal(true)}>
                         <Plus size={20} />
                     </Button>
                 </div>
@@ -177,10 +181,38 @@ export function ConversationList({ conversations, currentUser }: { conversations
                 {selectionMode && selectedIds.length > 0 && (
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-2 flex items-center justify-between animate-in slide-in-from-top-2">
                         <span className="text-xs font-semibold text-blue-700 ml-1">{selectedIds.length} selected</span>
-                        <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-blue-100 rounded text-blue-600" onClick={() => toast.info('Abriendo filtros avanzados...')}>
+                        <div className="flex gap-1 relative">
+                            <Button size="sm" variant="ghost" className={cn("h-6 w-6 p-0 rounded", showAdvancedFilters ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white" : "hover:bg-blue-100 text-blue-600")} onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
                                 <Filter size={14} />
                             </Button>
+                            {/* Advanced Filters Popover */}
+                            {showAdvancedFilters && (
+                                <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-20 animate-in zoom-in-95">
+                                    <h4 className="font-semibold text-xs text-gray-900 mb-3">Advanced Bulk Filters</h4>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-[10px] uppercase font-bold text-gray-500 mb-1 block">Date Range</label>
+                                            <select className="w-full text-xs p-1.5 border border-gray-200 rounded">
+                                                <option>Last 7 Days</option>
+                                                <option>Last 30 Days</option>
+                                                <option>This Month</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] uppercase font-bold text-gray-500 mb-1 block">Lead Tags</label>
+                                            <select className="w-full text-xs p-1.5 border border-gray-200 rounded">
+                                                <option>VIP</option>
+                                                <option>Urgent</option>
+                                                <option>Sales</option>
+                                            </select>
+                                        </div>
+                                        <Button size="sm" className="w-full text-xs h-7 bg-blue-600" onClick={() => {
+                                            toast.success('Filters applied to selection');
+                                            setShowAdvancedFilters(false);
+                                        }}>Apply Filters</Button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -268,6 +300,46 @@ export function ConversationList({ conversations, currentUser }: { conversations
                     </div>
                 )}
             </div>
+
+            {/* New Message Composition Modal */}
+            {showNewMessageModal && (
+                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2"><Send size={16} className="text-blue-600" /> New Message</h3>
+                            <button onClick={() => setShowNewMessageModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+                        </div>
+                        <div className="p-5 space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">Channel</label>
+                                <div className="flex gap-2">
+                                    {['WHATSAPP', 'MESSENGER', 'INSTAGRAM'].map(ch => (
+                                        <button key={ch} className="p-2 border rounded-lg hover:bg-gray-50 flex-1 flex justify-center items-center">
+                                            <ChannelIcon channel={ch as any} className="text-xl" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">Recipient (Lead Name or Phone)</label>
+                                <input type="text" className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Search contacts..." autoFocus />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">First Message</label>
+                                <textarea className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500 min-h-[80px]" placeholder="Type your message here..." />
+                            </div>
+                            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                                <Button variant="ghost" onClick={() => setShowNewMessageModal(false)}>Cancel</Button>
+                                <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => {
+                                    toast.success('Message queued for sending');
+                                    setShowNewMessageModal(false);
+                                    router.refresh();
+                                }}>Send Message</Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
