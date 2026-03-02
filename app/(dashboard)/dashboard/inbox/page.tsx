@@ -2,6 +2,7 @@ import { getConversations } from "@/actions/inbox";
 import { InboxLayout } from "@/components/inbox/inbox-layout";
 import { ConversationList } from "@/components/inbox/conversation-list";
 import { MessageSquare } from "lucide-react";
+import { auth } from "@/lib/auth";
 
 import { SimulationPanel } from "@/components/inbox/simulation-panel";
 import { MetaSyncButton } from "@/components/inbox/meta-sync-button";
@@ -12,10 +13,25 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
         limit: 50
     });
 
+    const session = await auth();
+    const currentUser = session?.user;
+
+    const metrics = {
+        unassigned: conversations?.filter(c => !c.assignedTo).length || 0,
+        mine: conversations?.filter(c => c.assignedTo === currentUser?.id).length || 0,
+        pending: conversations?.filter(c => c.status === 'OPEN').length || 0,
+        resolved: conversations?.filter(c => c.status === 'CLOSED').length || 0,
+        vip: conversations?.filter(c => (c.tags as string[])?.includes('Soporte VIP')).length || 0,
+        sales: conversations?.filter(c => (c.tags as string[])?.includes('Ventas')).length || 0,
+        questions: conversations?.filter(c => (c.tags as string[])?.includes('Dudas')).length || 0,
+    };
+
     return (
         <InboxLayout
+            currentUser={currentUser}
+            metrics={metrics}
             conversationList={
-                <ConversationList conversations={conversations as any || []} />
+                <ConversationList conversations={conversations as any || []} currentUser={currentUser} />
             }
             leadProfile={
                 <div className="flex h-full items-center justify-center p-4 bg-slate-50 text-slate-400 text-sm">

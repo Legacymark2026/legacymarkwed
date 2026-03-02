@@ -32,7 +32,7 @@ interface Conversation {
     assignedTo?: string | null;
 }
 
-export function ConversationList({ conversations }: { conversations: Conversation[] }) {
+export function ConversationList({ conversations, currentUser }: { conversations: Conversation[], currentUser?: any }) {
     const router = useRouter();
     const params = useParams();
     const activeId = params?.conversationId;
@@ -41,7 +41,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
     const [statusFilter, setStatusFilter] = useState<'OPEN' | 'CLOSED' | 'ALL'>('OPEN');
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    const mockUserId = "user-123"; // TODO: get from context
+    const mockUserId = currentUser?.id; // Real user ID
     const [activeChannel, setActiveChannel] = useState<ChannelType | 'ALL'>('ALL'); // Channel Filter
 
     // Real-time Polling (Phase 1 Improvement)

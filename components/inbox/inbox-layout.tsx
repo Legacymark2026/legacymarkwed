@@ -18,9 +18,11 @@ interface InboxLayoutProps {
     children: React.ReactNode;
     conversationList: React.ReactNode;
     leadProfile?: React.ReactNode; // Optional 4th panel or right-side info
+    currentUser?: any;
+    metrics?: any;
 }
 
-export function InboxLayout({ children, conversationList, leadProfile }: InboxLayoutProps) {
+export function InboxLayout({ children, conversationList, leadProfile, currentUser, metrics }: InboxLayoutProps) {
     const [isFoldersOpen, setIsFoldersOpen] = useState(true);
     const [isProfileOpen, setIsProfileOpen] = useState(true);
 
@@ -44,18 +46,18 @@ export function InboxLayout({ children, conversationList, leadProfile }: InboxLa
                         {/* Status Folders */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Vistas</p>}
-                            <NavItem icon={Inbox} label="Sin Asignar" count={12} active isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => toast.info('Filtrando vista: Sin Asignar')} />
-                            <NavItem icon={MessageSquare} label="Mis Chats" count={5} isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Mis Chats')} />
-                            <NavItem icon={Clock} label="Pendientes" count={3} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" onClick={() => toast.info('Filtrando vista: Pendientes')} />
-                            <NavItem icon={CheckCircle2} label="Resueltos" isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Resueltos')} />
+                            <NavItem icon={Inbox} label="Sin Asignar" count={metrics?.unassigned || 0} active isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => toast.info('Filtrando vista: Sin Asignar')} />
+                            <NavItem icon={MessageSquare} label="Mis Chats" count={metrics?.mine || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Mis Chats')} />
+                            <NavItem icon={Clock} label="Pendientes" count={metrics?.pending || 0} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" onClick={() => toast.info('Filtrando vista: Pendientes')} />
+                            <NavItem icon={CheckCircle2} label="Resueltos" count={metrics?.resolved || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Filtrando vista: Resueltos')} />
                         </div>
 
                         {/* Tags */}
                         <div className="space-y-1 px-3">
                             {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Etiquetas</p>}
-                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={2} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Soporte VIP')} />
-                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={8} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Ventas')} />
-                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Dudas')} />
+                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={metrics?.vip || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Soporte VIP')} />
+                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={metrics?.sales || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Ventas')} />
+                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" count={metrics?.questions || 0} isOpen={isFoldersOpen} onClick={() => toast.info('Aplicando etiqueta: Dudas')} />
                         </div>
 
                         {/* Other */}
@@ -72,10 +74,10 @@ export function InboxLayout({ children, conversationList, leadProfile }: InboxLa
                         <div className="p-4 border-t border-slate-200">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                                    AG
+                                    {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : 'AG'}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-slate-900 truncate">Agente Ventas</p>
+                                    <p className="text-sm font-semibold text-slate-900 truncate">{currentUser?.name || 'Agente Ventas'}</p>
                                     <p className="text-xs text-emerald-500 flex items-center gap-1">
                                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
                                         En línea
