@@ -19,9 +19,10 @@ const SOURCE_ICONS: Record<string, string> = {
     REFERRAL: "🤝", DIRECT: "🌐", EMAIL: "✉️", TIKTOK: "🎵", ORGANIC: "🌱",
 };
 
-interface PageProps { params: { id: string } }
+interface PageProps { params: Promise<{ id: string }> }
 
-export default async function LeadDetailPage({ params }: PageProps) {
+export default async function LeadDetailPage(props: PageProps) {
+    const params = await props.params;
     // Direct Prisma query — no server action intermediary to hide errors
     let lead;
     let company;
