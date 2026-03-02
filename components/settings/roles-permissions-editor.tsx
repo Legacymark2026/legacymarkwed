@@ -2,11 +2,13 @@
 
 import { ShieldCheck, UserCheck, Eye, Edit3, Trash, Check, Lock, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
 import { toast } from "sonner";
 
 // Roles Mocked
-const ROLES = [
+const INITIAL_ROLES = [
     { id: "admin", name: "Administrador de Workspace", color: "red" },
     { id: "manager", name: "Jefe de Ventas", color: "indigo" },
     { id: "agent", name: "Agente de Ventas", color: "emerald" },
@@ -44,8 +46,13 @@ const PERMISSIONS = [
 ];
 
 export function RolesPermissionsEditor() {
-    const [selectedRole, setSelectedRole] = useState(ROLES[1]);
+    const [roles, setRoles] = useState(INITIAL_ROLES);
+    const [selectedRole, setSelectedRole] = useState(INITIAL_ROLES[1]);
     const [activePermissions, setActivePermissions] = useState<string[]>(["crm.view_own", "crm.view_all", "crm.edit", "mkt.view", "team.view"]);
+
+    // New Role State
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newRoleName, setNewRoleName] = useState("");
 
     const handleToggle = (id: string) => {
         setActivePermissions(prev =>
@@ -58,6 +65,26 @@ export function RolesPermissionsEditor() {
         setTimeout(() => {
             toast.success("Rol actualizado con éxito.", { id: toastId });
         }, 1200);
+    };
+
+    const handleCreateRole = () => {
+        if (!newRoleName.trim()) {
+            toast.error("El nombre del rol no puede estar vacío");
+            return;
+        }
+
+        const newRole = {
+            id: newRoleName.toLowerCase().replace(/\s+/g, "_"),
+            name: newRoleName,
+            color: "blue" // default color
+        };
+
+        setRoles([...roles, newRole]);
+        setSelectedRole(newRole);
+        setActivePermissions([]);
+        setNewRoleName("");
+        setIsDialogOpen(false);
+        toast.success(`Rol ${newRoleName} creado exitosamente`);
     };
 
     return (
@@ -80,22 +107,45 @@ export function RolesPermissionsEditor() {
                 {/* Sidebar Roles */}
                 <div className="w-full lg:w-64 border-r border-slate-100 bg-slate-50/50 p-4 space-y-2">
                     <h4 className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-4 px-2">Selecciona un Rol</h4>
-                    {ROLES.map((role) => (
+                    {roles.map((role) => (
                         <button
                             key={role.id}
                             onClick={() => setSelectedRole(role)}
                             className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all flex justify-between items-center ${selectedRole.id === role.id
-                                    ? `bg-${role.color}-100 text-${role.color}-800 border border-${role.color}-200 shadow-sm`
-                                    : "text-slate-600 hover:bg-white hover:text-slate-900 border border-transparent"
+                                ? `bg-${role.color}-100 text-${role.color}-800 border border-${role.color}-200 shadow-sm`
+                                : "text-slate-600 hover:bg-white hover:text-slate-900 border border-transparent"
                                 }`}
                         >
                             {role.name}
                             {selectedRole.id === role.id && <Settings className="w-4 h-4 opacity-50" />}
                         </button>
                     ))}
-                    <Button variant="outline" className="w-full mt-4 bg-white border-dashed text-slate-500">
-                        + Crear Nuevo Rol
-                    </Button>
+
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" className="w-full mt-4 bg-white border-dashed text-slate-500 hover:text-indigo-600 hover:border-indigo-300">
+                                + Crear Nuevo Rol
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Crear Nuevo Rol Personalizado</DialogTitle>
+                            </DialogHeader>
+                            <div className="py-4">
+                                <label className="text-sm font-semibold text-slate-700 block mb-2">Nombre del Rol</label>
+                                <Input
+                                    placeholder="ej. Analista de Datos"
+                                    value={newRoleName}
+                                    onChange={(e) => setNewRoleName(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+                                <Button onClick={handleCreateRole} className="bg-indigo-600 hover:bg-indigo-700 text-white">Crear Rol</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 {/* Main Content - Permissions Matrix */}
@@ -135,8 +185,8 @@ export function RolesPermissionsEditor() {
                                                     key={action.id}
                                                     onClick={() => handleToggle(action.id)}
                                                     className={`text-left flex items-start gap-3 p-3 rounded-lg border transition-all ${isActive
-                                                            ? "bg-indigo-50/50 border-indigo-200 hover:border-indigo-300"
-                                                            : "bg-white border-slate-200 hover:border-slate-300"
+                                                        ? "bg-indigo-50/50 border-indigo-200 hover:border-indigo-300"
+                                                        : "bg-white border-slate-200 hover:border-slate-300"
                                                         }`}
                                                 >
                                                     <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isActive ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-300"
