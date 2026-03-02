@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { updateSettings } from "@/actions/settings";
 import { SettingsSchema } from "@/lib/schemas";
-import { Loader2, User, Globe, Bell, Palette, Languages, Camera, Save, X } from "lucide-react";
+import { Loader2, User, Globe, Bell, Palette, Languages, Camera, Save, X, ShieldCheck } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import ImageUpload from "@/components/ui/image-upload";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { ActiveSessions } from "@/components/settings/active-sessions";
+import { useFacebookPixel } from "@/hooks/use-facebook-pixel";
 
 interface SettingsFormProps {
     initialData: {
