@@ -1,51 +1,48 @@
 import { prisma } from "@/lib/prisma";
 
 export const MetaService = {
-    // 1. Get connected pages
     async getConnectedPages(userId: string) {
-        const account = await prisma.account.findFirst({
-            where: {
-                userId,
-                provider: 'facebook'
-            },
-            include: { user: { include: { profile: true } } }
-        });
-
-        if (!account || !account.access_token) {
-            console.log('[MetaSync] No Facebook account or token found for user:', userId);
-            return [];
-        }
-
-        console.log('[MetaSync] Found Facebook Account. Token Length:', account.access_token.length);
-
-        let pages = [];
+        let pages: any[] = [];
 
         try {
-            const response = await fetch(
-                `https://graph.facebook.com/v19.0/me/accounts?access_token=${account.access_token}`
-            );
-            const data = await response.json();
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                include: { profile: true, accounts: true }
+            });
 
-            if (data.error) {
-                console.error('[MetaSync] Facebook API Error (getConnectedPages):', data.error);
+            if (!user) return [];
+
+            const account = user.accounts.find(a => a.provider === 'facebook');
+
+            if (account && account.access_token) {
+                console.log('[MetaSync] Found Facebook Account. Token Length:', account.access_token.length);
+                try {
+                    const response = await fetch(
+                        `https://graph.facebook.com/v19.0/me/accounts?access_token=${account.access_token}`
+                    );
+                    const data = await response.json();
+
+                    if (data.error) {
+                        console.error('[MetaSync] Facebook API Error (getConnectedPages):', data.error);
+                    } else {
+                        pages = data.data || [];
+                        console.log(`[MetaSync] Facebook Pages Found via API: ${pages.length}`);
+                    }
+                } catch (error) {
+                    console.error('[MetaSync] Error fetching pages:', error);
+                }
             } else {
-                pages = data.data || [];
-                console.log(`[MetaSync] Facebook Pages Found via API: ${pages.length}`);
+                console.log('[MetaSync] No Facebook OAuth account or token found, checking manual fallbacks.');
             }
-        } catch (error) {
-            console.error('[MetaSync] Error fetching pages:', error);
-        }
 
-        // --- MANUAL OVERRIDE CHECK ---
-        try {
-            const profile = account.user.profile;
+            // --- MANUAL OVERRIDE CHECK ---
+            const profile = user.profile;
             if (profile && profile.metadata) {
                 const meta = profile.metadata as any;
                 if (meta.manualConnectedPageId) {
                     console.log(`[MetaSync] Found MANUAL PAGE override: ${meta.manualConnectedPageId}`);
 
                     // Check if already in list to avoid duplicates
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const exists = pages.find((p: any) => p.id === meta.manualConnectedPageId);
                     if (!exists) {
                         pages.push({
@@ -53,14 +50,14 @@ export const MetaService = {
                             name: meta.manualConnectedPageName || 'Manually Linked Page',
                             category: 'Manual Link',
                             tasks: ['MANAGE', 'MESSAGING'],
-                            access_token: meta.manualConnectedPageToken // Might be undefined, handled later
+                            access_token: meta.manualConnectedPageToken // The manual token
                         });
                         console.log('[MetaSync] Injected manual page into sync list.');
                     }
                 }
             }
         } catch (e) {
-            console.error('[MetaSync] Error checking manual override:', e);
+            console.error('[MetaSync] Fatal Error in getConnectedPages:', e);
         }
 
         return pages;
@@ -176,20 +173,18 @@ export const MetaSyncService = {
             where: { userId, provider: 'facebook' }
         });
 
-        if (!account?.access_token) return { success: false, error: "No access token" };
-
         // 2. Iterate pages
         for (const page of pages) {
             console.log(`[MetaSync] Processing page: ${page.name} (${page.id})`);
 
             // Use existing token (from manual override) or fetch new one
             let pageAccessToken = (page as any).access_token;
-            if (!pageAccessToken) {
+            if (!pageAccessToken && account?.access_token) {
                 pageAccessToken = await MetaService.getPageAccessToken(page.id, account.access_token);
             }
 
             if (!pageAccessToken) {
-                console.error(`[MetaSync] Could not get Access Token for page ${page.id}`);
+                console.error(`[MetaSync] Could not get Access Token for page ${page.id}. Disconnected or missing token.`);
                 continue;
             }
 

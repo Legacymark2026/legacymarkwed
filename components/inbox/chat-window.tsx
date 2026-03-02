@@ -20,7 +20,7 @@ import {
 import { format } from 'date-fns';
 import { QuickReplies } from './quick-replies';
 import { useInboxShortcuts } from '@/hooks/use-inbox-shortcuts';
-import { Mic, CheckCircle2, Maximize2, Minimize2, MonitorUp, UserPlus, MicOff, VideoOff } from 'lucide-react';
+import { Mic, CheckCircle2, Maximize2, Minimize2, MonitorUp, UserPlus, MicOff, VideoOff, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
@@ -29,33 +29,57 @@ function AudioPlayer({ durationText }: { durationText: string }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const fallbackTimer = useRef<NodeJS.Timeout | null>(null);
 
     const togglePlay = () => {
         if (!audioRef.current) return;
         if (isPlaying) {
             audioRef.current.pause();
+            if (fallbackTimer.current) clearInterval(fallbackTimer.current);
+            setIsPlaying(false);
         } else {
-            audioRef.current.play().catch(e => console.error(e));
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    setIsPlaying(true);
+                }).catch(error => {
+                    console.error("Audio playback prevented:", error);
+                    // Fallback visual simulation if browser blocks media or CORS fails
+                    setIsPlaying(true);
+                    let fakeProgress = progress;
+                    fallbackTimer.current = setInterval(() => {
+                        fakeProgress += 2;
+                        if (fakeProgress >= 100) {
+                            clearInterval(fallbackTimer.current!);
+                            setIsPlaying(false);
+                            setProgress(0);
+                        } else {
+                            setProgress(fakeProgress);
+                        }
+                    }, 500);
+                });
+            } else {
+                setIsPlaying(true);
+            }
         }
-        setIsPlaying(!isPlaying);
     };
 
     const handleTimeUpdate = () => {
-        if (audioRef.current) {
+        if (audioRef.current && isPlaying && !fallbackTimer.current) {
             setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
         }
     };
 
     return (
-        <div className="flex items-center gap-2 min-w-[200px]">
+        <div className="flex items-center gap-3 min-w-[200px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
                 src="https://actions.google.com/sounds/v1/water/glass_water_pour.ogg"
                 onTimeUpdate={handleTimeUpdate}
-                onEnded={() => { setIsPlaying(false); setProgress(0); }}
+                onEnded={() => { setIsPlaying(false); setProgress(0); if (fallbackTimer.current) clearInterval(fallbackTimer.current); }}
             />
-            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-white/20 hover:bg-white/30 text-current mix-blend-luminosity" onClick={togglePlay}>
-                {isPlaying ? <Timer width="14" height="14" /> : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>}
+            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-blue-500 hover:bg-blue-600 text-white shadow-md border-transparent flex items-center justify-center transition-all" onClick={togglePlay}>
+                {isPlaying ? <Pause width="14" height="14" className="fill-current ml-0.5" /> : <Play width="14" height="14" className="fill-current ml-0.5" />}
             </Button>
             <div className="flex-1 h-1.5 bg-black/10 rounded-full relative overflow-hidden cursor-pointer" onClick={(e) => {
                 if (audioRef.current && audioRef.current.duration) {
@@ -374,30 +398,110 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                         </div>
 
                         {activeCall === 'video' ? (
-                            <div className="w-full max-w-4xl flex-1 flex gap-4 mt-12 mb-8">
-                                {/* Agent Camera */}
-                                <div className="flex-1 rounded-2xl bg-black border border-slate-700 overflow-hidden relative shadow-2xl">
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        {isVideoOff ? (
-                                            <div className="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-3xl font-bold">AG</div>
-                                        ) : (
-                                            <div className="w-full h-full bg-gradient-to-t from-slate-900 to-slate-800 flex items-center justify-center">
-                                                <span className="text-slate-500 font-medium">Camera Active</span>
+                            <div className="w-full max-w-6xl flex-1 flex flex-col lg:flex-row gap-6 mt-8 mb-6 relative">
+                                {isSharingScreen ? (
+                                    <>
+                                        {/* Shared Screen Canvas */}
+                                        <div className="flex-[3] rounded-2xl bg-slate-800 border-2 border-slate-700 overflow-hidden relative shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-center group">
+                                            <div className="absolute inset-x-0 top-0 h-10 bg-slate-900/80 backdrop-blur-md flex items-center px-4 z-20 border-b border-white/5">
+                                                <div className="flex items-center gap-2 text-indigo-300 text-xs font-semibold">
+                                                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                                    Transmitting Screen: Application Window
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded-lg text-sm font-medium">Tú (Agente)</div>
-                                    {isMuted && <div className="absolute top-4 right-4 bg-red-500 p-1.5 rounded-full"><MicOff size={16} /></div>}
-                                </div>
-                                {/* Client Camera */}
-                                <div className="flex-1 rounded-2xl bg-slate-800 border border-slate-700 overflow-hidden relative shadow-2xl">
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900/50 to-purple-900/50">
-                                        <div className="w-32 h-32 rounded-full bg-indigo-500/20 flex items-center justify-center text-5xl font-bold text-indigo-200">
-                                            {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                                            {/* Mock Desktop Screen Content */}
+                                            <div className="w-full h-full p-4 bg-slate-100 flex flex-col">
+                                                <div className="w-full h-12 bg-white rounded-t-lg shadow-sm border-b border-slate-200 flex items-center px-4 gap-4">
+                                                    <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-red-400"></div><div className="w-3 h-3 rounded-full bg-amber-400"></div><div className="w-3 h-3 rounded-full bg-green-400"></div></div>
+                                                    <div className="w-1/2 h-6 bg-slate-100 rounded text-[10px] text-slate-400 flex items-center pl-2 font-mono">dashboard.legacymark.com/analytics</div>
+                                                </div>
+                                                <div className="flex-1 bg-slate-50 border-x border-b border-slate-200 p-8 grid grid-cols-3 gap-6">
+                                                    <div className="col-span-2 h-full bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col gap-4">
+                                                        <div className="w-48 h-6 bg-slate-200 rounded animate-pulse"></div>
+                                                        <div className="flex-1 bg-slate-50 rounded-lg border border-slate-100 mt-4 relative overflow-hidden">
+                                                            <svg className="absolute w-full h-full bottom-0 text-indigo-50" preserveAspectRatio="none" viewBox="0 0 100 100"><path d="M0 100 C 20 0 50 0 100 100 Z" fill="currentColor" /></svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-span-1 h-full flex flex-col gap-4">
+                                                        <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-sm p-4"><div className="w-24 h-4 bg-slate-200 rounded animate-pulse mb-4"></div><div className="space-y-3"><div className="w-full h-12 bg-indigo-50 rounded-lg"></div><div className="w-full h-12 bg-slate-50 rounded-lg"></div></div></div>
+                                                        <div className="flex-[0.5] bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-sm border border-slate-100 p-4 relative overflow-hidden"><div className="w-32 h-32 rounded-full bg-white/10 absolute -top-10 -right-10"></div></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="absolute inset-0 bg-transparent ring-inset ring-2 ring-indigo-500 pointer-events-none rounded-2xl z-20 transition-all opacity-0 group-hover:opacity-100 duration-500"></div>
                                         </div>
-                                    </div>
-                                    <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded-lg text-sm font-medium">{conversation.lead?.name || 'Cliente'}</div>
-                                </div>
+
+                                        {/* Side PIPs */}
+                                        <div className="flex-1 flex flex-col gap-4 w-full max-w-sm shrink-0">
+                                            {/* Client Camera PIP */}
+                                            <div className="flex-1 rounded-2xl bg-slate-800 border border-slate-700 overflow-hidden relative shadow-lg group">
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900/80 to-purple-900/80">
+                                                    <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center text-4xl font-bold text-white shadow-xl backdrop-blur-md border border-white/20">
+                                                        {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                                                    </div>
+                                                </div>
+                                                <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-semibold text-white/90 border border-white/10">{conversation.lead?.name || 'Client'}</div>
+                                            </div>
+                                            {/* Agent Camera PIP */}
+                                            <div className="flex-1 rounded-2xl bg-black border border-slate-700 overflow-hidden relative shadow-lg group">
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    {isVideoOff ? (
+                                                        <div className="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-3xl font-bold border-2 border-slate-700 text-slate-400">AG</div>
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-800 flex items-center justify-center relative shadow-[inset_0_0_50px_rgba(0,0,0,0.8)]">
+                                                            {/* Simulated webcam feed overlay */}
+                                                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80')] bg-cover bg-center opacity-70 mix-blend-screen transition-opacity duration-300"></div>
+                                                            <span className="text-white/30 font-medium z-10 font-mono text-xs tracking-widest absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none mix-blend-overlay">LIVE</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-semibold text-white/90 border border-white/10">You (Agent)</div>
+                                                {isMuted && <div className="absolute top-3 right-3 bg-red-500/90 p-1.5 rounded-full shadow-lg backdrop-blur-sm border border-red-400/50"><MicOff size={14} className="text-white" /></div>}
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Regular 50/50 Layout */}
+                                        {/* Agent Camera */}
+                                        <div className="flex-1 rounded-3xl bg-black border border-slate-800 overflow-hidden relative shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] group transition-all duration-300 hover:ring-2 ring-indigo-500/30">
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                {isVideoOff ? (
+                                                    <div className="w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-4xl font-bold text-slate-500 border-2 border-slate-800 shadow-inner">AG</div>
+                                                ) : (
+                                                    <div className="w-full h-full bg-slate-800 flex items-center justify-center relative">
+                                                        {/* Simulated webcam feed overlay */}
+                                                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80')] bg-cover bg-center opacity-80 transition-opacity duration-500"></div>
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10"></div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="absolute bottom-6 left-6 bg-slate-900/60 backdrop-blur-md px-4 py-2 rounded-xl text-sm font-semibold border border-white/5 z-20 flex items-center gap-2 text-white">
+                                                You (Agent)
+                                                {!isVideoOff && <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse ml-1"></span>}
+                                            </div>
+                                            {isMuted && <div className="absolute top-6 right-6 bg-red-500 p-2.5 rounded-full shadow-lg z-20 border border-red-400/30"><MicOff size={18} className="text-white" /></div>}
+                                        </div>
+
+                                        {/* Client Camera */}
+                                        <div className="flex-1 rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden relative shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] group transition-all duration-300 hover:ring-2 ring-indigo-500/30">
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900/40 to-slate-900/90 relative overflow-hidden">
+                                                {/* Decorative background rings */}
+                                                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.5)_0,transparent_50%))]"></div>
+                                                <div className="w-40 h-40 rounded-full bg-indigo-500/10 flex items-center justify-center text-6xl font-bold text-indigo-100 shadow-2xl backdrop-blur-sm border border-indigo-500/20 z-10 relative">
+                                                    {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
+                                                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-800 rounded-full border-4 border-slate-900 flex items-center justify-center z-20">
+                                                        <VideoOff size={16} className="text-slate-400" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="absolute bottom-6 left-6 bg-slate-900/60 backdrop-blur-md px-4 py-2 rounded-xl text-sm font-semibold border border-white/5 z-20 text-white">
+                                                {conversation.lead?.name || 'Cliente'}
+                                            </div>
+                                            <div className="absolute top-6 right-6 bg-slate-800/80 backdrop-blur p-2.5 rounded-full z-20 border border-white/5"><MicOff size={18} className="text-slate-400" /></div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             <div className="relative mb-8 mt-12">
