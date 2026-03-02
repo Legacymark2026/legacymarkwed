@@ -14,8 +14,13 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
 
     return (
         <InboxLayout
-            sidebar={
+            conversationList={
                 <ConversationList conversations={conversations as any || []} />
+            }
+            leadProfile={
+                <div className="flex h-full items-center justify-center p-4 bg-slate-50 text-slate-400 text-sm">
+                    Seleccione un chat para ver el perfil del cliente
+                </div>
             }
         >
             <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50/50">

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
     Send, Paperclip, Smile, Image as ImageIcon,
     Phone, Video, MoreHorizontal, Check, CheckCheck,
-    Reply, Forward, Trash2, Copy
+    Reply, Forward, Trash2, Copy, Clock, Sparkles, Download, Timer
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,9 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [showQuickReplies, setShowQuickReplies] = useState(false);
     const [isRecording, setIsRecording] = useState(false); // Visual state for Voice Note
     const [isTyping, setIsTyping] = useState(false); // Simulated typing state
+    const [isPrivateNote, setIsPrivateNote] = useState(false); // Internal Private Notes Toggle
+
+    const [showBackgroundAlert, setShowBackgroundAlert] = useState(false);
 
     // Simulate typing effect for demo
     useEffect(() => {
@@ -40,7 +43,17 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
             setIsTyping(true);
             setTimeout(() => setIsTyping(false), 3000);
         }, 2000);
-        return () => clearTimeout(timer);
+
+        // Simulate a background message arriving from another channel
+        const alertTimer = setTimeout(() => {
+            setShowBackgroundAlert(true);
+            setTimeout(() => setShowBackgroundAlert(false), 5000); // hide after 5s
+        }, 4000);
+
+        return () => {
+            clearTimeout(timer);
+            clearTimeout(alertTimer);
+        }
     }, []);
 
     // Shortcuts
@@ -78,7 +91,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
         const optimisticMsg = {
             id: 'temp-' + Date.now(),
             content: content,
-            direction: 'OUTBOUND',
+            direction: isPrivateNote ? 'INTERNAL' : 'OUTBOUND',
             status: 'SENT',
             createdAt: new Date(),
             senderId: currentUserId
@@ -88,6 +101,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
         setNewItem('');
         setShowQuickReplies(false);
         setIsRecording(false);
+        setIsPrivateNote(false);
         if (textareaRef.current) textareaRef.current.style.height = '44px'; // Reset height
 
         // Call Server Action
@@ -126,13 +140,27 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                     </div>
 
                     <div>
-                        <h2 className="font-bold text-gray-900 text-sm md:text-base">{conversation.lead?.name || 'Unknown Lead'}</h2>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h2 className="font-bold text-gray-900 text-sm md:text-base">{conversation.lead?.name || 'Unknown Lead'}</h2>
+                            <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded flex items-center gap-1 cursor-default" title="AI Sentiment Analysis: Positive">
+                                😊 Positive
+                            </span>
+                        </div>
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 font-medium">{conversation.channel}</span>
                             <span className="w-1 h-1 rounded-full bg-gray-300"></span>
                             <span className="text-xs text-green-600 font-medium flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                                 Active
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-gray-300 mx-1"></span>
+
+                            {/* Analytics Phase 6 */}
+                            <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded" title="First Response Time">
+                                <Timer size={10} className="text-slate-400" /> FRT: 3m
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded" title="Total Resolution Time">
+                                <Clock size={10} className="text-slate-400" /> TRT: 45m
                             </span>
                         </div>
                     </div>
@@ -175,12 +203,40 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem>View Contact Details</DropdownMenuItem>
+                            <DropdownMenuItem>Pin to Top</DropdownMenuItem>
                             <DropdownMenuItem>Snooze Conversation</DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-indigo-600 focus:text-indigo-600">
+                                <Download size={14} /> Export Transcript
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-amber-600 focus:text-amber-600">Mark as Spam</DropdownMenuItem>
                             <DropdownMenuItem className="text-red-600 focus:text-red-600">Close Conversation</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
             </div>
+
+            {/* Floating Background Notification Bubble */}
+            <AnimatePresence>
+                {showBackgroundAlert && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                        className="absolute top-24 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800 transition-colors border border-slate-700"
+                    >
+                        <div className="relative">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center font-bold text-xs ring-2 ring-slate-900">
+                                WA
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-slate-900"></div>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-slate-100">Nuevo mensaje de WhatsApp</span>
+                            <span className="text-[11px] text-slate-300">Carlos Díaz: "¡Listo, gracias!"</span>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Messages Area */}
             <div
@@ -299,7 +355,19 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
 
                     {/* Input Container */}
-                    <div className="flex-1 relative bg-gray-50 border border-gray-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10 rounded-xl transition-all flex items-end p-1">
+                    <div className={cn(
+                        "flex-1 relative border rounded-xl transition-all flex items-end p-1",
+                        isPrivateNote
+                            ? "bg-amber-50/50 border-amber-200 hover:border-amber-400 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20"
+                            : "bg-gray-50 border-gray-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10"
+                    )}>
+
+                        {/* Private Note Toggle Label */}
+                        {isPrivateNote && (
+                            <div className="absolute -top-3 left-4 bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 shadow-sm z-10 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Internal Note
+                            </div>
+                        )}
 
                         {/* Quick Replies Popover */}
                         {showQuickReplies && (
@@ -310,6 +378,17 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 />
                             </div>
                         )}
+
+                        {/* AI Copilot Action Bar */}
+                        <div className="absolute bottom-full right-0 mb-2 z-40 hidden md:flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 p-1.5 rounded-2xl shadow-lg border border-indigo-400">
+                            <span className="text-[10px] text-indigo-100 font-bold px-1.5 flex items-center gap-1">
+                                <Sparkles size={10} className="text-amber-300" /> COPILOT
+                            </span>
+                            <div className="w-px h-3 bg-indigo-400/50"></div>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors">Resumir Chat</button>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors">Mejorar Tono</button>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors">Sugerir Respuesta</button>
+                        </div>
 
                         <textarea
                             ref={textareaRef}
@@ -341,8 +420,18 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 <span className="italic text-xs font-serif">I</span>
                             </Button>
                             <div className="w-px h-3 bg-gray-200 mx-1"></div>
-                            <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-800 rounded">
-                                <Smile size={14} />
+
+                            {/* Private Note Toggle */}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsPrivateNote(!isPrivateNote)}
+                                className={cn(
+                                    "h-6 px-2 text-[10px] font-bold rounded transiton-colors",
+                                    isPrivateNote ? "bg-amber-200 text-amber-900 hover:bg-amber-300" : "text-gray-400 hover:text-amber-600 hover:bg-amber-50"
+                                )}
+                            >
+                                /Note
                             </Button>
 
                             <div className="flex-1"></div>
@@ -362,25 +451,46 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                         </div>
                     </div>
 
-                    <Button
-                        onClick={handleSend}
-                        disabled={!newItem.trim() || isSending}
-                        size="icon"
-                        className={cn(
-                            "h-11 w-11 shrink-0 rounded-xl transition-all shadow-md",
-                            newItem.trim()
-                                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                                : "bg-gray-100 text-gray-300 shadow-none"
-                        )}
-                    >
-                        <Send size={20} className={cn("transition-transform", newItem.trim() ? "translate-x-0.5 ml-0.5" : "")} />
-                    </Button>
+                    <div className="flex shadow-md rounded-xl">
+                        <Button
+                            onClick={handleSend}
+                            disabled={!newItem.trim() || isSending}
+                            className={cn(
+                                "h-11 px-4 shrink-0 rounded-l-xl rounded-r-none transition-all border-r border-white/20",
+                                newItem.trim()
+                                    ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
+                                    : "bg-gray-100 text-gray-300 shadow-none"
+                            )}
+                        >
+                            <Send size={18} className={cn("transition-transform", newItem.trim() ? "translate-x-0.5 mr-1" : "")} />
+                            <span className="font-semibold text-sm">{isPrivateNote ? 'Save' : 'Send'}</span>
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    disabled={!newItem.trim() || isSending}
+                                    className={cn(
+                                        "h-11 w-8 px-0 shrink-0 rounded-l-none rounded-r-xl transition-all shadow-none",
+                                        newItem.trim()
+                                            ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
+                                            : "bg-gray-100 text-gray-300 shadow-none border-l border-gray-200"
+                                    )}
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem className="gap-2"><Clock size={14} className="text-blue-500" /> Send Later...</DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2"><CheckCheck size={14} className="text-green-500" /> Send & Mark Resolved</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
                 <div className="text-[10px] text-center text-gray-400 mt-2 font-medium">
                     Powered by <span className="text-indigo-500">LegacyMark OmniChannel</span>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

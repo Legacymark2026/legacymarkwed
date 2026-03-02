@@ -37,30 +37,28 @@ export default async function InboxConversationPage({
 
     return (
         <InboxLayout
-            sidebar={
+            conversationList={
                 <ConversationList conversations={conversations as any || []} />
             }
-        >
-            <div className="flex h-full">
-                <div className="flex-1 min-w-0 border-r border-gray-200">
-                    {activeConversation ? (
-                        <ChatWindow
-                            conversation={activeConversation as any}
-                            messages={messages || []}
-                            currentUserId={currentUserId}
-                        />
-                    ) : (
-                        <EmptyState title="Conversation not found" description="The conversation you are looking for does not exist or has been deleted." />
-                    )}
-                </div>
-
-                {/* Marketing Brain Sidebar (Right Pane) */}
-                <div className="w-80 hidden xl:block bg-white h-full">
+            leadProfile={
+                <div className="h-full bg-slate-50 border-l border-slate-200">
                     <RightSidebar
                         conversation={activeConversation as any}
                         leadDetails={leadDetails}
                     />
                 </div>
+            }
+        >
+            <div className="flex-1 h-full min-w-0">
+                {activeConversation ? (
+                    <ChatWindow
+                        conversation={activeConversation as any}
+                        messages={messages || []}
+                        currentUserId={currentUserId}
+                    />
+                ) : (
+                    <EmptyState title="Conversation not found" description="The conversation you are looking for does not exist or has been deleted." />
+                )}
             </div>
         </InboxLayout>
     );

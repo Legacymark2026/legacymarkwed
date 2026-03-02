@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
     User, MapPin, Mail, Phone, Tag, Clock,
-    CreditCard, TrendingUp, AlertCircle, Plus, X
+    CreditCard, TrendingUp, AlertCircle, Plus, X, Link, DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,7 @@ import { ChannelIcon } from './channel-icon';
 
 export function RightSidebar({ conversation, leadDetails }: { conversation: any, leadDetails?: any }) {
     if (!conversation) return (
-        <div className="w-80 border-l border-gray-200 h-full bg-gray-50 flex items-center justify-center text-gray-400 text-sm">
+        <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-400 text-sm">
             Select a conversation
         </div>
     );
@@ -29,7 +29,7 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
     const tempBg = leadScore > 70 ? 'bg-red-50' : leadScore > 40 ? 'bg-amber-50' : 'bg-blue-50';
 
     return (
-        <div className="w-80 border-l border-gray-200 h-full bg-white flex flex-col overflow-y-auto">
+        <div className="w-full h-full bg-white flex flex-col overflow-y-auto">
             {/* Lead Header */}
             <div className="p-6 text-center border-b border-gray-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-indigo-50/50 to-transparent -z-10" />
@@ -55,6 +55,49 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                         <CreditCard size={12} />
                         Deal
                     </Button>
+                </div>
+                <div className="flex justify-center gap-2 mt-2">
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50">
+                        <User size={10} className="text-blue-500" /> + Convert Lead
+                    </Button>
+                    <Button size="sm" variant="outline" className="h-8 rounded-full text-[10px] gap-1 border-slate-200 text-slate-700 hover:bg-slate-50">
+                        <Link size={10} className="text-indigo-500" /> Payment Link
+                    </Button>
+                </div>
+            </div>
+
+            {/* SLA Routing & Tags (Phase 2) */}
+            <div className="p-5 border-b border-gray-100 space-y-4 bg-slate-50/50">
+                <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assignee</span>
+                    <button className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
+                                ME
+                            </div>
+                            <span className="font-medium text-gray-700">Tú (Agente Ventas)</span>
+                        </div>
+                        <User size={14} className="text-gray-400" />
+                    </button>
+                    <p className="text-[10px] text-gray-400 pl-1">Route to another agent</p>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center justify-between">
+                        Chat Tags
+                        <button className="text-indigo-600 hover:bg-indigo-50 p-0.5 rounded transition-colors"><Plus size={14} /></button>
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                        <Badge variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6">
+                            VIP <button className="ml-1 opacity-70 hover:opacity-100"><X size={12} /></button>
+                        </Badge>
+                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium border-none pl-2 pr-1 h-6">
+                            Cotización <button className="ml-1 opacity-70 hover:opacity-100"><X size={12} /></button>
+                        </Badge>
+                        <button className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
+                            <Plus size={10} /> Add
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -119,6 +162,28 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                                 <span className="text-xs font-medium text-gray-700">{lead.campaign?.name || '-'}</span>
                             </div>
                         </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* CRM Metrics (Lifetime Value & History) */}
+                    <div className="space-y-3">
+                        <h4 className="text-xs font-semibold text-gray-900 flex items-center gap-2">
+                            <DollarSign size={14} className="text-emerald-500" /> Purchase History
+                        </h4>
+                        <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-medium text-emerald-800">Lifetime Value (LTV)</span>
+                                <span className="text-sm font-bold text-emerald-700">$1,450.00</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-emerald-600">Total Orders</span>
+                                <span className="text-[10px] font-semibold text-emerald-700">3</span>
+                            </div>
+                        </div>
+                        <Button size="sm" variant="outline" className="w-full text-xs border-dashed text-slate-500">
+                            + Add Custom CRM Field
+                        </Button>
                     </div>
 
                     <Separator />

@@ -73,7 +73,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
     };
 
     return (
-        <div className="flex flex-col h-full bg-white border-r border-gray-200 w-80 md:w-96">
+        <div className="flex flex-col h-full bg-white w-full">
             {/* Header / Search */}
             <div className="p-4 border-b border-gray-100 space-y-3">
                 <div className="flex items-center justify-between">
