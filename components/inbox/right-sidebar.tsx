@@ -45,6 +45,17 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [showDealModal, setShowDealModal] = useState(false);
 
+    // Dynamic Tags State
+    const [activeTags, setActiveTags] = useState<string[]>(
+        conversation.tags || []
+    );
+
+    // Dynamic CRM Custom Fields State
+    const [customFields, setCustomFields] = useState<{ name: string, value: string }[]>([]);
+    const [showNewFieldInput, setShowNewFieldInput] = useState(false);
+    const [newFieldName, setNewFieldName] = useState('');
+    const [newFieldValue, setNewFieldValue] = useState('');
+
     return (
         <div className="w-full h-full bg-white flex flex-col overflow-y-auto">
             {/* Lead Header */}
@@ -106,7 +117,7 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
             {/* SLA Routing & Tags (Phase 2) */}
             <div className="p-5 border-b border-gray-100 space-y-4 bg-slate-50/50">
                 <div className="flex flex-col gap-1.5">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assignee</span>
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Cesionario</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <button className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
@@ -114,7 +125,7 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                                     <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
                                         {conversation.assignee?.name?.substring(0, 2).toUpperCase() || 'UN'}
                                     </div>
-                                    <span className="font-medium text-gray-700">{conversation.assignee?.name || 'Unassigned'}</span>
+                                    <span className="font-medium text-gray-700">{conversation.assignee?.name || 'Sin Asignar'}</span>
                                 </div>
                                 <User size={14} className="text-gray-400" />
                             </button>
@@ -133,42 +144,54 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <p className="text-[10px] text-gray-400 pl-1">Route to another agent</p>
+                    <p className="text-[10px] text-gray-400 pl-1">Asignar a otro cesionario</p>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center justify-between">
-                        Chat Tags
+                        Etiquetas de Chat
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className="text-indigo-600 hover:bg-indigo-50 p-0.5 rounded transition-colors"><Plus size={14} /></button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Ventas')}>Ventas</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Soporte VIP')}>Soporte VIP</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Dudas')}>Dudas</DropdownMenuItem>
+                                {['Ventas', 'Soporte VIP', 'Dudas', 'URGENTE'].filter(t => !activeTags.includes(t)).map(tag => (
+                                    <DropdownMenuItem key={tag} onClick={() => {
+                                        setActiveTags(prev => [...prev, tag]);
+                                        toast.success(`Etiqueta agregada: ${tag}`);
+                                    }}>
+                                        {tag}
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                        {conversation.tags ? conversation.tags.map((tag: string, i: number) => (
-                            <Badge key={i} variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6">
-                                {tag} <button className="ml-1 opacity-70 hover:opacity-100" onClick={() => toast.success(`Tag ${tag} removed`)}><X size={12} /></button>
+                        {activeTags.length > 0 ? activeTags.map((tag: string, i: number) => (
+                            <Badge key={i} variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6 transition-all">
+                                {tag} <button className="ml-1 opacity-70 hover:opacity-100" onClick={() => {
+                                    setActiveTags(prev => prev.filter(t => t !== tag));
+                                    toast.success(`Sujeción de etiqueta ${tag} removida`);
+                                }}><X size={12} /></button>
                             </Badge>
-                        )) : null}
-                        {(!conversation.tags || conversation.tags.length === 0) && (
-                            <span className="text-[10px] text-gray-400 italic">No tags</span>
+                        )) : (
+                            <span className="text-[10px] text-gray-400 italic">Sin etiquetas</span>
                         )}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
-                                    <Plus size={10} /> Add
+                                    <Plus size={10} /> Añadir
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
-                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Ventas')}>Ventas</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: Soporte VIP')}>Soporte VIP</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => toast.success('Etiqueta agregada: URGENTE')}>URGENTE</DropdownMenuItem>
+                                {['Ventas', 'Soporte VIP', 'Dudas', 'URGENTE'].filter(t => !activeTags.includes(t)).map(tag => (
+                                    <DropdownMenuItem key={tag} onClick={() => {
+                                        setActiveTags(prev => [...prev, tag]);
+                                        toast.success(`Etiqueta agregada: ${tag}`);
+                                    }}>
+                                        {tag}
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -255,12 +278,67 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                                 <span className="text-[10px] font-semibold text-emerald-700">{lead.score > 0 ? Math.floor(lead.score / 15) : 0}</span>
                             </div>
                         </div>
-                        <Button size="sm" variant="outline" className="w-full text-xs border-dashed text-slate-500" onClick={() => toast.info('Custom Field Editor opening...')}>
-                            + Add Custom CRM Field
-                        </Button>
                     </div>
 
                     <Separator />
+
+                    {/* Custom CRM Fields */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h4 className="text-xs font-semibold text-gray-900 flex items-center gap-2">
+                                <AlertCircle size={14} className="text-gray-400" /> Campos CRM Personali...
+                            </h4>
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-600 hover:bg-indigo-50" onClick={() => setShowNewFieldInput(!showNewFieldInput)}>
+                                <Plus size={14} />
+                            </Button>
+                        </div>
+
+                        {customFields.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-3 pl-1">
+                                {customFields.map((field, i) => (
+                                    <div key={i} className="bg-gray-50 p-2 rounded-lg border border-gray-100 relative group">
+                                        <button
+                                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500"
+                                            onClick={() => setCustomFields(prev => prev.filter((_, idx) => idx !== i))}
+                                        ><X size={10} /></button>
+                                        <span className="text-[10px] text-gray-400 block uppercase truncate pr-4">{field.name}</span>
+                                        <span className="text-xs font-medium text-gray-700 truncate">{field.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-[10px] text-gray-400 pl-1 italic">No hay campos personalizados.</p>
+                        )}
+
+                        {showNewFieldInput && (
+                            <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 space-y-2 animate-in zoom-in-95">
+                                <input
+                                    className="w-full text-xs p-1.5 border border-indigo-200 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                                    placeholder="Nombre del campo (ej. Empresa)"
+                                    value={newFieldName} onChange={e => setNewFieldName(e.target.value)}
+                                />
+                                <input
+                                    className="w-full text-xs p-1.5 border border-indigo-200 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                                    placeholder="Valor"
+                                    value={newFieldValue} onChange={e => setNewFieldValue(e.target.value)}
+                                />
+                                <div className="flex gap-2">
+                                    <Button size="sm" variant="ghost" className="flex-1 h-7 text-[10px]" onClick={() => {
+                                        setShowNewFieldInput(false);
+                                        setNewFieldName('');
+                                        setNewFieldValue('');
+                                    }}>Cancelar</Button>
+                                    <Button size="sm" className="flex-1 h-7 text-[10px] bg-indigo-600 hover:bg-indigo-700" disabled={!newFieldName || !newFieldValue} onClick={() => {
+                                        setCustomFields(prev => [...prev, { name: newFieldName, value: newFieldValue }]);
+                                        setShowNewFieldInput(false);
+                                        setNewFieldName('');
+                                        setNewFieldValue('');
+                                        toast.success('Campo personalizado agregado');
+                                    }}>Guardar</Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="activity" className="p-5">

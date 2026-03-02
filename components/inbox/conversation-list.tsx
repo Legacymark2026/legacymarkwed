@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Search, Filter, SlidersHorizontal, Plus, X, Send } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, Plus, X, Send, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User, Users, UserX } from 'lucide-react';
 import { toast } from 'sonner';
+import { syncMetaConversations } from '@/actions/inbox';
 
 // Mock types for props - replace with actual types later
 interface Conversation {
@@ -51,6 +52,20 @@ export function ConversationList({ conversations, currentUser }: { conversations
     // Interactive Modal States
     const [showNewMessageModal, setShowNewMessageModal] = useState(false);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    const handleSync = async () => {
+        setIsSyncing(true);
+        toast.info("Sincronizando mensajes de Meta...");
+        const res = await syncMetaConversations();
+        if (res.success) {
+            toast.success(`Sincronización completa: ${(res as any).messagesSynced} mensajes nuevos.`);
+            router.refresh();
+        } else {
+            toast.error("Error al sincronizar: " + ((res as any).error || "Revisa la conexión de Meta."));
+        }
+        setIsSyncing(false);
+    };
 
     // Real-time Polling (Phase 1 Improvement)
     useEffect(() => {
@@ -96,9 +111,21 @@ export function ConversationList({ conversations, currentUser }: { conversations
             <div className="p-4 border-b border-gray-100 space-y-3">
                 <div className="flex items-center justify-between">
                     <h2 className="font-bold text-xl text-gray-900 tracking-tight">Inbox</h2>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900" onClick={() => setShowNewMessageModal(true)}>
-                        <Plus size={20} />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            onClick={handleSync}
+                            disabled={isSyncing}
+                            title="Sincronizar Meta (Facebook/Instagram)"
+                        >
+                            <RefreshCw size={18} className={cn(isSyncing && "animate-spin")} />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900" onClick={() => setShowNewMessageModal(true)}>
+                            <Plus size={20} />
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="relative">
@@ -141,9 +168,9 @@ export function ConversationList({ conversations, currentUser }: { conversations
                 {/* Tabs */}
                 <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-3 h-9 bg-gray-100/80 p-1">
-                        <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
-                        <TabsTrigger value="mine" className="text-xs">Mine</TabsTrigger>
-                        <TabsTrigger value="unassigned" className="text-xs">Unassigned</TabsTrigger>
+                        <TabsTrigger value="all" className="text-xs">Todos</TabsTrigger>
+                        <TabsTrigger value="mine" className="text-xs">Míos</TabsTrigger>
+                        <TabsTrigger value="unassigned" className="text-xs">Sin Asignar</TabsTrigger>
                     </TabsList>
                 </Tabs>
 
@@ -160,7 +187,7 @@ export function ConversationList({ conversations, currentUser }: { conversations
                                     : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
                             )}
                         >
-                            {status.charAt(0) + status.slice(1).toLowerCase()}
+                            {status === 'OPEN' ? 'ABIERTOS' : 'CERRADOS'}
                         </button>
                     ))}
                     <div className="flex-1"></div>

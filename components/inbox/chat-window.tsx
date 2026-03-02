@@ -25,6 +25,62 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 
+function AudioPlayer({ durationText }: { durationText: string }) {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const togglePlay = () => {
+        if (!audioRef.current) return;
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play().catch(e => console.error(e));
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleTimeUpdate = () => {
+        if (audioRef.current) {
+            setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
+        }
+    };
+
+    return (
+        <div className="flex items-center gap-2 min-w-[200px]">
+            <audio
+                ref={audioRef}
+                src="https://actions.google.com/sounds/v1/water/glass_water_pour.ogg"
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={() => { setIsPlaying(false); setProgress(0); }}
+            />
+            <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-white/20 hover:bg-white/30 text-current mix-blend-luminosity" onClick={togglePlay}>
+                {isPlaying ? <Timer width="14" height="14" /> : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>}
+            </Button>
+            <div className="flex-1 h-1.5 bg-black/10 rounded-full relative overflow-hidden cursor-pointer" onClick={(e) => {
+                if (audioRef.current && audioRef.current.duration) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const per = (e.clientX - rect.left) / rect.width;
+                    audioRef.current.currentTime = per * audioRef.current.duration;
+                    setProgress(per * 100);
+                }
+            }}>
+                <div className="absolute left-0 top-0 h-full bg-current rounded-full transition-all duration-75" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="flex items-center gap-1">
+                <span className="text-[10px] font-mono opacity-80">{durationText}</span>
+                <Button variant="ghost" size="sm" className="h-5 px-1 text-[10px] font-bold rounded bg-black/5 hover:bg-black/10 text-current ml-1" onClick={(e) => {
+                    if (!audioRef.current) return;
+                    const btn = e.currentTarget;
+                    if (btn.textContent === '1x') { btn.textContent = '1.5x'; audioRef.current.playbackRate = 1.5; }
+                    else if (btn.textContent === '1.5x') { btn.textContent = '2x'; audioRef.current.playbackRate = 2; }
+                    else { btn.textContent = '1x'; audioRef.current.playbackRate = 1; }
+                }}>1x</Button>
+            </div>
+        </div>
+    );
+}
+
 export function ChatWindow({ conversation, messages: initialMessages, currentUserId }: any) {
     const [messages, setMessages] = useState(initialMessages);
     const [newItem, setNewItem] = useState('');
@@ -46,6 +102,9 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const [isCallMinimized, setIsCallMinimized] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [isVideoOff, setIsVideoOff] = useState(false);
+    const [isSharingScreen, setIsSharingScreen] = useState(false);
+    const [showAddParticipant, setShowAddParticipant] = useState(false);
+    const [newParticipant, setNewParticipant] = useState('');
 
     // Advanced Chat Features State
     const [pendingFiles, setPendingFiles] = useState<{ name: string, type: string }[]>([]);
@@ -367,13 +426,14 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 </Button>
                             )}
 
-                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-transparent bg-slate-700 hover:bg-slate-600 text-white" onClick={() => toast.info('Selecciona qué pantalla compartir')}>
+                            <Button variant="outline" size="icon" className={cn("w-14 h-14 rounded-full border-transparent transition-all", isSharingScreen ? "bg-blue-500 hover:bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]" : "bg-slate-700 hover:bg-slate-600 text-white")} onClick={() => setIsSharingScreen(!isSharingScreen)}>
                                 <MonitorUp className="w-6 h-6" />
                             </Button>
 
                             <Button variant="primary" size="icon" className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20 mx-2" onClick={() => {
                                 setActiveCall(null);
                                 setIsCallMinimized(false);
+                                setIsSharingScreen(false);
                                 setMessages((prev: any) => [...prev, {
                                     id: 'call-' + Date.now(),
                                     content: `📞 ${activeCall === 'video' ? 'Video' : ''} Llamada finalizada (${formatDuration(callDuration)})`,
@@ -386,7 +446,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                 <Phone className="w-7 h-7 rotate-[135deg]" />
                             </Button>
 
-                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-transparent bg-slate-700 hover:bg-slate-600 text-white" onClick={() => toast.info('Añadir participante...')}>
+                            <Button variant="outline" size="icon" className="w-14 h-14 rounded-full border-transparent bg-slate-700 hover:bg-slate-600 text-white" onClick={() => setShowAddParticipant(true)}>
                                 <UserPlus className="w-6 h-6" />
                             </Button>
                         </div>
@@ -479,24 +539,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                             : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm"
                                     )}>
                                         {msg.content.startsWith('🎤 Nota de Voz') ? (
-                                            <div className="flex items-center gap-2 min-w-[200px]">
-                                                <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-white/20 hover:bg-white/30 text-current" onClick={() => toast.info('Reproduciendo audio')}>
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                                                </Button>
-                                                <div className="flex-1 h-1.5 bg-black/10 rounded-full relative">
-                                                    <div className="absolute left-0 top-0 h-full w-1/3 bg-current rounded-full" />
-                                                    <div className="absolute left-1/3 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow" />
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <span className="text-[10px] font-mono opacity-80">{msg.content.split('(')[1]?.replace(')', '') || '0:00'}</span>
-                                                    <Button variant="ghost" size="sm" className="h-5 px-1 text-[10px] font-bold rounded bg-black/5 hover:bg-black/10 text-current ml-1" onClick={(e) => {
-                                                        const btn = e.currentTarget;
-                                                        if (btn.textContent === '1x') btn.textContent = '1.5x';
-                                                        else if (btn.textContent === '1.5x') btn.textContent = '2x';
-                                                        else btn.textContent = '1x';
-                                                    }}>1x</Button>
-                                                </div>
-                                            </div>
+                                            <AudioPlayer durationText={msg.content.split('(')[1]?.replace(')', '') || '0:00'} />
                                         ) : (
                                             <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                         )}
@@ -788,7 +831,40 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                     </div>
                 </div>
             )}
-        </div >
+
+            {/* Add Participant Modal Simulation */}
+            {showAddParticipant && (
+                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-xs overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-indigo-50 text-indigo-900">
+                            <h3 className="font-bold flex items-center gap-2"><UserPlus size={16} /> Añadir Participante</h3>
+                            <button onClick={() => setShowAddParticipant(false)} className="text-indigo-400 hover:text-indigo-600"><X size={16} /></button>
+                        </div>
+                        <div className="p-5 space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500">Nombre o Correo del Agente</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ej. Juan Pérez"
+                                    className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    value={newParticipant}
+                                    onChange={(e) => setNewParticipant(e.target.value)}
+                                />
+                            </div>
+                            <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={() => {
+                                if (!newParticipant) {
+                                    toast.error('Ingresa un nombre');
+                                    return;
+                                }
+                                toast.success(`${newParticipant} invocado a la llamada`);
+                                setShowAddParticipant(false);
+                                setNewParticipant('');
+                            }}>Invitar a la llamada</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -807,5 +883,5 @@ function PlusIcon({ size, className }: any) {
         >
             <path d="M12 5v14M5 12h14" />
         </svg>
-    )
+    );
 }
