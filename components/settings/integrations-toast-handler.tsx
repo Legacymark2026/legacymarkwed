@@ -4,6 +4,8 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { syncMetaConversations } from "@/actions/inbox";
+
 export function IntegrationsToastHandler() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -32,9 +34,23 @@ export function IntegrationsToastHandler() {
             }
 
             if (success === "facebook_connected") {
-                toast.success("¡Meta Conectado!", {
-                    description: "Se ha vinculado correctamente tu cuenta de Facebook e Instagram.",
-                });
+                // Automatically trigger sync and show progress
+                toast.promise(
+                    syncMetaConversations(),
+                    {
+                        loading: 'Conexión exitosa. Sincronizando Páginas y Mensajes de Meta...',
+                        success: (data) => {
+                            if (data && data.success) {
+                                return `¡Todo listo! Sincronizados ${data.conversationsSynced || 0} chats y ${data.messagesSynced || 0} mensajes.`;
+                            }
+                            if (data && !data.success) {
+                                return `La cuenta se conectó, pero hubo un error al sincronizar mensajes: ${data.error || 'Error desconocido'}`;
+                            }
+                            return "¡Cuenta de Meta conectada y sincronizada correctamente!";
+                        },
+                        error: 'Meta se conectó, pero falló la sincronización inicial de mensajes.',
+                    }
+                );
             }
 
             // Remove query params from URL without refreshing the page
