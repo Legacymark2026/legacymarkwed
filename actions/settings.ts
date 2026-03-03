@@ -264,6 +264,8 @@ export async function getPublicIntegrations() {
         let gaPropertyId = process.env.NEXT_PUBLIC_GA_PROPERTY_ID || "";
         // measurementId (G-XXXXXXXX) is what gtag.js needs — different from propertyId
         let gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
+        let tiktokPixelId = "";
+        let linkedinPartnerId = "";
 
         // Merge Strategy: IntegrationConfig > UserProfile > Env Vars
 
@@ -306,6 +308,8 @@ export async function getPublicIntegrations() {
                 if (data?.propertyId) gaPropertyId = data.propertyId;
                 if (data?.measurementId) gaMeasurementId = data.measurementId;
             }
+            if (conf.provider === 'tiktok-pixel' && data?.tiktokPixelId) tiktokPixelId = data.tiktokPixelId;
+            if (conf.provider === 'linkedin-insight' && data?.linkedinPartnerId) linkedinPartnerId = data.linkedinPartnerId;
 
             // Special Case: Facebook provider might also have Pixel ID
             if (conf.provider === 'facebook' && data?.pixelId) fbPixelId = data.pixelId;
@@ -316,7 +320,7 @@ export async function getPublicIntegrations() {
             gaMeasurementId = gaPropertyId;
         }
 
-        const results = { fbPixelId, gtmId, hotjarId, gaPropertyId: gaMeasurementId };
+        const results = { fbPixelId, gtmId, hotjarId, gaPropertyId: gaMeasurementId, tiktokPixelId, linkedinPartnerId };
 
         if (Object.values(results).some(v => !!v)) {
             console.log("[Settings] Public Integrations Found:", JSON.stringify(results));
@@ -327,7 +331,7 @@ export async function getPublicIntegrations() {
         return results;
     } catch (error) {
         console.error("[Settings] Error fetching public integrations:", error);
-        return { fbPixelId: "", gtmId: "", hotjarId: "", gaPropertyId: "" };
+        return { fbPixelId: "", gtmId: "", hotjarId: "", gaPropertyId: "", tiktokPixelId: "", linkedinPartnerId: "" };
     }
 }
 

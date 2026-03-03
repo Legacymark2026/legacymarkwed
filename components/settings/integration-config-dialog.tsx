@@ -37,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IntegrationConfigDialogProps {
-    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar';
+    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar' | 'tiktok-pixel' | 'linkedin-insight';
     title: string;
 }
 
@@ -373,6 +373,104 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                             />
                                         </div>
                                     </div>
+                                ) : provider === 'tiktok-pixel' ? (
+                                    <>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="tiktokPixelId" className="text-xs font-semibold text-gray-700">
+                                                TikTok Pixel ID
+                                            </Label>
+                                            <div className="relative">
+                                                <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                <Input
+                                                    id="tiktokPixelId"
+                                                    value={formData.tiktokPixelId || ''}
+                                                    onChange={e => handleChange('tiktokPixelId', e.target.value)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                    placeholder="e.g., C01XXXXXXXXXX"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-2 mt-4">
+                                            <Label htmlFor="tiktokAccessToken" className="text-xs font-semibold text-gray-700">
+                                                Events API Access Token
+                                            </Label>
+                                            <div className="relative group">
+                                                <Key className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                                                <Input
+                                                    id="tiktokAccessToken"
+                                                    type={showToken ? "text" : "password"}
+                                                    value={formData.tiktokAccessToken || ''}
+                                                    onChange={e => handleChange('tiktokAccessToken', e.target.value)}
+                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-xs focus:bg-white", brandRing)}
+                                                    placeholder="e.g., bc1234..."
+                                                />
+                                                <div className="absolute right-2 top-2 flex gap-1">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600 rounded-md"
+                                                        onClick={() => setShowToken(!showToken)}
+                                                    >
+                                                        {showToken ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                                <Info className="h-3 w-3" />
+                                                Requerido para envíos Server-Side de TikTok.
+                                            </p>
+                                        </div>
+                                    </>
+                                ) : provider === 'linkedin-insight' ? (
+                                    <>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="linkedinPartnerId" className="text-xs font-semibold text-gray-700">
+                                                LinkedIn Partner ID
+                                            </Label>
+                                            <div className="relative">
+                                                <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                <Input
+                                                    id="linkedinPartnerId"
+                                                    value={formData.linkedinPartnerId || ''}
+                                                    onChange={e => handleChange('linkedinPartnerId', e.target.value)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                    placeholder="e.g., 1234567"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-2 mt-4">
+                                            <Label htmlFor="linkedinAccessToken" className="text-xs font-semibold text-gray-700">
+                                                Conversions API Token
+                                            </Label>
+                                            <div className="relative group">
+                                                <Key className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                                                <Input
+                                                    id="linkedinAccessToken"
+                                                    type={showToken ? "text" : "password"}
+                                                    value={formData.linkedinAccessToken || ''}
+                                                    onChange={e => handleChange('linkedinAccessToken', e.target.value)}
+                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-xs focus:bg-white", brandRing)}
+                                                    placeholder="Token..."
+                                                />
+                                                <div className="absolute right-2 top-2 flex gap-1">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600 rounded-md"
+                                                        onClick={() => setShowToken(!showToken)}
+                                                    >
+                                                        {showToken ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                                <Info className="h-3 w-3" />
+                                                Opcional: Si habilitas CAPI, pega el token aquí.
+                                            </p>
+                                        </div>
+                                    </>
                                 ) : isWhatsapp ? (
                                     <>
                                         <div className="grid gap-2">

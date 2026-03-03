@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { detectLeadSource, parseUTMParams, calculateLeadScore, type UTMParams } from "@/lib/lead-source-detector";
 import { sendMetaCapiEvent } from "@/lib/meta-capi";
 import { sendGa4Event } from "@/lib/ga4-mp";
+import { sendTiktokCapiEvent } from "@/lib/tiktok-capi";
+import { sendLinkedinCapiEvent } from "@/lib/linkedin-capi";
 
 // ==================== LEAD TYPES ====================
 
@@ -207,6 +209,36 @@ export async function createLead(input: CreateLeadInput) {
                 lead_status: "NEW"
             }
         }).catch(err => console.error("[LeadsAction] Failed to send GA4-MP event:", err));
+
+        // Trigger TikTok Events API
+        sendTiktokCapiEvent(input.companyId, {
+            eventName: "SubmitForm",
+            eventSourceUrl: input.landingPage || input.referer || undefined,
+            userData: {
+                email: input.email,
+                phone: input.phone || undefined,
+                clientIpAddress: input.ipAddress,
+                clientUserAgent: input.userAgent,
+            },
+            customData: {
+                contentName: "CRM Lead Captured",
+                value: 0,
+                currency: "COP"
+            }
+        }).catch(err => console.error("[LeadsAction] Failed to send TikTok event:", err));
+
+        // Trigger LinkedIn Conversions API
+        sendLinkedinCapiEvent(input.companyId, {
+            conversionInfo: {
+                currencyCode: "COP",
+                amount: 0
+            },
+            userData: {
+                email: input.email,
+                firstName: input.name ? input.name.split(' ')[0] : undefined,
+                lastName: input.name ? input.name.split(' ').slice(1).join(' ') : undefined,
+            }
+        }).catch(err => console.error("[LeadsAction] Failed to send LinkedIn event:", err));
 
         revalidatePath('/dashboard/admin/crm/leads');
         return { success: true, data: lead };

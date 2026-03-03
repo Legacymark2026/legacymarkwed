@@ -1,5 +1,5 @@
 import { getConnectedIntegrations } from "@/actions/integrations";
-import { Facebook, MessageSquare, Activity } from "lucide-react";
+import { Facebook, MessageSquare, Activity, Linkedin, Music2 } from "lucide-react";
 import { MetaConnectButton } from "./meta-connect-button";
 import { MetaDisconnectButton } from "./meta-disconnect-button";
 import { IntegrationConfigDialog } from "./integration-config-dialog";
@@ -15,6 +15,8 @@ export async function MetaIntegrations() {
     const fbConfig = await getIntegrationConfig('facebook');
     const waConfig = await getIntegrationConfig('whatsapp');
     const pixelConfig = await getIntegrationConfig('facebook-pixel');
+    const tiktokConfig = await getIntegrationConfig('tiktok-pixel');
+    const linkedinConfig = await getIntegrationConfig('linkedin-insight');
 
     // Check if WhatsApp is configured (has Phone ID and Access Token)
     const isWhatsappConfigured = !!waConfig?.phoneNumberId && !!waConfig?.accessToken;
@@ -70,6 +72,28 @@ export async function MetaIntegrations() {
                 providerLink="https://business.facebook.com/events_manager2"
                 customConfigureButton={<IntegrationConfigDialog provider="facebook-pixel" title="Meta Pixel" />}
                 metrics={pixelConfig?.pixelId ? [{ label: "Pixel ID", value: String(pixelConfig.pixelId) }] : undefined}
+            />
+
+            <IntegrationAppCard
+                name="TikTok Pixel & Events API"
+                description="Rastrea eventos y maximiza el retorno de anuncios en la red de TikTok."
+                icon={<Music2 className="w-6 h-6 text-pink-600" />}
+                brandColor="bg-gradient-to-r from-pink-600 to-rose-400"
+                status={tiktokConfig?.tiktokPixelId ? "connected" : "disconnected"}
+                providerLink="https://ads.tiktok.com/i18n/events"
+                customConfigureButton={<IntegrationConfigDialog provider="tiktok-pixel" title="TikTok Pixel" />}
+                metrics={tiktokConfig?.tiktokPixelId ? [{ label: "Pixel ID", value: String(tiktokConfig.tiktokPixelId) }] : undefined}
+            />
+
+            <IntegrationAppCard
+                name="LinkedIn Insight Tag & CAPI"
+                description="Sincroniza conversiones B2B de forma precisa con el servidor de LinkedIn."
+                icon={<Linkedin className="w-6 h-6 text-[#0A66C2]" />}
+                brandColor="bg-gradient-to-r from-[#0A66C2] to-blue-400"
+                status={linkedinConfig?.linkedinPartnerId ? "connected" : "disconnected"}
+                providerLink="https://www.linkedin.com/campaignmanager"
+                customConfigureButton={<IntegrationConfigDialog provider="linkedin-insight" title="LinkedIn Insight Tag" />}
+                metrics={linkedinConfig?.linkedinPartnerId ? [{ label: "Partner ID", value: String(linkedinConfig.linkedinPartnerId) }] : undefined}
             />
         </>
     );

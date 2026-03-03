@@ -9,6 +9,8 @@ type AnalyticsConfig = {
     fbPixelId?: string;
     gtmId?: string;
     hotjarId?: string;
+    tiktokPixelId?: string;
+    linkedinPartnerId?: string;
     debug?: boolean;
     userData?: {
         em?: string;
@@ -468,6 +470,46 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                                 r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
                                 a.appendChild(r);
                             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+                        `
+                    }}
+                />
+            )}
+
+            {/* ── TIKTOK PIXEL ── */}
+            {config.tiktokPixelId && (
+                <Script
+                    id="tiktok-pixel-init"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            !function (w, d, t) {
+                              w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+                              ttq.load('${config.tiktokPixelId}');
+                              ttq.page();
+                            }(window, document, 'ttq');
+                        `
+                    }}
+                />
+            )}
+
+            {/* ── LINKEDIN INSIGHT TAG ── */}
+            {config.linkedinPartnerId && (
+                <Script
+                    id="linkedin-insight-tag"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            _linkedin_partner_id = "${config.linkedinPartnerId}";
+                            window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+                            window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+                            (function(l) {
+                            if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+                            window.lintrk.q=[]}
+                            var s = document.getElementsByTagName("script")[0];
+                            var b = document.createElement("script");
+                            b.type = "text/javascript";b.async = true;
+                            b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+                            s.parentNode.insertBefore(b, s);})(window.lintrk);
                         `
                     }}
                 />

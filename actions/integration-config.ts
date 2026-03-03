@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar';
+export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar' | 'tiktok-pixel' | 'linkedin-insight';
 
 export interface IntegrationConfigData {
     // Meta Config
@@ -27,6 +27,14 @@ export interface IntegrationConfigData {
 
     // Hotjar Config
     siteId?: string;
+
+    // TikTok Config
+    tiktokPixelId?: string; // TikTok Pixel ID
+    tiktokAccessToken?: string; // TikTok Events API Access Token
+
+    // LinkedIn Config
+    linkedinPartnerId?: string; // LinkedIn Insight Tag Partner ID
+    linkedinAccessToken?: string; // LinkedIn Conversions API Token
 }
 
 export async function getIntegrationConfig(provider: IntegrationProvider): Promise<IntegrationConfigData | null> {
