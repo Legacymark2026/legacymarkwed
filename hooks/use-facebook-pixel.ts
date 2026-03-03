@@ -9,15 +9,17 @@ export const useFacebookPixel = () => {
         import("react-facebook-pixel").then((x) => setPixel(x.default));
     }, []);
 
-    const trackEvent = (event: string, data?: unknown) => {
+    const trackEvent = (event: string, data?: any) => {
         if (pixel) {
-            pixel.track(event, data);
+            const payload = { currency: 'USD', value: 0.00, ...(data || {}) };
+            pixel.track(event, payload);
         }
     };
 
-    const trackCustom = (event: string, data?: unknown) => {
+    const trackCustom = (event: string, data?: any) => {
         if (pixel) {
-            pixel.trackCustom(event, data);
+            const payload = { currency: 'USD', value: 0.00, ...(data || {}) };
+            pixel.trackCustom(event, payload);
         }
     };
 
