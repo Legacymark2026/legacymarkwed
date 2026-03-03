@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { detectLeadSource, parseUTMParams, calculateLeadScore, type UTMParams } from "@/lib/lead-source-detector";
+import { sendMetaCapiEvent } from "@/lib/meta-capi";
 
 // ==================== LEAD TYPES ====================
 
@@ -168,6 +169,27 @@ export async function createLead(input: CreateLeadInput) {
                 campaign: true,
             }
         });
+
+        // Trigger Meta Conversions API Event
+        sendMetaCapiEvent(input.companyId, {
+            eventName: "Lead",
+            actionSource: "website",
+            eventSourceUrl: input.landingPage || input.referer || undefined,
+            userData: {
+                em: input.email,
+                ph: input.phone || undefined,
+                fn: input.name ? input.name.split(' ')[0] : undefined,
+                ln: input.name ? input.name.split(' ').slice(1).join(' ') : undefined,
+                client_ip_address: input.ipAddress,
+                client_user_agent: input.userAgent,
+            },
+            customData: {
+                content_name: "CRM Lead Captured",
+                status: "NEW",
+                currency: "COP",
+                value: 0.00
+            }
+        }).catch(err => console.error("[LeadsAction] Failed to send CAPI event:", err));
 
         revalidatePath('/dashboard/admin/crm/leads');
         return { success: true, data: lead };

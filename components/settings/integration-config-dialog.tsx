@@ -278,21 +278,54 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                         </div>
                                     </div>
                                 ) : provider === 'facebook-pixel' ? (
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="pixelId" className="text-xs font-semibold text-gray-700">
-                                            Pixel ID
-                                        </Label>
-                                        <div className="relative">
-                                            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                                            <Input
-                                                id="pixelId"
-                                                value={formData.pixelId || ''}
-                                                onChange={e => handleChange('pixelId', e.target.value)}
-                                                className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
-                                                placeholder="e.g., 123456789012345"
-                                            />
+                                    <>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="pixelId" className="text-xs font-semibold text-gray-700">
+                                                Pixel ID
+                                            </Label>
+                                            <div className="relative">
+                                                <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                                <Input
+                                                    id="pixelId"
+                                                    value={formData.pixelId || ''}
+                                                    onChange={e => handleChange('pixelId', e.target.value)}
+                                                    className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                    placeholder="e.g., 123456789012345"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div className="grid gap-2 mt-4">
+                                            <Label htmlFor="capiToken" className="text-xs font-semibold text-gray-700">
+                                                Conversions API Token
+                                            </Label>
+                                            <div className="relative group">
+                                                <Key className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                                                <Input
+                                                    id="capiToken"
+                                                    type={showToken ? "text" : "password"}
+                                                    value={formData.capiToken || ''}
+                                                    onChange={e => handleChange('capiToken', e.target.value)}
+                                                    className={cn("pl-9 pr-20 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white font-mono text-xs focus:bg-white", brandRing)}
+                                                    placeholder="EAAG..."
+                                                />
+                                                <div className="absolute right-2 top-2 flex gap-1">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-6 w-6 text-gray-400 hover:text-gray-600 rounded-md"
+                                                        onClick={() => setShowToken(!showToken)}
+                                                    >
+                                                        {showToken ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                                <Info className="h-3 w-3" />
+                                                Generado en el Administrador de Eventos para envíos Server-Side.
+                                            </p>
+                                        </div>
+                                    </>
                                 ) : provider === 'hotjar' ? (
                                     <div className="grid gap-2">
                                         <Label htmlFor="siteId" className="text-xs font-semibold text-gray-700">

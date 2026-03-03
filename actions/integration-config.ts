@@ -15,6 +15,7 @@ export interface IntegrationConfigData {
     phoneNumberId?: string; // WhatsApp
     wabaId?: string; // WhatsApp Business Account ID
     pixelId?: string; // Facebook Pixel
+    capiToken?: string; // Conversions API Access Token
 
     // Google Config
     measurementId?: string; // GA4 Measurement ID (G-XXXXXXXX) — used by gtag.js in browser
