@@ -48,8 +48,8 @@ export function IntegrationAppCard({
 
                     <div className="flex items-center gap-2">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${isConnected ? "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20" :
-                                status === "error" ? "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20" :
-                                    "bg-slate-50 text-slate-500 ring-1 ring-inset ring-slate-500/20"
+                            status === "error" ? "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20" :
+                                "bg-slate-50 text-slate-500 ring-1 ring-inset ring-slate-500/20"
                             }`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-emerald-500" : status === "error" ? "bg-red-500" : "bg-slate-400"}`}></span>
                             {isConnected ? "Conectado" : status === "error" ? "Error" : "Desconectado"}
@@ -102,11 +102,14 @@ export function IntegrationAppCard({
                             )}
                         </>
                     ) : (
-                        customConnectButton ? customConnectButton : onConnect && (
-                            <Button size="sm" onClick={onConnect} className="h-8 w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white">
-                                Conectar
-                            </Button>
-                        )
+                        <div className="flex items-center gap-2">
+                            {customConfigureButton && customConfigureButton}
+                            {customConnectButton ? customConnectButton : onConnect && (
+                                <Button size="sm" onClick={onConnect} className="h-8 w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white">
+                                    Conectar
+                                </Button>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
