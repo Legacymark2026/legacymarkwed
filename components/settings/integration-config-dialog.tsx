@@ -37,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IntegrationConfigDialogProps {
-    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar' | 'tiktok-pixel' | 'linkedin-insight';
+    provider: 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar' | 'tiktok-pixel' | 'linkedin-insight' | 'google-ads';
     title: string;
 }
 
@@ -471,6 +471,26 @@ export function IntegrationConfigDialog({ provider, title }: IntegrationConfigDi
                                             </p>
                                         </div>
                                     </>
+                                ) : provider === 'google-ads' ? (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="googleAdsId" className="text-xs font-semibold text-gray-700">
+                                            Google Ads Conversion ID (AW-Tag)
+                                        </Label>
+                                        <div className="relative">
+                                            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                            <Input
+                                                id="googleAdsId"
+                                                value={formData.googleAdsId || ''}
+                                                onChange={e => handleChange('googleAdsId', e.target.value)}
+                                                className={cn("pl-9 h-10 transition-all bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white focus:bg-white", brandRing)}
+                                                placeholder="e.g., AW-123456789"
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                            <Info className="h-3 w-3" />
+                                            Utilizado para conversiones y remarketing dinámico.
+                                        </p>
+                                    </div>
                                 ) : isWhatsapp ? (
                                     <>
                                         <div className="grid gap-2">

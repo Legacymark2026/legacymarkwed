@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar' | 'tiktok-pixel' | 'linkedin-insight';
+export type IntegrationProvider = 'facebook' | 'whatsapp' | 'instagram' | 'google-analytics' | 'google-tag-manager' | 'facebook-pixel' | 'hotjar' | 'tiktok-pixel' | 'linkedin-insight' | 'google-ads';
 
 export interface IntegrationConfigData {
     // Meta Config
@@ -24,6 +24,7 @@ export interface IntegrationConfigData {
     clientEmail?: string; // GA4 Data API Service Account
     privateKey?: string; // GA4 Data API Private Key
     containerId?: string; // GTM
+    googleAdsId?: string; // Google Ads AW- tag
 
     // Hotjar Config
     siteId?: string;

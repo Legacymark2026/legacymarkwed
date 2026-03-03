@@ -11,6 +11,7 @@ type AnalyticsConfig = {
     hotjarId?: string;
     tiktokPixelId?: string;
     linkedinPartnerId?: string;
+    googleAdsId?: string;
     debug?: boolean;
     userData?: {
         em?: string;
@@ -431,6 +432,31 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                         `
                     }}
                 />
+            )}
+
+            {/* ── GOOGLE ADS (REMARKETING / CONVERSIONS) ── */}
+            {config.googleAdsId && (
+                <>
+                    <Script
+                        id="google-ads-lib"
+                        src={`https://www.googletagmanager.com/gtag/js?id=${config.googleAdsId}`}
+                        strategy="afterInteractive"
+                    />
+                    <Script
+                        id="google-ads-init"
+                        strategy="afterInteractive"
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                                window.dataLayer = window.dataLayer || [];
+                                function gtag(){dataLayer.push(arguments);}
+                                gtag('js', new Date());
+                                gtag('config', '${config.googleAdsId}', {
+                                    allow_enhanced_conversions: true
+                                });
+                            `
+                        }}
+                    />
+                </>
             )}
 
             {/* ── FACEBOOK PIXEL ── */}

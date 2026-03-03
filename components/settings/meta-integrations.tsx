@@ -1,5 +1,5 @@
 import { getConnectedIntegrations } from "@/actions/integrations";
-import { Facebook, MessageSquare, Activity, Linkedin, Music2 } from "lucide-react";
+import { Facebook, MessageSquare, Activity, Linkedin, Music2, Megaphone } from "lucide-react";
 import { MetaConnectButton } from "./meta-connect-button";
 import { MetaDisconnectButton } from "./meta-disconnect-button";
 import { IntegrationConfigDialog } from "./integration-config-dialog";
@@ -17,6 +17,7 @@ export async function MetaIntegrations() {
     const pixelConfig = await getIntegrationConfig('facebook-pixel');
     const tiktokConfig = await getIntegrationConfig('tiktok-pixel');
     const linkedinConfig = await getIntegrationConfig('linkedin-insight');
+    const googleAdsConfig = await getIntegrationConfig('google-ads');
 
     // Check if WhatsApp is configured (has Phone ID and Access Token)
     const isWhatsappConfigured = !!waConfig?.phoneNumberId && !!waConfig?.accessToken;
@@ -94,6 +95,17 @@ export async function MetaIntegrations() {
                 providerLink="https://www.linkedin.com/campaignmanager"
                 customConfigureButton={<IntegrationConfigDialog provider="linkedin-insight" title="LinkedIn Insight Tag" />}
                 metrics={linkedinConfig?.linkedinPartnerId ? [{ label: "Partner ID", value: String(linkedinConfig.linkedinPartnerId) }] : undefined}
+            />
+
+            <IntegrationAppCard
+                name="Google Ads (AW-Tag)"
+                description="Habilita conversiones mejoradas y remarketing en la red de búsqueda y display de Google."
+                icon={<Megaphone className="w-6 h-6 text-[#4285F4]" />}
+                brandColor="bg-gradient-to-r from-[#4285F4] to-blue-400"
+                status={googleAdsConfig?.googleAdsId ? "connected" : "disconnected"}
+                providerLink="https://ads.google.com"
+                customConfigureButton={<IntegrationConfigDialog provider="google-ads" title="Google Ads" />}
+                metrics={googleAdsConfig?.googleAdsId ? [{ label: "AW Tag ID", value: String(googleAdsConfig.googleAdsId) }] : undefined}
             />
         </>
     );
