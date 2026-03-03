@@ -67,7 +67,7 @@ export async function MetaIntegrations() {
                 icon={<Activity className="w-6 h-6 text-indigo-600" />}
                 brandColor="bg-gradient-to-r from-blue-600 to-indigo-600"
                 status={pixelConfig?.pixelId ? "connected" : "disconnected"}
-                providerLink="https://events_manager2.facebook.com/"
+                providerLink="https://business.facebook.com/events_manager2"
                 customConfigureButton={<IntegrationConfigDialog provider="facebook-pixel" title="Meta Pixel" />}
                 metrics={pixelConfig?.pixelId ? [{ label: "Pixel ID", value: String(pixelConfig.pixelId) }] : undefined}
             />
