@@ -24,7 +24,7 @@ async function verifyInstagramSync() {
     console.log("User:", user.email, `(${user.id})`);
 
     try {
-        const pages = await MetaService.getConnectedPages(user.id);
+        const { pages } = await MetaService.getConnectedPages(user.id);
         console.log(`✅ Found ${pages.length} Pages.`);
 
         for (const page of pages) {

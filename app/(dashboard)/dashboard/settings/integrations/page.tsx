@@ -2,11 +2,17 @@ import { GoogleIntegrations } from "@/components/settings/google-integrations";
 import { MetaIntegrations } from "@/components/settings/meta-integrations";
 import { HotjarIntegrations } from "@/components/settings/hotjar-integrations";
 
+import { IntegrationsToastHandler } from "@/components/settings/integrations-toast-handler";
+import { Suspense } from "react";
+
 export const dynamic = 'force-dynamic';
 
 export default function SettingsIntegrationsPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">
+            <Suspense fallback={null}>
+                <IntegrationsToastHandler />
+            </Suspense>
             <div>
                 <h2 className="text-xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-4">
                     App Store de Integraciones

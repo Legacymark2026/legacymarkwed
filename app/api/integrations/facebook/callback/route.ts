@@ -10,11 +10,11 @@ export async function GET(req: NextRequest) {
     const error = searchParams.get("error");
 
     if (error) {
-        return NextResponse.redirect(new URL("/dashboard/settings?error=" + error, req.url));
+        return NextResponse.redirect(new URL("/dashboard/settings/integrations?error=" + error, req.url));
     }
 
     if (!code) {
-        return NextResponse.redirect(new URL("/dashboard/settings?error=no_code", req.url));
+        return NextResponse.redirect(new URL("/dashboard/settings/integrations?error=no_code", req.url));
     }
 
     try {
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
         // Note: Check session usually, but for callback we might rely on state or just identifying the user 
         // For now, let's assume valid session or we can't save.
         if (!session?.user?.id) {
-            return NextResponse.redirect(new URL("/auth/login?returnUrl=/dashboard/settings", req.url));
+            return NextResponse.redirect(new URL("/auth/login?returnUrl=/dashboard/settings/integrations", req.url));
         }
 
         // 1. Get App Config from DB
@@ -204,7 +204,7 @@ export async function GET(req: NextRequest) {
 
         // 5. Redirect Success
         // Use the sanitized 'origin' to ensure we don't redirect to an internal localhost
-        return NextResponse.redirect(`${origin}/dashboard/settings?tab=integrations&success=facebook_connected`);
+        return NextResponse.redirect(`${origin}/dashboard/settings/integrations?success=facebook_connected`);
 
     } catch (error: any) {
         console.error("[Facebook Callback] Error:", error);
@@ -213,6 +213,6 @@ export async function GET(req: NextRequest) {
             ? process.env.NEXTAUTH_URL
             : new URL(req.url).origin;
 
-        return NextResponse.redirect(`${base}/dashboard/settings?error=${encodeURIComponent(error.message)}`);
+        return NextResponse.redirect(`${base}/dashboard/settings/integrations?error=${encodeURIComponent(error.message)}`);
     }
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 export const MetaService = {
     async getConnectedPages(userId: string, companyId?: string) {
         let pages: any[] = [];
+        let hasAccountEntry = false;
 
         try {
             const user = await prisma.user.findUnique({
@@ -10,9 +11,10 @@ export const MetaService = {
                 include: { profile: true, accounts: true }
             });
 
-            if (!user) return [];
+            if (!user) return { pages: [], hasAccountEntry: false };
 
             const account = user.accounts.find(a => a.provider === 'facebook');
+            hasAccountEntry = !!account;
 
             if (account && account.access_token) {
                 console.log('[MetaSync] Found Facebook Account. Token Length:', account.access_token.length);
@@ -84,7 +86,7 @@ export const MetaService = {
             console.error('[MetaSync] Fatal Error in getConnectedPages:', e);
         }
 
-        return pages;
+        return { pages, hasAccountEntry };
     },
 
     // 2. Get conversations for a page (Generic)
@@ -181,13 +183,15 @@ export const MetaSyncService = {
         console.log(`[MetaSync] Starting sync for user ${userId} in company ${companyId}`);
 
         // 1. Get user's pages
-        const pages = await MetaService.getConnectedPages(userId, companyId);
+        const { pages, hasAccountEntry } = await MetaService.getConnectedPages(userId, companyId);
 
         if (pages.length === 0) {
             console.error('[MetaSync] No pages found. Aborting.');
             return {
                 success: false,
-                error: "No Facebook pages connected. Please check permissions."
+                error: hasAccountEntry
+                    ? "Meta account is connected, but no Facebook pages were found. Ensure you have granted page permissions and have a business page."
+                    : "No Meta account connected for this workspace. Please connect Facebook in Settings > Integrations."
             };
         }
 

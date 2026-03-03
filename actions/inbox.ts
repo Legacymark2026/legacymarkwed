@@ -194,7 +194,7 @@ export async function sendMessage(conversationId: string, content: string, userI
 
             // We need the page access token.
             // Improvement: Store pageAccessToken in Account or Metadata. For now, fetch from User Accounts.
-            const pages = await MetaService.getConnectedPages(userId, conversation.companyId);
+            const { pages } = await MetaService.getConnectedPages(userId, conversation.companyId);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const page = pages.find((p: any) => p.id === meta.pageId);
 
@@ -378,8 +378,10 @@ export async function syncMetaConversations() {
     const session = await auth();
 
     if (!session?.user?.id) {
+        console.error("[syncMetaConversations] Unauthorized. No session.");
         return { success: false, error: "Unauthorized" };
     }
+    console.log(`[syncMetaConversations] Caller: ${session.user.id}`);
 
     // A-5: Rate limit para sincronización Meta (5 veces por minuto)
     const allowed = rateLimit(`sync_meta:${session.user.id}`, 5, 60_000);
@@ -396,6 +398,7 @@ export async function syncMetaConversations() {
     }
 
     try {
+        console.log(`[syncMetaConversations] Executing for user ${session.user.id}, company ${userCompany.companyId}`);
         const { MetaSyncService } = await import("@/lib/services/meta-sync");
         const result = await MetaSyncService.syncAllConversations(
             session.user.id,

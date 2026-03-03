@@ -23,7 +23,7 @@ export function MetaConnectButton({ provider, appId, redirectUri: propRedirectUr
                 window.location.href = authUrl;
             } else {
                 // Fallback to NextAuth if no custom ID (or for other providers)
-                await signIn(provider, { callbackUrl: '/dashboard/settings?tab=integrations' });
+                await signIn(provider, { callbackUrl: '/dashboard/settings/integrations' });
             }
         } catch (error) {
             console.error("Connection failed", error);
