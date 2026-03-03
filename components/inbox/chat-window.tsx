@@ -58,7 +58,7 @@ function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSr
     };
 
     return (
-        <div className="flex items-center gap-3 min-w-[200px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
+        <div className="flex items-center gap-3 min-w-[200px] max-w-[300px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
                 src={audioSrc || "https://upload.wikimedia.org/wikipedia/commons/d/d9/1_second_tone.ogg"}
