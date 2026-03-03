@@ -61,14 +61,14 @@ function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSr
         <div className="flex items-center gap-3 min-w-[200px] max-w-[300px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
-                src={audioSrc || "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"}
+                src={audioSrc || "https://www.w3schools.com/html/horse.mp3"}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => { setIsPlaying(false); setProgress(0); }}
                 onError={(e) => {
-                    // Si falla el archivo original/ogg, intentar con un MP3 de respaldo
                     const target = e.target as HTMLAudioElement;
-                    if (target.src !== "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3") {
-                        target.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+                    if (target.src !== "https://www.w3schools.com/html/horse.mp3") {
+                        target.src = "https://www.w3schools.com/html/horse.mp3";
+                        target.play().catch(err => console.error("Fallback play failed", err));
                     } else {
                         console.error("Audio error", e);
                     }
