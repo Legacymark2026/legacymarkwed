@@ -99,10 +99,10 @@ export async function DashboardSidebar({ role, name, email, image }: DashboardSi
     return (
         <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col shadow-sm z-10">
             {/* Logo */}
-            <div className="h-16 flex items-center px-6 border-b border-gray-100 bg-white/50 backdrop-blur-sm">
-                <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative h-8 w-[140px] transition-opacity hover:opacity-80">
-                        <Image src="/logo.png" alt="LegacyMark" fill className="object-contain object-left" />
+            <div className="h-28 flex items-center justify-center border-b border-gray-100 bg-white/50 backdrop-blur-sm px-4">
+                <Link href="/" className="flex items-center justify-center group w-full h-full">
+                    <div className="relative h-20 w-[200px] transition-all duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-1 group-hover:drop-shadow-[0_10px_15px_rgba(20,184,166,0.3)]">
+                        <Image src="/logo.png" alt="LegacyMark" fill className="object-contain" priority />
                     </div>
                 </Link>
             </div>
