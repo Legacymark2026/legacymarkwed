@@ -10,6 +10,12 @@ type AnalyticsConfig = {
     gtmId?: string;
     hotjarId?: string;
     debug?: boolean;
+    userData?: {
+        em?: string;
+        fn?: string;
+        ln?: string;
+        ph?: string;
+    };
 };
 
 // ─────────────────────────────────────────────
@@ -440,7 +446,7 @@ export function AnalyticsProvider({ config }: { config: AnalyticsConfig }) {
                             t.src=v;s=b.getElementsByTagName(e)[0];
                             s.parentNode.insertBefore(t,s)}(window, document,'script',
                             'https://connect.facebook.net/en_US/fbevents.js');
-                            fbq('init', '${config.fbPixelId}');
+                            fbq('init', '${config.fbPixelId}'${config.userData ? `, ${JSON.stringify(config.userData)}` : ''});
                             fbq('track', 'PageView');
                         `
                     }}

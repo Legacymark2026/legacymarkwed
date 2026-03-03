@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import { Providers } from "@/components/providers";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { getPublicIntegrations } from "@/actions/settings";
+import { auth } from "@/lib/auth";
 import { Suspense } from "react";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { CustomCursor } from "@/components/ui/custom-cursor";
@@ -74,7 +75,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const integrations = await getPublicIntegrations();
-  console.log("DEBUG: RootLayout integrations:", JSON.stringify(integrations, null, 2));
+  const session = await auth();
+
+  let userData: { em?: string; fn?: string; ln?: string; ph?: string } | undefined;
+  if (session?.user) {
+    // Advanced Matching format: strictly lowercase string, no leading/trailing spaces
+    userData = {
+      em: session.user.email?.toLowerCase().trim() || undefined,
+      fn: session.user.name?.split(' ')[0]?.toLowerCase().trim() || undefined,
+      ln: session.user.name?.split(' ').slice(1).join(' ')?.toLowerCase().trim() || undefined,
+    };
+    // remove undefined keys
+    Object.keys(userData).forEach(key => (userData as any)[key] === undefined && delete (userData as any)[key]);
+  }
 
   return (
     <html lang="es" suppressHydrationWarning>
@@ -85,6 +98,7 @@ export default async function RootLayout({
           <Suspense fallback={null}>
             <AnalyticsProvider config={{
               ...integrations,
+              userData,
               debug: process.env.NODE_ENV === 'development'
             }} />
           </Suspense>
