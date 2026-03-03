@@ -61,10 +61,18 @@ function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSr
         <div className="flex items-center gap-3 min-w-[200px] max-w-[300px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
-                src={audioSrc || "https://upload.wikimedia.org/wikipedia/commons/d/d9/1_second_tone.ogg"}
+                src={audioSrc || "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => { setIsPlaying(false); setProgress(0); }}
-                onError={(e) => console.error("Audio error", e)}
+                onError={(e) => {
+                    // Si falla el archivo original/ogg, intentar con un MP3 de respaldo
+                    const target = e.target as HTMLAudioElement;
+                    if (target.src !== "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3") {
+                        target.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+                    } else {
+                        console.error("Audio error", e);
+                    }
+                }}
             />
             <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-blue-500 hover:bg-blue-600 text-white shadow-md border-transparent flex items-center justify-center transition-all" onClick={togglePlay}>
                 {isPlaying ? <Pause width="14" height="14" className="fill-current ml-0.5" /> : <Play width="14" height="14" className="fill-current ml-0.5" />}
