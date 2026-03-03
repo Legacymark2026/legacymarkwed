@@ -88,8 +88,10 @@ export async function GET(req: NextRequest) {
         console.log(`[Facebook Callback] Origin used: ${origin}`);
         console.log(`[Facebook Callback] Redirect URI sent to FB: ${redirectUri}`);
 
-        // IMPORTANT: Params must be encoded
-        const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${config.appId}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${config.appSecret}&code=${code}`;
+        // IMPORTANT: Params must be encoded, also trim to prevent accidental whitespaces
+        const cleanAppId = config.appId.trim();
+        const cleanAppSecret = config.appSecret.trim();
+        const tokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?client_id=${cleanAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${cleanAppSecret}&code=${code}`;
 
         const tokenRes = await fetch(tokenUrl);
         const tokenData = await tokenRes.json();
@@ -102,7 +104,7 @@ export async function GET(req: NextRequest) {
         const shortLivedToken = tokenData.access_token;
 
         // 3. Exchange for Long-Lived Token
-        const longLivedUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${config.appId}&client_secret=${config.appSecret}&fb_exchange_token=${shortLivedToken}`;
+        const longLivedUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${cleanAppId}&client_secret=${cleanAppSecret}&fb_exchange_token=${shortLivedToken}`;
 
         const longLivedRes = await fetch(longLivedUrl);
         const longLivedData = await longLivedRes.json();
