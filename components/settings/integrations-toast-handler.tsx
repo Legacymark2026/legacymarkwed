@@ -44,7 +44,9 @@ export function IntegrationsToastHandler() {
                                 return `¡Todo listo! Sincronizados ${data.conversationsSynced || 0} chats y ${data.messagesSynced || 0} mensajes.`;
                             }
                             if (data && !data.success) {
-                                return `La cuenta se conectó, pero hubo un error al sincronizar mensajes: ${data.error || 'Error desconocido'}`;
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                const errorMessage = (data as any).error || ((data as any).errors && (data as any).errors[0]) || 'Error desconocido';
+                                return `La cuenta se conectó, pero hubo un error al sincronizar mensajes: ${errorMessage}`;
                             }
                             return "¡Cuenta de Meta conectada y sincronizada correctamente!";
                         },
