@@ -153,6 +153,11 @@ export default function PrivacyPolicyPage() {
                             <p>
                                 Nos comprometemos a proteger tu privacidad y a tratar tus datos con la más absoluta <strong>transparencia, lealtad y seguridad</strong>, en estricto cumplimiento de la Ley 1581 de 2012 y demás normas vigentes.
                             </p>
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 mt-6 rounded-r-lg">
+                                <p className="text-sm text-blue-800 dark:text-blue-200 m-0">
+                                    <strong>Uso de APIs y Plataformas de Terceros (Meta, Google, etc.):</strong> Nuestro negocio utiliza los datos proporcionados por la plataforma exclusivamente para prestar servicios de marketing digital y desarrollo web en nombre de nuestros clientes. Esto incluye la gestión y optimización de campañas publicitarias, análisis de métricas de rendimiento, segmentación de audiencias, implementación de píxeles y APIs de conversión. La información obtenida se utiliza únicamente con el fin de planificar, ejecutar, medir y mejorar las estrategias digitales. <strong>No vendemos, compartimos ni utilizamos estos datos para fines propios</strong> o distintos a la prestación de los servicios contratados.
+                                </p>
+                            </div>
                         </motion.div>
 
                         {/* 8. Card Layout for Sections */}
@@ -233,9 +238,10 @@ export default function PrivacyPolicyPage() {
                         </SectionCard>
 
                         {/* 7. Derechos */}
-                        <SectionCard id="rights" title="7. Tus Derechos" icon={<Shield className="w-6 h-6 text-emerald-600" />}>
+                        <SectionCard id="rights" title="7. Tus Derechos y Eliminación de Datos" icon={<Shield className="w-6 h-6 text-emerald-600" />}>
+                            <p className="text-gray-600 mb-4">Tienes control total sobre tu información. Puedes ejercer los siguientes derechos en cualquier momento:</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {["Conocer, actualizar y rectificar", "Solicitar prueba de autorización", "Ser informado del uso", "Revocar autorización", "Acceder gratuitamente", "Presentar quejas ante la SIC"].map((right, idx) => (
+                                {["Conocer, actualizar y rectificar", "Solicitar eliminación o borrado de datos", "Solicitar prueba de autorización", "Ser informado del uso", "Revocar autorización", "Acceder gratuitamente", "Presentar quejas ante la SIC"].map((right, idx) => (
                                     <div key={idx} className="flex items-start p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700">
                                         <Check className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                                         <span className="text-sm text-gray-700 dark:text-gray-300">{right}</span>
