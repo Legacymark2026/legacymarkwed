@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 export const MetaService = {
-    async getConnectedPages(userId: string) {
+    async getConnectedPages(userId: string, companyId?: string) {
         let pages: any[] = [];
 
         try {
@@ -35,14 +35,12 @@ export const MetaService = {
                 console.log('[MetaSync] No Facebook OAuth account or token found, checking manual fallbacks.');
             }
 
-            // --- MANUAL OVERRIDE CHECK ---
+            // --- MANUAL OVERRIDE CHECK (From Profile Metadata) ---
             const profile = user.profile;
             if (profile && profile.metadata) {
                 const meta = profile.metadata as any;
                 if (meta.manualConnectedPageId) {
                     console.log(`[MetaSync] Found MANUAL PAGE override: ${meta.manualConnectedPageId}`);
-
-                    // Check if already in list to avoid duplicates
                     const exists = pages.find((p: any) => p.id === meta.manualConnectedPageId);
                     if (!exists) {
                         pages.push({
@@ -50,12 +48,38 @@ export const MetaService = {
                             name: meta.manualConnectedPageName || 'Manually Linked Page',
                             category: 'Manual Link',
                             tasks: ['MANAGE', 'MESSAGING'],
-                            access_token: meta.manualConnectedPageToken // The manual token
+                            access_token: meta.manualConnectedPageToken
                         });
-                        console.log('[MetaSync] Injected manual page into sync list.');
+                        console.log('[MetaSync] Injected profile manual page into sync list.');
                     }
                 }
             }
+
+            // --- MANUAL OVERRIDE CHECK (From IntegrationConfig) ---
+            if (pages.length === 0 && companyId) {
+                const fallbackConfig = await prisma.integrationConfig.findFirst({
+                    where: { provider: 'facebook', companyId }
+                });
+
+                const fbConfigObj = fallbackConfig?.config as any;
+
+                if (fbConfigObj && fbConfigObj.accessToken) {
+                    console.log('[MetaSync] API returned 0 pages, trying manual accessToken from IntegrationConfig.');
+                    // Use the token to fetch "me/accounts" since OAuth gives a User token.
+                    const accountsRes = await fetch(`https://graph.facebook.com/v19.0/me/accounts?access_token=${fbConfigObj.accessToken}`);
+                    const accountsData = await accountsRes.json();
+
+                    if (accountsData.error) {
+                        console.error('[MetaSync] Fallback IntegrationConfig token error:', accountsData.error);
+                    } else if (accountsData.data && accountsData.data.length > 0) {
+                        pages.push(...accountsData.data);
+                        console.log(`[MetaSync] Recovered ${accountsData.data.length} Pages via IntegrationConfig token fallback.`);
+                    } else {
+                        console.log('[MetaSync] Fallback token valid but no pages found.');
+                    }
+                }
+            }
+
         } catch (e) {
             console.error('[MetaSync] Fatal Error in getConnectedPages:', e);
         }
@@ -157,7 +181,7 @@ export const MetaSyncService = {
         console.log(`[MetaSync] Starting sync for user ${userId} in company ${companyId}`);
 
         // 1. Get user's pages
-        const pages = await MetaService.getConnectedPages(userId);
+        const pages = await MetaService.getConnectedPages(userId, companyId);
 
         if (pages.length === 0) {
             console.error('[MetaSync] No pages found. Aborting.');

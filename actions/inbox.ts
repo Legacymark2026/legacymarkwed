@@ -194,7 +194,7 @@ export async function sendMessage(conversationId: string, content: string, userI
 
             // We need the page access token.
             // Improvement: Store pageAccessToken in Account or Metadata. For now, fetch from User Accounts.
-            const pages = await MetaService.getConnectedPages(userId);
+            const pages = await MetaService.getConnectedPages(userId, conversation.companyId);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const page = pages.find((p: any) => p.id === meta.pageId);
 

@@ -122,10 +122,47 @@ export async function GET(req: NextRequest) {
         console.log(`[Facebook Callback] Fetched User ID: ${facebookUserId}`);
 
         // 4. Save to DB (Configuration)
-        await updateIntegrationConfig('facebook', {
-            ...config,
-            accessToken: finalToken
-        });
+        // CRITICAL FIX: Writing directly using prisma instead of server action to avoid context issues inside API routes
+        try {
+            let targetCompanyId = null;
+            const userCompany = await prisma.companyUser.findFirst({
+                where: { userId: session.user.id },
+                select: { companyId: true }
+            });
+
+            if (userCompany) {
+                targetCompanyId = userCompany.companyId;
+            } else {
+                const firstCompany = await prisma.company.findFirst();
+                if (firstCompany) targetCompanyId = firstCompany.id;
+            }
+
+            if (targetCompanyId) {
+                await prisma.integrationConfig.upsert({
+                    where: {
+                        companyId_provider: {
+                            companyId: targetCompanyId,
+                            provider: 'facebook'
+                        }
+                    },
+                    update: {
+                        config: { ...config, accessToken: finalToken } as any,
+                        isEnabled: true
+                    },
+                    create: {
+                        companyId: targetCompanyId,
+                        provider: 'facebook',
+                        config: { ...config, accessToken: finalToken } as any,
+                        isEnabled: true
+                    }
+                });
+                console.log("[Facebook Callback] Successfully saved IntegrationConfig directly.");
+            } else {
+                console.error("[Facebook Callback] Failed to save IntegrationConfig: No company found.");
+            }
+        } catch (e) {
+            console.error("[Facebook Callback] Prisma error saving IntegrationConfig:", e);
+        }
 
         // 4.5 Save to DB (Account/Connection Status)
         // CRITICAL: This is what the UI checks to show "Connected" badge
