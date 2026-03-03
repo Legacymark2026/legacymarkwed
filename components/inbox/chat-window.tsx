@@ -42,7 +42,8 @@ function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSr
                     setIsPlaying(true);
                 }).catch(error => {
                     console.error("Audio playback prevented:", error);
-                    toast.error("No se pudo reproducir el audio. Verifica tu conexión o formato.");
+                    setIsPlaying(false);
+                    toast.error("No se pudo reproducir el audio. El archivo puede estar corrupto o bloqueado por CORS.");
                 });
             } else {
                 setIsPlaying(true);
@@ -60,9 +61,10 @@ function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSr
         <div className="flex items-center gap-3 min-w-[200px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
-                src={audioSrc || "https://actions.google.com/sounds/v1/water/glass_water_pour.ogg"}
+                src={audioSrc || "https://upload.wikimedia.org/wikipedia/commons/d/d9/1_second_tone.ogg"}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => { setIsPlaying(false); setProgress(0); }}
+                onError={(e) => console.error("Audio error", e)}
             />
             <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-blue-500 hover:bg-blue-600 text-white shadow-md border-transparent flex items-center justify-center transition-all" onClick={togglePlay}>
                 {isPlaying ? <Pause width="14" height="14" className="fill-current ml-0.5" /> : <Play width="14" height="14" className="fill-current ml-0.5" />}
