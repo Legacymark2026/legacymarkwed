@@ -20,8 +20,9 @@ export interface IntegrationConfigData {
     // Google Config
     measurementId?: string; // GA4 Measurement ID (G-XXXXXXXX) — used by gtag.js in browser
     propertyId?: string; // GA4 Property ID (numeric) — used by server-side Reporting API
-    clientEmail?: string; // GA4
-    privateKey?: string; // GA4
+    apiSecret?: string; // GA4 Measurement Protocol API Secret
+    clientEmail?: string; // GA4 Data API Service Account
+    privateKey?: string; // GA4 Data API Private Key
     containerId?: string; // GTM
 
     // Hotjar Config

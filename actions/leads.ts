@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { detectLeadSource, parseUTMParams, calculateLeadScore, type UTMParams } from "@/lib/lead-source-detector";
 import { sendMetaCapiEvent } from "@/lib/meta-capi";
+import { sendGa4Event } from "@/lib/ga4-mp";
 
 // ==================== LEAD TYPES ====================
 
@@ -190,6 +191,22 @@ export async function createLead(input: CreateLeadInput) {
                 value: 0.00
             }
         }).catch(err => console.error("[LeadsAction] Failed to send CAPI event:", err));
+
+        // Trigger Google Analytics 4 Measurement Protocol Event
+        sendGa4Event(input.companyId, {
+            eventName: "generate_lead",
+            userData: {
+                email: input.email,
+                phone: input.phone || undefined,
+                firstName: input.name ? input.name.split(' ')[0] : undefined,
+                lastName: input.name ? input.name.split(' ').slice(1).join(' ') : undefined,
+            },
+            eventParams: {
+                lead_source: sourceResult.source,
+                lead_score: score,
+                lead_status: "NEW"
+            }
+        }).catch(err => console.error("[LeadsAction] Failed to send GA4-MP event:", err));
 
         revalidatePath('/dashboard/admin/crm/leads');
         return { success: true, data: lead };
