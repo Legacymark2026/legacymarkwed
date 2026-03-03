@@ -11,14 +11,14 @@ export const useFacebookPixel = () => {
 
     const trackEvent = (event: string, data?: any) => {
         if (pixel) {
-            const payload = { currency: 'USD', value: 0.00, ...(data || {}) };
+            const payload = { currency: 'COP', value: 0.00, ...(data || {}) };
             pixel.track(event, payload);
         }
     };
 
     const trackCustom = (event: string, data?: any) => {
         if (pixel) {
-            const payload = { currency: 'USD', value: 0.00, ...(data || {}) };
+            const payload = { currency: 'COP', value: 0.00, ...(data || {}) };
             pixel.trackCustom(event, payload);
         }
     };
