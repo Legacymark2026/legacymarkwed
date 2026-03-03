@@ -61,17 +61,12 @@ function AudioPlayer({ durationText, audioSrc }: { durationText: string, audioSr
         <div className="flex items-center gap-3 min-w-[200px] max-w-[300px] bg-white/5 py-1 px-2 rounded-full border border-white/10">
             <audio
                 ref={audioRef}
-                src={audioSrc || "https://www.w3schools.com/html/horse.mp3"}
+                src={audioSrc || ""} /* Now handled by the proxy URL or empty */
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => { setIsPlaying(false); setProgress(0); }}
                 onError={(e) => {
-                    const target = e.target as HTMLAudioElement;
-                    if (target.src !== "https://www.w3schools.com/html/horse.mp3") {
-                        target.src = "https://www.w3schools.com/html/horse.mp3";
-                        target.play().catch(err => console.error("Fallback play failed", err));
-                    } else {
-                        console.error("Audio error", e);
-                    }
+                    console.error("Audio error", e);
+                    setIsPlaying(false);
                 }}
             />
             <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full shrink-0 bg-blue-500 hover:bg-blue-600 text-white shadow-md border-transparent flex items-center justify-center transition-all" onClick={togglePlay}>

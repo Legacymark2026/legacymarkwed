@@ -119,10 +119,40 @@ export class WhatsAppProvider implements ChannelProvider {
                             const msg = value.messages[0];
                             const contact = value.contacts?.[0];
 
+                            let mediaUrl = undefined;
+                            let mediaType = undefined;
+                            let bodyContent = msg.text?.body || "[Notificación / Texto No Soportado]";
+
+                            if (msg.type === 'audio' && msg.audio?.id) {
+                                mediaUrl = `/api/media/whatsapp/${msg.audio.id}`;
+                                bodyContent = "🎤 Nota de Voz";
+                                mediaType = "AUDIO";
+                            } else if (msg.type === 'image' && msg.image?.id) {
+                                mediaUrl = `/api/media/whatsapp/${msg.image.id}`;
+                                bodyContent = "📷 Imagen";
+                                mediaType = "IMAGE";
+                            } else if (msg.type === 'video' && msg.video?.id) {
+                                mediaUrl = `/api/media/whatsapp/${msg.video.id}`;
+                                bodyContent = "🎥 Video";
+                                mediaType = "VIDEO";
+                            } else if (msg.type === 'document' && msg.document?.id) {
+                                mediaUrl = `/api/media/whatsapp/${msg.document.id}`;
+                                bodyContent = `📄 Documento: ${msg.document.filename || 'Archivo'}`;
+                                mediaType = "DOCUMENT";
+                            } else if (msg.type === 'sticker' && msg.sticker?.id) {
+                                mediaUrl = `/api/media/whatsapp/${msg.sticker.id}`;
+                                bodyContent = "👾 Sticker";
+                                mediaType = "IMAGE";
+                            } else if (msg.type === 'button') {
+                                bodyContent = `[Botón]: ${msg.button?.text}`;
+                            } else if (msg.type === 'interactive') {
+                                bodyContent = `[Interactivo]: ${msg.interactive?.button_reply?.title || msg.interactive?.list_reply?.title}`;
+                            }
+
                             return {
                                 channel: this.channel,
                                 externalId: msg.id, // FIX: Use Message ID
-                                content: msg.text?.body || "[Media/Template]",
+                                content: bodyContent,
                                 sender: {
                                     id: msg.from,
                                     name: contact?.profile?.name || "WhatsApp User",
@@ -131,7 +161,9 @@ export class WhatsAppProvider implements ChannelProvider {
                                 metadata: {
                                     wabaId: entry.id,
                                     messageId: msg.id,
-                                    phoneNumberId: value.metadata?.phone_number_id
+                                    phoneNumberId: value.metadata?.phone_number_id,
+                                    mediaUrl: mediaUrl,
+                                    mediaType: mediaType
                                 }
                             }
                         }

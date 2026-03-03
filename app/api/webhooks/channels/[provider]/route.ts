@@ -171,8 +171,8 @@ async function handlePost(
                 senderId: inboundMessage.sender.id,
                 externalId: inboundMessage.externalId,
                 // senderName/Avatar not in schema, store in metadata
-                mediaUrl: inboundMessage.images?.[0],
-                mediaType: inboundMessage.images?.length ? 'IMAGE' : 'TEXT',
+                mediaUrl: (inboundMessage.metadata?.mediaUrl as string) || inboundMessage.images?.[0],
+                mediaType: (inboundMessage.metadata?.mediaType as any) || (inboundMessage.images?.length ? 'IMAGE' : 'TEXT'),
                 metadata: {
                     ...inboundMessage.metadata,
                     senderName: inboundMessage.sender.name,
