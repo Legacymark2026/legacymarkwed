@@ -109,6 +109,8 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     const isAdmin = true; // Simulate Admin check for deletion
 
     const [showBackgroundAlert, setShowBackgroundAlert] = useState(false);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<BlobPart[]>([]);
 
     // Call UI State
     const [activeCall, setActiveCall] = useState<'video' | 'audio' | null>(null);
@@ -186,7 +188,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
 
     // Advanced Chat Features State
-    const [pendingFiles, setPendingFiles] = useState<{ name: string, type: string }[]>([]);
+    const [pendingFiles, setPendingFiles] = useState<(File | { name: string, type: string })[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [showSendLaterModal, setShowSendLaterModal] = useState(false);
     const [sendLaterDate, setSendLaterDate] = useState('');
@@ -264,32 +266,126 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
         }
     };
 
+    const toggleRecording = async () => {
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // En Safari el MediaRecorder soporta mp4 típicamente, en Chrome webm
+                const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+                const mediaRecorder = new MediaRecorder(stream, { mimeType });
+                mediaRecorderRef.current = mediaRecorder;
+                audioChunksRef.current = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) audioChunksRef.current.push(event.data);
+                };
+
+                mediaRecorder.start(200);
+                setIsRecording(true);
+                toast.success('Grabando nota de voz...');
+            } catch (error) {
+                console.error("Mic error:", error);
+                toast.error('No se pudo acceder al micrófono');
+            }
+        } else {
+            if (mediaRecorderRef.current) {
+                mediaRecorderRef.current.stop();
+                mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+
+                const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorderRef.current.mimeType });
+                const ext = mediaRecorderRef.current.mimeType.includes('webm') ? 'webm' : 'mp4';
+                const file = new File([audioBlob], `voice-note-${Date.now()}.${ext}`, { type: mediaRecorderRef.current.mimeType });
+
+                // Add it straight to pending files and trigger send by faking newItem if needed
+                setPendingFiles(prev => [...prev, file]);
+            }
+            setIsRecording(false);
+        }
+    };
+
+    const cancelRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+            setIsRecording(false);
+            setRecordDuration(0);
+            audioChunksRef.current = [];
+            toast.info('Grabación cancelada');
+        }
+    };
+
     const handleSend = async () => {
-        if (!newItem.trim() && !isRecording) return; // Allow sending if recording (mock)
+        if (!newItem.trim() && !isRecording && pendingFiles.length === 0) return; // Allow sending if recording (mock)
+
+        // Si estaba grabando al apretar enviar, detener grabación, recolectar y luego subir
+        if (isRecording && mediaRecorderRef.current) {
+            toggleRecording(); // Stop it, will add to pendingFiles
+            // The file will be in state next tick, but we need to wait or rely on a wrapper
+            // For simplicity, wait 100ms for state to settle out of synchronous flow
+            setTimeout(handleSend, 100);
+            return;
+        }
 
         setIsSending(true);
-        const content = isRecording ? `🎤 Nota de Voz (${formatDuration(recordDuration)})` : newItem;
+        let content = newItem;
 
-        const optimisticMsg = {
-            id: 'temp-' + Date.now(),
-            content: content,
-            direction: isPrivateNote ? 'INTERNAL' : 'OUTBOUND',
-            status: 'SENT',
-            createdAt: new Date(),
-            senderId: currentUserId
-        };
+        try {
+            // Subir archivos a Meta
+            const uploadedAttachments = [];
 
-        setMessages((prev: any) => [...prev, optimisticMsg]);
-        setNewItem('');
-        setShowQuickReplies(false);
-        setIsRecording(false);
-        setIsPrivateNote(false);
-        setPendingFiles([]); // Clear pending files
-        if (textareaRef.current) textareaRef.current.style.height = '44px'; // Reset height
+            for (const file of pendingFiles) {
+                if (file instanceof File) {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    const isAudio = file.type.includes('audio');
 
-        // Call Server Action
-        await sendMessage(conversation.id, content, currentUserId);
-        setIsSending(false);
+                    const res = await fetch("/api/media/whatsapp-upload", { method: "POST", body: formData });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.id) {
+                            uploadedAttachments.push({
+                                url: `/api/media/whatsapp/${data.id}`,
+                                type: isAudio ? 'AUDIO' : (file.type.includes('image') ? 'IMAGE' : 'DOCUMENT')
+                            });
+                            if (isAudio && !content) {
+                                content = `🎤 Nota de Voz`; // Replace visual content
+                            }
+                        }
+                    } else {
+                        toast.error(`Error subiendo ${file.name}`);
+                    }
+                } else {
+                    // It's a mock old string file
+                }
+            }
+
+            const optimisticMsg = {
+                id: 'temp-' + Date.now(),
+                content: content,
+                direction: isPrivateNote ? 'INTERNAL' : 'OUTBOUND',
+                status: 'SENT',
+                createdAt: new Date(),
+                senderId: currentUserId,
+                mediaUrl: uploadedAttachments.length > 0 ? uploadedAttachments[0].url : null,
+            };
+
+            setMessages((prev: any) => [...prev, optimisticMsg]);
+            setNewItem('');
+            setShowQuickReplies(false);
+            setIsRecording(false);
+            setIsPrivateNote(false);
+            setPendingFiles([]); // Clear pending files
+            if (textareaRef.current) textareaRef.current.style.height = '44px'; // Reset height
+
+            // Call Server Action
+            await sendMessage(conversation.id, content, currentUserId, uploadedAttachments);
+        } catch (error) {
+            console.error("Error sending message", error);
+            toast.error("Error enviando el mensaje.");
+        } finally {
+            setIsSending(false);
+        }
     };
 
     const handleQuickReplySelect = (content: string) => {
@@ -837,7 +933,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                     <span className="text-red-600 font-mono font-bold text-base">{formatDuration(recordDuration)}</span>
                                     <span className="text-red-500/80 text-sm hidden sm:inline ml-2 font-medium">Grabando audio...</span>
                                 </div>
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-100/50 h-8 font-semibold" onClick={() => { setIsRecording(false); setRecordDuration(0); toast.info('Grabación cancelada'); }}>
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-100/50 h-8 font-semibold" onClick={cancelRecording}>
                                     Cancelar
                                 </Button>
                             </div>
@@ -893,11 +989,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => {
-                                    setIsRecording(!isRecording);
-                                    if (!isRecording) toast.success('Grabando nota de voz...');
-                                    else toast.info('Grabación cancelada');
-                                }}
+                                onClick={toggleRecording}
                                 className={cn(
                                     "h-8 w-8 rounded-lg transition-all",
                                     isRecording ? "text-red-500 bg-red-50 animate-pulse" : "text-gray-400 hover:text-red-500"

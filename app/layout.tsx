@@ -16,6 +16,7 @@ import { CommandMenu } from "@/components/ui/command-menu";
 import { PageTransition } from "@/components/ui/page-transition";
 import { SocialShare } from "@/components/ui/social-share";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { getLocale } from "next-intl/server";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -24,50 +25,56 @@ const jetbrainsMono = JetBrains_Mono({
 
 import { siteConfig } from "@/lib/site-config";
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  keywords: siteConfig.keywords,
-  authors: siteConfig.authors,
-  creator: siteConfig.creator,
-  openGraph: {
-    type: "website",
-    locale: "es_ES",
-    url: siteConfig.url,
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
-    creator: "@legacymark",
-  },
-  icons: {
-    icon: "/favicon.ico?v=2",
-    shortcut: "/favicon-16x16.png?v=2",
-    apple: "/apple-touch-icon.png?v=2",
-  },
-  manifest: "/site.webmanifest",
-  verification: {
-    other: {
-      "facebook-domain-verification": "fm9attbfbqwnfk3yfcn6t8v3rymszu",
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const openGraphLocale = locale === 'en' ? 'en_US' : 'es_ES';
+
+  return {
+    metadataBase: new URL(siteConfig.url),
+    title: {
+      default: siteConfig.name,
+      template: `%s | ${siteConfig.name}`,
     },
-  },
-};
+    description: siteConfig.description,
+    keywords: siteConfig.keywords,
+    authors: siteConfig.authors,
+    creator: siteConfig.creator,
+    openGraph: {
+      type: "website",
+      locale: openGraphLocale,
+      url: siteConfig.url,
+      title: siteConfig.name,
+      description: siteConfig.description,
+      siteName: siteConfig.name,
+      images: [
+        {
+          url: siteConfig.ogImage,
+          width: 1200,
+          height: 630,
+          alt: siteConfig.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteConfig.name,
+      description: siteConfig.description,
+      images: [siteConfig.ogImage],
+      creator: "@legacymark",
+    },
+    icons: {
+      icon: "/favicon.ico?v=2",
+      shortcut: "/favicon-16x16.png?v=2",
+      apple: "/apple-touch-icon.png?v=2",
+    },
+    manifest: "/site.webmanifest",
+    verification: {
+      other: {
+        "facebook-domain-verification": "fm9attbfbqwnfk3yfcn6t8v3rymszu",
+      },
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -76,6 +83,7 @@ export default async function RootLayout({
 }>) {
   const integrations = await getPublicIntegrations();
   const session = await auth();
+  const locale = await getLocale();
 
   let userData: { em?: string; fn?: string; ln?: string; ph?: string } | undefined;
   if (session?.user) {
@@ -90,7 +98,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`font-sans ${jetbrainsMono.variable} antialiased selection:bg-teal-500 selection:text-white bg-white text-slate-900`}
       >

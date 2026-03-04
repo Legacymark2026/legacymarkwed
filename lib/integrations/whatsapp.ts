@@ -36,17 +36,50 @@ export class WhatsAppProvider implements ChannelProvider {
 
         try {
             const url = `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`;
+
+            let requestBody: any = {
+                messaging_product: "whatsapp",
+                to: message.conversationId, // Phone number
+                type: "text",
+                text: { body: message.content }
+            };
+
+            // Support sending media/audio attachments
+            if (message.attachments && message.attachments.length > 0) {
+                const attachment = message.attachments[0];
+                if ((attachment.type as string).toUpperCase() === 'AUDIO') {
+                    // Si la URL empieza con nuestro proxy /api/media/whatsapp/, extraemos el ID para enviarlo como Media ID
+                    let mediaId = null;
+                    if (attachment.url.includes('/api/media/whatsapp/')) {
+                        mediaId = attachment.url.split('/').pop();
+                    }
+
+                    if (mediaId) {
+                        requestBody = {
+                            messaging_product: "whatsapp",
+                            to: message.conversationId,
+                            type: "audio",
+                            audio: { id: mediaId }
+                        };
+                    } else {
+                        // Public URL fallback
+                        requestBody = {
+                            messaging_product: "whatsapp",
+                            to: message.conversationId,
+                            type: "audio",
+                            audio: { link: attachment.url }
+                        };
+                    }
+                }
+            }
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${apiToken}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    messaging_product: "whatsapp",
-                    to: message.conversationId, // Phone number
-                    text: { body: message.content }
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();

@@ -208,6 +208,18 @@ export async function sendMessage(conversationId: string, content: string, userI
             } else {
                 console.warn("[Inbox] Cannot send Meta reply: Missing Page Context or Recipient ID in metadata");
             }
+        } else if (conversation && conversation.channel === 'WHATSAPP') {
+            const { automationHub } = await import("@/lib/integrations/providers");
+            const waProvider = automationHub.get('WHATSAPP');
+            if (waProvider) {
+                await waProvider.sendMessage({
+                    conversationId: conversation.platformId || conversation.lead?.phone || '',
+                    content: content,
+                    attachments: attachments
+                });
+            } else {
+                console.warn("[Inbox] WhatsApp provider not configured");
+            }
         }
 
         revalidatePath(`/dashboard/inbox`);
