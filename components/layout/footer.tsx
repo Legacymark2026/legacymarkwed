@@ -4,6 +4,7 @@ import Link from "next/link";
 import NextImage from "next/image";
 import { siteConfig } from "@/lib/site-config";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 // ─── Social Icon Component ─────────────────────────────────────────────────────
 interface SocialLinkProps {
@@ -54,6 +55,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 // ─── Main Footer ───────────────────────────────────────────────────────────────
 export function Footer() {
+    const t = useTranslations("footer");
     const [email, setEmail] = useState("");
     const [status, setStatus] = useState<"idle" | "success" | "loading">("idle");
 
@@ -99,13 +101,13 @@ export function Footer() {
                     <div>
                         <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-teal-500/15 px-3 py-1 text-xs font-medium text-teal-400 ring-1 ring-teal-500/30">
                             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal-400" />
-                            Disponibles para nuevos proyectos
+                            {t('ctaBadge')}
                         </span>
                         {/* ── 6. Gradient headline text ── */}
                         <h2 className="mt-1 text-xl font-bold text-white sm:text-2xl">
-                            ¿Listo para{" "}
+                            {t('ctaTitleStart')}
                             <span className="bg-gradient-to-r from-teal-400 to-violet-400 bg-clip-text text-transparent">
-                                transformar tu marca?
+                                {t('ctaTitleHighlight')}
                             </span>
                         </h2>
                     </div>
@@ -115,7 +117,7 @@ export function Footer() {
                         className="group relative inline-flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-teal-500 to-teal-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-500/25 transition-all duration-300 hover:scale-105 hover:shadow-teal-500/40 hover:shadow-xl"
                     >
                         <span className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-[100%]" />
-                        Agenda una consulta
+                        {t('ctaBtn')}
                         <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -146,11 +148,7 @@ export function Footer() {
 
                         {/* ── 10. Tagline with improved typography ── */}
                         <p className="max-w-xs text-sm leading-relaxed text-gray-400">
-                            Transformamos marcas a través de la{" "}
-                            <span className="text-gray-300">innovación</span>,{" "}
-                            <span className="text-gray-300">diseño</span> y{" "}
-                            <span className="text-gray-300">estrategia digital</span>{" "}
-                            con foco en resultados medibles.
+                            {t('tagline')}
                         </p>
 
                         {/* ── 11. Address card with glass effect ── */}
@@ -207,35 +205,35 @@ export function Footer() {
 
                     {/* ── Services ── */}
                     <div className="lg:col-span-2">
-                        <SectionHeading>Soluciones</SectionHeading>
+                        <SectionHeading>{t('services')}</SectionHeading>
                         {/* ── 16. Animated underline on hover links ── */}
                         <ul className="space-y-2.5">
-                            <FooterLink href="/soluciones/estrategia-de-marca">Estrategia de Marca</FooterLink>
-                            <FooterLink href="/soluciones/creacion-contenido">Creación de Contenido</FooterLink>
-                            <FooterLink href="/soluciones/automatizacion">Automatización & IA</FooterLink>
-                            <FooterLink href="/soluciones/web-dev">Desarrollo Web</FooterLink>
-                            <FooterLink href="/flyering">Marketing 360°</FooterLink>
+                            <FooterLink href="/soluciones/estrategia-de-marca">{t('links.strategy')}</FooterLink>
+                            <FooterLink href="/soluciones/creacion-contenido">{t('links.content')}</FooterLink>
+                            <FooterLink href="/soluciones/automatizacion">{t('links.automation')}</FooterLink>
+                            <FooterLink href="/soluciones/web-dev">{t('links.webdev')}</FooterLink>
+                            <FooterLink href="/flyering">{t('links.flyering')}</FooterLink>
                         </ul>
                     </div>
 
                     {/* ── Company ── */}
                     <div className="lg:col-span-2">
-                        <SectionHeading>Empresa</SectionHeading>
+                        <SectionHeading>{t('company')}</SectionHeading>
                         <ul className="space-y-2.5">
-                            <FooterLink href="/nosotros">Nosotros</FooterLink>
-                            <FooterLink href="/metodologia">Metodología</FooterLink>
-                            <FooterLink href="/portfolio">Portfolio</FooterLink>
-                            <FooterLink href="/blog">Insights</FooterLink>
-                            <FooterLink href="/contacto">Contacto</FooterLink>
+                            <FooterLink href="/nosotros">{t('links.about')}</FooterLink>
+                            <FooterLink href="/metodologia">{t('links.methodology')}</FooterLink>
+                            <FooterLink href="/portfolio">{t('links.portfolio')}</FooterLink>
+                            <FooterLink href="/blog">{t('links.blog')}</FooterLink>
+                            <FooterLink href="/contacto">{t('links.contact')}</FooterLink>
                         </ul>
                     </div>
 
                     {/* ── Newsletter ── */}
                     <div className="lg:col-span-4">
-                        <SectionHeading>Newsletter</SectionHeading>
+                        <SectionHeading>{t('newsletter')}</SectionHeading>
                         {/* ── 17. Improved newsletter description ── */}
                         <p className="mb-5 text-sm leading-relaxed text-gray-400">
-                            Recibe estrategias digitales, casos de éxito y tendencias de marketing directamente en tu bandeja.
+                            {t('newsletterDesc')}
                         </p>
 
                         {status === "success" ? (
@@ -244,7 +242,7 @@ export function Footer() {
                                 <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                ¡Suscrito! Pronto recibirás nuestro contenido.
+                                {t('subscribeSuccess')}
                             </div>
                         ) : (
                             <form onSubmit={handleSubscribe}>
@@ -254,7 +252,7 @@ export function Footer() {
                                         type="email"
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
-                                        placeholder="tu@empresa.com"
+                                        placeholder={t('email')}
                                         required
                                         className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-32 text-sm text-white placeholder-gray-500 backdrop-blur-sm transition-all duration-200 focus:border-teal-500/60 focus:bg-white/8 focus:outline-none focus:ring-1 focus:ring-teal-500/40"
                                     />
@@ -264,7 +262,7 @@ export function Footer() {
                                         disabled={status === "loading"}
                                         className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-all duration-200 hover:bg-teal-400 disabled:opacity-60"
                                     >
-                                        {status === "loading" ? "..." : "Suscribir"}
+                                        {status === "loading" ? t('subscribeLoading') : t('subscribe')}
                                     </button>
                                 </div>
                                 {/* ── 21. Privacy consent styled ── */}
@@ -280,11 +278,9 @@ export function Footer() {
                                         </svg>
                                     </div>
                                     <span className="text-xs leading-relaxed text-gray-500">
-                                        Acepto la{" "}
-                                        <Link href="/politica-privacidad" className="text-teal-500 underline-offset-2 hover:underline">
-                                            Política de Privacidad
-                                        </Link>{" "}
-                                        y el envío de comunicaciones de marketing.
+                                        {t('privacyConsent')} <Link href="/politica-privacidad" className="text-teal-500 underline-offset-2 hover:underline">
+                                            {t('privacyPolicy')}
+                                        </Link>
                                     </span>
                                 </label>
                             </form>
@@ -293,9 +289,9 @@ export function Footer() {
                         {/* ── 22. Trust badges row ── */}
                         <div className="mt-6 flex items-center gap-4 border-t border-white/6 pt-5">
                             {[
-                                { icon: "🔒", label: "100% Seguro" },
-                                { icon: "✉️", label: "Sin Spam" },
-                                { icon: "🚫", label: "Cancela Gratis" },
+                                { icon: "🔒", label: t('trust.secure') },
+                                { icon: "✉️", label: t('trust.noSpam') },
+                                { icon: "🚫", label: t('trust.cancelFree') },
                             ].map(b => (
                                 <div key={b.label} className="flex items-center gap-1.5 text-xs text-gray-500">
                                     <span>{b.icon}</span>
@@ -315,18 +311,17 @@ export function Footer() {
                     <p className="text-center text-xs text-gray-600 sm:text-left">
                         © {year}{" "}
                         <span className="font-semibold text-gray-400">LegacyMark SAS</span>
-                        {" "}— Todos los derechos reservados.{" "}
+                        {" "}— {t('rightsEnd')}{" "}
                         <span className="text-gray-600">NIT {siteConfig.nit}</span>
                     </p>
 
                     {/* ── 25. Legal links with separators ── */}
                     <nav className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-xs text-gray-600">
                         {[
-                            { href: "/politica-privacidad", label: "Privacidad" },
-                            { href: "/terms", label: "Términos" },
-                            { href: "/politica-cookies", label: "Cookies" },
-                            { href: "/sitemap", label: "Sitemap" },
-                            { href: "/data-deletion", label: "Datos" },
+                            { href: "/politica-privacidad", label: t('privacy') },
+                            { href: "/terms", label: t('terms') },
+                            { href: "/politica-cookies", label: t('cookies') },
+                            { href: "/sitemap", label: t('sitemap') },
                         ].map((l, i) => (
                             <span key={l.href} className="flex items-center gap-x-1">
                                 {i > 0 && <span className="text-gray-700">·</span>}
@@ -339,9 +334,7 @@ export function Footer() {
 
                     {/* ── 26. "Made with ❤️" badge ── */}
                     <p className="hidden text-xs text-gray-700 lg:block">
-                        Hecho con{" "}
-                        <span className="animate-pulse text-red-500">♥</span>{" "}
-                        en Girón, Colombia
+                        {t('madeWithLove')}
                     </p>
                 </div>
             </div>
@@ -352,7 +345,7 @@ export function Footer() {
             {/* ── 28. Floating Colombia flag badge ── */}
             <div className="absolute bottom-14 right-4 hidden lg:block">
                 <div className="flex items-center gap-1.5 rounded-full border border-white/8 bg-white/4 px-3 py-1.5 text-xs text-gray-500 backdrop-blur-sm">
-                    🇨🇴 <span>Colombia</span>
+                    🇨🇴 <span>{t('country')}</span>
                 </div>
             </div>
         </footer>

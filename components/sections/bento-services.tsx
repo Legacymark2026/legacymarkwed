@@ -4,8 +4,11 @@ import { cn } from "@/lib/utils";
 import React, { useRef, useState, useEffect } from "react";
 import { Search, PenTool, LayoutTemplate, Briefcase, ChevronRight, BarChart3, Cloud, Code, LineChart, Globe } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export const BentoServices = () => {
+    const t = useTranslations("home.services");
+
     return (
         <div className="relative bg-white py-24 sm:py-32 overflow-hidden border-b border-gray-100">
             {/* Background Grid */}
@@ -20,14 +23,14 @@ export const BentoServices = () => {
                         className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono mb-6 uppercase tracking-widest"
                     >
                         <Briefcase size={12} />
-                        Service Architecture
+                        {t('badge')}
                     </motion.div>
 
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                        Soluciones <span className="text-teal-600">Integrales</span>
+                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                     </h2>
                     <p className="mt-6 text-lg leading-8 text-gray-600">
-                        Infraestructura digital diseñada para escalar. Desde la estrategia hasta el código.
+                        {t('subtitle')}
                     </p>
                 </div>
 
@@ -36,8 +39,8 @@ export const BentoServices = () => {
                     {/* CARD 1: Large (Span 2) - Marketing */}
                     <TechCard
                         className="md:col-span-2"
-                        title="Marketing Estratégico"
-                        description="Campañas de alto rendimiento impulsadas por datos. ROAS optimizado."
+                        title={t('items.marketing.title')}
+                        description={t('items.marketing.desc')}
                         icon={BarChart3}
                         bgCode="MKT_SYS_01"
                     >
@@ -46,16 +49,16 @@ export const BentoServices = () => {
 
                     {/* CARD 2: Branding */}
                     <TechCard
-                        title="Branding & Identidad"
-                        description="Diseño de marca que comunica autoridad y confianza."
+                        title={t('items.branding.title')}
+                        description={t('items.branding.desc')}
                         icon={PenTool}
                         bgCode="DSGN_CORE"
                     />
 
                     {/* CARD 3: Web Dev */}
                     <TechCard
-                        title="Desarrollo Web"
-                        description="Sitios ultra-rápidos construidos con Next.js y React."
+                        title={t('items.webdev.title')}
+                        description={t('items.webdev.desc')}
                         icon={LayoutTemplate}
                         bgCode="DEV_OPS"
                     />
@@ -63,8 +66,8 @@ export const BentoServices = () => {
                     {/* CARD 4: Large (Span 2) - Automation */}
                     <TechCard
                         className="md:col-span-2"
-                        title="Automatización IA"
-                        description="Sistemas autónomos que reducen carga operativa."
+                        title={t('items.automation.title')}
+                        description={t('items.automation.desc')}
                         icon={Code}
                         bgCode="AUTO_BOT_V3"
                     >
@@ -78,24 +81,24 @@ export const BentoServices = () => {
 
                     {/* CARD 5: SEO */}
                     <TechCard
-                        title="SEO Técnico"
-                        description="Posicionamiento orgánico para dominio de mercado."
+                        title={t('items.seo.title')}
+                        description={t('items.seo.desc')}
                         icon={Search}
                         bgCode="SERP_RANK_1"
                     />
 
                     {/* CARD 6: Cloud */}
                     <TechCard
-                        title="Infraestructura Cloud"
-                        description="Hosting escalable y seguro en Vercel/AWS."
+                        title={t('items.cloud.title')}
+                        description={t('items.cloud.desc')}
                         icon={Cloud}
                         bgCode="AWS_VPC"
                     />
 
                     {/* CARD 7: Analytics */}
                     <TechCard
-                        title="Analítica Avanzada"
-                        description="Dashboards en tiempo real para toma de decisiones."
+                        title={t('items.analytics.title')}
+                        description={t('items.analytics.desc')}
                         icon={LineChart}
                         bgCode="DATA_LAKE"
                     />

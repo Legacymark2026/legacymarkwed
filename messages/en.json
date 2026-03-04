@@ -33,30 +33,265 @@
       "portfolio": "Portfolio",
       "blog": "Insights",
       "contact": "Contact"
-    }
+    },
+    "ctaBadge": "Available for new projects",
+    "ctaTitleStart": "Ready to",
+    "ctaTitleHighlight": "transform your brand?",
+    "ctaBtn": "Schedule a consultation",
+    "trust": {
+      "secure": "100% Secure",
+      "noSpam": "No Spam",
+      "cancelFree": "Cancel Anytime"
+    },
+    "madeWithLove": "Made with ♥ in Girón, Colombia",
+    "country": "Colombia",
+    "rightsEnd": "All rights reserved.",
+    "subscribeSuccess": "Subscribed! You will receive our content soon.",
+    "subscribeLoading": "..."
   },
   "home": {
     "hero": {
       "badge": "Digital Marketing Agency",
-      "title": "We transform your brand with strategy and innovation",
-      "subtitle": "We create digital strategies that generate real results and sustainable growth for your business.",
-      "cta": "Start your project",
-      "ctaSecondary": "View portfolio"
+      "systemActive": "System v2.4 ::",
+      "systemStatus": "Ready for Launch",
+      "titleStart": "We Transform",
+      "titleHighlight": "The Future",
+      "subtitle": "LegacyMark merges ARTIFICIAL INTELLIGENCE with elite strategy to build digital ecosystems that dominate markets.",
+      "ctaPrimary": "Initiate Protocol",
+      "ctaSecondary": "Play Tactical Demo"
     },
     "services": {
-      "title": "Our Services",
-      "subtitle": "Comprehensive solutions to grow your brand in the digital environment."
+      "badge": "Service Architecture",
+      "titleStart": "Comprehensive",
+      "titleHighlight": "Solutions",
+      "subtitle": "Digital infrastructure designed to scale. From strategy to code.",
+      "items": {
+        "marketing": {
+          "title": "Strategic Marketing",
+          "desc": "High-performance data-driven campaigns. Optimized ROAS."
+        },
+        "branding": {
+          "title": "Branding & Identity",
+          "desc": "Brand design that communicates authority and trust."
+        },
+        "webdev": {
+          "title": "Web Development",
+          "desc": "Ultra-fast sites built with Next.js and React."
+        },
+        "automation": {
+          "title": "AI Automation",
+          "desc": "Autonomous systems that reduce operational load."
+        },
+        "seo": {
+          "title": "Technical SEO",
+          "desc": "Organic positioning for market dominance."
+        },
+        "cloud": {
+          "title": "Cloud Infrastructure",
+          "desc": "Scalable and secure hosting on Vercel/AWS."
+        },
+        "analytics": {
+          "title": "Advanced Analytics",
+          "desc": "Real-time dashboards for decision making."
+        }
+      }
     },
     "stats": {
-      "clients": "Happy clients",
-      "projects": "Completed projects",
-      "growth": "Average growth",
-      "years": "Years of experience"
+      "badge": "LIVE TELEMETRY",
+      "items": {
+        "roi": {
+          "label": "Average Return",
+          "desc": "Continuous ad optimization"
+        },
+        "leads": {
+          "label": "Qualified Leads",
+          "desc": "High-intent pipeline"
+        },
+        "conversion": {
+          "label": "Conversion Rate",
+          "desc": "Above industry average"
+        },
+        "scale": {
+          "label": "Scaled Systems",
+          "desc": "Robust infrastructure"
+        }
+      }
+    },
+    "alliances": {
+      "badge": "Strategic Ecosystem",
+      "titleStart": "Alliances that",
+      "titleHighlight": "Power your Growth"
+    },
+    "valueProp": {
+      "titleStart": "Absolute Value",
+      "titleHighlight": "Engineering",
+      "subtitle": "We eliminate friction between strategy and technology.",
+      "items": {
+        "execution": {
+          "title": "Vision to Execution",
+          "desc": "We don't just deliver reports. We build, deploy, and operate the infrastructure your business needs."
+        },
+        "engineering": {
+          "title": "Top-Tier Engineering",
+          "desc": "Clean code, scalable architectures, and banking security standards. Uncompromising technical quality."
+        },
+        "growth": {
+          "title": "Predictable Growth",
+          "desc": "Automated customer acquisition systems that generate consistent results, month after month."
+        }
+      }
+    },
+    "caseStudies": {
+      "badge": "Project Holodeck",
+      "liveDb": "Live Database",
+      "titleStart": "Results that",
+      "titleHighlight": "Define",
+      "projects": {
+        "cs1": {
+          "client": "FinTech Global",
+          "title": "Infrastructure Scaling",
+          "desc": "Migration to serverless architecture reducing latency by 40%.",
+          "tags": {
+            "t1": "Cloud",
+            "t2": "DevOps"
+          }
+        },
+        "cs2": {
+          "client": "E-Commerce Giant",
+          "title": "Conversion Optimization",
+          "desc": "UX/UI redesign focused on checkout and cart recovery.",
+          "tags": {
+            "t1": "UX/UI",
+            "t2": "CRO"
+          }
+        },
+        "cs3": {
+          "client": "SaaS Enterprise",
+          "title": "Unified Design System",
+          "desc": "Implementation of Design System for 12 internal products.",
+          "tags": {
+            "t1": "Design System",
+            "t2": "React"
+          }
+        }
+      }
+    },
+    "testimonials": {
+      "badge": "Encrypted Transmissions",
+      "titleStart": "What our",
+      "titleHighlight": "Allies Say",
+      "reviews": {
+        "r1": {
+          "name": "Carlos Mendez",
+          "role": "CEO, Fincorp",
+          "body": "The re-engineering of our platform increased traffic by 300% in the first quarter. Absolutely brutal."
+        },
+        "r2": {
+          "name": "Elena Torres",
+          "role": "Product Lead, Nova",
+          "body": "I've never seen a development team so aligned with business goals. Impeccable quality."
+        },
+        "r3": {
+          "name": "Javier Ruiz",
+          "role": "Founder, Blockify",
+          "body": "Military execution speed. They delivered the MVP two weeks ahead of schedule."
+        },
+        "r4": {
+          "name": "Ana Soto",
+          "role": "CMO, E-Shop",
+          "body": "The analytics dashboard gave us the clarity we needed to scale ad spend."
+        }
+      }
+    },
+    "methodology": {
+      "badge": "Active Protocol v2.4",
+      "titleStart": "SYSTEM",
+      "titleHighlight": "A.C.T.I.O.N™",
+      "subtitle": "Our proprietary execution framework. A proven methodology to transform chaos into predictable and scalable results.",
+      "steps": {
+        "s1": {
+          "title": "Audit",
+          "subtitle": "DEEP DIAGNOSIS",
+          "desc": "Forensic analysis of your current digital infrastructure, detecting bottlenecks and efficiency leaks."
+        },
+        "s2": {
+          "title": "Conceptualize",
+          "subtitle": "ARCHITECTURE STRATEGY",
+          "desc": "Design of custom solutions merging business goals with technical feasibility."
+        },
+        "s3": {
+          "title": "Tactical Plan",
+          "subtitle": "OPERATIONAL ROADMAP",
+          "desc": "Granular breakdown of milestones, resource allocation, and definition of critical KPIs for success."
+        },
+        "s4": {
+          "title": "Implement",
+          "subtitle": "CODE DEPLOYMENT",
+          "desc": "Agile execution with Enterprise quality standards. CI/CD pipelines and automated testing."
+        },
+        "s5": {
+          "title": "Optimize",
+          "subtitle": "PERFORMANCE MAXIMIZATION",
+          "desc": "Fine-tuning based on real data. A/B testing and latency monitoring for continuous improvement."
+        },
+        "s6": {
+          "title": "Next Steps",
+          "subtitle": "GLOBAL SCALING",
+          "desc": "Planning the next growth phase. Preparation for massive load and new markets."
+        }
+      }
+    },
+    "teamGrid": {
+      "titleStart": "Elite",
+      "titleHighlight": "Operatives",
+      "subtitle": "Masterminds behind the infrastructure."
+    },
+    "faq": {
+      "badge": "Knowledge Base",
+      "titleStart": "Response",
+      "titleHighlight": "Protocols",
+      "q1": {
+        "q": "How long does implementation take?",
+        "a": "Depending on complexity. Tactical landing pages: 2-3 weeks. Complex systems: 4-8 weeks. Our initial sprint lasts 5 days."
+      },
+      "q2": {
+        "q": "Do you have post-launch support?",
+        "a": "Absolutely. We offer 'Always-On' maintenance packages to ensure 99.9% uptime, security updates, and continuous optimization."
+      },
+      "q3": {
+        "q": "Do you integrate with my current stack?",
+        "a": "Yes. We connect via API to any CRM (HubSpot, Salesforce), ERP, or database. We are technology agnostic but integration experts."
+      }
     },
     "cta": {
-      "title": "Ready to transform your business?",
-      "subtitle": "Let's talk about how we can help you reach your goals.",
-      "button": "Schedule a consultation"
+      "badge": "Secure Channel Open",
+      "titleStart": "Ready to",
+      "titleHighlight": "Scale?",
+      "subtitle": "No more excuses. Start your brand's digital transformation today. Schedule a tactical strategy session.",
+      "btn1": "Initiate Mission",
+      "btn2": "Check Availability",
+      "footerInfo": {
+        "f1": "EST. TIME: 2-4 WEEKS",
+        "f2": "SLOTS: LIMITED",
+        "f3": "REGION: GLOBAL"
+      }
+    },
+    "portfolioPreview": {
+      "badge": "System Archive",
+      "titleStart": "Deployed",
+      "titleHighlight": "Systems",
+      "subtitle": "Active digital infrastructure in production. Audited results.",
+      "btn": "Explore Full Archive",
+      "hoverHint": "Click to access detailed project report ::"
+    },
+    "latestPosts": {
+      "badge": "Intelligence Feed",
+      "titleStart": "Intelligence",
+      "titleHighlight": "Reports",
+      "subtitle": "Tactical analysis of trends and technology.",
+      "btn": "Access Database",
+      "lockedMsg": "Classified content. Requires level 1 access to view full summary.",
+      "readAction": "Read Report"
     }
   },
   "contact": {

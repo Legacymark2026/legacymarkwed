@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, FileText, Calendar, User } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Post {
     id: string;
@@ -20,6 +21,7 @@ interface LatestPostsProps {
 }
 
 export function LatestPosts({ posts }: LatestPostsProps) {
+    const t = useTranslations("home.latestPosts");
     if (!posts || posts.length === 0) return null;
 
     return (
@@ -31,14 +33,14 @@ export function LatestPosts({ posts }: LatestPostsProps) {
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white shadow-sm text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest">
                             <FileText size={12} />
-                            Intelligence Feed
+                            {t('badge')}
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Reportes de <span className="text-teal-600">Inteligencia</span></h2>
-                        <p className="mt-2 text-lg text-slate-600 font-medium">Análisis táctico de tendencias y tecnología.</p>
+                        <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span></h2>
+                        <p className="mt-2 text-lg text-slate-600 font-medium">{t('subtitle')}</p>
                     </div>
                     <Link href="/blog">
                         <Button variant="outline" className="text-slate-700 border-gray-200 hover:bg-white hover:text-teal-600 hover:shadow-md">
-                            Acceder a la Base de Datos
+                            {t('btn')}
                         </Button>
                     </Link>
                 </div>
@@ -76,11 +78,11 @@ export function LatestPosts({ posts }: LatestPostsProps) {
                                 </h3>
 
                                 <p className="mb-6 flex-1 text-gray-500 line-clamp-3 text-sm leading-relaxed">
-                                    {post.excerpt || "Contenido clasificado. Requiere acceso de nivel 1 para visualizar el resumen completo."}
+                                    {post.excerpt || t('lockedMsg')}
                                 </p>
 
                                 <Link href={`/blog/${post.slug}`} className="inline-flex items-center font-bold text-teal-600 hover:text-teal-700 transition-colors text-sm uppercase tracking-wider">
-                                    Leer Informe <ArrowRight className="ml-2 h-4 w-4" />
+                                    {t('readAction')} <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>
                             </div>
                         </motion.article>

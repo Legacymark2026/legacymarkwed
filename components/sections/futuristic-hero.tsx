@@ -4,10 +4,12 @@ import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } fr
 import { MouseEvent, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Activity, Wifi, ShieldCheck, Rocket } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const GLITCH_MSGS = ["INNOVATION", "DISRUPTION", "EVOLUTION", "DOMINATION", "GROWTH"];
 
 export function FuturisticHero() {
+    const t = useTranslations("home.hero");
     // Mouse Interaction
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -110,7 +112,7 @@ export function FuturisticHero() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                             </span>
-                            <span className="hidden sm:inline">System v2.4 ::</span> Ready for Launch
+                            <span className="hidden sm:inline">{t('systemActive')}</span> {t('systemStatus')}
                         </span>
                     </motion.div>
 
@@ -122,17 +124,17 @@ export function FuturisticHero() {
 
                         <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-4 sm:mb-6 relative z-10 leading-[0.9]">
                             <span className="block mb-2 drop-shadow-sm">
-                                Transformamos
+                                {t('titleStart')}
                             </span>
                             <div className="flex justify-center items-center gap-2 sm:gap-4 flex-wrap">
-                                <span className="text-xl sm:text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">El Futuro</span>
+                                <span className="text-xl sm:text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">{t('titleHighlight')}</span>
                                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-emerald-500 to-cyan-600 animate-gradient-x font-mono relative">
                                     {glitchText}
                                 </span>
                             </div>
                         </h1>
-                        <p className="mx-auto max-w-2xl text-base md:text-xl text-slate-600 leading-relaxed text-pretty font-medium">
-                            LegacyMark fusiona <span className="text-teal-700 font-bold bg-teal-50 px-2 rounded border border-teal-100">INTELIGENCIA ARTIFICIAL</span> con estrategia de élite para construir ecosistemas digitales que dominan mercados.
+                        <p className="mx-auto max-w-2xl text-base md:text-xl text-slate-600 leading-relaxed text-pretty font-medium uppercase font-mono tracking-wide">
+                            {t('subtitle')}
                         </p>
                     </div>
 
@@ -151,7 +153,7 @@ export function FuturisticHero() {
 
                         <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-gray-200 text-slate-700 hover:bg-gray-50 hover:text-teal-600 transition-all group relative overflow-hidden">
                             <span className="flex items-center gap-2 relative z-10 font-semibold">
-                                <Play className="w-4 h-4 fill-current" /> Ver Demo Táctico
+                                <Play className="w-4 h-4 fill-current" /> {t('ctaSecondary')}
                             </span>
                         </Button>
                     </motion.div>

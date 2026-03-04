@@ -2,18 +2,20 @@
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Terminal, HelpCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function FaqAccordion() {
+    const t = useTranslations("home.faq");
     return (
         <section className="bg-slate-50 py-24 relative border-y border-gray-200">
             <div className="mx-auto max-w-3xl px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
                         <HelpCircle size={12} />
-                        Knowledge Base
+                        {t('badge')}
                     </div>
                     <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl text-balance">
-                        Protocolos de <span className="text-teal-600">Respuesta</span>
+                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                     </h2>
                 </div>
 
@@ -33,11 +35,11 @@ export function FaqAccordion() {
                                 <AccordionTrigger className="text-slate-800 hover:text-teal-700 font-medium text-left hover:no-underline">
                                     <span className="flex items-center gap-3">
                                         <Terminal size={14} className="text-teal-500 shrink-0" />
-                                        ¿Cuánto tarda la implementación?
+                                        {t('q1.q')}
                                     </span>
                                 </AccordionTrigger>
                                 <AccordionContent className="text-slate-600 pl-7 leading-relaxed font-normal">
-                                    Dependiendo de la complejidad. Landing pages tácticas: 2-3 semanas. Sistemas complejos: 4-8 semanas. Nuestro sprint inicial dura 5 días.
+                                    {t('q1.a')}
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -45,11 +47,11 @@ export function FaqAccordion() {
                                 <AccordionTrigger className="text-slate-800 hover:text-teal-700 font-medium text-left hover:no-underline">
                                     <span className="flex items-center gap-3">
                                         <Terminal size={14} className="text-teal-500 shrink-0" />
-                                        ¿Tienen soporte post-lanzamiento?
+                                        {t('q2.q')}
                                     </span>
                                 </AccordionTrigger>
                                 <AccordionContent className="text-slate-600 pl-7 leading-relaxed font-normal">
-                                    Absolutamente. Ofrecemos paquetes de mantenimiento "Always-On" para asegurar uptime del 99.9%, actualizaciones de seguridad y optimización continua.
+                                    {t('q2.a')}
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -57,11 +59,11 @@ export function FaqAccordion() {
                                 <AccordionTrigger className="text-slate-800 hover:text-teal-700 font-medium text-left hover:no-underline">
                                     <span className="flex items-center gap-3">
                                         <Terminal size={14} className="text-teal-500 shrink-0" />
-                                        ¿Se integran con mi stack actual?
+                                        {t('q3.q')}
                                     </span>
                                 </AccordionTrigger>
                                 <AccordionContent className="text-slate-600 pl-7 leading-relaxed font-normal">
-                                    Sí. Nos conectamos vía API a cualquier CRM (HubSpot, Salesforce), ERP o base de datos. Somos agnósticos a la tecnología pero expertos en integración.
+                                    {t('q3.a')}
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>

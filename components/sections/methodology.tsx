@@ -4,85 +4,87 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Search, Lightbulb, Map, FileCode, BarChart3, Rocket, CheckCircle2, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const STEPS = [
-    {
-        id: "A",
-        title: "Audit (Auditoría)",
-        subtitle: "DIAGNÓSTICO PROFUNDO",
-        desc: "Análisis forense de tu infraestructura digital actual, detectando cuellos de botella y fugas de eficiencia.",
-        icon: Search,
-        tech_spec: "ANALYSIS_PROTOCOL_V4",
-        color: "text-teal-600",
-        bg: "bg-teal-50",
-        border: "border-teal-200",
-        load: "84%"
-    },
-    {
-        id: "C",
-        title: "Conceptualize (Conceptualización)",
-        subtitle: "ESTRATEGIA DE ARQUITECTURA",
-        desc: "Diseño de soluciones personalizadas donde fusionamos objetivos de negocio con factibilidad técnica.",
-        icon: Lightbulb,
-        tech_spec: "BLUEPRINT_GEN_2.0",
-        color: "text-emerald-600",
-        bg: "bg-emerald-50",
-        border: "border-emerald-200",
-        load: "92%"
-    },
-    {
-        id: "T",
-        title: "Tactical Plan (Plan Táctico)",
-        subtitle: "HOJA DE RUTA OPERATIVA",
-        desc: "Desglose granular de hitos, asignación de recursos y definición de KPIs críticos para el éxito.",
-        icon: Map,
-        tech_spec: "OPS_MATRIX_LOADED",
-        color: "text-teal-500",
-        bg: "bg-teal-50",
-        border: "border-teal-200",
-        load: "76%"
-    },
-    {
-        id: "I",
-        title: "Implement (Implementación)",
-        subtitle: "DESPLIEGUE DE CÓDIGO",
-        desc: "Ejecución ágil con estándares de calidad Enterprise. CI/CD pipelines y testing automatizado.",
-        icon: FileCode,
-        tech_spec: "EXEC_CORE_ACTIVE",
-        color: "text-cyan-600",
-        bg: "bg-cyan-50",
-        border: "border-cyan-200",
-        load: "100%"
-    },
-    {
-        id: "O",
-        title: "Optimize (Optimización)",
-        subtitle: "MAXIMIZACIÓN DE RENDIMIENTO",
-        desc: "Ajuste fino basado en datos reales. A/B testing y monitoreo de latencia para mejora continua.",
-        icon: BarChart3,
-        tech_spec: "DATA_LOOP_SYNC",
-        color: "text-emerald-500",
-        bg: "bg-emerald-50",
-        border: "border-emerald-200",
-        load: "98%"
-    },
-    {
-        id: "N",
-        title: "Next Steps (Siguientes Pasos)",
-        subtitle: "ESCALAMIENTO GLOBAL",
-        desc: "Planificación de la siguiente fase de crecimiento. Preparación para carga masiva y nuevos mercados.",
-        icon: Rocket,
-        tech_spec: "SCALE_UP_READY",
-        color: "text-teal-600",
-        bg: "bg-teal-50",
-        border: "border-teal-200",
-        load: "89%"
-    },
-];
+import { useTranslations } from "next-intl";
 
 export function Methodology() {
+    const t = useTranslations("home.methodology");
     const [activeStep, setActiveStep] = useState(0);
     const [progress, setProgress] = useState(0);
+
+    const STEPS = [
+        {
+            id: "A",
+            title: t('steps.s1.title'),
+            subtitle: t('steps.s1.subtitle'),
+            desc: t('steps.s1.desc'),
+            icon: Search,
+            tech_spec: "ANALYSIS_PROTOCOL_V4",
+            color: "text-teal-600",
+            bg: "bg-teal-50",
+            border: "border-teal-200",
+            load: "84%"
+        },
+        {
+            id: "C",
+            title: t('steps.s2.title'),
+            subtitle: t('steps.s2.subtitle'),
+            desc: t('steps.s2.desc'),
+            icon: Lightbulb,
+            tech_spec: "BLUEPRINT_GEN_2.0",
+            color: "text-emerald-600",
+            bg: "bg-emerald-50",
+            border: "border-emerald-200",
+            load: "92%"
+        },
+        {
+            id: "T",
+            title: t('steps.s3.title'),
+            subtitle: t('steps.s3.subtitle'),
+            desc: t('steps.s3.desc'),
+            icon: Map,
+            tech_spec: "OPS_MATRIX_LOADED",
+            color: "text-teal-500",
+            bg: "bg-teal-50",
+            border: "border-teal-200",
+            load: "76%"
+        },
+        {
+            id: "I",
+            title: t('steps.s4.title'),
+            subtitle: t('steps.s4.subtitle'),
+            desc: t('steps.s4.desc'),
+            icon: FileCode,
+            tech_spec: "EXEC_CORE_ACTIVE",
+            color: "text-cyan-600",
+            bg: "bg-cyan-50",
+            border: "border-cyan-200",
+            load: "100%"
+        },
+        {
+            id: "O",
+            title: t('steps.s5.title'),
+            subtitle: t('steps.s5.subtitle'),
+            desc: t('steps.s5.desc'),
+            icon: BarChart3,
+            tech_spec: "DATA_LOOP_SYNC",
+            color: "text-emerald-500",
+            bg: "bg-emerald-50",
+            border: "border-emerald-200",
+            load: "98%"
+        },
+        {
+            id: "N",
+            title: t('steps.s6.title'),
+            subtitle: t('steps.s6.subtitle'),
+            desc: t('steps.s6.desc'),
+            icon: Rocket,
+            tech_spec: "SCALE_UP_READY",
+            color: "text-teal-600",
+            bg: "bg-teal-50",
+            border: "border-teal-200",
+            load: "89%"
+        },
+    ];
 
     // Auto-rotate steps if not interacting
     useEffect(() => {
@@ -110,13 +112,13 @@ export function Methodology() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                         </span>
-                        Protocolo Activo v2.4
+                        {t('badge')}
                     </div>
                     <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4 sm:mb-6 text-slate-900">
-                        SISTEMA <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">A.C.T.I.O.N™</span>
+                        {t('titleStart')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">{t('titleHighlight')}</span>
                     </h2>
                     <p className="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
-                        Nuestro framework propietario de ejecución. Una metodología probada para transformar caos en resultados predecibles y escalables.
+                        {t('subtitle')}
                     </p>
                 </div>
 

@@ -3,23 +3,26 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import React, { useRef } from "react";
 import { Target, Cpu, Activity, Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function ValueProposition() {
+    const t = useTranslations("home.valueProp");
+
     const values = [
         {
             icon: Target,
-            title: "Visión a Ejecución",
-            description: "No solo entregamos reportes. Construimos, desplegamos y operamos la infraestructura que tu negocio necesita.",
+            title: t('items.execution.title'),
+            description: t('items.execution.desc'),
         },
         {
             icon: Cpu,
-            title: "Ingeniería de Primer Nivel",
-            description: "Código limpio, arquitecturas escalables y estándares de seguridad bancaria. Calidad técnica sin compromisos.",
+            title: t('items.engineering.title'),
+            description: t('items.engineering.desc'),
         },
         {
             icon: Activity,
-            title: "Crecimiento Predecible",
-            description: "Sistemas de adquisición de clientes automatizados que generan resultados constantes, mes a mes.",
+            title: t('items.growth.title'),
+            description: t('items.growth.desc'),
         }
     ];
 
@@ -30,10 +33,10 @@ export function ValueProposition() {
                     {/* Header */}
                     <div className="lg:col-span-3 text-center mb-12">
                         <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl text-balance">
-                            Ingeniería de Valor <span className="text-teal-600">Absoluto</span>
+                            {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                         </h2>
                         <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                            Eliminamos la fricción entre la estrategia y la tecnología.
+                            {t('subtitle')}
                         </p>
                     </div>
 

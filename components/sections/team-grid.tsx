@@ -6,12 +6,14 @@ import Image from "next/image";
 
 import * as LucideIcons from "lucide-react";
 import type { Expert } from "@/types/experts";
+import { useTranslations } from "next-intl";
 
 interface TeamGridProps {
     experts: Expert[];
 }
 
 export function TeamGrid({ experts }: TeamGridProps) {
+    const t = useTranslations("home.teamGrid");
     // Si no hay expertos reales, usamos un fallback básico u ocultamos la sección
     if (!experts || experts.length === 0) {
         return null;
@@ -23,10 +25,10 @@ export function TeamGrid({ experts }: TeamGridProps) {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
-                        Operativos de <span className="text-teal-600">Élite</span>
+                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                     </h2>
                     <p className="text-slate-600 max-w-2xl mx-auto">
-                        Mentes maestras detrás de la infraestructura.
+                        {t('subtitle')}
                     </p>
                 </div>
 

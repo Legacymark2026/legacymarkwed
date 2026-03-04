@@ -3,38 +3,41 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, BarChart3, Target, Calendar } from "lucide-react";
 import Image from "next/image";
-
-const PROJECTS = [
-    {
-        id: "CS-01",
-        client: "FinTech Global",
-        title: "Escalado de Infraestructura",
-        desc: "Migración a arquitectura serverless reduciendo latencia un 40%.",
-        metric: "+240% Speed",
-        tags: ["Cloud", "DevOps"],
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-        id: "CS-02",
-        client: "E-Commerce Giant",
-        title: "Optimización de Conversión",
-        desc: "Rediseño UX/UI enfocado en checkout y recuperación de carritos.",
-        metric: "+85% Sales",
-        tags: ["UX/UI", "CRO"],
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop"
-    },
-    {
-        id: "CS-03",
-        client: "SaaS Enterprise",
-        title: "Sistema de Diseño Unificado",
-        desc: "Implementación de Design System para 12 productos internos.",
-        metric: "3x Dev Speed",
-        tags: ["Design System", "React"],
-        image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=2055&auto=format&fit=crop"
-    }
-];
+import { useTranslations } from "next-intl";
 
 export function CaseStudies() {
+    const t = useTranslations("home.caseStudies");
+
+    const PROJECTS = [
+        {
+            id: "CS-01",
+            client: t('projects.cs1.client'),
+            title: t('projects.cs1.title'),
+            desc: t('projects.cs1.desc'),
+            metric: "+240% Speed",
+            tags: [t('projects.cs1.tags.t1'), t('projects.cs1.tags.t2')],
+            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop"
+        },
+        {
+            id: "CS-02",
+            client: t('projects.cs2.client'),
+            title: t('projects.cs2.title'),
+            desc: t('projects.cs2.desc'),
+            metric: "+85% Sales",
+            tags: [t('projects.cs2.tags.t1'), t('projects.cs2.tags.t2')],
+            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop"
+        },
+        {
+            id: "CS-03",
+            client: t('projects.cs3.client'),
+            title: t('projects.cs3.title'),
+            desc: t('projects.cs3.desc'),
+            metric: "3x Dev Speed",
+            tags: [t('projects.cs3.tags.t1'), t('projects.cs3.tags.t2')],
+            image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=2055&auto=format&fit=crop"
+        }
+    ];
+
     return (
         <section className="bg-slate-50 py-20 sm:py-32 relative overflow-hidden border-y border-gray-200">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
@@ -44,15 +47,15 @@ export function CaseStudies() {
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
                             <Target size={12} />
-                            Project Holodeck
+                            {t('badge')}
                         </div>
                         <h2 className="text-4xl font-bold tracking-tight text-slate-900">
-                            Resultados que <span className="text-teal-600">Definen</span>
+                            {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                         </h2>
                     </div>
                     <div className="flex gap-2">
                         <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
-                        <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">Live Database</span>
+                        <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">{t('liveDb')}</span>
                     </div>
                 </div>
 

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpRight, FolderOpen, Layers } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Project {
     id: string;
@@ -18,6 +19,7 @@ interface PortfolioPreviewProps {
 }
 
 export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
+    const t = useTranslations("home.portfolioPreview");
     if (!projects || projects.length === 0) return null;
 
     return (
@@ -31,19 +33,19 @@ export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
                             <Layers size={12} />
-                            System Archive
+                            {t('badge')}
                         </div>
                         <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                            Sistemas <span className="text-teal-600">Desplegados</span>
+                            {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                         </h2>
                         <p className="mt-4 text-lg text-slate-600 max-w-xl font-medium">
-                            Infraestructura digital activa en producción. Resultados auditados.
+                            {t('subtitle')}
                         </p>
                     </div>
                     <Link href="/portfolio">
                         <Button variant="outline" className="text-slate-700 border-gray-200 hover:bg-slate-50 hover:text-teal-600 group">
                             <FolderOpen className="mr-2 h-4 w-4" />
-                            Explorar Archivo Completo
+                            {t('btn')}
                         </Button>
                     </Link>
                 </div>
@@ -81,7 +83,7 @@ export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
 
                                         <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100">
                                             <p className="text-gray-300 text-sm mt-2">
-                                                Click para acceder al informe detallado del proyecto ::
+                                                {t('hoverHint')}
                                             </p>
                                         </div>
                                     </div>

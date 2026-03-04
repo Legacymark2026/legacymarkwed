@@ -2,40 +2,43 @@
 
 import { MeteorCard } from "@/components/ui/meteor-card";
 import { MessageSquare, Quote } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-
-const REVIEWS = [
-    {
-        name: "Carlos Mendez",
-        username: "@cmendez_ceo",
-        body: "La reingeniería de nuestra plataforma aumentó el tráfico un 300% en el primer Q. Absolutamente brutal.",
-        role: "CEO, Fincorp",
-        img: "https://avatar.vercel.sh/carlos",
-    },
-    {
-        name: "Elena Torres",
-        username: "@elena_ux",
-        body: "Nunca había visto un equipo de desarrollo tan alineado con los objetivos de negocio. Calidad impecable.",
-        role: "Product Lead, Nova",
-        img: "https://avatar.vercel.sh/elena",
-    },
-    {
-        name: "Javier Ruiz",
-        username: "@crypto_jav",
-        body: "Velocidad de ejecución militar. Entregaron el MVP dos semanas antes de lo previsto.",
-        role: "Founder, Blockify",
-        img: "https://avatar.vercel.sh/javier",
-    },
-    {
-        name: "Ana Soto",
-        username: "@ana_growth",
-        body: "El dashboard de analítica nos dio la claridad que necesitábamos para escalar la inversión publicitaria.",
-        role: "CMO, E-Shop",
-        img: "https://avatar.vercel.sh/ana",
-    },
-];
 
 export function TestimonialSlider() {
+    const t = useTranslations("home.testimonials");
+
+    const REVIEWS = [
+        {
+            name: t('reviews.r1.name'),
+            username: "@cmendez_ceo",
+            body: t('reviews.r1.body'),
+            role: t('reviews.r1.role'),
+            img: "https://avatar.vercel.sh/carlos",
+        },
+        {
+            name: t('reviews.r2.name'),
+            username: "@elena_ux",
+            body: t('reviews.r2.body'),
+            role: t('reviews.r2.role'),
+            img: "https://avatar.vercel.sh/elena",
+        },
+        {
+            name: t('reviews.r3.name'),
+            username: "@crypto_jav",
+            body: t('reviews.r3.body'),
+            role: t('reviews.r3.role'),
+            img: "https://avatar.vercel.sh/javier",
+        },
+        {
+            name: t('reviews.r4.name'),
+            username: "@ana_growth",
+            body: t('reviews.r4.body'),
+            role: t('reviews.r4.role'),
+            img: "https://avatar.vercel.sh/ana",
+        },
+    ];
+
     return (
         <section className="bg-slate-50 py-24 border-y border-gray-200 overflow-hidden relative">
             <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-50 to-transparent z-10 pointer-events-none" />
@@ -45,10 +48,10 @@ export function TestimonialSlider() {
                 <div className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
                         <MessageSquare size={12} />
-                        Encrypted Transmissions
+                        {t('badge')}
                     </div>
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl text-balance">
-                        Lo que dicen nuestros <span className="text-teal-600">Aliados</span>
+                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
                     </h2>
                 </div>
 

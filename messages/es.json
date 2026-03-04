@@ -33,30 +33,265 @@
       "portfolio": "Portfolio",
       "blog": "Insights",
       "contact": "Contacto"
-    }
+    },
+    "ctaBadge": "Disponibles para nuevos proyectos",
+    "ctaTitleStart": "¿Listo para ",
+    "ctaTitleHighlight": "transformar tu marca?",
+    "ctaBtn": "Agenda una consulta",
+    "trust": {
+      "secure": "100% Seguro",
+      "noSpam": "Sin Spam",
+      "cancelFree": "Cancela Gratis"
+    },
+    "madeWithLove": "Hecho con ♥ en Girón, Colombia",
+    "country": "Colombia",
+    "rightsEnd": "Todos los derechos reservados.",
+    "subscribeSuccess": "¡Suscrito! Pronto recibirás nuestro contenido.",
+    "subscribeLoading": "..."
   },
   "home": {
     "hero": {
       "badge": "Agencia de Marketing Digital",
-      "title": "Transformamos tu marca con estrategia e innovación",
-      "subtitle": "Creamos estrategias digitales que generan resultados reales y crecimiento sostenible para tu negocio.",
-      "cta": "Comenzar proyecto",
-      "ctaSecondary": "Ver portfolio"
+      "systemActive": "System v2.4 ::",
+      "systemStatus": "Listo para Lanzamiento",
+      "titleStart": "Transformamos",
+      "titleHighlight": "El Futuro",
+      "subtitle": "LegacyMark fusiona INTELIGENCIA ARTIFICIAL con estrategia de élite para construir ecosistemas digitales que dominan mercados.",
+      "ctaPrimary": "Iniciar Protocolo",
+      "ctaSecondary": "Ver Demo Táctico"
     },
     "services": {
-      "title": "Nuestros Servicios",
-      "subtitle": "Soluciones integrales para hacer crecer tu marca en el entorno digital."
+      "badge": "Service Architecture",
+      "titleStart": "Soluciones",
+      "titleHighlight": "Integrales",
+      "subtitle": "Infraestructura digital diseñada para escalar. Desde la estrategia hasta el código.",
+      "items": {
+        "marketing": {
+          "title": "Marketing Estratégico",
+          "desc": "Campañas de alto rendimiento impulsadas por datos. ROAS optimizado."
+        },
+        "branding": {
+          "title": "Branding & Identidad",
+          "desc": "Diseño de marca que comunica autoridad y confianza."
+        },
+        "webdev": {
+          "title": "Desarrollo Web",
+          "desc": "Sitios ultra-rápidos construidos con Next.js y React."
+        },
+        "automation": {
+          "title": "Automatización IA",
+          "desc": "Sistemas autónomos que reducen carga operativa."
+        },
+        "seo": {
+          "title": "SEO Técnico",
+          "desc": "Posicionamiento orgánico para dominio de mercado."
+        },
+        "cloud": {
+          "title": "Infraestructura Cloud",
+          "desc": "Hosting escalable y seguro en Vercel/AWS."
+        },
+        "analytics": {
+          "title": "Analítica Avanzada",
+          "desc": "Dashboards en tiempo real para toma de decisiones."
+        }
+      }
     },
     "stats": {
-      "clients": "Clientes satisfechos",
-      "projects": "Proyectos completados",
-      "growth": "Crecimiento promedio",
-      "years": "Años de experiencia"
+      "badge": "LIVE TELEMETRY",
+      "items": {
+        "roi": {
+          "label": "Retorno Promedio",
+          "desc": "Optimización continua de pauta"
+        },
+        "leads": {
+          "label": "Leads Calificados",
+          "desc": "Pipeline de alta intención"
+        },
+        "conversion": {
+          "label": "Tasa de Conversión",
+          "desc": "Sobre la media de la industria"
+        },
+        "scale": {
+          "label": "Sistemas Escalados",
+          "desc": "Infraestructura robusta"
+        }
+      }
+    },
+    "alliances": {
+      "badge": "Strategic Ecosystem",
+      "titleStart": "Alianzas que",
+      "titleHighlight": "Potencian tu Crecimiento"
+    },
+    "valueProp": {
+      "titleStart": "Ingeniería de Valor",
+      "titleHighlight": "Absoluto",
+      "subtitle": "Eliminamos la fricción entre la estrategia y la tecnología.",
+      "items": {
+        "execution": {
+          "title": "Visión a Ejecución",
+          "desc": "No solo entregamos reportes. Construimos, desplegamos y operamos la infraestructura que tu negocio necesita."
+        },
+        "engineering": {
+          "title": "Ingeniería de Primer Nivel",
+          "desc": "Código limpio, arquitecturas escalables y estándares de seguridad bancaria. Calidad técnica sin compromisos."
+        },
+        "growth": {
+          "title": "Crecimiento Predecible",
+          "desc": "Sistemas de adquisición de clientes automatizados que generan resultados constantes, mes a mes."
+        }
+      }
+    },
+    "caseStudies": {
+      "badge": "Project Holodeck",
+      "liveDb": "Live Database",
+      "titleStart": "Resultados que",
+      "titleHighlight": "Definen",
+      "projects": {
+        "cs1": {
+          "client": "FinTech Global",
+          "title": "Escalado de Infraestructura",
+          "desc": "Migración a arquitectura serverless reduciendo latencia un 40%.",
+          "tags": {
+            "t1": "Cloud",
+            "t2": "DevOps"
+          }
+        },
+        "cs2": {
+          "client": "E-Commerce Giant",
+          "title": "Optimización de Conversión",
+          "desc": "Rediseño UX/UI enfocado en checkout y recuperación de carritos.",
+          "tags": {
+            "t1": "UX/UI",
+            "t2": "CRO"
+          }
+        },
+        "cs3": {
+          "client": "SaaS Enterprise",
+          "title": "Sistema de Diseño Unificado",
+          "desc": "Implementación de Design System para 12 productos internos.",
+          "tags": {
+            "t1": "Design System",
+            "t2": "React"
+          }
+        }
+      }
+    },
+    "testimonials": {
+      "badge": "Encrypted Transmissions",
+      "titleStart": "Lo que dicen nuestros",
+      "titleHighlight": "Aliados",
+      "reviews": {
+        "r1": {
+          "name": "Carlos Mendez",
+          "role": "CEO, Fincorp",
+          "body": "La reingeniería de nuestra plataforma aumentó el tráfico un 300% en el primer Q. Absolutamente brutal."
+        },
+        "r2": {
+          "name": "Elena Torres",
+          "role": "Product Lead, Nova",
+          "body": "Nunca había visto un equipo de desarrollo tan alineado con los objetivos de negocio. Calidad impecable."
+        },
+        "r3": {
+          "name": "Javier Ruiz",
+          "role": "Founder, Blockify",
+          "body": "Velocidad de ejecución militar. Entregaron el MVP dos semanas antes de lo previsto."
+        },
+        "r4": {
+          "name": "Ana Soto",
+          "role": "CMO, E-Shop",
+          "body": "El dashboard de analítica nos dio la claridad que necesitábamos para escalar la inversión publicitaria."
+        }
+      }
+    },
+    "methodology": {
+      "badge": "Protocolo Activo v2.4",
+      "titleStart": "SISTEMA",
+      "titleHighlight": "A.C.T.I.O.N™",
+      "subtitle": "Nuestro framework propietario de ejecución. Una metodología probada para transformar caos en resultados predecibles y escalables.",
+      "steps": {
+        "s1": {
+          "title": "Audit (Auditoría)",
+          "subtitle": "DIAGNÓSTICO PROFUNDO",
+          "desc": "Análisis forense de tu infraestructura digital actual, detectando cuellos de botella y fugas de eficiencia."
+        },
+        "s2": {
+          "title": "Conceptualize (Conceptualización)",
+          "subtitle": "ESTRATEGIA DE ARQUITECTURA",
+          "desc": "Diseño de soluciones personalizadas donde fusionamos objetivos de negocio con factibilidad técnica."
+        },
+        "s3": {
+          "title": "Tactical Plan (Plan Táctico)",
+          "subtitle": "HOJA DE RUTA OPERATIVA",
+          "desc": "Desglose granular de hitos, asignación de recursos y definición de KPIs críticos para el éxito."
+        },
+        "s4": {
+          "title": "Implement (Implementación)",
+          "subtitle": "DESPLIEGUE DE CÓDIGO",
+          "desc": "Ejecución ágil con estándares de calidad Enterprise. CI/CD pipelines y testing automatizado."
+        },
+        "s5": {
+          "title": "Optimize (Optimización)",
+          "subtitle": "MAXIMIZACIÓN DE RENDIMIENTO",
+          "desc": "Ajuste fino basado en datos reales. A/B testing y monitoreo de latencia para mejora continua."
+        },
+        "s6": {
+          "title": "Next Steps (Siguientes Pasos)",
+          "subtitle": "ESCALAMIENTO GLOBAL",
+          "desc": "Planificación de la siguiente fase de crecimiento. Preparación para carga masiva y nuevos mercados."
+        }
+      }
+    },
+    "teamGrid": {
+      "titleStart": "Operativos de",
+      "titleHighlight": "Élite",
+      "subtitle": "Mentes maestras detrás de la infraestructura."
+    },
+    "faq": {
+      "badge": "Knowledge Base",
+      "titleStart": "Protocolos de",
+      "titleHighlight": "Respuesta",
+      "q1": {
+        "q": "¿Cuánto tarda la implementación?",
+        "a": "Dependiendo de la complejidad. Landing pages tácticas: 2-3 semanas. Sistemas complejos: 4-8 semanas. Nuestro sprint inicial dura 5 días."
+      },
+      "q2": {
+        "q": "¿Tienen soporte post-lanzamiento?",
+        "a": "Absolutamente. Ofrecemos paquetes de mantenimiento 'Always-On' para asegurar uptime del 99.9%, actualizaciones de seguridad y optimización continua."
+      },
+      "q3": {
+        "q": "¿Se integran con mi stack actual?",
+        "a": "Sí. Nos conectamos vía API a cualquier CRM (HubSpot, Salesforce), ERP o base de datos. Somos agnósticos a la tecnología pero expertos en integración."
+      }
     },
     "cta": {
-      "title": "¿Listo para transformar tu negocio?",
-      "subtitle": "Hablemos sobre cómo podemos ayudarte a alcanzar tus metas.",
-      "button": "Agenda una consulta"
+      "badge": "Secure Channel Open",
+      "titleStart": "Listo para",
+      "titleHighlight": "Escalar?",
+      "subtitle": "No más excusas. Inicia la transformación digital de tu marca hoy. Agenda una sesión de estrategia táctica.",
+      "btn1": "Iniciar Misión",
+      "btn2": "Consultar Disponibilidad",
+      "footerInfo": {
+        "f1": "EST. TIME: 2-4 WEEKS",
+        "f2": "SLOTS: LIMITED",
+        "f3": "REGION: GLOBAL"
+      }
+    },
+    "portfolioPreview": {
+      "badge": "System Archive",
+      "titleStart": "Sistemas",
+      "titleHighlight": "Desplegados",
+      "subtitle": "Infraestructura digital activa en producción. Resultados auditados.",
+      "btn": "Explorar Archivo Completo",
+      "hoverHint": "Click para acceder al informe detallado del proyecto ::"
+    },
+    "latestPosts": {
+      "badge": "Intelligence Feed",
+      "titleStart": "Reportes de",
+      "titleHighlight": "Inteligencia",
+      "subtitle": "Análisis táctico de tendencias y tecnología.",
+      "btn": "Acceder a la Base de Datos",
+      "lockedMsg": "Contenido clasificado. Requiere acceso de nivel 1 para visualizar el resumen completo.",
+      "readAction": "Leer Informe"
     }
   },
   "contact": {

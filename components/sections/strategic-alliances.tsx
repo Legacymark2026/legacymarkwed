@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Handshake, TrendingUp, CheckCircle2, ShieldCheck, Globe, Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const PARTNERS = [
     { name: "Google Ads", tier: "Premier Partner", metric: "Top 3% Global", icon: Globe, color: "text-blue-500", bg: "bg-blue-500/10" },
@@ -14,6 +15,8 @@ const PARTNERS = [
 ];
 
 export function StrategicAlliances() {
+    const t = useTranslations("home.alliances");
+
     return (
         <section className="py-24 bg-white border-y border-gray-100 overflow-hidden relative">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -25,9 +28,9 @@ export function StrategicAlliances() {
                         className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest"
                     >
                         <ShieldCheck size={12} />
-                        Strategic Ecosystem
+                        {t('badge')}
                     </motion.div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900">Alianzas que <span className="text-teal-600">Potencian tu Crecimiento</span></h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span></h2>
                 </div>
 
                 {/* Partners Grid */}

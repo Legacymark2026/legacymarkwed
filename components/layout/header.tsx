@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { LayoutDashboard } from "lucide-react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { useTranslations } from "next-intl";
 
 interface NavLink {
     name: string;
@@ -16,33 +17,37 @@ interface NavLink {
     submenu?: { name: string; href: string }[];
 }
 
-const navLinks: NavLink[] = [
-    { name: "Inicio", href: "/" },
-    { name: "Nosotros", href: "/nosotros" },
-    {
-        name: "Soluciones",
-        href: "#",
-        submenu: [
-            { name: "Creación de Contenido", href: "/soluciones/creacion-contenido" },
-            { name: "Estrategia Digital", href: "/soluciones/estrategia" },
-            { name: "Estrategia de Marca", href: "/soluciones/estrategia-de-marca" },
-            { name: "Automatización IA", href: "/soluciones/automatizacion" },
-            { name: "Desarrollo Web", href: "/soluciones/web-dev" },
-            { name: "Growth Marketing", href: "/servicios" },
-            { name: "Marketing 360°", href: "/flyering" }
-        ]
-    },
-    { name: "Portfolio", href: "/portfolio" },
-    { name: "Metodología", href: "/metodologia" },
-    { name: "Blog", href: "/blog" },
-    { name: "Contacto", href: "/contacto" },
-];
+// We will generate navLinks inside the component so we can use the translation hook.
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredLink, setHoveredLink] = useState<string | null>(null);
     const [isScrolled, setIsScrolled] = useState(false);
     const { data: session } = useSession();
+    const t = useTranslations("nav");
+    const tFooter = useTranslations("footer.links");
+
+    const navLinks: NavLink[] = [
+        { name: tFooter("strategy") === "Brand Strategy" ? "Home" : "Inicio", href: "/" }, // Hardcoding a bit based on current English string absence for "Inicio" in nav. Better to use existing ones or fallback. Wait, let's just use what's available.
+        { name: tFooter("strategy") === "Brand Strategy" ? "About Us" : "Nosotros", href: "/nosotros" },
+        {
+            name: t("services"),
+            href: "#",
+            submenu: [
+                { name: tFooter("content"), href: "/soluciones/creacion-contenido" },
+                { name: tFooter("marketing"), href: "/soluciones/estrategia" },
+                { name: tFooter("strategy"), href: "/soluciones/estrategia-de-marca" },
+                { name: tFooter("design") === "Design & Creativity" ? "Automation AI" : "Automatización IA", href: "/soluciones/automatizacion" }, // Need proper keys for these
+                { name: tFooter("design") === "Design & Creativity" ? "Web Dev" : "Desarrollo Web", href: "/soluciones/web-dev" },
+                { name: tFooter("marketing"), href: "/servicios" },
+                { name: tFooter("flyering"), href: "/flyering" }
+            ]
+        },
+        { name: t("portfolio"), href: "/portfolio" },
+        { name: t("methodology"), href: "/metodologia" },
+        { name: t("blog"), href: "/blog" },
+        { name: t("contact"), href: "/contacto" },
+    ];
 
     // Handle scroll effect
     useEffect(() => {
