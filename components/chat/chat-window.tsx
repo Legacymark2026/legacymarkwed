@@ -39,7 +39,7 @@ function TypingIndicator() {
         <div className="flex items-end gap-2">
             <Avatar className="h-7 w-7 shrink-0">
                 <AvatarImage src={AGENT.avatar} />
-                <AvatarFallback className="text-[10px] bg-gradient-to-br from-violet-600 to-indigo-600 text-white">
+                <AvatarFallback className="text-[10px] bg-gradient-to-br from-teal-600 to-emerald-600 text-white">
                     {AGENT.initials}
                 </AvatarFallback>
             </Avatar>
@@ -93,7 +93,7 @@ function MessageBubble({ msg, isLast }: { msg: Message; isLast: boolean }) {
             {!isInbound && (
                 <Avatar className="h-7 w-7 shrink-0">
                     <AvatarImage src={AGENT.avatar} />
-                    <AvatarFallback className="text-[10px] bg-gradient-to-br from-violet-600 to-indigo-600 text-white">
+                    <AvatarFallback className="text-[10px] bg-gradient-to-br from-teal-600 to-emerald-600 text-white">
                         {AGENT.initials}
                     </AvatarFallback>
                 </Avatar>
@@ -104,7 +104,7 @@ function MessageBubble({ msg, isLast }: { msg: Message; isLast: boolean }) {
                     className={cn(
                         "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm",
                         isInbound
-                            ? "bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-br-sm"
+                            ? "bg-gradient-to-br from-teal-600 to-emerald-600 text-white rounded-br-sm"
                             : "bg-white dark:bg-zinc-800 border border-border/50 text-foreground rounded-bl-sm"
                     )}
                 >
@@ -115,7 +115,7 @@ function MessageBubble({ msg, isLast }: { msg: Message; isLast: boolean }) {
                     {isInbound && (
                         msg.status === "SENDING"
                             ? <Check className="h-3 w-3 text-muted-foreground" />
-                            : <CheckCheck className="h-3 w-3 text-violet-500" />
+                            : <CheckCheck className="h-3 w-3 text-teal-500" />
                     )}
                 </div>
             </div>
@@ -201,7 +201,7 @@ export function ChatWindow({ conversationId, visitorId, onClose }: ChatWindowPro
     return (
         <div className="flex flex-col w-[380px] h-[520px] bg-zinc-50 dark:bg-zinc-950 overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-3 flex items-center gap-3 relative overflow-hidden shrink-0">
+            <div className="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-3 flex items-center gap-3 relative overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
                 <div className="relative flex items-center gap-3 flex-1 min-w-0">
                     <div className="relative">
@@ -238,7 +238,7 @@ export function ChatWindow({ conversationId, visitorId, onClose }: ChatWindowPro
                     className="flex items-end gap-2"
                 >
                     <Avatar className="h-7 w-7 shrink-0">
-                        <AvatarFallback className="text-[10px] bg-gradient-to-br from-violet-600 to-indigo-600 text-white">
+                        <AvatarFallback className="text-[10px] bg-gradient-to-br from-teal-600 to-emerald-600 text-white">
                             LM
                         </AvatarFallback>
                     </Avatar>
@@ -279,7 +279,7 @@ export function ChatWindow({ conversationId, visitorId, onClose }: ChatWindowPro
                             <button
                                 key={reply}
                                 onClick={() => handleSend(reply)}
-                                className="text-xs px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors font-medium"
+                                className="text-xs px-3 py-1.5 rounded-full border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50 hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors font-medium"
                             >
                                 {reply}
                             </button>
@@ -290,7 +290,7 @@ export function ChatWindow({ conversationId, visitorId, onClose }: ChatWindowPro
 
             {/* Input Area */}
             <div className="px-4 py-3 bg-white dark:bg-zinc-900 border-t border-border/50 shrink-0">
-                <div className="flex items-end gap-2 bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-2 border border-transparent focus-within:border-violet-300 dark:focus-within:border-violet-700 transition-colors">
+                <div className="flex items-end gap-2 bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-2 border border-transparent focus-within:border-teal-300 dark:focus-within:border-teal-700 transition-colors">
                     <textarea
                         ref={textareaRef}
                         value={inputValue}
@@ -308,7 +308,7 @@ export function ChatWindow({ conversationId, visitorId, onClose }: ChatWindowPro
                         className={cn(
                             "h-8 w-8 rounded-full flex items-center justify-center transition-all shrink-0",
                             inputValue.trim()
-                                ? "bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/30"
+                                ? "bg-gradient-to-br from-teal-600 to-emerald-600 text-white shadow-md shadow-teal-500/30"
                                 : "bg-zinc-200 dark:bg-zinc-700 text-zinc-400"
                         )}
                     >
@@ -316,7 +316,7 @@ export function ChatWindow({ conversationId, visitorId, onClose }: ChatWindowPro
                     </motion.button>
                 </div>
                 <p className="text-[10px] text-center text-muted-foreground mt-2">
-                    Powered by <span className="font-semibold text-violet-600">LegacyMark</span>
+                    Powered by <span className="font-semibold text-teal-600">LegacyMark</span>
                 </p>
             </div>
         </div>

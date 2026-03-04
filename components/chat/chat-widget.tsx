@@ -59,7 +59,7 @@ export function ChatWidget() {
                             <ChatWindow conversationId={conversationId} visitorId={visitorId} onClose={() => setIsOpen(false)} />
                         ) : (
                             <div className="w-[380px] bg-white/50 dark:bg-black/50 backdrop-blur-md rounded-2xl overflow-hidden">
-                                <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-6 text-white relative overflow-hidden">
+                                <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-white relative overflow-hidden">
                                     <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20"></div>
                                     <div className="relative z-10">
                                         <h3 className="font-bold text-xl tracking-tight">LegacyMark AI</h3>
@@ -67,7 +67,7 @@ export function ChatWidget() {
                                     </div>
                                     {/* Decorative circles */}
                                     <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                                    <div className="absolute bottom-0 right-0 w-24 h-24 bg-indigo-500/30 rounded-full blur-xl"></div>
+                                    <div className="absolute bottom-0 right-0 w-24 h-24 bg-emerald-500/30 rounded-full blur-xl"></div>
                                 </div>
                                 <LeadForm onChatStarted={handleChatStarted} />
                             </div>
@@ -102,7 +102,7 @@ export function ChatWidget() {
                         "h-14 w-14 rounded-full shadow-2xl transition-all duration-300 flex items-center justify-center relative",
                         isOpen
                             ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rotate-0"
-                            : "bg-gradient-to-br from-violet-600 to-indigo-600 text-white"
+                            : "bg-gradient-to-br from-teal-600 to-emerald-600 text-white"
                     )}
                 >
                     {/* Unread Badge */}

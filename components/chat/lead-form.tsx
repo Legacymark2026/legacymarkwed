@@ -11,7 +11,7 @@ interface LeadFormProps {
 }
 
 const TEAM_AVATARS = [
-    { initials: "LM", color: "from-violet-500 to-indigo-500" },
+    { initials: "LM", color: "from-teal-500 to-emerald-500" },
     { initials: "AS", color: "from-pink-500 to-rose-500" },
     { initials: "JR", color: "from-amber-500 to-orange-500" },
 ];
@@ -44,14 +44,14 @@ function FloatingInput({
                 className={cn(
                     "flex items-center gap-3 border rounded-xl px-4 py-3 transition-all duration-200 bg-white dark:bg-zinc-900",
                     active
-                        ? "border-violet-400 dark:border-violet-600 ring-2 ring-violet-100 dark:ring-violet-900/50"
+                        ? "border-teal-400 dark:border-teal-600 ring-2 ring-teal-100 dark:ring-teal-900/50"
                         : "border-zinc-200 dark:border-zinc-700"
                 )}
             >
                 <Icon
                     className={cn(
                         "h-4 w-4 shrink-0 transition-colors",
-                        active ? "text-violet-500" : "text-zinc-400"
+                        active ? "text-teal-500" : "text-zinc-400"
                     )}
                 />
                 <div className="flex-1 relative">
@@ -59,7 +59,7 @@ function FloatingInput({
                         htmlFor={id}
                         className={cn(
                             "absolute left-0 transition-all duration-200 pointer-events-none text-zinc-400",
-                            active ? "top-0 text-[10px] text-violet-500 font-medium" : "top-1/2 -translate-y-1/2 text-sm"
+                            active ? "top-0 text-[10px] text-teal-500 font-medium" : "top-1/2 -translate-y-1/2 text-sm"
                         )}
                     >
                         {label}
@@ -150,10 +150,10 @@ export function LeadForm({ onChatStarted }: LeadFormProps) {
                 transition={{ delay: 0.15 }}
                 className="grid grid-cols-2 gap-2"
             >
-                <div className="bg-violet-50 dark:bg-violet-950/30 rounded-xl p-3 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-violet-600 shrink-0" />
+                <div className="bg-teal-50 dark:bg-teal-950/30 rounded-xl p-3 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-teal-600 shrink-0" />
                     <div>
-                        <p className="text-xs font-semibold text-violet-700 dark:text-violet-300">&lt; 2 min</p>
+                        <p className="text-xs font-semibold text-teal-700 dark:text-teal-300">&lt; 2 min</p>
                         <p className="text-[10px] text-muted-foreground">Tiempo de respuesta</p>
                     </div>
                 </div>
@@ -205,7 +205,7 @@ export function LeadForm({ onChatStarted }: LeadFormProps) {
                         "w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300",
                         isSubmitting || !name || !email || !message
                             ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50"
+                            : "bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50"
                     )}
                 >
                     {isSubmitting ? (
@@ -224,7 +224,7 @@ export function LeadForm({ onChatStarted }: LeadFormProps) {
 
             <p className="text-[10px] text-center text-muted-foreground">
                 Al continuar aceptas nuestra{" "}
-                <a href="/privacidad" className="underline hover:text-violet-600 transition-colors">
+                <a href="/privacidad" className="underline hover:text-teal-600 transition-colors">
                     política de privacidad
                 </a>
             </p>
