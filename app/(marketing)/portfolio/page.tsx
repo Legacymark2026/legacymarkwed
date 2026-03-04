@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { motion, useTransform, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 // --- ULTRA-PREMIUM VISUAL FX COMPONENTS ---
 
@@ -158,7 +159,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                     translateY: "-50%"
                 }}
             >
-                <span className="text-white font-black uppercase tracking-widest text-xs">View Case</span>
+                <span className="text-white font-black uppercase tracking-widest text-xs">👀</span>
             </motion.div>
         </motion.div>
     );
@@ -197,50 +198,46 @@ const FilterButton = ({ active, onClick, children }: { active: boolean; onClick:
 );
 
 // DATA
-const projects = [
+const projectsConfig = [
     {
         id: 1,
-        title: "NEOBANK",
-        category: "FinTech",
-        description: "Re-architecting the core banking core. 99.99% uptime with 5M+ daily transactions.",
+        key: "neobank",
         gradient: "from-blue-600 via-indigo-900 to-black",
         stack: [Code2, Database, Layout, Shield],
-        stats: [
-            { label: "Latency", value: "12ms" },
-            { label: "Uptime", value: "99.99%" },
-            { label: "Transact", value: "$5B+" }
-        ]
+        filterCategory: "FinTech"
     },
     {
         id: 2,
-        title: "AURA MODA",
-        category: "E-Commerce",
-        description: "Immersive 3D shopping experience for luxury streetwear. WebGL powered.",
+        key: "aura",
         gradient: "from-purple-600 via-pink-900 to-black",
         stack: [Layers, PenTool, Monitor, Box],
-        stats: [
-            { label: "Returns", value: "-30%" },
-            { label: "AOV", value: "$450" },
-            { label: "Conversion", value: "4.8%" }
-        ]
+        filterCategory: "E-Commerce"
     },
     {
         id: 3,
-        title: "SYNTH AI",
-        category: "SaaS",
-        description: "Generative AI platform with real-time scaling and edge inference.",
+        key: "synth",
         gradient: "from-emerald-600 via-teal-900 to-black",
         stack: [Cpu, Terminal, Zap, Brain],
-        stats: [
-            { label: "Users", value: "100k+" },
-            { label: "Tokens/s", value: "4M" },
-            { label: "MRR", value: "$80k" }
-        ]
+        filterCategory: "SaaS"
     }
 ];
 
 export default function PortfolioPage() {
     const [filter, setFilter] = useState("All");
+    const t = useTranslations("portfolioPage");
+
+    // Hydrate projects with translations
+    const translatedProjects = projectsConfig.map(p => ({
+        ...p,
+        title: t(`projects.${p.key}.title`),
+        category: t(`projects.${p.key}.category`),
+        description: t(`projects.${p.key}.desc`),
+        stats: [
+            { label: t(`projects.${p.key}.stats.s1.label`), value: t(`projects.${p.key}.stats.s1.val`) },
+            { label: t(`projects.${p.key}.stats.s2.label`), value: t(`projects.${p.key}.stats.s2.val`) },
+            { label: t(`projects.${p.key}.stats.s3.label`), value: t(`projects.${p.key}.stats.s3.val`) }
+        ]
+    }));
 
     return (
         <main className="bg-slate-50 min-h-screen selection:bg-pink-500 selection:text-white cursor-crosshair">
@@ -263,29 +260,28 @@ export default function PortfolioPage() {
                     <div className="inline-flex items-center gap-3 mb-12 px-6 py-3 rounded-full border border-slate-200 bg-white/50 backdrop-blur-sm shadow-sm hover:scale-105 transition-transform cursor-pointer">
                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" />
                         <span className="text-xs font-mono font-bold uppercase tracking-[0.3em] text-slate-500">
-                            Classified: Level 5 Clearance
+                            {t('hero.badge')}
                         </span>
                     </div>
 
                     <h1 className="text-8xl md:text-[11rem] font-black text-slate-900 leading-[0.8] tracking-tighter mb-12 mix-blend-darken">
-                        <ScrambleTitle text="PROOF" /><br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-400">OF WORK.</span>
+                        <ScrambleTitle text={t('hero.scramble')} /><br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-400">{t('hero.titleHighlight')}</span>
                     </h1>
 
                     <div className="flex flex-col md:flex-row gap-12 items-start opacity-0 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500 fill-mode-forwards">
                         <p className="text-2xl text-slate-600 max-w-xl font-medium leading-relaxed border-l-4 border-black pl-8">
-                            We don&apos;t just write code. We engineer dominance.
-                            Explore the vault of our most ambitious deployments.
+                            {t('hero.desc')}
                         </p>
 
                         <div className="flex gap-8">
                             <div className="text-center">
-                                <div className="text-4xl font-black text-slate-900">$50M+</div>
-                                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-2">Client Revenue</div>
+                                <div className="text-4xl font-black text-slate-900">{t('hero.stats.s1.val')}</div>
+                                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-2">{t('hero.stats.s1.label')}</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-4xl font-black text-slate-900">100%</div>
-                                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-2">Success Rate</div>
+                                <div className="text-4xl font-black text-slate-900">{t('hero.stats.s2.val')}</div>
+                                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-2">{t('hero.stats.s2.label')}</div>
                             </div>
                         </div>
                     </div>
@@ -297,9 +293,14 @@ export default function PortfolioPage() {
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-2 mb-24 justify-center md:justify-start border-b border-slate-200 pb-8">
-                    {["All", "FinTech", "E-Commerce", "SaaS"].map((f) => (
-                        <FilterButton key={f} active={filter === f} onClick={() => setFilter(f)}>
-                            {f === "All" ? "View All" : f}
+                    {[
+                        { key: "All", label: t('filters.all') },
+                        { key: "FinTech", label: t('filters.fintech') },
+                        { key: "E-Commerce", label: t('filters.ecommerce') },
+                        { key: "SaaS", label: t('filters.saas') }
+                    ].map((f) => (
+                        <FilterButton key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)}>
+                            {f.label}
                         </FilterButton>
                     ))}
                 </div>
@@ -307,16 +308,16 @@ export default function PortfolioPage() {
                 {/* Grid */}
                 <div className="grid gap-24">
                     <AnimatePresence mode="popLayout">
-                        {projects.filter(p => filter === "All" || p.category === filter).map((project, index) => (
-                            <ProjectCard key={project.id} project={project} index={index} />
+                        {translatedProjects.filter(p => filter === "All" || p.filterCategory === filter).map((project, index) => (
+                            <ProjectCard key={project.id} project={project as any} index={index} />
                         ))}
                     </AnimatePresence>
                 </div>
 
                 <div className="mt-40 text-center">
-                    <p className="font-mono text-slate-400 text-sm mb-4">{"/// END OF PUBLIC RECORDS ///"}</p>
+                    <p className="font-mono text-slate-400 text-sm mb-4">{t('gallery.end')}</p>
                     <Button variant="outline" className="h-20 px-12 border-2 border-dashed border-slate-300 text-slate-400 uppercase tracking-widest hover:border-black hover:text-black hover:bg-transparent transition-all">
-                        Request Full Credentials
+                        {t('gallery.req')}
                     </Button>
                 </div>
             </section>
@@ -329,14 +330,14 @@ export default function PortfolioPage() {
                     <div className="mb-12 inline-block">
                         <Trophy size={64} className="text-yellow-500 mb-6 mx-auto animate-bounce" />
                         <h2 className="text-6xl md:text-9xl font-black mb-4 tracking-tighter">
-                            BE THE NEXT<br />UNICORN.
+                            {t('cta.title')}<br />{t('cta.titleBr')}
                         </h2>
                     </div>
 
                     <div className="flex justify-center gap-6">
                         <Link href="/contacto">
                             <Button className="h-24 px-16 bg-white text-black text-xl font-bold uppercase tracking-widest rounded-none hover:bg-green-400 hover:scale-105 transition-all shadow-[0_0_50px_rgba(255,255,255,0.2)]">
-                                Start Project
+                                {t('cta.btn')}
                             </Button>
                         </Link>
                     </div>

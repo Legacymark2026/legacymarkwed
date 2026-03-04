@@ -3,24 +3,23 @@
 import { motion } from "framer-motion";
 import { Eye, Flag, Heart } from "lucide-react";
 
-const features = [
+import { useTranslations } from "next-intl";
+
+const featuresConfig = [
     {
-        title: "Misión",
-        description: "Impulsamos el desarrollo de empresas a través de estrategias de marketing y publicidad basadas en el ADN de cada marca. Diagnosticamos y resolvemos los obstáculos de comunicación para transformar el potencial de nuestros clientes en resultados de ventas y posicionamiento real.",
+        key: "mission",
         icon: Flag,
         color: "bg-blue-500",
         delay: 0
     },
     {
-        title: "Visión 2030",
-        description: "Ser el referente del marketing táctico y estratégico en Latinoamérica, reconocidos por transformar marcas emergentes en legados corporativos a través de resultados de alto impacto y crecimiento sostenible.",
+        key: "vision",
         icon: Eye,
         color: "bg-teal-500",
         delay: 0.2
     },
     {
-        title: "Personalidad",
-        description: "Somos una agencia creativa, innovadora y comprometida. Nuestra amabilidad y cercanía destacará al inicio de una conversación, pues nuestro legado es cultivar la calidez humana en cada empresa que trabaje con nosotros.",
+        key: "personality",
         icon: Heart,
         color: "bg-rose-500",
         delay: 0.4
@@ -28,6 +27,8 @@ const features = [
 ];
 
 export function CorporatePhilosophy() {
+    const t = useTranslations("nosotrosPage.philosophy");
+
     return (
         <section className="py-24 relative overflow-hidden bg-slate-50">
             {/* Background Decorations */}
@@ -37,17 +38,17 @@ export function CorporatePhilosophy() {
             <div className="container px-4 md:px-6 relative z-10">
                 <div className="mb-16 text-center max-w-3xl mx-auto">
                     <h2 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 mb-6">
-                        Nuestro <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">ADN Corporativo</span>
+                        {t('titleStart')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">{t('titleHighlight')}</span>
                     </h2>
                     <p className="text-slate-500 text-lg">
-                        Más que una agencia, somos arquitectos de crecimiento empresarial.
+                        {t('subtitle')}
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8">
-                    {features.map((feature, i) => (
+                    {featuresConfig.map((feature, i) => (
                         <motion.div
-                            key={feature.title}
+                            key={feature.key}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -60,9 +61,9 @@ export function CorporatePhilosophy() {
                                 <feature.icon className={`w-7 h-7 text-${feature.color.split("-")[1]}-600`} />
                             </div>
 
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">{feature.title}</h3>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-4">{t(`features.${feature.key}.title`)}</h3>
                             <p className="text-slate-600 leading-relaxed text-pretty">
-                                {feature.description}
+                                {t(`features.${feature.key}.description`)}
                             </p>
                         </motion.div>
                     ))}

@@ -1,45 +1,32 @@
-import { Metadata } from 'next';
 import { ContactForm } from "@/components/sections/contact-form";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-    title: 'Contacto | Legacy Mark',
-    description: 'Hablemos de tu proyecto. Agenda una auditoría gratuita de 15 minutos con nuestro equipo de estrategia digital.',
-};
+export async function generateMetadata() {
+    const t = await getTranslations('contactPage.meta');
+    return {
+        title: t('title'),
+        description: t('description'),
+    };
+}
 
 // ─── STATIC DATA ─────────────────────────────────────────────────────────────
 
-const contactMethods = [
-    {
-        icon: '✉️', label: 'Email Principal', value: 'legacymarkcolombia@legacymarksas.com',
-        href: 'mailto:legacymarkcolombia@legacymarksas.com', sub: 'Respuesta < 24h',
-        color: 'from-violet-500 to-purple-600',
-    },
-    {
-        icon: '📱', label: 'WhatsApp', value: '+57 322 304 7353',
-        href: 'https://wa.me/573223047353', sub: 'Disponible L–V 8am–6pm',
-        color: 'from-teal-500 to-emerald-600',
-    },
-    {
-        icon: '📍', label: 'Oficina', value: 'Crr18a 22-21 Villa Linda, Girón, Santander',
-        href: '#', sub: 'NIT 902028722-3 · Colombia 687541',
-        color: 'from-sky-500 to-blue-600',
-    },
+const contactMethodsConfig = [
+    { key: 'email', icon: '✉️', value: 'legacymarkcolombia@legacymarksas.com', href: 'mailto:legacymarkcolombia@legacymarksas.com', color: 'from-violet-500 to-purple-600' },
+    { key: 'whatsapp', icon: '📱', value: '+57 322 304 7353', href: 'https://wa.me/573223047353', color: 'from-teal-500 to-emerald-600' },
+    { key: 'office', icon: '📍', value: '', href: '#', color: 'from-sky-500 to-blue-600' }, // value is handled below or from translations depending on design
 ];
 
-const processSteps = [
-    { num: '01', title: 'Envía tu mensaje', desc: 'Cuéntanos sobre tu proyecto, objetivos y presupuesto estimado.', icon: '📝' },
-    { num: '02', title: 'Revisamos tu caso', desc: 'Nuestro equipo analiza tu negocio en menos de 24 horas.', icon: '🔍' },
-    { num: '03', title: 'Auditoría gratuita', desc: 'Llamada de 15 min para entender tus metas y presentar un plan.', icon: '📞' },
-    { num: '04', title: 'Propuesta a medida', desc: 'Recibes una estrategia personalizada con proyecciones de ROI.', icon: '🚀' },
+const processStepsConfig = [
+    { num: '01', key: 's1', icon: '📝' },
+    { num: '02', key: 's2', icon: '🔍' },
+    { num: '03', key: 's3', icon: '📞' },
+    { num: '04', key: 's4', icon: '🚀' },
 ];
 
 const trustedBy = ['TechStart', 'InmoGroup', 'EcoBrand', 'MediaFlow', 'GrowthCo', 'BrandLab'];
 
-const faqs = [
-    { q: '¿Cuánto tiempo tarda la primera entrega?', a: 'El onboarding inicia en 48h. Las primeras piezas se entregan en 9 días hábiles.' },
-    { q: '¿Hay permanencia mínima?', a: 'No. Operamos mes a mes. Creemos en los resultados, no en los contratos.' },
-    { q: '¿Trabajan con marcas internacionales?', a: 'Sí, atendemos clientes de Colombia, USA, México y España con equipos bi-lingüe.' },
-];
+const faqsConfig = ['q1', 'q2', 'q3'];
 
 // SVG globe decoration
 const GridOrb = () => (
@@ -83,7 +70,9 @@ const PulseRings = () => (
     </div>
 );
 
-export default function ContactPage() {
+export default async function ContactPage() {
+    const t = await getTranslations('contactPage');
+
     return (
         <main className="min-h-screen bg-white overflow-hidden">
 
@@ -119,36 +108,37 @@ export default function ContactPage() {
                 {/* Status indicator */}
                 <div className="absolute top-24 right-5 flex items-center gap-2 px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-full shadow-sm hidden md:flex" aria-hidden>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" style={{ animationDuration: '2s' }} />
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Equipo disponible</span>
+                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">{t('hero.status')}</span>
                 </div>
 
                 <div className="container mx-auto px-4 md:px-6 max-w-4xl text-center relative z-10">
                     <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-teal-200 bg-white/70 backdrop-blur-md shadow-md mb-8">
                         <span className="text-teal-500 text-sm">📬</span>
-                        <span className="text-teal-700 text-xs font-black tracking-widest uppercase">Comienza Aquí</span>
+                        <span className="text-teal-700 text-xs font-black tracking-widest uppercase">{t('hero.badge')}</span>
                     </div>
 
                     <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-6">
-                        <span className="block text-slate-900">Hablemos</span>
-                        <span className="block bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #0d9488 0%, #0891b2 50%, #7c3aed 100%)' }}>de tu Proyecto</span>
+                        <span className="block text-slate-900">{t('hero.titleStart')}</span>
+                        <span className="block bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #0d9488 0%, #0891b2 50%, #7c3aed 100%)' }}>{t('hero.titleHighlight')}</span>
                     </h1>
 
                     <p className="text-xl text-slate-500 max-w-xl mx-auto mb-10 leading-relaxed">
-                        ¿Tienes un proyecto en mente? Estamos listos para ayudarte a{' '}
-                        <span className="text-slate-800 font-semibold">llevarlo al siguiente nivel.</span>
+                        {t.rich('hero.description', {
+                            highlight: (chunks) => <span className="text-slate-800 font-semibold">{chunks}</span>
+                        })}
                     </p>
 
                     {/* Trust micro-proof */}
                     <div className="flex flex-col items-center gap-4">
                         <div className="flex items-center gap-2">
-                            {['✓ Sin contrato', '✓ Respuesta en 24h', '✓ Primera consulta gratis'].map((t) => (
-                                <span key={t} className="text-xs font-medium text-slate-500 px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm">{t}</span>
+                            {[t('hero.trust.t1'), t('hero.trust.t2'), t('hero.trust.t3')].map((tStr) => (
+                                <span key={tStr} className="text-xs font-medium text-slate-500 px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm">{tStr}</span>
                             ))}
                         </div>
 
                         {/* Trusted by marquee */}
                         <div className="mt-4 overflow-hidden w-full max-w-xl">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Con la confianza de</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('hero.trustedByLabel')}</p>
                             <div className="flex gap-6 overflow-hidden">
                                 <div className="flex gap-6 shrink-0 animate-marquee">
                                     {[...trustedBy, ...trustedBy].map((name, i) => (
@@ -165,18 +155,18 @@ export default function ContactPage() {
             <section className="py-16 bg-white border-y border-slate-100">
                 <div className="container mx-auto px-4 md:px-6 max-w-5xl">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
-                        {processSteps.map((step, i) => (
+                        {processStepsConfig.map((step, i) => (
                             <div key={step.num} className="relative group flex flex-col items-center text-center p-6">
                                 {/* Connector line */}
-                                {i < processSteps.length - 1 && (
+                                {i < processStepsConfig.length - 1 && (
                                     <div className="absolute right-0 top-[44px] w-1/2 h-px bg-gradient-to-r from-teal-200 to-slate-100 hidden md:block" aria-hidden />
                                 )}
                                 <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-50 to-sky-50 border border-teal-100 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 group-hover:border-teal-300 transition-all duration-300 shadow-sm">
                                     {step.icon}
                                     <span className="absolute -top-1.5 -right-1.5 text-[10px] font-black text-teal-600 bg-teal-50 border border-teal-200 rounded-full w-5 h-5 flex items-center justify-center">{step.num}</span>
                                 </div>
-                                <h3 className="text-sm font-bold text-slate-900 mb-1">{step.title}</h3>
-                                <p className="text-xs text-slate-400 leading-relaxed">{step.desc}</p>
+                                <h3 className="text-sm font-bold text-slate-900 mb-1">{t(`process.${step.key}.title`)}</h3>
+                                <p className="text-xs text-slate-400 leading-relaxed">{t(`process.${step.key}.desc`)}</p>
                             </div>
                         ))}
                     </div>
@@ -193,16 +183,16 @@ export default function ContactPage() {
 
                             {/* Section label */}
                             <div>
-                                <span className="text-xs font-black text-teal-600 uppercase tracking-widest block mb-3">Canales directos</span>
-                                <h2 className="text-2xl font-black text-slate-900 mb-2">¿Prefieres contactarnos directo?</h2>
-                                <p className="text-slate-500 text-sm leading-relaxed">Selecciona el canal que más te convenga. Nuestro equipo está disponible por todos los medios.</p>
+                                <span className="text-xs font-black text-teal-600 uppercase tracking-widest block mb-3">{t('info.badge')}</span>
+                                <h2 className="text-2xl font-black text-slate-900 mb-2">{t('info.title')}</h2>
+                                <p className="text-slate-500 text-sm leading-relaxed">{t('info.desc')}</p>
                             </div>
 
                             {/* Contact method cards */}
                             <div className="space-y-4">
-                                {contactMethods.map((m) => (
+                                {contactMethodsConfig.map((m) => (
                                     <a
-                                        key={m.label}
+                                        key={m.key}
                                         href={m.href}
                                         className="card-lift group flex items-start gap-4 p-5 rounded-2xl border border-slate-100 bg-white hover:border-teal-200 hover:shadow-lg transition-all duration-300 relative overflow-hidden no-underline"
                                     >
@@ -211,9 +201,9 @@ export default function ContactPage() {
                                             {m.icon}
                                         </div>
                                         <div className="relative z-10 min-w-0">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{m.label}</p>
-                                            <p className="font-bold text-slate-900 text-sm truncate">{m.value}</p>
-                                            <p className="text-xs text-teal-600 font-medium mt-0.5">{m.sub}</p>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{t(`methods.${m.key}.label`)}</p>
+                                            <p className="font-bold text-slate-900 text-sm truncate">{m.value || t(`methods.${m.key}.val`)}</p>
+                                            <p className="text-xs text-teal-600 font-medium mt-0.5">{t(`methods.${m.key}.sub`)}</p>
                                         </div>
                                         <div className="relative z-10 ml-auto text-slate-300 group-hover:text-teal-400 group-hover:translate-x-1 transition-all flex-shrink-0 self-center">→</div>
                                     </a>
@@ -226,26 +216,26 @@ export default function ContactPage() {
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
-                                        <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Tiempo de Respuesta Promedio</span>
+                                        <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{t('info.responseTime.badge')}</span>
                                     </div>
                                     <div className="flex items-end gap-2 mb-2">
-                                        <span className="text-5xl font-black text-slate-900">&lt;4</span>
-                                        <span className="text-xl font-bold text-slate-400 mb-2">horas</span>
+                                        <span className="text-5xl font-black text-slate-900">{t('info.responseTime.val')}</span>
+                                        <span className="text-xl font-bold text-slate-400 mb-2">{t('info.responseTime.unit')}</span>
                                     </div>
                                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div className="h-2 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" style={{ width: '85%' }} />
                                     </div>
-                                    <p className="text-xs text-slate-400 mt-2">85% de consultas respondidas en el día</p>
+                                    <p className="text-xs text-slate-400 mt-2">{t('info.responseTime.desc')}</p>
                                 </div>
                             </div>
 
                             {/* FAQs */}
                             <div className="space-y-4">
-                                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Preguntas Frecuentes</h3>
-                                {faqs.map((faq, i) => (
+                                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">{t('info.faq.badge')}</h3>
+                                {faqsConfig.map((faqKey, i) => (
                                     <div key={i} className="p-5 rounded-xl border border-slate-100 bg-white hover:border-teal-200 hover:shadow-sm transition-all">
-                                        <p className="font-bold text-slate-900 text-sm mb-1">{faq.q}</p>
-                                        <p className="text-slate-500 text-xs leading-relaxed">{faq.a}</p>
+                                        <p className="font-bold text-slate-900 text-sm mb-1">{t(`info.faq.${faqKey}.q`)}</p>
+                                        <p className="text-slate-500 text-xs leading-relaxed">{t(`info.faq.${faqKey}.a`)}</p>
                                     </div>
                                 ))}
                             </div>
@@ -262,13 +252,13 @@ export default function ContactPage() {
                                 <div className="px-8 pt-8 pb-4 border-b border-slate-50">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h2 className="text-xl font-black text-slate-900">Envíanos un Mensaje</h2>
-                                            <p className="text-slate-400 text-sm mt-0.5">Recibirás respuesta antes de 24h.</p>
+                                            <h2 className="text-xl font-black text-slate-900">{t('form.title')}</h2>
+                                            <p className="text-slate-400 text-sm mt-0.5">{t('form.desc')}</p>
                                         </div>
                                         {/* Security badge */}
                                         <div className="flex flex-col items-center gap-1 p-3 rounded-xl border border-slate-100 bg-slate-50">
                                             <span className="text-xl">🔒</span>
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">100% Seguro</span>
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">{t('form.secure')}</span>
                                         </div>
                                     </div>
 
@@ -278,7 +268,7 @@ export default function ContactPage() {
                                             <div key={s} className={`h-1 flex-1 rounded-full ${s === 1 ? 'bg-gradient-to-r from-teal-400 to-sky-400' : 'bg-slate-100'}`} />
                                         ))}
                                     </div>
-                                    <p className="text-[10px] text-slate-400 mt-1">Paso 1 de 1 — Solo 2 minutos</p>
+                                    <p className="text-[10px] text-slate-400 mt-1">{t('form.step')}</p>
                                 </div>
 
                                 {/* The form itself */}
@@ -288,8 +278,8 @@ export default function ContactPage() {
 
                                 {/* Form footer trust signals */}
                                 <div className="px-8 pb-8 pt-2 flex flex-wrap gap-4 text-xs text-slate-400">
-                                    {['🔒 Datos protegidos por GDPR', '⚡ Respuesta en &lt;24h', '🤝 Sin spam, prometido'].map((t, i) => (
-                                        <span key={i} dangerouslySetInnerHTML={{ __html: t }} />
+                                    {[t('form.trust.t1'), t('form.trust.t2'), t('form.trust.t3')].map((tStr, i) => (
+                                        <span key={i} dangerouslySetInnerHTML={{ __html: tStr }} />
                                     ))}
                                 </div>
                             </div>
@@ -346,19 +336,23 @@ export default function ContactPage() {
 
                         {/* Info */}
                         <div>
-                            <span className="text-xs font-black uppercase tracking-widest text-teal-600 block mb-4">Nuestra Ubicación</span>
-                            <h2 className="text-3xl font-black text-slate-900 mb-6">Presencia en<br /><span className="bg-gradient-to-r from-teal-500 to-sky-500 bg-clip-text text-transparent">Latinoamérica</span></h2>
+                            <span className="text-xs font-black uppercase tracking-widest text-teal-600 block mb-4">{t('location.badge')}</span>
+                            <h2 className="text-3xl font-black text-slate-900 mb-6">{t('location.titleStart')}<br /><span className="bg-gradient-to-r from-teal-500 to-sky-500 bg-clip-text text-transparent">{t('location.titleHighlight')}</span></h2>
                             <div className="space-y-4 text-sm text-slate-500 leading-relaxed">
-                                <p>Aunque somos nativos digitales y trabajamos de forma remota, tenemos base en <strong className="text-slate-700">Bogotá, Colombia</strong> y atendemos clientes en toda la región.</p>
-                                <p>Las reuniones presenciales están disponibles con previa cita. También nos conectamos por videollamada en cualquier zona horaria.</p>
+                                <p>
+                                    {t.rich('location.p1', {
+                                        highlight: (chunks) => <strong className="text-slate-700">{chunks}</strong>
+                                    })}
+                                </p>
+                                <p>{t('location.p2')}</p>
                             </div>
 
                             <div className="mt-8 grid grid-cols-2 gap-4">
                                 {[
-                                    { label: 'Clientes Activos', val: '120+', icon: '🌎' },
-                                    { label: 'Años de Experiencia', val: '5+', icon: '📅' },
-                                    { label: 'Proyectos Entregados', val: '340+', icon: '✅' },
-                                    { label: 'Países Atendidos', val: '6', icon: '🗺️' },
+                                    { label: t('location.stats.clients.label'), val: '120+', icon: '🌎' },
+                                    { label: t('location.stats.experience.label'), val: '5+', icon: '📅' },
+                                    { label: t('location.stats.projects.label'), val: '340+', icon: '✅' },
+                                    { label: t('location.stats.countries.label'), val: '6', icon: '🗺️' },
                                 ].map((s) => (
                                     <div key={s.label} className="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-teal-100 hover:shadow transition-all">
                                         <span className="text-xl block mb-1">{s.icon}</span>
@@ -388,22 +382,22 @@ export default function ContactPage() {
                 <div className="container mx-auto px-4 md:px-6 max-w-2xl text-center relative z-10">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-teal-500/30 bg-teal-500/10 mb-6">
                         <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-                        <span className="text-teal-400 text-xs font-black uppercase tracking-widest">Respuesta Garantizada</span>
+                        <span className="text-teal-400 text-xs font-black uppercase tracking-widest">{t('cta.badge')}</span>
                     </div>
 
                     <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
-                        ¿Prefieres que te<br />
-                        <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">llamemos nosotros?</span>
+                        {t('cta.titleStart')}<br />
+                        <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">{t('cta.titleHighlight')}</span>
                     </h2>
-                    <p className="text-slate-400 text-lg mb-8">Envíanos tu número y te contactamos en menos de 2 horas en días hábiles.</p>
+                    <p className="text-slate-400 text-lg mb-8">{t('cta.desc')}</p>
 
                     <a
                         href="https://wa.me/573223047353"
                         className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-lg rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-teal-500/30"
                     >
-                        💬 +57 322 304 7353 — Escríbenos →
+                        {t('cta.btn')}
                     </a>
-                    <p className="mt-4 text-slate-500 text-sm">Sin bots · Personas reales · Sin spam</p>
+                    <p className="mt-4 text-slate-500 text-sm">{t('cta.footer')}</p>
                 </div>
             </section>
 

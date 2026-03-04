@@ -5,6 +5,15 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { getExperts } from "@/actions/experts";
 import { Linkedin, Twitter, Github, Globe, ArrowUpRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata() {
+    const t = await getTranslations('nosotrosPage.meta');
+    return {
+        title: t('title'),
+        description: t('description'),
+    };
+}
 
 const socialIconMap: Record<string, any> = {
     linkedin: Linkedin,
@@ -15,6 +24,7 @@ const socialIconMap: Record<string, any> = {
 
 export default async function AboutPage() {
     const experts = await getExperts();
+    const t = await getTranslations('nosotrosPage.team');
 
     return (
         <main className="min-h-screen bg-white overflow-hidden">
@@ -33,11 +43,11 @@ export default async function AboutPage() {
                 <div className="container px-4 md:px-6 relative z-10">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                         <div className="max-w-xl">
-                            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4">Liderazgo Estratégico</h2>
-                            <p className="text-slate-400 text-lg">Mentes brillantes unidas por una obsesión: el crecimiento de tu empresa.</p>
+                            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-4">{t('title')}</h2>
+                            <p className="text-slate-400 text-lg">{t('subtitle')}</p>
                         </div>
                         <Button variant="outline" className="border-slate-700 text-white hover:bg-white hover:text-slate-900 transition-all rounded-full px-8">
-                            Unirse al Equipo <ArrowUpRight className="ml-2 w-4 h-4" />
+                            {t('btn')} <ArrowUpRight className="ml-2 w-4 h-4" />
                         </Button>
                     </div>
 

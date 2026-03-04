@@ -3,26 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check } from 'lucide-react';
-
-const features = [
-    'Estrategia de Contenido',
-    'Guiones & Storyboards',
-    'Grabación Profesional 4K',
-    'Edición Estilo Hormozi',
-    'Distribución Multi-plataforma',
-    'Reporte Mensual de Métricas',
-    'Community Management',
-    'Miniaturas Clickbait',
-];
-
-const packages = [
-    { name: 'Starter', price: '2.5M', description: 'Perfecto para marcas personales iniciando.', features: [true, true, false, true, true, false, false, true], popular: false },
-    { name: 'Growth', price: '4.5M', description: 'Para negocios listos para escalar agresivamente.', features: [true, true, true, true, true, true, false, true], popular: true },
-    { name: 'Dominance', price: '8M', description: 'Solución completa "Done-For-You".', features: [true, true, true, true, true, true, true, true], popular: false },
-];
+import { useTranslations } from 'next-intl';
 
 export function PricingClient() {
+    const t = useTranslations('creacionContenidoPage.pricing');
     const [selected, setSelected] = useState('Growth');
+
+    const features = [
+        t('f1'), t('f2'), t('f3'), t('f4'), t('f5'), t('f6'), t('f7'), t('f8')
+    ];
+
+    const packages = [
+        { name: 'Starter', price: '2.5M', description: t('p1Desc'), features: [true, true, false, true, true, false, false, true], popular: false },
+        { name: 'Growth', price: '4.5M', description: t('p2Desc'), features: [true, true, true, true, true, true, false, true], popular: true },
+        { name: 'Dominance', price: '8M', description: t('p3Desc'), features: [true, true, true, true, true, true, true, true], popular: false },
+    ];
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -39,7 +34,7 @@ export function PricingClient() {
                 >
                     {pkg.popular && (
                         <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-lg">
-                            Más Popular
+                            {t('popular')}
                         </div>
                     )}
 
@@ -48,7 +43,7 @@ export function PricingClient() {
 
                     <div className="mb-6">
                         <span className="text-4xl font-black text-slate-900">${pkg.price}</span>
-                        <span className="text-slate-400 text-sm ml-2">COP /mes</span>
+                        <span className="text-slate-400 text-sm ml-2">{t('month')}</span>
                     </div>
 
                     <Link
@@ -58,7 +53,7 @@ export function PricingClient() {
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                             }`}
                     >
-                        Comenzar Ahora →
+                        {t('btn')} →
                     </Link>
 
                     <div className="space-y-3">

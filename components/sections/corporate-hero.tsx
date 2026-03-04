@@ -4,6 +4,7 @@ import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } fr
 import { MouseEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Sparkles, Target, Zap } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function MagneticButton({ children, className }: { children: React.ReactNode, className?: string }) {
     const ref = useRef<HTMLDivElement>(null);
@@ -37,6 +38,8 @@ function MagneticButton({ children, className }: { children: React.ReactNode, cl
 }
 
 export function CorporateHero() {
+    const t = useTranslations("nosotrosPage.hero");
+
     // Mouse Interaction
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -96,7 +99,7 @@ export function CorporateHero() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                             </span>
-                            LegacyMark Corporate Profile
+                            {t('badge')}
                         </span>
                     </motion.div>
 
@@ -104,10 +107,10 @@ export function CorporateHero() {
                     <div className="max-w-5xl space-y-6 relative">
                         <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-4 sm:mb-6 relative z-10 leading-[0.9]">
                             <span className="block mb-2 drop-shadow-sm text-slate-400 font-thin text-4xl md:text-6xl tracking-widest uppercase">
-                                Innovación que
+                                {t('titleStart')}
                             </span>
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-emerald-500 to-cyan-600 animate-gradient-x font-mono relative">
-                                Transforma Marcas
+                                {t('titleHighlight')}
                             </span>
                         </h1>
 
@@ -119,7 +122,11 @@ export function CorporateHero() {
                         >
                             <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-teal-500 to-transparent hidden md:block" />
                             <p className="text-lg md:text-xl text-slate-600 leading-relaxed text-pretty font-medium pl-6 text-left border-l-2 border-teal-500/20 md:border-none">
-                                <span className="text-teal-700 font-bold">No adivinamos, validamos.</span> El corazón de Legacy Mark es nuestra metodología de análisis de datos. Nuestro compromiso con la precisión nos permite entregar servicios de gran impacto, donde la eficacia de la inversión está garantizada por la evidencia, no por la intuición.
+                                {t.rich('description', {
+                                    highlight: (chunks) => (
+                                        <span className="text-teal-700 font-bold">{chunks}</span>
+                                    ),
+                                })}
                             </p>
                         </motion.div>
                     </div>
@@ -134,7 +141,7 @@ export function CorporateHero() {
                         <MagneticButton>
                             <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base sm:text-lg transition-all shadow-xl shadow-slate-900/20 relative overflow-hidden group">
                                 <span className="relative flex items-center gap-2">
-                                    Iniciar Transformación <Zap className="w-5 h-5 text-teal-400 group-hover:text-teal-300 transition-colors" />
+                                    {t('btnPrimary')} <Zap className="w-5 h-5 text-teal-400 group-hover:text-teal-300 transition-colors" />
                                 </span>
                             </Button>
                         </MagneticButton>
@@ -142,7 +149,7 @@ export function CorporateHero() {
                         <MagneticButton>
                             <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-all group relative overflow-hidden">
                                 <span className="flex items-center gap-2 relative z-10 font-semibold">
-                                    <Play className="w-4 h-4 fill-current" /> Ver Reel de Agencia
+                                    <Play className="w-4 h-4 fill-current" /> {t('btnSecondary')}
                                 </span>
                             </Button>
                         </MagneticButton>
@@ -156,10 +163,10 @@ export function CorporateHero() {
                         className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 pt-12 border-t border-slate-100 w-full max-w-4xl"
                     >
                         {[
-                            { label: "Precisión", icon: Target, value: "99.8%" },
-                            { label: "Innovación", icon: Sparkles, value: "Top 1%" },
-                            { label: "Velocidad", icon: Zap, value: "X10" },
-                            { label: "Impacto", icon: ActivityIcon, value: "Global" },
+                            { label: t("stats.precision.label"), icon: Target, value: t("stats.precision.value") },
+                            { label: t("stats.innovation.label"), icon: Sparkles, value: t("stats.innovation.value") },
+                            { label: t("stats.speed.label"), icon: Zap, value: t("stats.speed.value") },
+                            { label: t("stats.impact.label"), icon: ActivityIcon, value: t("stats.impact.value") },
                         ].map((stat, i) => (
                             <div key={i} className="flex flex-col items-center gap-2 group cursor-default">
                                 <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-teal-50 transition-colors duration-300">

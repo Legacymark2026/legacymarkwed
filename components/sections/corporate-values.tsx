@@ -3,38 +3,35 @@
 import { motion } from "framer-motion";
 import { Lightbulb, Zap, TrendingUp, Clock, Globe } from "lucide-react";
 
-const values = [
+import { useTranslations } from "next-intl";
+
+const valuesConfig = [
     {
-        title: "Creatividad",
-        description: "Ideas disruptivas que rompen el status quo.",
+        key: "creativity",
         icon: Lightbulb,
         className: "md:col-span-2",
         gradient: "from-purple-500 to-indigo-500"
     },
     {
-        title: "Innovación",
-        description: "Tecnología de vanguardia aplicada al branding.",
+        key: "innovation",
         icon: Zap,
         className: "md:col-span-1",
         gradient: "from-amber-400 to-orange-500"
     },
     {
-        title: "Eficacia",
-        description: "Resultados contundentes, no solo esfuerzos.",
+        key: "effectiveness",
         icon: TrendingUp,
         className: "md:col-span-1",
         gradient: "from-emerald-400 to-teal-500"
     },
     {
-        title: "Eficiencia",
-        description: "Optimización máxima de recursos y tiempo.",
+        key: "efficiency",
         icon: Clock,
         className: "md:col-span-2",
         gradient: "from-blue-400 to-cyan-500"
     },
     {
-        title: "Responsabilidad Social",
-        description: "Impacto positivo en nuestra comunidad y entorno.",
+        key: "responsibility",
         icon: Globe,
         className: "md:col-span-3",
         gradient: "from-pink-500 to-rose-500"
@@ -42,18 +39,20 @@ const values = [
 ];
 
 export function CorporateValues() {
+    const t = useTranslations("nosotrosPage.values");
+
     return (
         <section className="py-24 bg-white">
             <div className="container px-4 md:px-6">
                 <div className="text-center max-w-2xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 mb-4">Nuestros Valores</h2>
-                    <p className="text-slate-500">Los pilares fundamentales que sostienen cada decisión estratégica en LegacyMark.</p>
+                    <h2 className="text-3xl md:text-5xl font-bold tracking-tighter text-slate-900 mb-4">{t('title')}</h2>
+                    <p className="text-slate-500">{t('subtitle')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    {values.map((value, i) => (
+                    {valuesConfig.map((value, i) => (
                         <motion.div
-                            key={value.title}
+                            key={value.key}
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             whileInView={{ opacity: 1, scale: 1, y: 0 }}
                             viewport={{ once: true, margin: "-50px" }}
@@ -71,8 +70,8 @@ export function CorporateValues() {
                                     <value.icon className="w-7 h-7 text-slate-700 group-hover:text-black transition-colors" />
                                 </div>
                                 <div>
-                                    <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{value.title}</h3>
-                                    <p className="text-slate-500 font-medium text-lg leading-relaxed group-hover:text-slate-600 transition-colors">{value.description}</p>
+                                    <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">{t(`items.${value.key}.title`)}</h3>
+                                    <p className="text-slate-500 font-medium text-lg leading-relaxed group-hover:text-slate-600 transition-colors">{t(`items.${value.key}.description`)}</p>
                                 </div>
                             </div>
                         </motion.div>

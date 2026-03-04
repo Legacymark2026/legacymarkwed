@@ -1,42 +1,46 @@
-import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import '@/styles/content-animations.css';
 import { RoiCalculatorClient } from './roi-calculator-client';
 import { PricingClient } from './pricing-client';
 
-export const metadata: Metadata = {
-    title: 'Creación de Contenido Premium | Legacy Mark',
-    description: 'Elevamos tu marca con contenido estratégico que genera resultados reales: más vistas, más leads, más ventas.',
-};
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+    const t = await getTranslations({ locale, namespace: 'creacionContenidoPage.meta' });
+    return {
+        title: t('title'),
+        description: t('description'),
+    };
+}
 
 // ─── STATIC DATA ──────────────────────────────────────────────────────────────
 
-const services = [
-    { icon: '🎬', tag: '4K', title: 'Video Short-Form', desc: 'Reels, TikToks y Shorts optimizados para viralizarse. Guión, producción y edición estilo Hormozi.', stat: '2.4M Vistas', color: 'from-rose-500 to-pink-600' },
-    { icon: '🎨', tag: 'HD', title: 'Identidad Visual', desc: 'Diseño gráfico de alto impacto que detiene el scroll. Miniaturas, carruseles y posts que convierten.', stat: '+12k Shares', color: 'from-violet-500 to-purple-600' },
-    { icon: '✍️', tag: 'COPY', title: 'Copywriting', desc: 'Palabras que venden. Email sequences, captions y scripts con tasas de apertura de 45%+.', stat: '45% Open Rate', color: 'from-sky-500 to-blue-600' },
-    { icon: '📊', tag: 'DATA', title: 'Estrategia & Datos', desc: 'No creamos a ciegas. Analizamos métricas, tendencias y competencia para maximizar cada acción.', stat: '8.7x ROAS', color: 'from-teal-500 to-emerald-600' },
+const servicesConfig = [
+    { id: 's1', icon: '🎬', tag: '4K', stat: '2.4M Vistas', color: 'from-rose-500 to-pink-600' },
+    { id: 's2', icon: '🎨', tag: 'HD', stat: '+12k Shares', color: 'from-violet-500 to-purple-600' },
+    { id: 's3', icon: '✍️', tag: 'COPY', stat: '45% Open Rate', color: 'from-sky-500 to-blue-600' },
+    { id: 's4', icon: '📊', tag: 'DATA', stat: '8.7x ROAS', color: 'from-teal-500 to-emerald-600' },
 ];
 
-const steps = [
-    { num: '01', title: 'Estrategia & Concepto', desc: 'Analizamos tendencias en tiempo real y diseñamos hooks virales para tu nicho específico.', time: 'Día 1–2', color: 'from-violet-500 to-purple-600', glyph: '💡' },
-    { num: '02', title: 'Planificación Editorial', desc: 'Guiones palabra por palabra, storyboards y calendario de 30 días listos para tu aprobación.', time: 'Día 3', color: 'from-sky-500 to-cyan-500', glyph: '📋' },
-    { num: '03', title: 'Producción Premium', desc: 'Grabación 4K, iluminación profesional y dirección creativa de nivel internacional.', time: 'Día 4–5', color: 'from-orange-500 to-red-500', glyph: '🎥' },
-    { num: '04', title: 'Edición Hormozi-Style', desc: 'Cortes dinámicos, subtítulos animados nativos y motion graphics que frenan el scroll.', time: 'Día 6–8', color: 'from-teal-500 to-emerald-500', glyph: '✂️' },
-    { num: '05', title: 'Distribución & Escala', desc: 'Publicación en horario pico, gestión primeras 48h y reporte de métricas detallado.', time: 'Día 9+', color: 'from-pink-500 to-rose-500', glyph: '🚀' },
+const stepsConfig = [
+    { id: 's1', num: '01', color: 'from-violet-500 to-purple-600', glyph: '💡' },
+    { id: 's2', num: '02', color: 'from-sky-500 to-cyan-500', glyph: '📋' },
+    { id: 's3', num: '03', color: 'from-orange-500 to-red-500', glyph: '🎥' },
+    { id: 's4', num: '04', color: 'from-teal-500 to-emerald-500', glyph: '✂️' },
+    { id: 's5', num: '05', color: 'from-pink-500 to-rose-500', glyph: '🚀' },
 ];
 
-const testimonials = [
-    { author: 'Sofia R.', role: 'Marketing Director · TechStart', text: 'Pasamos de 500 a 15k views promedio en reels en solo 3 semanas. Saben exactamente cómo crear contenido que para el scroll.', metric: '+2,900%', metricLabel: 'Views', avatar: 'SR', color: 'from-violet-500 to-purple-600' },
-    { author: 'Carlos M.', role: 'CEO · InmoGroup', text: 'La calidad visual es de otro nivel. Nuestros clientes ahora nos perciben como líderes del sector.', metric: '18x', metricLabel: 'ROAS', avatar: 'CM', color: 'from-sky-500 to-cyan-600' },
-    { author: 'Ana P.', role: 'Founder · EcoBrand', text: 'ROI positivo desde el mes 1 y triplicamos nuestra base de suscriptores en 90 días.', metric: '3x', metricLabel: 'Clientes', avatar: 'AP', color: 'from-teal-500 to-emerald-600' },
+const testimonialsConfig = [
+    { id: 't1', author: 'Sofia R.', role: 'Marketing Director · TechStart', metric: '+2,900%', avatar: 'SR', color: 'from-violet-500 to-purple-600' },
+    { id: 't2', author: 'Carlos M.', role: 'CEO · InmoGroup', metric: '18x', avatar: 'CM', color: 'from-sky-500 to-cyan-600' },
+    { id: 't3', author: 'Ana P.', role: 'Founder · EcoBrand', metric: '3x', avatar: 'AP', color: 'from-teal-500 to-emerald-600' },
 ];
 
-const stats = [
-    { value: '2.4B+', label: 'Views Generadas', icon: '👁️' },
-    { value: '8.7x', label: 'ROAS Promedio', icon: '📈' },
-    { value: '$4.2M', label: 'Revenue Generado', icon: '💰' },
-    { value: '120+', label: 'Clientes Activos', icon: '🤝' },
+const statsConfig = [
+    { id: 's1', value: '2.4B+', icon: '👁️' },
+    { id: 's2', value: '8.7x', icon: '📈' },
+    { id: 's3', value: '$4.2M', icon: '💰' },
+    { id: 's4', value: '120+', icon: '🤝' },
 ];
 
 // SVG icons for audiovisual theme
@@ -63,6 +67,7 @@ const Waveform = ({ className = '' }: { className?: string }) => (
 );
 
 export default function ContentCreationPage() {
+    const t = useTranslations('creacionContenidoPage');
     return (
         <main className="min-h-screen bg-white text-slate-900 overflow-hidden">
 
@@ -107,25 +112,25 @@ export default function ContentCreationPage() {
                     {/* Badge */}
                     <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-teal-200 bg-white/80 backdrop-blur-md shadow-lg shadow-teal-100 mb-8">
                         <span className="w-2 h-2 rounded-full bg-teal-500 animate-broadcast" />
-                        <span className="text-teal-700 text-xs font-black tracking-widest uppercase">Next-Gen Content Studio</span>
+                        <span className="text-teal-700 text-xs font-black tracking-widest uppercase">{t('hero.badge')}</span>
                         <Waveform className="text-teal-400" />
                     </div>
 
                     {/* H1 */}
                     <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-6 leading-[0.88] animate-glitch">
-                        <span className="block text-slate-900">Creamos</span>
+                        <span className="block text-slate-900">{t('hero.title1')}</span>
                         <span className="block relative">
                             <span className="absolute -inset-3 blur-3xl bg-teal-300/20 rounded-full" aria-hidden />
                             <span className="relative bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #0f172a 0%, #134e4a 40%, #0891b2 100%)' }}>
-                                Contenido
+                                {t('hero.title2')}
                             </span>
                         </span>
-                        <span className="block bg-clip-text text-transparent stat-shine">que Vende.</span>
+                        <span className="block bg-clip-text text-transparent stat-shine">{t('hero.title3')}</span>
                     </h1>
 
                     <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mb-10 font-light leading-relaxed">
-                        Estrategia. Producción. Viralidad.<br className="hidden md:block" />
-                        <span className="text-slate-700 font-semibold">Resultados desde el primer mes.</span>
+                        {t('hero.desc1')}<br className="hidden md:block" />
+                        <span className="text-slate-700 font-semibold">{t('hero.desc2')}</span>
                     </p>
 
                     {/* CTAs */}
@@ -133,22 +138,22 @@ export default function ContentCreationPage() {
                         <Link href="/contacto" className="group relative px-10 py-5 bg-slate-900 text-white font-bold text-lg rounded-2xl overflow-hidden hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-slate-900/30 animate-shimmer">
                             <span className="absolute inset-0 bg-gradient-to-r from-teal-500 via-sky-500 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             <span className="relative flex items-center gap-3">
-                                🎬 Iniciar Proyecto
+                                🎬 {t('hero.btn1')}
                                 <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                             </span>
                         </Link>
                         <Link href="#proceso" className="px-10 py-5 rounded-2xl border-2 border-slate-200 bg-white/70 backdrop-blur-sm hover:border-teal-300 hover:bg-teal-50 transition-all text-slate-700 font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5">
-                            Ver Proceso
+                            {t('hero.btn2')}
                         </Link>
                     </div>
 
                     {/* Stats grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
-                        {stats.map((s, i) => (
-                            <div key={s.label} className="card-lift text-center p-5 rounded-2xl bg-white border border-slate-100 shadow-md hover:shadow-xl hover:border-teal-200 transition-all" style={{ animationDelay: `${i * 0.1}s` }}>
+                        {statsConfig.map((s, i) => (
+                            <div key={s.id} className="card-lift text-center p-5 rounded-2xl bg-white border border-slate-100 shadow-md hover:shadow-xl hover:border-teal-200 transition-all" style={{ animationDelay: `${i * 0.1}s` }}>
                                 <div className="text-2xl mb-1">{s.icon}</div>
                                 <div className="text-2xl font-black stat-shine">{s.value}</div>
-                                <div className="text-xs text-slate-500 font-medium mt-1">{s.label}</div>
+                                <div className="text-xs text-slate-500 font-medium mt-1">{t(`hero.stats.${s.id}`)}</div>
                             </div>
                         ))}
                     </div>
@@ -184,15 +189,15 @@ export default function ContentCreationPage() {
                                     ))}
                                 </div>
                             </div>
-                            <span className="relative text-xs font-black tracking-widest text-slate-600 uppercase">Producción Audiovisual</span>
+                            <span className="relative text-xs font-black tracking-widest text-slate-600 uppercase">{t('services.badge')}</span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 text-center">Servicios de Contenido</h2>
-                        <p className="text-slate-500 text-lg max-w-xl text-center">Producción profesional en todos los formatos que dominan las plataformas de hoy.</p>
+                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 text-center">{t('services.title')}</h2>
+                        <p className="text-slate-500 text-lg max-w-xl text-center">{t('services.desc')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {services.map((s, i) => (
-                            <div key={s.title} className="card-lift group relative p-8 rounded-3xl border border-slate-100 bg-white hover:border-transparent hover:shadow-2xl transition-all duration-300 overflow-hidden" style={{ animationDelay: `${i * 0.08}s` }}>
+                        {servicesConfig.map((s, i) => (
+                            <div key={s.id} className="card-lift group relative p-8 rounded-3xl border border-slate-100 bg-white hover:border-transparent hover:shadow-2xl transition-all duration-300 overflow-hidden" style={{ animationDelay: `${i * 0.08}s` }}>
                                 {/* Gradient border on hover */}
                                 <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${s.color} opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none`} />
                                 <div className={`absolute inset-[1px] rounded-[22px] border border-transparent group-hover:border-transparent bg-white`} />
@@ -212,8 +217,8 @@ export default function ContentCreationPage() {
                                         <Waveform />
                                     </div>
 
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">{s.title}</h3>
-                                    <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">{t(`services.${s.id}Title`)}</h3>
+                                    <p className="text-slate-500 text-sm leading-relaxed">{t(`services.${s.id}Desc`)}</p>
                                 </div>
                             </div>
                         ))}
@@ -232,10 +237,10 @@ export default function ContentCreationPage() {
                     <div className="text-center mb-12">
                         <div className="inline-flex items-center gap-2 mb-4">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-rec" />
-                            <span className="text-xs font-black tracking-widest text-red-500 uppercase">En Vivo</span>
+                            <span className="text-xs font-black tracking-widest text-red-500 uppercase">{t('roi.badge')}</span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Calcula tu ROI Potencial</h2>
-                        <p className="text-slate-500 text-lg">Visualiza el impacto financiero de una estrategia de contenido profesional.</p>
+                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">{t('roi.title')}</h2>
+                        <p className="text-slate-500 text-lg">{t('roi.desc')}</p>
                     </div>
                     <RoiCalculatorClient />
                 </div>
@@ -264,24 +269,24 @@ export default function ContentCreationPage() {
                         {/* LIVE badge */}
                         <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-red-500/30 bg-red-500/10 mb-6 animate-live">
                             <span className="w-2 h-2 rounded-full bg-red-400 animate-rec" />
-                            <span className="text-red-400 text-xs font-black tracking-widest uppercase">En Producción</span>
+                            <span className="text-red-400 text-xs font-black tracking-widest uppercase">{t('process.badge')}</span>
                         </div>
 
                         <h2 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
-                            De la idea al{' '}
-                            <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">viral</span>
+                            {t('process.title1')}{' '}
+                            <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">{t('process.title2')}</span>
                         </h2>
-                        <p className="text-slate-400 text-lg max-w-xl mx-auto">Nuestro pipeline de producción en 9 días. Sin improvisación.</p>
+                        <p className="text-slate-400 text-lg max-w-xl mx-auto">{t('process.desc')}</p>
 
                         <div className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm">
                             <span className="text-xl">⏱</span>
-                            <span className="text-white/70 text-sm">Entrega garantizada en <strong className="text-teal-400">9 días hábiles</strong></span>
+                            <span className="text-white/70 text-sm">{t('process.guarantee')} <strong className="text-teal-400">{t('process.days')}</strong></span>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        {steps.map((step, i) => (
-                            <div key={step.num} className="group flex gap-5 p-6 rounded-2xl border border-white/5 bg-white/2 hover:border-teal-500/25 hover:bg-white/5 transition-all duration-300 cursor-default">
+                        {stepsConfig.map((step, i) => (
+                            <div key={step.id} className="group flex gap-5 p-6 rounded-2xl border border-white/5 bg-white/2 hover:border-teal-500/25 hover:bg-white/5 transition-all duration-300 cursor-default">
                                 {/* Step number — film counter style */}
                                 <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex flex-col items-center justify-center flex-shrink-0 shadow-lg`}>
                                     <span className="text-white/60 text-[8px] font-mono uppercase leading-none">TAKE</span>
@@ -291,10 +296,10 @@ export default function ContentCreationPage() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">
                                         <span className="text-lg">{step.glyph}</span>
-                                        <h3 className="text-white font-bold text-lg">{step.title}</h3>
-                                        <span className="text-[10px] font-mono text-white/25 border border-white/10 px-2 py-0.5 rounded">{step.time}</span>
+                                        <h3 className="text-white font-bold text-lg">{t(`process.${step.id}Title`)}</h3>
+                                        <span className="text-[10px] font-mono text-white/25 border border-white/10 px-2 py-0.5 rounded">{t(`process.${step.id}Time`)}</span>
                                     </div>
-                                    <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+                                    <p className="text-slate-400 text-sm leading-relaxed">{t(`process.${step.id}Desc`)}</p>
                                 </div>
 
                                 {/* Waveform indicator on hover */}
@@ -324,20 +329,20 @@ export default function ContentCreationPage() {
                     <div className="text-center mb-16">
                         <div className="inline-flex items-center gap-3 mb-4 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200">
                             <span className="text-amber-500">★★★★★</span>
-                            <span className="text-amber-700 text-xs font-bold">4.9/5 · 120+ clientes</span>
+                            <span className="text-amber-700 text-xs font-bold">{t('testimonials.rating')}</span>
                         </div>
                         <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                            Números que{' '}
-                            <span className="bg-gradient-to-r from-teal-500 to-sky-500 bg-clip-text text-transparent">hablan solos</span>
+                            {t('testimonials.title1')}{' '}
+                            <span className="bg-gradient-to-r from-teal-500 to-sky-500 bg-clip-text text-transparent">{t('testimonials.title2')}</span>
                         </h2>
-                        <p className="text-slate-500 text-lg">Datos reales de campañas activas.</p>
+                        <p className="text-slate-500 text-lg">{t('testimonials.desc')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {testimonials.map((t, i) => (
-                            <div key={t.author} className="card-lift group relative p-8 rounded-3xl border border-slate-100 bg-gradient-to-b from-white to-slate-50 hover:border-teal-200 hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                        {testimonialsConfig.map((ts, i) => (
+                            <div key={ts.id} className="card-lift group relative p-8 rounded-3xl border border-slate-100 bg-gradient-to-b from-white to-slate-50 hover:border-teal-200 hover:shadow-2xl transition-all duration-300 overflow-hidden">
                                 {/* Polaroid top bar */}
-                                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${t.color}`} />
+                                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${ts.color}`} />
 
                                 {/* Quote mark watermark */}
                                 <div className="absolute top-4 right-6 text-6xl font-black text-slate-100 leading-none select-none" aria-hidden>"</div>
@@ -347,19 +352,19 @@ export default function ContentCreationPage() {
                                     <div className="flex gap-0.5">
                                         {[1, 2, 3, 4, 5].map(s => <span key={s} className="text-amber-400 text-sm">★</span>)}
                                     </div>
-                                    <span className="text-2xl font-black text-teal-600 stat-shine">{t.metric} <span className="text-xs font-normal text-slate-400 [background:none] [-webkit-text-fill-color:initial]" style={{ color: '#94a3b8' }}>{t.metricLabel}</span></span>
+                                    <span className="text-2xl font-black text-teal-600 stat-shine">{ts.metric} <span className="text-xs font-normal text-slate-400 [background:none] [-webkit-text-fill-color:initial]" style={{ color: '#94a3b8' }}>{t(`testimonials.${ts.id}Metric`)}</span></span>
                                 </div>
 
-                                <p className="text-slate-600 text-sm leading-relaxed mb-6 italic">"{t.text}"</p>
+                                <p className="text-slate-600 text-sm leading-relaxed mb-6 italic">"{t(`testimonials.${ts.id}Text`)}"</p>
 
                                 {/* Author */}
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
-                                        {t.avatar}
+                                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${ts.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                                        {ts.avatar}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-slate-900 text-sm">{t.author}</div>
-                                        <div className="text-slate-400 text-xs">{t.role}</div>
+                                        <div className="font-bold text-slate-900 text-sm">{ts.author}</div>
+                                        <div className="text-slate-400 text-xs">{ts.role}</div>
                                     </div>
                                 </div>
 
@@ -396,9 +401,9 @@ export default function ContentCreationPage() {
 
                 <div className="container px-4 md:px-6 max-w-5xl mx-auto">
                     <div className="text-center mb-16">
-                        <span className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3 block">Inversión</span>
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Planes Flexibles</h2>
-                        <p className="text-slate-500 text-lg">Escoge el nivel de impacto que necesitas para tu marca.</p>
+                        <span className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3 block">{t('pricing.badge')}</span>
+                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">{t('pricing.title')}</h2>
+                        <p className="text-slate-500 text-lg">{t('pricing.desc')}</p>
                     </div>
                     <PricingClient />
 
@@ -407,12 +412,12 @@ export default function ContentCreationPage() {
                         <div className="flex items-center gap-3">
                             <span className="text-2xl">🔥</span>
                             <div>
-                                <p className="font-bold text-orange-700 text-sm">Oferta Limitada Esta Semana</p>
-                                <p className="text-orange-600 text-sm">Reserva tu llamada de estrategia y obtén <strong>2 Videos Extra</strong> en tu primer mes.</p>
+                                <p className="font-bold text-orange-700 text-sm">{t('pricing.urgentTitle')}</p>
+                                <p className="text-orange-600 text-sm">{t('pricing.urgentDesc1')} <strong>{t('pricing.urgentDesc2')}</strong> {t('pricing.urgentDesc3')}</p>
                             </div>
                         </div>
                         <Link href="/contacto" className="flex-shrink-0 px-6 py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition-colors text-sm">
-                            Reservar Ahora →
+                            {t('pricing.urgentBtn')} →
                         </Link>
                     </div>
                 </div>
@@ -445,12 +450,12 @@ export default function ContentCreationPage() {
                     {/* LIVE on air badge */}
                     <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-red-500/30 bg-red-500/10 mb-8 animate-live">
                         <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-rec" />
-                        <span className="text-red-400 text-xs font-black tracking-widest uppercase">Al Aire — Solo 3 Cupos Esta Semana</span>
+                        <span className="text-red-400 text-xs font-black tracking-widest uppercase">{t('cta.badge')}</span>
                     </div>
 
                     <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
-                        ¿Listo para escalar<br />
-                        <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">tu contenido?</span>
+                        {t('cta.title1')}<br />
+                        <span className="bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">{t('cta.title2')}</span>
                     </h2>
 
                     {/* Waveform decoration */}
@@ -459,20 +464,20 @@ export default function ContentCreationPage() {
                     </div>
 
                     <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
-                        Agenda tu auditoría gratuita de 15 min. Te entregamos <strong className="text-white">3 ideas virales personalizadas</strong> — sin compromiso.
+                        {t('cta.desc1')} <strong className="text-white">{t('cta.desc2')}</strong> {t('cta.desc3')}
                     </p>
 
                     <Link href="/contacto" className="group inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-teal-500 to-sky-500 text-white font-bold text-lg rounded-2xl hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-teal-500/30 animate-shimmer">
-                        🎬 Agendar Auditoría Gratis
+                        🎬 {t('cta.btn')}
                         <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                     </Link>
 
                     <div className="mt-6 flex items-center justify-center gap-6 text-slate-500 text-sm">
-                        <span>✓ Sin tarjeta de crédito</span>
+                        <span>{t('cta.c1')}</span>
                         <span>·</span>
-                        <span>✓ Respuesta en 24h</span>
+                        <span>{t('cta.c2')}</span>
                         <span>·</span>
-                        <span>✓ 100% Gratis</span>
+                        <span>{t('cta.c3')}</span>
                     </div>
 
                     {/* Viewfinder corners */}

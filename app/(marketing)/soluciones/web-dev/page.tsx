@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { motion, useScroll, useTransform, useMotionValue, useMotionTemplate, Variants } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 // --- Animation Variants & Utilities ---
 const fadeIn: Variants = {
@@ -68,13 +69,13 @@ const TypingEffect = ({ text }: { text: string }) => {
 };
 
 export default function WebDevPage() {
+    const t = useTranslations('webDevPage');
     const targetRef = useRef(null);
     const { scrollYProgress } = useScroll();
 
     // Parallax & Scale Transforms
     const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
     const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
-
 
     return (
         <main className="bg-slate-950 selection:bg-teal-500 selection:text-white overflow-hidden text-white w-full">
@@ -135,7 +136,7 @@ export default function WebDevPage() {
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
                         </span>
                         <span className="text-slate-300 text-xs font-mono font-semibold uppercase tracking-[0.2em] group-hover:text-white transition-colors">
-                            Next.js Enterprise Architecture
+                            {t('hero.badge')}
                         </span>
                     </motion.div>
 
@@ -149,7 +150,7 @@ export default function WebDevPage() {
                             transition={{ duration: 0.8, ease: "easeOut" }}
                             className="block"
                         >
-                            Tu Web No Es
+                            {t('hero.title1')}
                         </motion.span>
                         <motion.span
                             initial={{ opacity: 0, y: 50, rotateX: -45 }}
@@ -157,7 +158,7 @@ export default function WebDevPage() {
                             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                             className="block text-slate-500"
                         >
-                            Un Gasto.
+                            {t('hero.title2')}
                         </motion.span>
                         <motion.span
                             initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
@@ -165,7 +166,7 @@ export default function WebDevPage() {
                             transition={{ duration: 0.8, delay: 0.4, type: "spring" }}
                             className="block mt-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-blue-400 to-purple-400 animate-gradient-x bg-[length:200%_auto]"
                         >
-                            Es Una Inversión.
+                            {t('hero.title3')}
                         </motion.span>
                     </motion.h1>
 
@@ -175,8 +176,7 @@ export default function WebDevPage() {
                         transition={{ duration: 1, delay: 0.6 }}
                         className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed font-light"
                     >
-                        Ingeniería de software de <span className="text-white font-medium border-b border-teal-500/50 pb-0.5">clase mundial</span>.
-                        Velocidad extrema, SEO técnico impecable y conversión como objetivo único.
+                        {t('hero.desc1')}<span className="text-white font-medium border-b border-teal-500/50 pb-0.5">{t('hero.desc2')}</span>{t('hero.desc3')}
                     </motion.p>
 
                     {/* 7. Advanced Button Group */}
@@ -191,7 +191,7 @@ export default function WebDevPage() {
                                 <Button size="lg" className="h-16 px-10 rounded-full bg-slate-950 text-white relative overflow-hidden transition-all group-hover:bg-slate-900">
                                     <span className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <span className="relative z-10 flex items-center text-lg font-bold tracking-wide">
-                                        Iniciar Proyecto <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                        {t('hero.btn1')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                                     </span>
                                 </Button>
                             </div>
@@ -199,7 +199,7 @@ export default function WebDevPage() {
                         <Link href="#portfolio">
                             <Button variant="ghost" size="lg" className="h-16 px-10 rounded-full text-slate-400 hover:text-white hover:bg-white/5 text-lg transition-all border border-transparent hover:border-slate-800">
                                 <Sparkles className="mr-2 h-5 w-5 text-purple-400" />
-                                Ver Casos de Éxito
+                                {t('hero.btn2')}
                             </Button>
                         </Link>
                     </motion.div>
@@ -224,7 +224,7 @@ export default function WebDevPage() {
                                 </div>
                                 <div className="text-xs text-slate-500 font-mono flex items-center gap-2">
                                     <Terminal size={12} />
-                                    vercel-deploy-pipeline.sh
+                                    {t('hero.term.title')}
                                 </div>
                                 <div className="w-10" />
                             </div>
@@ -240,10 +240,10 @@ export default function WebDevPage() {
                                             <span className="text-purple-400">const</span> <span className="text-blue-400">AppConfig</span> = {'{'}
                                         </div>
                                         <div className="pl-6 w-full">
-                                            <span className="text-slate-50">{"// Deploy to Edge Network"}</span><br />
-                                            target: <span className="text-green-400">&apos;serverless&apos;</span>,<br />
-                                            performance: <span className="text-yellow-400 mb-1 inline-block"><TypingEffect text="'obsessed-mode'" /></span>,<br />
-                                            security: <span className="text-blue-400">true</span>
+                                            <span className="text-slate-50">{t('hero.term.c1')}</span><br />
+                                            {t('hero.term.c2')} <span className="text-green-400">{t('hero.term.c2v')}</span>,<br />
+                                            {t('hero.term.c3')} <span className="text-yellow-400 mb-1 inline-block"><TypingEffect text={t('hero.term.c3v')} /></span>,<br />
+                                            {t('hero.term.c4')} <span className="text-blue-400">{t('hero.term.c4v')}</span>
                                         </div>
                                         <div>{'}'};</div>
                                     </div>
@@ -252,7 +252,7 @@ export default function WebDevPage() {
 
                             {/* Status Bar */}
                             <div className="bg-teal-900/20 text-teal-400 text-xs px-4 py-1 flex justify-between items-center border-t border-teal-900/30">
-                                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" /> COMPILING...</span>
+                                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" /> {t('hero.term.status')}</span>
                                 <span>UTF-8</span>
                             </div>
                         </div>
@@ -263,8 +263,8 @@ export default function WebDevPage() {
             {/* 9. DUAL MARQUEE SECTION */}
             <section className="py-24 bg-slate-950 border-y border-slate-900 relative">
                 <div className="container mx-auto px-6 lg:px-8 relative z-10 text-center mb-16">
-                    <p className="text-sm font-bold text-teal-500 uppercase tracking-widest mb-3">Tech Landscape</p>
-                    <h2 className="text-3xl md:text-5xl font-bold text-white">Construimos sobre Gigantes</h2>
+                    <p className="text-sm font-bold text-teal-500 uppercase tracking-widest mb-3">{t('marquee.tag')}</p>
+                    <h2 className="text-3xl md:text-5xl font-bold text-white">{t('marquee.title')}</h2>
                 </div>
 
                 {/* Marquee 1 (Left) */}
@@ -313,23 +313,23 @@ export default function WebDevPage() {
                             variants={fadeIn}
                         >
                             <Badge variant="outline" className="mb-6 border-green-500/30 bg-green-900/20 text-green-400 px-3 py-1">
-                                <Zap size={14} className="mr-2" /> Core Web Vitals
+                                <Zap size={14} className="mr-2" /> {t('performance.tag')}
                             </Badge>
                             <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight">
-                                Velocidad es <br />
+                                {t('performance.title1')} <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400">
-                                    SEO & Conversión.
+                                    {t('performance.title2')}
                                 </span>
                             </h2>
                             <p className="text-lg text-slate-400 mb-10 leading-relaxed border-l-2 border-slate-700 pl-6">
-                                Cada milisegundo cuenta. Optimizamos el Critical Rendering Path para lograr puntuaciones perfectas que Google (y tus usuarios) aman.
+                                {t('performance.desc')}
                             </p>
 
                             <ul className="space-y-8">
                                 {[
-                                    { icon: Rocket, title: "LCP < 1.0s", desc: "El contenido principal carga en un parpadeo.", color: "text-purple-400" },
-                                    { icon: Smartphone, title: "Mobile First Nativo", desc: "UI/UX diseñada para el toque, no adaptada.", color: "text-blue-400" },
-                                    { icon: Search, title: "SEO Semántico", desc: "Estructura JSON-LD integrada para Rich Snippets.", color: "text-yellow-400" },
+                                    { icon: Rocket, title: t('performance.features.f1Title'), desc: t('performance.features.f1Desc'), color: "text-purple-400" },
+                                    { icon: Smartphone, title: t('performance.features.f2Title'), desc: t('performance.features.f2Desc'), color: "text-blue-400" },
+                                    { icon: Search, title: t('performance.features.f3Title'), desc: t('performance.features.f3Desc'), color: "text-yellow-400" },
                                 ].map((item, idx) => (
                                     <motion.li
                                         key={idx}
@@ -398,8 +398,8 @@ export default function WebDevPage() {
                                     ))}
                                 </div>
                                 <div className="mt-8 pt-6 border-t border-slate-800 flex justify-between items-center text-xs text-slate-500 font-mono">
-                                    <span>Lighthouse 12.0 Report</span>
-                                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> PASSED</span>
+                                    <span>{t('performance.report')}</span>
+                                    <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> {t('performance.status')}</span>
                                 </div>
                             </PerspectiveCard>
                         </div>
@@ -411,9 +411,9 @@ export default function WebDevPage() {
             <section className="py-32 bg-slate-950 relative">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">La Verdad Incómoda</h2>
+                        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">{t('comparison.title')}</h2>
                         <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-                            La mayoría de agencias venden plantillas de $50 USD como &quot;diseño web profesional&quot;.
+                            {t('comparison.desc')}
                         </p>
                     </div>
 
@@ -431,24 +431,24 @@ export default function WebDevPage() {
                             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
                             <h3 className="text-3xl font-bold text-red-100/80 mb-8 flex items-center gap-3">
                                 <XCircle className="text-red-500" />
-                                &quot;La Competencia&quot;
+                                {t('comparison.bad.title')}
                             </h3>
                             <ul className="space-y-6 text-slate-400 font-medium">
                                 <li className="flex gap-4 items-center">
                                     <XCircle size={20} className="text-red-500/50" />
-                                    <span>Wordpress / Wix (Lento)</span>
+                                    <span>{t('comparison.bad.items.0')}</span>
                                 </li>
                                 <li className="flex gap-4 items-center">
                                     <XCircle size={20} className="text-red-500/50" />
-                                    <span>Plantillas Genéricas</span>
+                                    <span>{t('comparison.bad.items.1')}</span>
                                 </li>
                                 <li className="flex gap-4 items-center">
                                     <XCircle size={20} className="text-red-500/50" />
-                                    <span>Sin Acceso al Código</span>
+                                    <span>{t('comparison.bad.items.2')}</span>
                                 </li>
                                 <li className="flex gap-4 items-center">
                                     <XCircle size={20} className="text-red-500/50" />
-                                    <span>Vulnerable a Hacks</span>
+                                    <span>{t('comparison.bad.items.3')}</span>
                                 </li>
                             </ul>
                         </motion.div>
@@ -460,24 +460,24 @@ export default function WebDevPage() {
                             </div>
                             <h3 className="text-3xl font-bold text-white mb-8 flex items-center gap-3 relative z-10">
                                 <CheckCircle2 className="text-teal-400" />
-                                LegacyMark Custom
+                                {t('comparison.good.title')}
                             </h3>
                             <ul className="space-y-6 text-slate-200 font-medium relative z-10">
                                 <li className="flex gap-4 items-center">
                                     <div className="bg-teal-500/20 p-1 rounded-full"><CheckCircle2 size={16} className="text-teal-400" /></div>
-                                    <span>Next.js Enterprise Stack</span>
+                                    <span>{t('comparison.good.items.0')}</span>
                                 </li>
                                 <li className="flex gap-4 items-center">
                                     <div className="bg-teal-500/20 p-1 rounded-full"><CheckCircle2 size={16} className="text-teal-400" /></div>
-                                    <span>Diseño 100% A Medida</span>
+                                    <span>{t('comparison.good.items.1')}</span>
                                 </li>
                                 <li className="flex gap-4 items-center">
                                     <div className="bg-teal-500/20 p-1 rounded-full"><CheckCircle2 size={16} className="text-teal-400" /></div>
-                                    <span>Propiedad Total del Código</span>
+                                    <span>{t('comparison.good.items.2')}</span>
                                 </li>
                                 <li className="flex gap-4 items-center">
                                     <div className="bg-teal-500/20 p-1 rounded-full"><CheckCircle2 size={16} className="text-teal-400" /></div>
-                                    <span>Seguridad Grado Militar</span>
+                                    <span>{t('comparison.good.items.3')}</span>
                                 </li>
                             </ul>
                         </PerspectiveCard>
@@ -491,26 +491,26 @@ export default function WebDevPage() {
                 <div className="container mx-auto px-6 lg:px-8 relative z-10">
                     <div className="text-center mb-24">
                         <Badge variant="outline" className="mb-4 border-purple-500/30 bg-purple-500/10 text-purple-300">
-                            Scalable Solutions
+                            {t('pricing.tag')}
                         </Badge>
-                        <h2 className="text-4xl text-white font-bold">Inversión Transparente</h2>
+                        <h2 className="text-4xl text-white font-bold">{t('pricing.title')}</h2>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8 items-start">
                         {/* Startup */}
                         <motion.div whileHover={{ y: -10 }} className="bg-slate-950/80 p-8 rounded-3xl border border-slate-800 backdrop-blur-sm flex flex-col min-h-[500px]">
-                            <h3 className="text-2xl font-bold text-white mb-2">MVP Launch</h3>
-                            <div className="text-4xl font-bold text-slate-200 mb-6 font-mono tracking-tighter">$7.5M <span className="text-sm font-sans font-normal text-slate-500">COP</span></div>
-                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">Ideal para startups que necesitan validar su producto en el mercado rápidamente.</p>
+                            <h3 className="text-2xl font-bold text-white mb-2">{t('pricing.t1.title')}</h3>
+                            <div className="text-4xl font-bold text-slate-200 mb-6 font-mono tracking-tighter">{t('pricing.t1.price')} <span className="text-sm font-sans font-normal text-slate-500">{t('pricing.t1.currency')}</span></div>
+                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">{t('pricing.t1.desc')}</p>
                             <div className="h-px w-full bg-slate-800 mb-8" />
                             <ul className="space-y-4 mb-8 flex-1">
-                                {["Landing Page (5 Secciones)", "Diseño UI/UX Custom", "Formulario Contacto", "Analytics Básico", "1 Mes Soporte"].map((f, i) => (
+                                {[0, 1, 2, 3, 4].map((i) => (
                                     <li key={i} className="flex gap-3 text-sm text-slate-300">
-                                        <CheckCircle2 size={16} className="text-teal-500 flex-shrink-0" /> {f}
+                                        <CheckCircle2 size={16} className="text-teal-500 flex-shrink-0" /> {t(`pricing.t1.features.${i}`)}
                                     </li>
                                 ))}
                             </ul>
-                            <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 h-12 rounded-xl">Seleccionar Plan</Button>
+                            <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 h-12 rounded-xl">{t('pricing.t1.btn')}</Button>
                         </motion.div>
 
                         {/* Business - Featured */}
@@ -518,35 +518,35 @@ export default function WebDevPage() {
                             whileHover={{ y: -10 }}
                             className="bg-slate-900 p-8 rounded-3xl border border-teal-500 relative flex flex-col shadow-[0_0_50px_-10px_rgba(20,184,166,0.3)] min-h-[550px] -mt-6"
                         >
-                            <div className="absolute top-0 right-0 bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl rounded-tr-2xl shadow-lg">MOST POPULAR</div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Growth Scale</h3>
-                            <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400 mb-6 font-mono tracking-tighter">$12M <span className="text-sm font-sans font-normal text-slate-400">COP</span></div>
-                            <p className="text-slate-300 text-sm mb-8 leading-relaxed">La suite completa para empresas que buscan dominar su nicho digital.</p>
+                            <div className="absolute top-0 right-0 bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl rounded-tr-2xl shadow-lg">{t('pricing.t2.badge')}</div>
+                            <h3 className="text-2xl font-bold text-white mb-2">{t('pricing.t2.title')}</h3>
+                            <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-400 mb-6 font-mono tracking-tighter">{t('pricing.t2.price')} <span className="text-sm font-sans font-normal text-slate-400">{t('pricing.t2.currency')}</span></div>
+                            <p className="text-slate-300 text-sm mb-8 leading-relaxed">{t('pricing.t2.desc')}</p>
                             <div className="h-px w-full bg-slate-700 mb-8" />
                             <ul className="space-y-4 mb-8 flex-1">
-                                {["Sitio Web Completo (10+ Páginas)", "CMS Autoadministrable (Sanity)", "Blog SEO-Optimized", "Integración CRM & Email", "Dashboard de Analytics", "3 Meses Soporte VIP"].map((f, i) => (
+                                {[0, 1, 2, 3, 4, 5].map((i) => (
                                     <li key={i} className="flex gap-3 text-sm text-white font-medium">
-                                        <div className="bg-teal-500/20 rounded-full p-0.5"><CheckCircle2 size={14} className="text-teal-400" /></div> {f}
+                                        <div className="bg-teal-500/20 rounded-full p-0.5"><CheckCircle2 size={14} className="text-teal-400" /></div> {t(`pricing.t2.features.${i}`)}
                                     </li>
                                 ))}
                             </ul>
-                            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-white font-bold h-14 rounded-xl shadow-lg">Comenzar Ahora</Button>
+                            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-white font-bold h-14 rounded-xl shadow-lg">{t('pricing.t2.btn')}</Button>
                         </motion.div>
 
                         {/* Enterprise */}
                         <motion.div whileHover={{ y: -10 }} className="bg-slate-950/80 p-8 rounded-3xl border border-slate-800 backdrop-blur-sm flex flex-col min-h-[500px]">
-                            <h3 className="text-2xl font-bold text-white mb-2">Custom SaaS</h3>
-                            <div className="text-4xl font-bold text-slate-200 mb-6 font-mono tracking-tighter">Talk to Us</div>
-                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">Arquitectura compleja, paneles administrativos y lógica de negocio avanzada.</p>
+                            <h3 className="text-2xl font-bold text-white mb-2">{t('pricing.t3.title')}</h3>
+                            <div className="text-4xl font-bold text-slate-200 mb-6 font-mono tracking-tighter">{t('pricing.t3.price')}</div>
+                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">{t('pricing.t3.desc')}</p>
                             <div className="h-px w-full bg-slate-800 mb-8" />
                             <ul className="space-y-4 mb-8 flex-1">
-                                {["Arquitectura Serverless", "Base de Datos Dedicada", "Auth & Roles (RBAC)", "API REST / GraphQL", "CI/CD Pipelines", "SLA Garantizado"].map((f, i) => (
+                                {[0, 1, 2, 3, 4, 5].map((i) => (
                                     <li key={i} className="flex gap-3 text-sm text-slate-300">
-                                        <CheckCircle2 size={16} className="text-teal-500 flex-shrink-0" /> {f}
+                                        <CheckCircle2 size={16} className="text-teal-500 flex-shrink-0" /> {t(`pricing.t3.features.${i}`)}
                                     </li>
                                 ))}
                             </ul>
-                            <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 h-12 rounded-xl">Contactar Ing. Ventas</Button>
+                            <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 h-12 rounded-xl">{t('pricing.t3.btn')}</Button>
                         </motion.div>
                     </div>
                 </div>
@@ -556,19 +556,14 @@ export default function WebDevPage() {
             <section className="py-24 bg-slate-950 relative">
                 <div className="container mx-auto px-6 lg:px-8 max-w-3xl">
                     <h2 className="text-3xl font-bold text-white text-center mb-16">
-                        Dudas Técnicas Resueltas
+                        {t('faq.title')}
                     </h2>
                     <Accordion type="single" collapsible className="w-full space-y-4">
-                        {[
-                            { q: "¿Por qué no usar Wordpress?", a: "Wordpress carga lento y es inseguro. Next.js es la tecnología que usan Netflix, Twitch y Nike para velocidad instantánea." },
-                            { q: "¿Puedo editar el contenido?", a: "Sí. Implementamos un CMS Headless (Sanity/Strapi) para que edites textos e imágenes visualmente sin tocar código." },
-                            { q: "¿Qué incluye el mantenimiento?", a: "Monitoreo 24/7, actualizaciones de seguridad, backups diarios y soporte técnico directo por WhatsApp." },
-                            { q: "¿Cuánto tarda el desarrollo?", a: "Un MVP puede estar listo en 2 semanas. Un sitio corporativo completo tomamos 4-6 semanas para asegurar calidad." }
-                        ].map((faq, i) => (
+                        {[1, 2, 3, 4].map((i) => (
                             <AccordionItem key={i} value={`item-${i}`} className="border border-slate-800 rounded-xl px-6 bg-slate-900/30 data-[state=open]:bg-slate-900 data-[state=open]:border-slate-700 transition-all duration-300">
-                                <AccordionTrigger className="text-lg font-medium text-slate-200 hover:no-underline py-6 hover:text-teal-400 transition-colors text-left">{faq.q}</AccordionTrigger>
+                                <AccordionTrigger className="text-lg font-medium text-slate-200 hover:no-underline py-6 hover:text-teal-400 transition-colors text-left">{t(`faq.q${i}`)}</AccordionTrigger>
                                 <AccordionContent className="text-slate-400 text-base leading-relaxed pb-6 pr-8">
-                                    {faq.a}
+                                    {t(`faq.a${i}`)}
                                 </AccordionContent>
                             </AccordionItem>
                         ))}
@@ -593,17 +588,17 @@ export default function WebDevPage() {
                         transition={{ duration: 0.5 }}
                     >
                         <h2 className="text-5xl md:text-8xl font-bold text-white mb-8 tracking-tighter">
-                            Deja de Perder <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600">Clientes.</span>
+                            {t('cta.title1')} <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600">{t('cta.title2')}</span>
                         </h2>
                         <p className="text-xl md:text-2xl text-slate-500 mb-16 max-w-3xl mx-auto font-light">
-                            Tu competencia sigue usando plantillas lentas. <br />
-                            Es el momento perfecto para adelantarlos.
+                            {t('cta.desc1')} <br />
+                            {t('cta.desc2')}
                         </p>
 
                         <Link href="/contacto">
                             <Button size="lg" className="h-24 px-16 rounded-full bg-white text-black hover:bg-slate-200 text-2xl font-bold shadow-[0_0_100px_-20px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300">
-                                Iniciar Transformación
+                                {t('cta.btn')}
                             </Button>
                         </Link>
                     </motion.div>

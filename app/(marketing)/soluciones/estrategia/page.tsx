@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { motion, useScroll, useTransform, useMotionValue, useMotionTemplate } from "framer-motion";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 
 // --- Advanced Visual Components (Spanish Edition) ---
 
@@ -122,6 +123,7 @@ const TimelineNode = ({
 export default function StrategyPage() {
     const targetRef = useRef(null);
     const { scrollYProgress } = useScroll();
+    const t = useTranslations("estrategiaPage");
 
     // Parallax
 
@@ -153,31 +155,31 @@ export default function StrategyPage() {
                                 className="inline-flex items-center gap-3 px-3 py-1 border border-slate-800 bg-black/50 backdrop-blur-sm mb-8 hover:border-teal-500/30 transition-colors cursor-default"
                             >
                                 <BrainCircuit size={14} className="text-teal-500" />
-                                <span className="text-slate-400 text-[10px] font-mono font-medium uppercase tracking-[0.2em]">Arquitectos de Transformación Digital</span>
+                                <span className="text-slate-400 text-[10px] font-mono font-medium uppercase tracking-[0.2em]">{t('hero.badge')}</span>
                             </motion.div>
 
                             <h1 className="text-5xl lg:text-7xl font-bold tracking-tighter text-white mb-8 leading-[0.95]">
-                                Diseñamos <br />
+                                {t('hero.title1')} <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-200">
-                                    Dominio de Mercado.
+                                    {t('hero.title2')}
                                 </span>
                             </h1>
 
-                            <p className="text-lg text-slate-400 mb-12 leading-relaxed font-light max-w-lg border-l border-teal-500/30 pl-6">
-                                Deja de reaccionar al mercado. Empieza a dictarlo. <br />
-                                Proveemos la <strong>infraestructura estratégica</strong> para compañías listas para liderar.
-                            </p>
+                            <p
+                                className="text-lg text-slate-400 mb-12 leading-relaxed font-light max-w-lg border-l border-teal-500/30 pl-6"
+                                dangerouslySetInnerHTML={{ __html: t('hero.desc') }}
+                            />
 
                             <div className="flex flex-col sm:flex-row gap-0">
                                 <Link href="/contacto">
                                     <Button size="lg" className="h-16 px-10 rounded-none bg-teal-600 text-white hover:bg-teal-500 text-sm font-bold uppercase tracking-widest transition-all hover:pr-12 group shadow-[0_0_30px_rgba(20,184,166,0.3)]">
-                                        Agendar Consultoría
+                                        {t('hero.btn1')}
                                         <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </Link>
                                 <Link href="#roadmap">
                                     <Button variant="outline" size="lg" className="h-16 px-10 rounded-none border-l-0 border-slate-800 bg-transparent text-slate-300 hover:bg-slate-900 hover:text-white text-sm uppercase tracking-widest">
-                                        Ver el Blueprint
+                                        {t('hero.btn2')}
                                     </Button>
                                 </Link>
                             </div>
@@ -207,23 +209,23 @@ export default function StrategyPage() {
                                 <div className="grid grid-cols-2 gap-6 w-full h-full transform translate-z-20">
                                     <ExecutiveCard className="bg-black/90 flex flex-col items-center justify-center text-center p-8 border-slate-800 hover:border-teal-500/50 transition-colors shadow-2xl">
                                         <div className="mb-4 p-3 bg-slate-900/50 rounded-full"><Briefcase size={24} className="text-teal-500" /></div>
-                                        <div className="text-xs font-bold uppercase tracking-wider text-slate-300">Visión Ejecutiva</div>
+                                        <div className="text-xs font-bold uppercase tracking-wider text-slate-300">{t('hero.cards.c1')}</div>
                                         <div className="mt-2 h-0.5 w-6 bg-teal-500 mx-auto" />
                                     </ExecutiveCard>
 
                                     <ExecutiveCard className="bg-black/80 flex flex-col items-center justify-center text-center p-8 border-slate-800 mt-12 hover:border-teal-500/50 transition-colors shadow-2xl backdrop-blur-md">
                                         <div className="mb-4 p-3 bg-slate-900/50 rounded-full"><Database size={24} className="text-slate-500" /></div>
-                                        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Core de Datos</div>
+                                        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{t('hero.cards.c2')}</div>
                                     </ExecutiveCard>
 
                                     <ExecutiveCard className="bg-black/80 flex flex-col items-center justify-center text-center p-8 border-slate-800 -mt-8 hover:border-teal-500/50 transition-colors shadow-2xl backdrop-blur-md">
                                         <div className="mb-4 p-3 bg-slate-900/50 rounded-full"><Network size={24} className="text-slate-500" /></div>
-                                        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Arquitectura</div>
+                                        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{t('hero.cards.c3')}</div>
                                     </ExecutiveCard>
 
                                     <ExecutiveCard className="bg-white text-black flex flex-col items-center justify-center text-center p-8 border-white shadow-[0_0_60px_rgba(255,255,255,0.1)] transform scale-105 z-20 hover:scale-110 transition-transform">
                                         <div className="mb-4 p-3 bg-slate-100 rounded-full"><Crown size={24} className="text-black" /></div>
-                                        <div className="text-xs font-bold uppercase tracking-wider">Líder de Mercado</div>
+                                        <div className="text-xs font-bold uppercase tracking-wider">{t('hero.cards.c4')}</div>
                                     </ExecutiveCard>
                                 </div>
                             </div>
@@ -240,41 +242,41 @@ export default function StrategyPage() {
                     <div className="flex flex-col md:flex-row justify-between items-end mb-24 border-b border-slate-900 pb-8">
                         <div>
                             <Badge variant="outline" className="mb-4 border-teal-900/50 bg-teal-950/10 text-teal-500 rounded-none px-3 py-1">
-                                Blueprint Operativo
+                                {t('roadmap.badge')}
                             </Badge>
-                            <h2 className="text-4xl text-white font-bold tracking-tight">Roadmap de Transformación</h2>
+                            <h2 className="text-4xl text-white font-bold tracking-tight">{t('roadmap.title')}</h2>
                         </div>
                         <p className="text-slate-500 max-w-sm text-right mt-6 md:mt-0 font-light text-sm">
-                            Un enfoque estructurado de grado militar para actualizar todo tu ecosistema digital.
+                            {t('roadmap.desc')}
                         </p>
                     </div>
 
                     <div className="relative">
                         <TimelineNode
-                            step="Fase 01"
-                            title="Auditoría Forense"
-                            desc="Desmantelamos tus procesos actuales, stack tecnológico y flujo de datos. Encontramos dónde estás perdiendo dinero y dónde tus datos están desconectados."
+                            step={t('roadmap.phases.p01.step')}
+                            title={t('roadmap.phases.p01.title')}
+                            desc={t('roadmap.phases.p01.desc')}
                             icon={Search}
                             delay={0.2}
                         />
                         <TimelineNode
-                            step="Fase 02"
-                            title="Arquitectura Estratégica"
-                            desc="Diseñamos el nuevo sistema operativo. Seleccionamos el Stack Tecnológico Enterprise (ERP, CRM, BI), definimos dashboards de KPIs y mapeamos el Customer Journey."
+                            step={t('roadmap.phases.p02.step')}
+                            title={t('roadmap.phases.p02.title')}
+                            desc={t('roadmap.phases.p02.desc')}
                             icon={Map}
                             delay={0.4}
                         />
                         <TimelineNode
-                            step="Fase 03"
-                            title="Despliegue & Integración"
-                            desc="La fase de construcción. Migramos datos, configuramos conexiones API, flujos de automatización y capacitamos a tus stakeholders clave."
+                            step={t('roadmap.phases.p03.step')}
+                            title={t('roadmap.phases.p03.title')}
+                            desc={t('roadmap.phases.p03.desc')}
                             icon={Rocket}
                             delay={0.6}
                         />
                         <TimelineNode
-                            step="Fase 04"
-                            title="Escalado Agresivo"
-                            desc="Ciclo de optimización continua. Usamos la nueva claridad de datos para inyectar capital en canales rentables y cortar despiadadamente lo que no funciona."
+                            step={t('roadmap.phases.p04.step')}
+                            title={t('roadmap.phases.p04.title')}
+                            desc={t('roadmap.phases.p04.desc')}
                             icon={TrendingUp}
                             isLast={true}
                             delay={0.8}
@@ -289,8 +291,8 @@ export default function StrategyPage() {
 
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-16">
-                        <h2 className="text-3xl font-bold text-white mb-4">Servicios Ejecutivos</h2>
-                        <p className="text-slate-500">Intervenciones de alto apalancamiento para compañías en crecimiento.</p>
+                        <h2 className="text-3xl font-bold text-white mb-4">{t('services.title')}</h2>
+                        <p className="text-slate-500">{t('services.desc')}</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-0 border border-slate-900">
@@ -299,14 +301,14 @@ export default function StrategyPage() {
                             <div className="w-12 h-12 bg-black border border-slate-800 flex items-center justify-center mb-8 group-hover:border-teal-500 transition-colors">
                                 <Briefcase size={20} className="text-slate-400 group-hover:text-teal-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-4">Fractional CMO</h3>
+                            <h3 className="text-2xl font-bold text-white mb-4">{t('services.cmo.title')}</h3>
                             <p className="text-slate-400 mb-8 leading-relaxed text-sm">
-                                Liderazgo de marketing experto sin el costo de un ejecutivo full-time. Dirigimos tu estrategia, gestionamos tu equipo y somos responsables de los resultados.
+                                {t('services.cmo.desc')}
                             </p>
                             <ul className="space-y-4 border-t border-slate-900 pt-8">
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-teal-500" /> Asesoría de Junta</li>
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-teal-500" /> Gestión de Equipos</li>
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-teal-500" /> Asignación de Presupuesto</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-teal-500" /> {t('services.cmo.l1')}</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-teal-500" /> {t('services.cmo.l2')}</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-teal-500" /> {t('services.cmo.l3')}</li>
                             </ul>
                         </ExecutiveCard>
 
@@ -315,14 +317,14 @@ export default function StrategyPage() {
                             <div className="w-12 h-12 bg-black border border-slate-800 flex items-center justify-center mb-8 group-hover:border-blue-500 transition-colors">
                                 <Database size={20} className="text-slate-400 group-hover:text-blue-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-4">Arquitectura Tech</h3>
+                            <h3 className="text-2xl font-bold text-white mb-4">{t('services.tech.title')}</h3>
                             <p className="text-slate-400 mb-8 leading-relaxed text-sm">
-                                Construimos la columna vertebral digital de tu empresa. Integración perfecta entre CRM, Automatización de Marketing y Analítica.
+                                {t('services.tech.desc')}
                             </p>
                             <ul className="space-y-4 border-t border-slate-900 pt-8">
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-blue-500" /> Implementación CRM</li>
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-blue-500" /> APIs Personalizadas</li>
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-blue-500" /> Data Warehousing</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-blue-500" /> {t('services.tech.l1')}</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-blue-500" /> {t('services.tech.l2')}</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-blue-500" /> {t('services.tech.l3')}</li>
                             </ul>
                         </ExecutiveCard>
 
@@ -331,14 +333,14 @@ export default function StrategyPage() {
                             <div className="w-12 h-12 bg-black border border-slate-800 flex items-center justify-center mb-8 group-hover:border-purple-500 transition-colors">
                                 <LineChart size={20} className="text-slate-400 group-hover:text-purple-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-4">Consultoría Growth</h3>
+                            <h3 className="text-2xl font-bold text-white mb-4">{t('services.growth.title')}</h3>
                             <p className="text-slate-400 mb-8 leading-relaxed text-sm">
-                                Consultoría francotiradora para resolver bloqueos de ingresos específicos. Estrategia de precios, expansión de mercado y product-market fit.
+                                {t('services.growth.desc')}
                             </p>
                             <ul className="space-y-4 border-t border-slate-900 pt-8">
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-purple-500" /> Estrategia Go-to-Market</li>
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-purple-500" /> Análisis Unit Economics</li>
-                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-purple-500" /> Optimización de Funnel</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-purple-500" /> {t('services.growth.l1')}</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-purple-500" /> {t('services.growth.l2')}</li>
+                                <li className="text-sm text-slate-500 flex items-center gap-3 font-medium"><div className="w-1.5 h-1.5 bg-purple-500" /> {t('services.growth.l3')}</li>
                             </ul>
                         </ExecutiveCard>
                     </div>
@@ -351,8 +353,8 @@ export default function StrategyPage() {
                 <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black to-transparent z-10" />
 
                 <div className="container mx-auto px-6 lg:px-8 relative z-20 text-center mb-16">
-                    <p className="text-[10px] font-mono text-slate-600 uppercase tracking-[0.3em] mb-4">Impulsado por Datos Enterprise</p>
-                    <h2 className="text-2xl font-bold text-white">Stack de Inteligencia</h2>
+                    <p className="text-[10px] font-mono text-slate-600 uppercase tracking-[0.3em] mb-4">{t('stack.badge')}</p>
+                    <h2 className="text-2xl font-bold text-white">{t('stack.title')}</h2>
                 </div>
 
                 <div className="relative flex overflow-x-hidden group z-0">
@@ -376,51 +378,51 @@ export default function StrategyPage() {
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="text-center mb-24">
                         <Badge variant="outline" className="mb-4 border-slate-800 bg-slate-900/50 text-slate-400 rounded-none px-3 py-1">
-                            Modelos de Inversión
+                            {t('pricing.badge')}
                         </Badge>
-                        <h2 className="text-4xl text-white font-bold">Niveles de Partnership</h2>
+                        <h2 className="text-4xl text-white font-bold">{t('pricing.title')}</h2>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
                         {/* Advisory */}
                         <div className="bg-black p-12 border border-slate-800 flex flex-col hover:border-slate-600 transition-colors transform hover:-translate-y-1 duration-300">
                             <div className="mb-6"><BrainCircuit size={32} className="text-slate-500" /></div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Asesoría Estratégica</h3>
-                            <div className="text-4xl font-bold text-slate-200 mb-6 font-mono tracking-tight">$12M <span className="text-sm font-normal text-slate-500 font-sans">COP / mes</span></div>
+                            <h3 className="text-2xl font-bold text-white mb-2">{t('pricing.t1.title')}</h3>
+                            <div className="text-4xl font-bold text-slate-200 mb-6 font-mono tracking-tight">{t('pricing.t1.price')} <span className="text-sm font-normal text-slate-500 font-sans">{t('pricing.t1.unit')}</span></div>
                             <p className="text-slate-400 text-sm mb-10 leading-relaxed max-w-xs">
-                                Para líderes que necesitan un tablero de resonancia y dirección de alto nivel sin ejecución operativa.
+                                {t('pricing.t1.desc')}
                             </p>
 
                             <ul className="space-y-4 mb-10 flex-1">
-                                {["Llamadas de Estrategia Quincenales", "Revisión de Dashboards & KPIs", "Selección de Proveedores/Equipo", "Soporte Asíncrono Ilimitado"].map((f, i) => (
+                                {[t('pricing.t1.f1'), t('pricing.t1.f2'), t('pricing.t1.f3'), t('pricing.t1.f4')].map((f, i) => (
                                     <li key={i} className="flex gap-4 text-sm text-slate-300 items-start">
                                         <div className="w-1.5 h-1.5 bg-white mt-1.5 flex-shrink-0" />
                                         <span className="leading-tight">{f}</span>
                                     </li>
                                 ))}
                             </ul>
-                            <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-white hover:text-black rounded-none h-14 uppercase tracking-widest font-bold transition-all">Solicitar Asessoría</Button>
+                            <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:bg-white hover:text-black rounded-none h-14 uppercase tracking-widest font-bold transition-all">{t('pricing.t1.btn')}</Button>
                         </div>
 
                         {/* Fractional Executive - Feature */}
                         <div className="bg-white p-12 border border-white flex flex-col relative overflow-hidden group shadow-[0_0_80px_rgba(255,255,255,0.1)] transform scale-105">
-                            <div className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold px-4 py-2 uppercase tracking-widest">Capacidad Limitada</div>
+                            <div className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold px-4 py-2 uppercase tracking-widest">{t('pricing.t2.badge')}</div>
                             <div className="mb-6"><Crown size={32} className="text-black" /></div>
-                            <h3 className="text-2xl font-bold text-black mb-2">Ejecutivo Fraccional</h3>
-                            <div className="text-4xl font-bold text-black mb-6 font-mono tracking-tight">$25M <span className="text-sm font-normal text-slate-500 font-sans">COP / mes</span></div>
+                            <h3 className="text-2xl font-bold text-black mb-2">{t('pricing.t2.title')}</h3>
+                            <div className="text-4xl font-bold text-black mb-6 font-mono tracking-tight">{t('pricing.t2.price')} <span className="text-sm font-normal text-slate-500 font-sans">{t('pricing.t2.unit')}</span></div>
                             <p className="text-slate-600 text-sm mb-10 leading-relaxed max-w-xs">
-                                Entramos como tu CxO interino. Control operativo total, liderazgo de equipo y responsabilidad de ingresos.
+                                {t('pricing.t2.desc')}
                             </p>
 
                             <ul className="space-y-4 mb-10 flex-1">
-                                {["Miembro del Equipo de Liderazgo", "Planning & Review Semanal", "Gestión Completa del Departamento", "Representación ante la Junta"].map((f, i) => (
+                                {[t('pricing.t2.f1'), t('pricing.t2.f2'), t('pricing.t2.f3'), t('pricing.t2.f4')].map((f, i) => (
                                     <li key={i} className="flex gap-4 text-sm text-black font-medium items-start">
                                         <div className="w-1.5 h-1.5 bg-black mt-1.5 flex-shrink-0" />
                                         <span className="leading-tight">{f}</span>
                                     </li>
                                 ))}
                             </ul>
-                            <Button className="w-full bg-black hover:bg-slate-800 text-white rounded-none h-14 uppercase tracking-widest font-bold transition-all">Consultar Disponibilidad</Button>
+                            <Button className="w-full bg-black hover:bg-slate-800 text-white rounded-none h-14 uppercase tracking-widest font-bold transition-all">{t('pricing.t2.btn')}</Button>
                         </div>
                     </div>
                 </div>
@@ -435,17 +437,17 @@ export default function StrategyPage() {
                         transition={{ duration: 0.8 }}
                     >
                         <h2 className="text-4xl md:text-7xl font-bold text-white mb-8 tracking-tighter">
-                            Deja de Adivinar. <br />
-                            Empieza a <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-white">Arquitectar.</span>
+                            {t('cta.title1')} <br />
+                            {t('cta.title2')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-white">{t('cta.title2Span')}</span>
                         </h2>
                         <p className="text-xl text-slate-500 mb-16 max-w-2xl mx-auto font-light leading-relaxed">
-                            La estrategia es la diferencia entre movimiento y progreso. <br />
-                            Construyamos tu hoja de ruta hacia el dominio del mercado.
+                            {t('cta.desc1')} <br />
+                            {t('cta.desc2')}
                         </p>
 
                         <Link href="/contacto">
                             <Button size="lg" className="h-24 px-16 rounded-none bg-white text-black hover:bg-slate-200 text-xl font-bold uppercase tracking-[0.2em] hover:scale-105 transition-all duration-300 border-2 border-white hover:border-slate-300 shadow-[0_0_60px_rgba(255,255,255,0.2)]">
-                                Agendar Consultor
+                                {t('cta.btn')}
                             </Button>
                         </Link>
                     </motion.div>

@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 
 // Animation Variants
 const fadeIn = {
@@ -37,6 +38,7 @@ export default function AutomationPage() {
 
     const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
     const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+    const t = useTranslations("automatizacionPage");
 
     return (
         <main className="bg-slate-50 selection:bg-teal-500 selection:text-white overflow-hidden">
@@ -78,7 +80,7 @@ export default function AutomationPage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                         </span>
-                        <span className="text-slate-600 text-xs font-mono font-medium uppercase tracking-widest">Enterprise AI Workforce v2.0</span>
+                        <span className="text-slate-600 text-xs font-mono font-medium uppercase tracking-widest">{t('hero.badge')}</span>
                     </motion.div>
 
                     {/* 4. Gradient Text & Typography */}
@@ -88,21 +90,21 @@ export default function AutomationPage() {
                         transition={{ duration: 0.7, ease: "easeOut" }}
                         className="text-5xl lg:text-8xl font-bold tracking-tighter text-slate-900 mb-8 max-w-5xl mx-auto leading-[1.1]"
                     >
-                        No contrates más personal. <br />
+                        {t('hero.title1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-indigo-500 to-teal-500 animate-gradient-x bg-[length:200%_auto]">
-                            Clona a los mejores.
+                            {t('hero.title2')}
                         </span>
                     </motion.h1>
 
-                    <motion.p
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1, delay: 0.3 }}
                         className="text-xl lg:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light"
                     >
-                        Desplegamos <span className="font-semibold text-slate-900">Agentes Digitales Autónomos</span> que operan tu empresa 24/7.
-                        Desde ventas hasta soporte, con precisión de máquina y empatía humana.
-                    </motion.p>
+                        <p dangerouslySetInnerHTML={{ __html: t('hero.desc1') }} />
+                        <p>{t('hero.desc2')}</p>
+                    </motion.div>
 
                     {/* 5. Magnetic Buttons */}
                     <motion.div
@@ -114,7 +116,7 @@ export default function AutomationPage() {
                         <Link href="/contacto">
                             <Button size="lg" className="h-16 px-10 rounded-full bg-slate-900 text-white hover:bg-slate-800 text-lg shadow-[0_20px_50px_-12px_rgba(15,23,42,0.5)] hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.8)] transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
                                 <span className="relative z-10 flex items-center">
-                                    Auditoría de Procesos (Gratis) <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                    {t('hero.btn1')} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                                 </span>
                                 {/* Button Shine Effect */}
                                 <div className="absolute inset-0 h-full w-full scale-0 rounded-full transition-all duration-300 group-hover:scale-100 group-hover:bg-slate-800/50" />
@@ -123,14 +125,14 @@ export default function AutomationPage() {
                         <Link href="#agents">
                             <Button variant="outline" size="lg" className="h-16 px-10 rounded-full border-slate-200 bg-white/80 backdrop-blur text-slate-700 hover:bg-slate-50 hover:border-teal-200 text-lg hover:shadow-lg transition-all hover:-translate-y-1">
                                 <Bot className="mr-2 h-5 w-5 text-teal-500" />
-                                Ver Catálogo de Agentes
+                                {t('hero.btn2')}
                             </Button>
                         </Link>
                     </motion.div>
 
                     {/* 6. Scrolling Logos / Social Proof */}
                     <div className="mt-24 pt-10 border-t border-slate-200/60 max-w-4xl mx-auto">
-                        <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-6">Optimizing Workflow For</p>
+                        <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-6">{t('hero.trusted')}</p>
                         <div className="flex justify-between items-center opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
                             {/* Use Lucide icons as abstract logo placeholders for robustness */}
                             <div className="flex items-center gap-2 group cursor-pointer"><Server className="h-6 w-6 group-hover:text-teal-600 transition-colors" /><span className="font-bold text-lg group-hover:text-slate-900">NexusCore</span></div>
@@ -153,20 +155,20 @@ export default function AutomationPage() {
                             variants={fadeIn}
                         >
                             <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6 leading-tight">
-                                El &quot;Agujero Negro&quot; de <br />
+                                {t('problem.title1')} <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                                    Productividad Humana
+                                    {t('problem.title2')}
                                 </span>
                             </h2>
-                            <p className="text-lg text-slate-600 mb-10 leading-relaxed border-l-4 border-red-200 pl-6">
-                                Tu equipo pierde el <span className="font-bold text-slate-900">40% de su semana</span> en tareas repetitivas.
-                                Eso es 2 días completos pagados para mover datos de una hoja de cálculo a otra.
-                            </p>
+                            <div className="text-lg text-slate-600 mb-10 leading-relaxed border-l-4 border-red-200 pl-6 space-y-2">
+                                <p dangerouslySetInnerHTML={{ __html: t('problem.desc1') }} />
+                                <p>{t('problem.desc2')}</p>
+                            </div>
                             <ul className="space-y-6">
                                 {[
-                                    { icon: Workflow, text: "Procesos manuales lentos y costosos.", color: "text-red-500" },
-                                    { icon: Shield, text: "Errores humanos en datos críticos.", color: "text-orange-500" },
-                                    { icon: BarChart3, text: "Ceguera operativa por falta de reportes reales.", color: "text-amber-500" },
+                                    { icon: Workflow, text: t('problem.list1'), color: "text-red-500" },
+                                    { icon: Shield, text: t('problem.list2'), color: "text-orange-500" },
+                                    { icon: BarChart3, text: t('problem.list3'), color: "text-amber-500" },
                                 ].map((item, idx) => (
                                     <motion.li
                                         key={idx}
@@ -202,9 +204,9 @@ export default function AutomationPage() {
                                 <div className="grid grid-cols-2 gap-8 relative z-10">
                                     {/* Manual State */}
                                     <div className="text-center p-6 bg-slate-50 rounded-2xl border border-slate-100 group-hover:border-red-200 transition-colors">
-                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Huma-Ops</div>
-                                        <div className="text-5xl font-bold text-slate-300 mb-2 group-hover:text-red-400 transition-colors">40h</div>
-                                        <div className="text-sm text-slate-500">Tiempo / Proceso</div>
+                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t('problem.comparison.manual')}</div>
+                                        <div className="text-5xl font-bold text-slate-300 mb-2 group-hover:text-red-400 transition-colors">{t('problem.comparison.manualTime')}</div>
+                                        <div className="text-sm text-slate-500">{t('problem.comparison.timeLabel')}</div>
                                         <div className="mt-4 h-1 w-full bg-slate-200 rounded-full overflow-hidden">
                                             <div className="h-full w-full bg-red-400/50" />
                                         </div>
@@ -213,9 +215,9 @@ export default function AutomationPage() {
                                     {/* AI State */}
                                     <div className="text-center p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
                                         <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent" />
-                                        <div className="text-xs font-bold text-teal-400 uppercase tracking-widest mb-4 relative z-10">Agent-Ops</div>
-                                        <div className="text-5xl font-bold text-white mb-2 relative z-10">10ms</div>
-                                        <div className="text-sm text-slate-400 relative z-10">Tiempo / Proceso</div>
+                                        <div className="text-xs font-bold text-teal-400 uppercase tracking-widest mb-4 relative z-10">{t('problem.comparison.ai')}</div>
+                                        <div className="text-5xl font-bold text-white mb-2 relative z-10">{t('problem.comparison.aiTime')}</div>
+                                        <div className="text-sm text-slate-400 relative z-10">{t('problem.comparison.timeLabel')}</div>
                                         <div className="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden relative z-10">
                                             <div className="h-full w-[1%] bg-teal-400 animate-[loading_2s_ease-in-out_infinite]" />
                                         </div>
@@ -225,7 +227,7 @@ export default function AutomationPage() {
                                 </div>
 
                                 <div className="mt-8 pt-8 border-t border-slate-100 flex items-center justify-between">
-                                    <div className="text-sm font-medium text-slate-500">Eficiencia Ganada</div>
+                                    <div className="text-sm font-medium text-slate-500">{t('problem.comparison.efficiency')}</div>
                                     <div className="text-2xl font-bold text-teal-600">+9,900%</div>
                                 </div>
                             </motion.div>
@@ -246,13 +248,13 @@ export default function AutomationPage() {
                         className="text-center max-w-3xl mx-auto mb-20"
                     >
                         <Badge variant="outline" className="mb-6 border-teal-500/30 bg-teal-500/10 text-teal-300">
-                            Fuerza Laboral Digital v2.0
+                            {t('agents.badge')}
                         </Badge>
                         <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-                            Tus Nuevos &quot;Empleados&quot; Estrellas
+                            {t('agents.title')}
                         </h2>
                         <p className="text-lg text-slate-400">
-                            Agentes pre-entrenados, instanciables y escalables infinitamente. No duermen, no piden vacaciones, solo ejecutan.
+                            {t('agents.desc')}
                         </p>
                     </motion.div>
 
@@ -266,27 +268,27 @@ export default function AutomationPage() {
                         {[
                             {
                                 id: "Sales_V1",
-                                role: "Lead Qualification",
+                                role: t('agents.list.a1.role'),
                                 icon: MessageSquare,
                                 color: "indigo",
-                                desc: "Interactúa con leads. Califica interés, responde dudas y agenda reuniones.",
-                                stats: { label: "Respuesta", val: "< 1s" }
+                                desc: t('agents.list.a1.desc'),
+                                stats: { label: t('agents.list.a1.statsLabel'), val: "< 1s" }
                             },
                             {
                                 id: "Ops_Core",
-                                role: "Deep Automation",
+                                role: t('agents.list.a2.role'),
                                 icon: Workflow,
                                 color: "teal",
-                                desc: "Orquesta ERPs y CRMs. Mueve datos, factura y alerta anomalías.",
-                                stats: { label: "Uptime", val: "99.99%" }
+                                desc: t('agents.list.a2.desc'),
+                                stats: { label: t('agents.list.a2.statsLabel'), val: "99.99%" }
                             },
                             {
                                 id: "Analyst_Pro",
-                                role: "Predictive BI",
+                                role: t('agents.list.a3.role'),
                                 icon: LineChart,
                                 color: "amber",
-                                desc: "Predice tendencias de mercado y genera reportes ejecutivos autónomos.",
-                                stats: { label: "Accuracy", val: "98.5%" }
+                                desc: t('agents.list.a3.desc'),
+                                stats: { label: t('agents.list.a3.statsLabel'), val: "98.5%" }
                             }
                         ].map((agent, idx) => (
                             <motion.div
@@ -329,7 +331,7 @@ export default function AutomationPage() {
             <section className="py-24 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-2xl font-bold text-slate-900">Powered by Modern Infrastructure</h2>
+                        <h2 className="text-2xl font-bold text-slate-900">{t('stack.title')}</h2>
                     </div>
                     <div className="flex flex-wrap justify-center gap-12 lg:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
                         {[
@@ -362,24 +364,24 @@ export default function AutomationPage() {
                         <div className="flex-1 relative z-10">
                             <Badge variant="outline" className="mb-8 border-indigo-100 bg-indigo-50 text-indigo-600 px-4 py-1 text-sm">
                                 <BarChart3 className="w-3 h-3 mr-2" />
-                                Return On Investment
+                                {t('roi.badge')}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-8 leading-tight">
-                                La Matemática es <br />
-                                <span className="text-teal-600">Irrefutable.</span>
+                                {t('roi.title1')} <br />
+                                <span className="text-teal-600">{t('roi.title2')}</span>
                             </h2>
                             <p className="text-lg text-slate-600 mb-12 leading-relaxed">
-                                Implementar un agente de LegacyMark cuesta una fracción de un salario promedio, pero produce resultados exponencialmente superiores. Sin bajas médicas, sin errores.
+                                {t('roi.desc')}
                             </p>
 
                             <div className="grid grid-cols-2 gap-10">
                                 <motion.div whileHover={{ y: -5 }} className="p-6 rounded-2xl bg-slate-50 border border-slate-100">
-                                    <div className="text-5xl font-bold text-slate-900 mb-2 tracking-tight">70%</div>
-                                    <div className="text-sm font-medium text-slate-500 uppercase tracking-widest">Ahorro Costos</div>
+                                    <div className="text-5xl font-bold text-slate-900 mb-2 tracking-tight">{t('roi.stats.s1Val')}</div>
+                                    <div className="text-sm font-medium text-slate-500 uppercase tracking-widest">{t('roi.stats.s1Label')}</div>
                                 </motion.div>
                                 <motion.div whileHover={{ y: -5 }} className="p-6 rounded-2xl bg-teal-50 border border-teal-100">
-                                    <div className="text-5xl font-bold text-teal-600 mb-2 tracking-tight">10x</div>
-                                    <div className="text-sm font-medium text-teal-700 uppercase tracking-widest">Velocidad</div>
+                                    <div className="text-5xl font-bold text-teal-600 mb-2 tracking-tight">{t('roi.stats.s2Val')}</div>
+                                    <div className="text-sm font-medium text-teal-700 uppercase tracking-widest">{t('roi.stats.s2Label')}</div>
                                 </motion.div>
                             </div>
                         </div>
@@ -393,9 +395,9 @@ export default function AutomationPage() {
                                     transition={{ duration: 1, delay: 0.2 }}
                                     className="w-full bg-slate-200 rounded-t-2xl relative overflow-hidden"
                                 >
-                                    <div className="absolute top-4 w-full text-center font-bold text-slate-500">Antes</div>
+                                    <div className="absolute top-4 w-full text-center font-bold text-slate-500">{t('roi.graph.before')}</div>
                                 </motion.div>
-                                <span className="text-sm font-mono text-slate-400">Manual</span>
+                                <span className="text-sm font-mono text-slate-400">{t('roi.graph.manual')}</span>
                             </div>
 
                             <div className="flex flex-col items-center gap-4 w-32 group">
@@ -419,13 +421,13 @@ export default function AutomationPage() {
             <section className="py-24 bg-white relative">
                 <div className="container mx-auto px-6 lg:px-8 max-w-3xl">
                     <h2 className="text-3xl font-bold text-slate-900 text-center mb-16">
-                        Preguntas Frecuentes de Ingeniería
+                        {t('faq.title')}
                     </h2>
                     <Accordion type="single" collapsible className="w-full space-y-4">
                         {[
-                            { q: "¿Es seguro conectar mis datos?", a: "Absolutamente. Utilizamos encriptación de grado bancario (AES-256) y nuestras integraciones funcionan mediante APIs seguras con permisos de lectura/escritura granulares." },
-                            { q: "¿Cuánto tarda la implementación?", a: "Nuestros agentes pre-entrenados pueden desplegarse en 3-5 días hábiles. Para flujos a medida, 2-3 semanas." },
-                            { q: "¿Qué pasa si el proceso cambia?", a: "Nuestros agentes son modulares. Actualizar la lógica es tan simple como reconfigurar el nodo de decisión, sin reescribir código." }
+                            { q: t('faq.q1'), a: t('faq.a1') },
+                            { q: t('faq.q2'), a: t('faq.a2') },
+                            { q: t('faq.q3'), a: t('faq.a3') }
                         ].map((faq, i) => (
                             <AccordionItem key={i} value={`item-${i}`} className="border border-slate-100 rounded-xl px-4 bg-slate-50/50 data-[state=open]:bg-white data-[state=open]:shadow-md transition-all duration-300">
                                 <AccordionTrigger className="text-lg font-medium text-slate-800 hover:no-underline py-6">{faq.q}</AccordionTrigger>
@@ -454,18 +456,18 @@ export default function AutomationPage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                         </span>
-                        SYSTEM READY FOR DEPLOYMENT
+                        {t('cta.badge')}
                     </motion.div>
 
                     <h2 className="text-5xl lg:text-7xl font-bold text-white mb-8 tracking-tight max-w-4xl mx-auto">
-                        ¿Listo para lanzar tu <br />
+                        {t('cta.title1')} <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-indigo-400">
-                            fuerza laboral digital?
+                            {t('cta.title2')}
                         </span>
                     </h2>
 
                     <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-light">
-                        Agenda una demostración técnica hoy. Te mostraremos exactamente cuánto tiempo y dinero puedes ahorrar en la primera semana.
+                        {t('cta.desc')}
                     </p>
 
                     <motion.div
@@ -475,7 +477,7 @@ export default function AutomationPage() {
                     >
                         <Link href="/contacto">
                             <Button size="lg" className="h-20 px-12 rounded-full bg-teal-500 text-white hover:bg-teal-400 text-xl font-bold shadow-[0_0_40px_-10px_rgba(20,184,166,0.5)] transition-all">
-                                Agendar Demo Técnica
+                                {t('cta.btn')}
                             </Button>
                         </Link>
                     </motion.div>

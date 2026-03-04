@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { motion, useScroll, useTransform, useMotionValue, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 // --- SWISS DESIGN COMPONENTS (Light Mode) ---
 
@@ -67,17 +68,18 @@ const MagneticButton = ({ children, className = "", onClick }: MagneticButtonPro
 
 // 3. Strategic Tool: Archetype Selector
 const ArchetypeSelector = () => {
+    const t = useTranslations('estrategiaMarcaPage.tools.archetypes');
     const archetypes = [
-        { id: "hero", name: "El Héroe", traits: "Valiente, Audaz, Competente", color: "bg-red-600", icon: Crown },
-        { id: "sage", name: "El Sabio", traits: "Sabio, Visionario, Buscador de la Verdad", color: "bg-blue-600", icon: Eye },
-        { id: "creator", name: "El Creador", traits: "Imaginativo, Expresivo, Innovador", color: "bg-purple-600", icon: PenTool },
-        { id: "rebel", name: "El Rebelde", traits: "Disruptivo, Liberado, Salvaje", color: "bg-orange-600", icon: Zap },
+        { id: "hero", name: t("a1Name"), traits: t("a1Traits"), color: "bg-red-600", icon: Crown, voice: t("a1Voice"), drive: t("a1Drive") },
+        { id: "sage", name: t("a2Name"), traits: t("a2Traits"), color: "bg-blue-600", icon: Eye, voice: t("a2Voice"), drive: t("a2Drive") },
+        { id: "creator", name: t("a3Name"), traits: t("a3Traits"), color: "bg-purple-600", icon: PenTool, voice: t("a3Voice"), drive: t("a3Drive") },
+        { id: "rebel", name: t("a4Name"), traits: t("a4Traits"), color: "bg-orange-600", icon: Zap, voice: t("a4Voice"), drive: t("a4Drive") },
     ];
     const [selected, setSelected] = useState(archetypes[0]);
 
     return (
         <div className="bg-slate-50 border border-slate-200 p-8 rounded-xl shadow-sm">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">Simulador de Arquetipos</h3>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">{t("title")}</h3>
             <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
                 {archetypes.map((arch) => (
                     <button
@@ -108,8 +110,8 @@ const ArchetypeSelector = () => {
                         <h4 className="text-2xl font-bold text-slate-900 mb-2">{selected.name}</h4>
                         <p className="text-slate-600 text-lg">{selected.traits}</p>
                         <div className="mt-4 flex gap-2">
-                            <span className="text-xs bg-white border border-slate-200 px-2 py-1 rounded text-slate-500">Voz: Confiada</span>
-                            <span className="text-xs bg-white border border-slate-200 px-2 py-1 rounded text-slate-500">Impulso: Maestría</span>
+                            <span className="text-xs bg-white border border-slate-200 px-2 py-1 rounded text-slate-500">{selected.voice}</span>
+                            <span className="text-xs bg-white border border-slate-200 px-2 py-1 rounded text-slate-500">{selected.drive}</span>
                         </div>
                     </div>
                 </motion.div>
@@ -120,6 +122,7 @@ const ArchetypeSelector = () => {
 
 // 4. Strategic Tool: Brand Equity Calculator
 const BrandEquityCalc = () => {
+    const t = useTranslations('estrategiaMarcaPage.tools.equity');
     const [awareness, setAwareness] = useState([50]);
     const [loyalty, setLoyalty] = useState([50]);
     const [quality, setQuality] = useState([50]);
@@ -128,24 +131,24 @@ const BrandEquityCalc = () => {
 
     return (
         <div className="bg-white border border-slate-200 p-8 rounded-xl shadow-sm">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">Estimador de Valor de Marca</h3>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">{t("title")}</h3>
             <div className="space-y-6 mb-8">
                 <div>
-                    <div className="flex justify-between mb-2 text-sm font-medium text-slate-700"><span>Reconocimiento de Marca</span><span>{awareness}%</span></div>
+                    <div className="flex justify-between mb-2 text-sm font-medium text-slate-700"><span>{t("l1")}</span><span>{awareness}%</span></div>
                     <Slider value={awareness} onValueChange={setAwareness} max={100} step={1} className="cursor-pointer" />
                 </div>
                 <div>
-                    <div className="flex justify-between mb-2 text-sm font-medium text-slate-700"><span>Lealtad del Cliente</span><span>{loyalty}%</span></div>
+                    <div className="flex justify-between mb-2 text-sm font-medium text-slate-700"><span>{t("l2")}</span><span>{loyalty}%</span></div>
                     <Slider value={loyalty} onValueChange={setLoyalty} max={100} step={1} className="cursor-pointer" />
                 </div>
                 <div>
-                    <div className="flex justify-between mb-2 text-sm font-medium text-slate-700"><span>Calidad Percibida</span><span>{quality}%</span></div>
+                    <div className="flex justify-between mb-2 text-sm font-medium text-slate-700"><span>{t("l3")}</span><span>{quality}%</span></div>
                     <Slider value={quality} onValueChange={setQuality} max={100} step={1} className="cursor-pointer" />
                 </div>
             </div>
 
             <div className="border-t border-slate-100 pt-6 flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Potencial de Impacto en Mercado</span>
+                <span className="text-slate-500 font-medium">{t("result")}</span>
                 <span className={`text-3xl font-bold ${equityScore > 80 ? "text-green-600" : equityScore > 50 ? "text-blue-600" : "text-slate-400"}`}>
                     {equityScore}/100
                 </span>
@@ -156,17 +159,18 @@ const BrandEquityCalc = () => {
 
 // 5. Strategic Tool: Color Psychology
 const ColorPsychology = () => {
+    const t = useTranslations('estrategiaMarcaPage.tools.color');
     const colors = [
-        { hex: "#ef4444", name: "Rojo", emotion: "Pasión, Urgencia, Energía" },
-        { hex: "#3b82f6", name: "Azul", emotion: "Confianza, Calma, Estabilidad" },
-        { hex: "#22c55e", name: "Verde", emotion: "Crecimiento, Salud, Naturaleza" },
-        { hex: "#000000", name: "Negro", emotion: "Lujo, Poder, Misterio" },
+        { hex: "#ef4444", name: t("c1Name"), emotion: t("c1Emotion") },
+        { hex: "#3b82f6", name: t("c2Name"), emotion: t("c2Emotion") },
+        { hex: "#22c55e", name: t("c3Name"), emotion: t("c3Emotion") },
+        { hex: "#000000", name: t("c4Name"), emotion: t("c4Emotion") },
     ];
     const [activeColor, setActiveColor] = useState(colors[0]);
 
     return (
         <div className="bg-white border border-slate-200 p-8 rounded-xl shadow-sm h-full flex flex-col">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">Lab de Psicología del Color</h3>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">{t("title")}</h3>
             <div className="flex gap-3 mb-8 justify-center">
                 {colors.map(c => (
                     <button
@@ -186,6 +190,7 @@ const ColorPsychology = () => {
 }
 
 export default function BrandStrategyPage() {
+    const t = useTranslations('estrategiaMarcaPage');
     const targetRef = useRef(null);
     const { scrollYProgress } = useScroll();
 
@@ -220,29 +225,29 @@ export default function BrandStrategyPage() {
                                 <div className="inline-flex items-center gap-2 mb-8">
                                     <div className="w-3 h-3 bg-black rounded-full animate-pulse" />
                                     <span className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-slate-500">
-                                        Oficina de Diseño Estratégico
+                                        {t('hero.badge')}
                                     </span>
                                 </div>
 
                                 <h1 className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-black mb-6 sm:mb-8 leading-[0.9]">
-                                    LÓGICA<br />
-                                    <span className="text-slate-400">DE MARCA.</span>
+                                    {t('hero.title1')}<br />
+                                    <span className="text-slate-400">{t('hero.title2')}</span>
                                 </h1>
 
                                 <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-lg font-medium leading-relaxed">
-                                    Clarificamos el caos. <br />
-                                    Construimos sistemas de identidad que convierten la atención en valor.
+                                    {t('hero.desc1')} <br />
+                                    {t('hero.desc2')}
                                 </p>
 
                                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                                     <Link href="/contacto">
                                         <MagneticButton className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 bg-black text-white text-sm font-bold uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl">
-                                            Iniciar Auditoría <ArrowRight size={16} />
+                                            {t('hero.btn1')} <ArrowRight size={16} />
                                         </MagneticButton>
                                     </Link>
                                     <Link href="#tools">
                                         <Button variant="outline" className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 border-2 border-black text-black bg-transparent hover:bg-black hover:text-white text-sm font-bold uppercase tracking-widest rounded-none transition-all">
-                                            Explorar Herramientas
+                                            {t('hero.btn2')}
                                         </Button>
                                     </Link>
                                 </div>
@@ -276,8 +281,8 @@ export default function BrandStrategyPage() {
                                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                                 className="absolute top-20 -right-10 bg-white p-6 shadow-xl border border-slate-100 max-w-[200px]"
                             >
-                                <div className="text-xs font-bold uppercase text-slate-400 mb-2">Estrategia</div>
-                                <div className="text-lg font-bold text-black">Precisión sobre ruido.</div>
+                                <div className="text-xs font-bold uppercase text-slate-400 mb-2">{t('hero.graphic.tag')}</div>
+                                <div className="text-lg font-bold text-black">{t('hero.graphic.title')}</div>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -290,14 +295,14 @@ export default function BrandStrategyPage() {
                     <div className="flex flex-col md:flex-row justify-between items-end mb-20">
                         <div>
                             <Badge variant="outline" className="mb-4 border-black text-black bg-transparent rounded-none px-3 py-1 uppercase tracking-widest font-bold">
-                                Kit de Herramientas Estratégicas
+                                {t('tools.badge')}
                             </Badge>
                             <h2 className="text-4xl md:text-5xl font-bold text-black tracking-tight mt-4">
-                                Define Tu Norte.
+                                {t('tools.title')}
                             </h2>
                         </div>
                         <p className="text-slate-500 max-w-md text-right mt-6 md:mt-0">
-                            Explora nuestras herramientas interactivas para entender los componentes de una estrategia ganadora.
+                            {t('tools.desc')}
                         </p>
                     </div>
 
@@ -316,15 +321,14 @@ export default function BrandStrategyPage() {
                         <div className="lg:col-span-3">
                             <div className="grid md:grid-cols-2 gap-8 items-center bg-white border border-slate-200 p-8 rounded-xl shadow-sm">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-black mb-4">Impacto en Valor de Marca</h3>
+                                    <h3 className="text-2xl font-bold text-black mb-4">{t('tools.impact.title')}</h3>
                                     <p className="text-slate-600 mb-6">
-                                        Entiende cómo el reconocimiento, la lealtad y la calidad percibida se combinan para crear valor de mercado.
-                                        Usa el estimador para visualizar tu potencial.
+                                        {t('tools.impact.desc')}
                                     </p>
                                     <ul className="space-y-3">
-                                        <li className="flex items-center gap-3 text-sm text-slate-700"><Check size={16} className="text-green-600" /> Mayor LTV del Cliente</li>
-                                        <li className="flex items-center gap-3 text-sm text-slate-700"><Check size={16} className="text-green-600" /> Mayor Elasticidad de Precio</li>
-                                        <li className="flex items-center gap-3 text-sm text-slate-700"><Check size={16} className="text-green-600" /> Menor Costo de Adquisición</li>
+                                        <li className="flex items-center gap-3 text-sm text-slate-700"><Check size={16} className="text-green-600" /> {t('tools.impact.p1')}</li>
+                                        <li className="flex items-center gap-3 text-sm text-slate-700"><Check size={16} className="text-green-600" /> {t('tools.impact.p2')}</li>
+                                        <li className="flex items-center gap-3 text-sm text-slate-700"><Check size={16} className="text-green-600" /> {t('tools.impact.p3')}</li>
                                     </ul>
                                 </div>
                                 <BrandEquityCalc />
@@ -340,33 +344,26 @@ export default function BrandStrategyPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20">
                         <div className="md:sticky md:top-32 h-fit">
                             <h2 className="text-4xl sm:text-6xl font-black text-black mb-6 sm:mb-8 leading-none">
-                                REBRANDING<br />TOTAL.
+                                {t('process.title1')}<br />{t('process.title2')}
                             </h2>
                             <p className="text-xl text-slate-600 mb-12 leading-relaxed">
-                                No solo &quot;refrescamos&quot; logos. Deconstruimos y reconstruimos sistemas de identidad completos para alinearlos con tu próxima etapa de crecimiento.
+                                {t('process.desc')}
                             </p>
                             <div className="flex gap-4">
                                 <div className="flex flex-col">
-                                    <span className="text-4xl font-bold text-black">4-6</span>
-                                    <span className="text-sm font-mono text-slate-500 uppercase">Semanas</span>
+                                    <span className="text-4xl font-bold text-black">{t('process.stats.v1')}</span>
+                                    <span className="text-sm font-mono text-slate-500 uppercase">{t('process.stats.l1')}</span>
                                 </div>
                                 <div className="w-px bg-slate-200 mx-4" />
                                 <div className="flex flex-col">
-                                    <span className="text-4xl font-bold text-black">50+</span>
-                                    <span className="text-sm font-mono text-slate-500 uppercase">Activos</span>
+                                    <span className="text-4xl font-bold text-black">{t('process.stats.v2')}</span>
+                                    <span className="text-sm font-mono text-slate-500 uppercase">{t('process.stats.l2')}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-8">
-                            {[
-                                { num: "01", title: "Auditoría de Marca", desc: "Análisis científico de brechas de percepción actuales." },
-                                { num: "02", title: "Núcleo Estratégico", desc: "Definición de Misión, Visión y Posicionamiento Competitivo." },
-                                { num: "03", title: "Identidad Verbal", desc: "Naming, Taglines y Guías de Voz." },
-                                { num: "04", title: "Sistema Visual", desc: "Logo, Tipografía, Color y comportamientos de Movimiento." },
-                                { num: "05", title: "Guías de Marca", desc: "La 'Biblia' para tu equipo interno." },
-                                { num: "06", title: "Activos de Lanzamiento", desc: "Kit social, plantillas de presentaciones y skin web." },
-                            ].map((step, i) => (
+                            {[0, 1, 2, 3, 4, 5].map((i) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, y: 20 }}
@@ -376,10 +373,10 @@ export default function BrandStrategyPage() {
                                     className="group border-b border-slate-200 pb-8 hover:pl-8 transition-all duration-300 cursor-pointer"
                                 >
                                     <div className="flex items-baseline gap-6">
-                                        <span className="text-sm font-mono font-bold text-slate-300 group-hover:text-black transition-colors">{step.num}</span>
+                                        <span className="text-sm font-mono font-bold text-slate-300 group-hover:text-black transition-colors">0{i + 1}</span>
                                         <div>
-                                            <h3 className="text-2xl font-bold text-slate-800 group-hover:text-black mb-2">{step.title}</h3>
-                                            <p className="text-slate-500 group-hover:text-slate-700">{step.desc}</p>
+                                            <h3 className="text-2xl font-bold text-slate-800 group-hover:text-black mb-2">{t(`process.steps.s${i}Title`)}</h3>
+                                            <p className="text-slate-500 group-hover:text-slate-700">{t(`process.steps.s${i}Desc`)}</p>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -400,16 +397,16 @@ export default function BrandStrategyPage() {
                         transition={{ duration: 0.8 }}
                     >
                         <h2 className="text-4xl sm:text-5xl md:text-8xl font-black text-black mb-8 sm:mb-12 tracking-tighter">
-                            SÉ <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ATEMPORAL.</span>
+                            {t('cta.title1')}<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">{t('cta.title2')}</span>
                         </h2>
 
                         <div className="flex flex-col items-center gap-6">
                             <p className="text-xl text-slate-600 max-w-2xl font-medium">
-                                ¿Listo para construir una marca que sobreviva a las tendencias?
+                                {t('cta.desc')}
                             </p>
                             <Link href="/contacto">
                                 <MagneticButton className="w-full sm:w-auto h-16 sm:h-20 px-10 sm:px-16 bg-black text-white text-base sm:text-lg font-bold uppercase tracking-widest hover:bg-slate-900 border-2 border-black transition-all shadow-xl rounded-none">
-                                    Agendar Estrategia
+                                    {t('cta.btn')}
                                 </MagneticButton>
                             </Link>
                         </div>
