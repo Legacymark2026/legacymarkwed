@@ -20,42 +20,33 @@ export default async function HomePage() {
     const experts = await getExperts();
 
     return (
-        <main className="relative bg-white text-slate-900 overflow-hidden scroll-smooth">
-            {/* 12. Floating Particles/Noise - Light Mode */}
-            <div className="bg-noise fixed inset-0 z-50 pointer-events-none mix-blend-multiply opacity-[0.03]" />
-
-            {/* 20. Ambient Orbs - Light Mode (Subtle) */}
-            <div className="fixed top-0 left-0 w-[800px] h-[800px] bg-teal-200/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-            <div className="fixed bottom-0 right-0 w-[800px] h-[800px] bg-sky-200/20 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2 pointer-events-none" />
+        <main className="relative bg-[#F9FAFB] text-slate-900 overflow-hidden scroll-smooth">
+            {/* 12. Dense Editorial Noise */}
+            <div className="bg-noise fixed inset-0 z-50 pointer-events-none mix-blend-multiply opacity-[0.015]" />
 
             <div data-ga-section="hero"><FuturisticHero /></div>
 
-            <div className="relative z-10 space-y-0 pb-0">
-                <div data-ga-section="alianzas"><StrategicAlliances /></div>
+            <div className="relative z-10 space-y-0 pb-32">
+                <div data-ga-section="alianzas" className="pt-16 pb-24"><StrategicAlliances /></div>
 
-                {/* Separator */}
-                <div className="w-full h-px bg-gray-100" />
+                <div data-ga-section="servicios" className="py-24"><BentoServices /></div>
 
-                <div data-ga-section="servicios"><BentoServices /></div>
-
-                <div className="w-full h-px bg-gray-100" />
-
-                <div data-ga-section="estadisticas"><Stats /></div>
-                <div data-ga-section="propuesta-valor"><ValueProposition /></div>
-                <div data-ga-section="casos-de-exito"><CaseStudies /></div>
-                <div data-ga-section="testimonios"><TestimonialSlider /></div>
+                <div data-ga-section="estadisticas" className="py-24"><Stats /></div>
+                <div data-ga-section="propuesta-valor" className="py-24"><ValueProposition /></div>
+                <div data-ga-section="casos-de-exito" className="py-32"><CaseStudies /></div>
+                <div data-ga-section="testimonios" className="py-32"><TestimonialSlider /></div>
 
                 {/* 19. Grid Background for Tech Section - Light Mode */}
                 <div className="relative">
-                    <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] -z-10" />
-                    <div data-ga-section="metodologia"><Methodology /></div>
+                    <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] -z-10" />
+                    <div data-ga-section="metodologia" className="py-32"><Methodology /></div>
                 </div>
 
-                <div data-ga-section="equipo"><TeamGrid experts={experts} /></div>
-                <div data-ga-section="faq"><FaqAccordion /></div>
-                <div data-ga-section="cta-principal"><CTA /></div>
-                <div data-ga-section="portfolio-preview"><PortfolioPreview projects={projects} /></div>
-                <div data-ga-section="blog-preview"><LatestPosts posts={posts} /></div>
+                <div data-ga-section="equipo" className="py-32"><TeamGrid experts={experts} /></div>
+                <div data-ga-section="faq" className="py-24"><FaqAccordion /></div>
+                <div data-ga-section="cta-principal" className="py-32"><CTA /></div>
+                <div data-ga-section="portfolio-preview" className="pt-24 pb-32"><PortfolioPreview projects={projects} /></div>
+                <div data-ga-section="blog-preview" className="pb-40"><LatestPosts posts={posts} /></div>
             </div>
         </main>
     );

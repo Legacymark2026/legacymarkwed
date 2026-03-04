@@ -99,25 +99,25 @@ export function Methodology() {
     }, [activeStep]);
 
     return (
-        <section className="bg-slate-50 py-32 text-slate-900 relative overflow-hidden border-y border-gray-200">
-            {/* 1. Technical Background Overlay - Light Mode */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-40" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,#ffffff_0%,transparent_100%)] opacity-80" />
+        <section className="bg-transparent py-32 text-slate-900 relative overflow-hidden">
+            {/* 1. Technical Background Overlay - Light Mode Blueprint */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,#ffffff_0%,transparent_100%)] opacity-90" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 {/* 2. Header with 'System Status' aesthetic */}
-                <div className="text-center mb-12 sm:mb-24 relative">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
+                <div className="text-center mb-16 sm:mb-24 relative">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900"></span>
                         </span>
                         {t('badge')}
                     </div>
-                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4 sm:mb-6 text-slate-900">
-                        {t('titleStart')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">{t('titleHighlight')}</span>
+                    <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-[-0.04em] mb-6 text-slate-900">
+                        {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                     </h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
+                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg leading-relaxed font-light uppercase tracking-widest font-mono">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -141,34 +141,34 @@ export function Methodology() {
                                     key={step.id}
                                     onMouseEnter={() => setActiveStep(index)}
                                     className={cn(
-                                        "group relative flex items-center gap-6 p-4 rounded-xl cursor-pointer transition-all duration-300 border",
+                                        "group relative flex items-center gap-6 p-4 rounded-sm cursor-pointer transition-all duration-300 border",
                                         activeStep === index
-                                            ? "bg-white border-teal-200 shadow-md"
-                                            : "bg-transparent border-transparent hover:bg-white/50"
+                                            ? "bg-white border-slate-200 shadow-xl shadow-slate-200/50"
+                                            : "bg-transparent border-transparent hover:bg-white/50 hover:border-slate-100"
                                     )}
                                 >
                                     {/* ID Circle */}
                                     <div className={cn(
-                                        "relative h-14 w-14 rounded-full flex items-center justify-center font-bold text-xl border transition-all duration-300 z-10",
+                                        "relative h-14 w-14 rounded-full flex items-center justify-center font-mono font-bold text-xl border transition-all duration-300 z-10",
                                         activeStep === index
-                                            ? "bg-teal-600 text-white border-teal-500 scale-110 shadow-lg"
-                                            : "bg-white text-gray-400 border-gray-200 group-hover:border-teal-300 group-hover:text-teal-600 shadow-sm"
+                                            ? "bg-slate-900 text-white border-slate-800 scale-110 shadow-lg"
+                                            : "bg-white text-slate-400 border-slate-200 group-hover:border-slate-300 group-hover:text-slate-600 shadow-sm"
                                     )}>
                                         {step.id}
                                     </div>
 
                                     {/* Text Content */}
                                     <div className="flex-1">
-                                        <div className="flex justify-between items-center mb-1">
+                                        <div className="flex justify-between items-center mb-2">
                                             <h3 className={cn(
-                                                "font-bold text-lg transition-colors duration-300",
-                                                activeStep === index ? "text-slate-900" : "text-gray-500 group-hover:text-slate-700"
+                                                "font-black tracking-tight text-lg transition-colors duration-300",
+                                                activeStep === index ? "text-slate-900" : "text-slate-400 group-hover:text-slate-600"
                                             )}>
                                                 {step.title}
                                             </h3>
-                                            {activeStep === index && <ArrowRight size={16} className="text-teal-600" />}
+                                            {activeStep === index && <ArrowRight size={16} strokeWidth={1.5} className="text-slate-900" />}
                                         </div>
-                                        <p className="text-xs font-mono text-gray-400 uppercase tracking-widest">{step.subtitle}</p>
+                                        <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">{step.subtitle}</p>
                                     </div>
                                 </div>
                             ))}
@@ -177,10 +177,10 @@ export function Methodology() {
 
                     {/* 4. Visualization Panel - Light Mode Card */}
                     <div className="relative lg:h-auto min-h-[350px] sm:min-h-[500px] flex items-center">
-                        <div className="absolute inset-0 bg-white rounded-3xl border border-gray-200 md:rotate-2 hover:rotate-0 transition-transform duration-500 ease-out-expo shadow-2xl">
+                        <div className="absolute inset-0 bg-white rounded-sm border border-slate-200 md:rotate-1 hover:rotate-0 transition-transform duration-700 ease-out-expo shadow-2xl shadow-slate-200/60">
                             {/* Inner Grid */}
-                            <div className="absolute inset-4 border border-gray-100 rounded-2xl overflow-hidden">
-                                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05]" />
+                            <div className="absolute inset-4 border border-slate-100 rounded-sm overflow-hidden">
+                                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
 
                                 {/* Corner Decorations */}
                                 <div className="absolute top-0 left-0 w-20 h-20 border-t border-l border-teal-200 rounded-tl-2xl" />
@@ -214,36 +214,34 @@ export function Methodology() {
                                     {(() => {
                                         const ActiveIcon = STEPS[activeStep].icon;
                                         return (
-                                            <div className={cn(
-                                                "inline-flex p-4 rounded-2xl mb-8 border backdrop-blur-sm shadow-sm",
-                                                STEPS[activeStep].bg,
-                                                STEPS[activeStep].border
-                                            )}>
-                                                <ActiveIcon className={cn("h-10 w-10", STEPS[activeStep].color)} />
+                                            <div className="inline-flex p-5 rounded-sm mb-10 border border-slate-200 bg-[#F9FAFB] shadow-sm">
+                                                <ActiveIcon className="h-10 w-10 text-slate-800" strokeWidth={1.5} />
                                             </div>
                                         );
                                     })()}
 
                                     {/* Tech Spec Label */}
-                                    <div className="mb-4 inline-flex items-center gap-2 text-xs font-mono text-teal-700 bg-teal-50 px-2 py-1 rounded border border-teal-200">
+                                    <div className="mb-6 inline-flex items-center gap-2 text-[10px] font-mono text-slate-500 bg-white px-3 py-1.5 rounded-sm border border-slate-200 tracking-widest uppercase">
                                         <CodeIcon />
                                         {STEPS[activeStep].tech_spec}
                                     </div>
 
-                                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4 sm:mb-6">
+                                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 mb-6 font-mono uppercase">
                                         {STEPS[activeStep].title}
                                     </h3>
 
-                                    <p className="text-xl text-slate-600 leading-relaxed border-l-4 border-teal-500 pl-6">
+                                    <p className="text-lg text-slate-500 leading-relaxed font-light pl-6 relative">
+                                        <span className="absolute left-0 top-0 bottom-0 w-px bg-slate-200" />
+                                        <span className="absolute left-0 top-0 h-1/3 w-px bg-slate-600" />
                                         {STEPS[activeStep].desc}
                                     </p>
 
-                                    <div className="mt-8 flex items-center gap-4 text-sm text-gray-500 font-mono">
+                                    <div className="mt-12 flex items-center gap-4 text-[10px] text-slate-400 font-mono tracking-widest uppercase">
                                         <span>STATUS:</span>
-                                        <span className="text-teal-600 font-bold">OPTIMAL</span>
-                                        <span className="w-px h-4 bg-gray-300" />
+                                        <span className="text-slate-900 font-bold">OPTIMAL</span>
+                                        <span className="w-px h-4 bg-slate-200" />
                                         <span>LOAD:</span>
-                                        <span className="text-teal-600 font-bold">{STEPS[activeStep].load}</span>
+                                        <span className="text-slate-900 font-bold">{STEPS[activeStep].load}</span>
                                     </div>
                                 </motion.div>
                             </AnimatePresence>

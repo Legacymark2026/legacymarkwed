@@ -39,7 +39,7 @@ const STATS_CONFIG = [
 
 function Counter({ value, suffix }: { value: number, suffix: string }) {
     const ref = useRef<HTMLSpanElement>(null);
-    const inView = useInView(ref, { once: true, margin: "-50px" });
+    const inView = useInView(ref, { once: true, margin: "-30%" }); // Requires 70% viewport
     const springValue = useSpring(0, { stiffness: 40, damping: 15, duration: 2500 });
 
     useEffect(() => {
@@ -51,9 +51,9 @@ function Counter({ value, suffix }: { value: number, suffix: string }) {
     const displayValue = useTransform(springValue, (current) => Math.floor(current).toLocaleString());
 
     return (
-        <span className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 flex items-center justify-center font-mono relative z-10">
+        <span className="text-5xl sm:text-6xl lg:text-[5rem] font-black tracking-[-0.04em] text-slate-900 flex items-center justify-center font-mono relative z-10 leading-none">
             <motion.span ref={ref}>{displayValue}</motion.span>
-            <span className="text-teal-600 ml-1">{suffix}</span>
+            <span className="text-slate-400 ml-2 text-3xl font-light">{suffix}</span>
         </span>
     );
 }
@@ -70,16 +70,15 @@ export function Stats() {
     }, [t]);
 
     return (
-        <section className="bg-slate-50 py-20 sm:py-32 relative overflow-hidden border-y border-gray-200">
+        <section className="bg-transparent py-20 sm:py-32 relative overflow-hidden">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-transparent to-slate-50" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015]" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 {/* Section Header */}
-                <div className="flex justify-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono uppercase tracking-widest backdrop-blur-md">
-                        <Activity size={12} />
+                <div className="flex justify-center mb-24">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono uppercase tracking-widest backdrop-blur-md">
+                        <Activity size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </div>
                 </div>
@@ -95,23 +94,23 @@ export function Stats() {
                             transition={{ delay: index * 0.15 }}
                         >
                             {/* Hover BG */}
-                            <div className="absolute inset-0 bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl -inset-x-4 -inset-y-4 z-0" />
+                            <div className="absolute inset-0 bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-sm -inset-x-4 -inset-y-4 z-0" />
 
                             <div className="relative z-10 flex flex-col items-center">
-                                <div className="mb-6 relative">
-                                    <div className="absolute inset-0 bg-teal-200 blur-xl opacity-0 group-hover:opacity-40 transition-opacity" />
-                                    <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                                        <stat.icon className="text-teal-600 w-6 h-6" />
+                                <div className="mb-8 relative">
+                                    <div className="absolute inset-0 bg-slate-200 blur-xl opacity-0 group-hover:opacity-40 transition-opacity" />
+                                    <div className="w-10 h-10 rounded-sm bg-white border border-slate-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 shadow-sm">
+                                        <stat.icon className="text-slate-600 w-5 h-5" strokeWidth={1.5} />
                                     </div>
                                 </div>
 
                                 <Counter value={stat.value} suffix={stat.suffix} />
 
-                                <div className="mt-4 space-y-2">
-                                    <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-600 group-hover:text-teal-700 transition-colors">
+                                <div className="mt-6 space-y-2">
+                                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-900 transition-colors font-mono">
                                         {stat.label}
                                     </h3>
-                                    <p className="text-xs text-gray-400 font-mono">
+                                    <p className="text-[10px] text-slate-400 font-mono tracking-widest uppercase">
                                         [{stat.id}] :: {stat.desc}
                                     </p>
                                 </div>

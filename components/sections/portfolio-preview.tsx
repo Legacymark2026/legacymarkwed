@@ -23,66 +23,65 @@ export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
     if (!projects || projects.length === 0) return null;
 
     return (
-        <section className="bg-white py-32 relative overflow-hidden">
+        <section className="bg-transparent py-32 relative overflow-hidden">
             {/* Background */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015]" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="mb-16 flex flex-col items-end justify-between gap-6 md:flex-row md:items-end border-b border-gray-100 pb-8">
+                <div className="mb-24 flex flex-col items-end justify-between gap-6 md:flex-row md:items-end border-b border-slate-200 pb-12">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
-                            <Layers size={12} />
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                            <Layers size={12} strokeWidth={1.5} />
                             {t('badge')}
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                            {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                        <h2 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-[-0.04em] text-slate-900 mb-4">
+                            {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                         </h2>
-                        <p className="mt-4 text-lg text-slate-600 max-w-xl font-medium">
+                        <p className="mt-6 text-base md:text-lg text-slate-500 max-w-xl font-light font-mono uppercase tracking-widest">
                             {t('subtitle')}
                         </p>
                     </div>
                     <Link href="/portfolio">
-                        <Button variant="outline" className="text-slate-700 border-gray-200 hover:bg-slate-50 hover:text-teal-600 group">
-                            <FolderOpen className="mr-2 h-4 w-4" />
+                        <Button variant="outline" className="text-slate-800 border-slate-300 hover:bg-slate-900 hover:text-white rounded-sm group font-bold tracking-widest uppercase text-[10px] px-6 h-12 transition-all duration-300">
+                            <FolderOpen className="mr-2 h-4 w-4" strokeWidth={1.5} />
                             {t('btn')}
                         </Button>
                     </Link>
                 </div>
 
-                <div className="grid gap-8 sm:grid-cols-2">
+                <div className="grid gap-8 md:grid-cols-2">
                     {projects.map((project, index) => (
                         <motion.div
                             key={project.id}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                            transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
                             viewport={{ once: true }}
-                            className="group relative aspect-video cursor-pointer overflow-hidden rounded-2xl bg-slate-100 border border-gray-200 hover:border-teal-200  shadow-sm hover:shadow-xl transition-all duration-500"
+                            className="group relative aspect-square xl:aspect-video cursor-pointer overflow-hidden rounded-sm bg-[#F9FAFB] border border-slate-200 hover:border-slate-300 shadow-xl hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 hover:-translate-y-2"
                         >
                             <Link href={`/portfolio/${project.slug}`} className="block h-full w-full relative">
-                                {/* Image with Overlay */}
+                                {/* Image with Overlay - Default Grayscale, color on hover */}
                                 <div
-                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                                    className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-[1.03] opacity-80 group-hover:opacity-100 grayscale group-hover:grayscale-0"
                                     style={{ backgroundImage: `url(${project.coverImage || 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop'})` }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
 
                                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                     <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                        <div className="flex justify-between items-end mb-2">
-                                            <p className="text-xs font-mono text-teal-300 uppercase tracking-widest bg-slate-900/50 w-fit px-2 py-1 rounded border border-white/10 backdrop-blur-sm">
+                                        <div className="flex justify-between items-end mb-4">
+                                            <p className="text-[10px] font-mono text-slate-300 uppercase tracking-widest bg-white/10 w-fit px-3 py-1.5 rounded-sm border border-white/20 backdrop-blur-md">
                                                 {project.client || "CONFIDENTIAL"}
                                             </p>
-                                            <div className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                                                <ArrowUpRight size={20} />
+                                            <div className="w-12 h-12 rounded-sm bg-white text-slate-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                                <ArrowUpRight size={20} strokeWidth={1.5} />
                                             </div>
                                         </div>
 
-                                        <h3 className="text-3xl font-bold text-white mb-2">{project.title}</h3>
+                                        <h3 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2 uppercase font-mono">{project.title}</h3>
 
                                         <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100">
-                                            <p className="text-gray-300 text-sm mt-2">
+                                            <p className="text-slate-300 text-sm mt-4 font-light leading-relaxed">
                                                 {t('hoverHint')}
                                             </p>
                                         </div>

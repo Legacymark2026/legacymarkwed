@@ -19,15 +19,15 @@ export function TeamGrid({ experts }: TeamGridProps) {
         return null;
     }
     return (
-        <section className="bg-white py-20 sm:py-32 relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+        <section className="bg-transparent py-20 sm:py-32 relative overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
-                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                <div className="text-center mb-24">
+                    <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl mb-6">
+                        {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                     </h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg font-light uppercase tracking-widest font-mono">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -49,51 +49,51 @@ export function TeamGrid({ experts }: TeamGridProps) {
                                 transition={{ delay: index * 0.1 }}
                                 className="group relative"
                             >
-                                <div className="relative bg-slate-50 border border-gray-200 rounded-2xl p-2 overflow-hidden hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/5 transition-all duration-300">
+                                <div className="relative bg-white border border-slate-200 rounded-sm p-4 overflow-hidden hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-2 transition-all duration-500">
                                     {/* Profile Header */}
-                                    <div className="relative aspect-square rounded-xl overflow-hidden bg-white mb-4">
+                                    <div className="relative aspect-square rounded-sm overflow-hidden bg-[#F9FAFB] mb-6">
                                         <Image
                                             src={member.imageUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop"}
                                             alt={member.name}
                                             fill
-                                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                                         />
                                         {/* Overlay Gradient */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-60" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80" />
 
-                                        <div className="absolute bottom-4 left-4 text-white">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <IconComponent size={14} className="text-teal-400" />
+                                        <div className="absolute bottom-6 left-6 text-white">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <IconComponent size={14} strokeWidth={1.5} className="text-slate-300" />
                                                 {member.badgeId && (
-                                                    <span className="text-[10px] font-mono tracking-widest uppercase bg-slate-900/50 px-2 py-0.5 rounded backdrop-blur-sm border border-white/10">{member.badgeId}</span>
+                                                    <span className="text-[10px] font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm backdrop-blur-md border border-white/20">{member.badgeId}</span>
                                                 )}
                                             </div>
-                                            <div className="font-bold text-base sm:text-lg leading-tight text-shadow-sm line-clamp-2">{member.name}</div>
-                                            <div className="text-xs text-gray-300 font-medium">{member.role}</div>
+                                            <div className="font-black tracking-tight text-xl sm:text-2xl leading-tight text-shadow-sm line-clamp-2 uppercase font-mono">{member.name}</div>
+                                            <div className="text-xs text-slate-300 font-light font-mono uppercase tracking-widest mt-1">{member.role}</div>
                                         </div>
                                     </div>
 
                                     {/* Content */}
-                                    <div className="px-4 pb-4">
-                                        <p className="text-sm text-slate-600 mb-6 leading-relaxed min-h-[60px]">
+                                    <div className="px-2 pb-2">
+                                        <p className="text-sm text-slate-500 mb-8 leading-relaxed min-h-[60px] font-light">
                                             {member.bio}
                                         </p>
 
                                         {/* Skills Tags */}
-                                        <div className="flex flex-wrap gap-2 mb-6">
+                                        <div className="flex flex-wrap gap-2 mb-8">
                                             {member.skills?.map(skill => (
-                                                <span key={skill} className="text-[10px] px-2 py-1 bg-white border border-gray-200 rounded text-gray-500 font-medium group-hover:border-teal-200 group-hover:text-teal-700 transition-colors">
+                                                <span key={skill} className="text-[10px] uppercase tracking-widest font-mono px-2 py-1 bg-[#F9FAFB] border border-slate-200 rounded-sm text-slate-500 group-hover:border-slate-300 group-hover:text-slate-900 transition-colors">
                                                     {skill}
                                                 </span>
                                             ))}
                                         </div>
 
                                         {/* Social Actions */}
-                                        <div className="flex gap-2 pt-4 border-t border-gray-200">
+                                        <div className="flex gap-2 pt-6 border-t border-slate-100">
                                             {/* Aquí se pueden mapear las redes sociales usando member.socialLinks si están formateadas correctamente. Simplificado por ahora. */}
-                                            <button className="p-2 rounded hover:bg-teal-50 text-gray-400 hover:text-teal-600 transition-colors"><Linkedin size={16} /></button>
-                                            <button className="p-2 rounded hover:bg-teal-50 text-gray-400 hover:text-teal-600 transition-colors"><Github size={16} /></button>
-                                            <button className="p-2 rounded hover:bg-teal-50 text-gray-400 hover:text-teal-600 transition-colors ml-auto"><Mail size={16} /></button>
+                                            <button className="p-2 rounded-sm hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"><Linkedin size={16} strokeWidth={1.5} /></button>
+                                            <button className="p-2 rounded-sm hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"><Github size={16} strokeWidth={1.5} /></button>
+                                            <button className="p-2 rounded-sm hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors ml-auto"><Mail size={16} strokeWidth={1.5} /></button>
                                         </div>
                                     </div>
                                 </div>

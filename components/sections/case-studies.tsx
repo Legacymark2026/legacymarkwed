@@ -39,18 +39,18 @@ export function CaseStudies() {
     ];
 
     return (
-        <section className="bg-slate-50 py-20 sm:py-32 relative overflow-hidden border-y border-gray-200">
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
+        <section className="bg-transparent py-20 sm:py-32 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015]" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-6">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
-                            <Target size={12} />
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                            <Target size={12} strokeWidth={1.5} />
                             {t('badge')}
                         </div>
-                        <h2 className="text-4xl font-bold tracking-tight text-slate-900">
-                            {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                        <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl">
+                            {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                         </h2>
                     </div>
                     <div className="flex gap-2">
@@ -63,54 +63,54 @@ export function CaseStudies() {
                     {PROJECTS.map((project, index) => (
                         <motion.div
                             key={project.id}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
+                            transition={{ delay: index * 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="group relative bg-white rounded-sm overflow-hidden border border-slate-200 shadow-xl hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-2 transition-all duration-500"
                         >
-                            {/* Image Header */}
-                            <div className="relative h-48 overflow-hidden">
+                            {/* Image Header with Bleed */}
+                            <div className="relative h-64 overflow-hidden w-full m-0 p-0">
                                 <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors z-10" />
                                 <Image
                                     src={project.image}
                                     alt={project.title}
                                     fill
-                                    className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                    className="object-cover transform group-hover:scale-[1.03] transition-transform duration-700"
                                 />
-                                <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur text-slate-900 text-xs font-bold px-3 py-1 rounded-full border border-white/20 shadow-sm">
+                                <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm text-slate-900 text-[10px] font-mono tracking-widest uppercase px-3 py-1 rounded-sm border border-slate-200/50 shadow-sm">
                                     {project.id}
                                 </div>
                             </div>
 
                             {/* Content Body */}
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-4">
+                            <div className="p-8">
+                                <div className="flex justify-between items-start mb-6">
                                     <div>
-                                        <p className="text-xs font-mono text-teal-600 uppercase tracking-wider mb-1 font-bold">{project.client}</p>
-                                        <h3 className="text-xl font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
+                                        <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-2 font-medium">{project.client}</p>
+                                        <h3 className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-slate-950 transition-colors">
                                             {project.title}
                                         </h3>
                                     </div>
-                                    <button className="h-8 w-8 rounded-full bg-slate-50 border border-gray-200 flex items-center justify-center text-slate-400 group-hover:bg-teal-500 group-hover:text-white group-hover:border-teal-500 transition-all">
-                                        <ArrowUpRight size={16} />
+                                    <button className="h-10 w-10 flex-shrink-0 rounded-sm bg-[#F9FAFB] border border-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-300">
+                                        <ArrowUpRight size={18} strokeWidth={1.5} />
                                     </button>
                                 </div>
 
-                                <p className="text-slate-600 text-sm mb-6 line-clamp-2">
+                                <p className="text-slate-500 text-sm mb-8 line-clamp-2 font-light leading-relaxed">
                                     {project.desc}
                                 </p>
 
                                 {/* Footer Metrics */}
-                                <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <div className="pt-6 border-t border-slate-100 flex justify-between items-center">
                                     <div className="flex gap-2">
                                         {project.tags.map(tag => (
-                                            <span key={tag} className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded border border-gray-200">
+                                            <span key={tag} className="text-[10px] font-mono uppercase tracking-widest bg-[#F9FAFB] text-slate-500 px-2 py-1 rounded-sm border border-slate-200">
                                                 {tag}
                                             </span>
                                         ))}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-teal-700 font-bold text-sm bg-teal-50 px-2 py-1 rounded border border-teal-100">
-                                        <BarChart3 size={14} />
+                                    <div className="flex items-center gap-1.5 text-slate-900 font-mono text-xs uppercase tracking-widest font-bold">
+                                        <BarChart3 size={14} strokeWidth={1.5} className="text-slate-400" />
                                         {project.metric}
                                     </div>
                                 </div>

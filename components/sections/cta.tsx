@@ -8,37 +8,37 @@ import { useTranslations } from "next-intl";
 export function CTA() {
     const t = useTranslations("home.cta");
     return (
-        <section className="relative py-32 overflow-hidden bg-white">
+        <section className="relative py-32 overflow-hidden bg-transparent border-t border-slate-100">
             {/* Background Beams - Light Mode */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,white_0%,#f0f9ff_100%)]" />
+            <div className="absolute inset-0 bg-[#F9FAFB] pointer-events-none" />
 
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-slate-200/20 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+            <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white shadow-sm text-teal-700 text-xs font-mono mb-8 uppercase tracking-widest"
+                    className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-300 bg-white shadow-sm text-slate-800 text-[10px] font-mono mb-12 uppercase tracking-widest"
                 >
-                    <Radio size={12} className="animate-pulse" />
+                    <Radio size={12} strokeWidth={1.5} className="animate-pulse" />
                     {t('badge')}
                 </motion.div>
 
-                <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-8 leading-[0.9]">
-                    {t('titleStart')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-600">{t('titleHighlight')}</span>
+                <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-black tracking-[-0.04em] text-slate-900 mb-10 leading-[0.85] uppercase">
+                    {t('titleStart')} <span className="text-slate-400">{t('titleHighlight')}</span>
                 </h2>
 
-                <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto font-medium">
+                <p className="text-xl md:text-2xl text-slate-500 mb-16 max-w-2xl mx-auto font-light font-mono uppercase tracking-widest">
                     {t('subtitle')}
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <Button size="lg" className="h-16 px-12 rounded-full bg-slate-900 text-white hover:bg-slate-800 text-lg font-bold shadow-2xl hover:shadow-xl hover:-translate-y-1 transition-all group">
+                    <Button size="lg" className="h-16 px-12 rounded-sm bg-slate-900 text-white hover:bg-slate-950 hover:shadow-2xl hover:shadow-slate-900/20 text-lg font-bold shadow-xl hover:-translate-y-1 transition-all group">
                         <span className="flex items-center gap-3">
-                            {t('btn1')} <Rocket className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                            {t('btn1')} <Rocket strokeWidth={1.5} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                         </span>
                     </Button>
-                    <Button variant="outline" size="lg" className="h-16 px-12 rounded-full border-2 border-gray-200 text-slate-700 hover:border-teal-500 hover:text-teal-700 text-lg font-bold bg-white/50 backdrop-blur-sm transition-all">
+                    <Button variant="outline" size="lg" className="h-16 px-12 rounded-sm border border-slate-300 text-slate-800 hover:border-slate-900 hover:text-slate-900 text-lg font-bold bg-white backdrop-blur-sm transition-all shadow-sm">
                         {t('btn2')}
                     </Button>
                 </div>

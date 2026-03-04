@@ -40,37 +40,37 @@ export function TestimonialSlider() {
     ];
 
     return (
-        <section className="bg-slate-50 py-24 border-y border-gray-200 overflow-hidden relative">
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-50 to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-50 to-transparent z-10 pointer-events-none" />
+        <section className="bg-transparent py-32 rounded-sm overflow-hidden relative">
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#F9FAFB] to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#F9FAFB] to-transparent z-10 pointer-events-none" />
 
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-0">
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
-                        <MessageSquare size={12} />
+                <div className="text-center mb-24">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                        <MessageSquare size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl text-balance">
-                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                    <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl text-balance">
+                        {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {REVIEWS.map((review, idx) => (
-                        <MeteorCard key={idx} className="bg-white border-gray-200 shadow-md">
-                            <div className="flex flex-col h-full justify-between">
-                                <div className="mb-4 text-teal-500 opacity-20">
-                                    <Quote size={40} />
+                        <MeteorCard key={idx} className="bg-white/70 backdrop-blur-xl border border-white shadow-xl hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-2 transition-all duration-500 rounded-sm">
+                            <div className="flex flex-col h-full justify-between p-2">
+                                <div className="mb-6 text-slate-200 group-hover:text-slate-300 transition-colors">
+                                    <Quote size={40} strokeWidth={1} />
                                 </div>
-                                <p className="text-slate-600 font-medium leading-relaxed mb-6 relative z-10">
+                                <p className="text-slate-600 font-light leading-relaxed mb-8 relative z-10 text-sm">
                                     &quot;{review.body}&quot;
                                 </p>
-                                <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
+                                <div className="flex items-center gap-4 border-t border-slate-200/50 pt-6">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200" src={review.img} alt="" />
+                                    <img className="h-12 w-12 rounded-sm bg-[#F9FAFB] border border-slate-200 grayscale" src={review.img} alt="" />
                                     <div>
-                                        <div className="text-sm font-bold text-slate-900">{review.name}</div>
-                                        <div className="text-xs text-gray-500">{review.role}</div>
+                                        <div className="text-sm font-black tracking-tight text-slate-900 uppercase font-mono">{review.name}</div>
+                                        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-mono mt-0.5">{review.role}</div>
                                     </div>
                                 </div>
                             </div>

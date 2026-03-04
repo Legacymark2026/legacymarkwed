@@ -3,33 +3,33 @@
 import { cn } from "@/lib/utils";
 import React, { useRef, useState, useEffect } from "react";
 import { Search, PenTool, LayoutTemplate, Briefcase, ChevronRight, BarChart3, Cloud, Code, LineChart, Globe } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 export const BentoServices = () => {
     const t = useTranslations("home.services");
 
     return (
-        <div className="relative bg-white py-24 sm:py-32 overflow-hidden border-b border-gray-100">
+        <div className="relative bg-[#F9FAFB] py-24 sm:py-32 overflow-hidden border-b border-transparent">
             {/* Background Grid */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015] pointer-events-none" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="mx-auto max-w-2xl text-center mb-16">
+                <div className="mx-auto max-w-2xl text-center mb-24">
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono mb-6 uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest"
                     >
-                        <Briefcase size={12} />
+                        <Briefcase size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </motion.div>
 
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                    <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl">
+                        {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                     </h2>
-                    <p className="mt-6 text-lg leading-8 text-gray-600">
+                    <p className="mt-6 text-base md:text-lg leading-relaxed text-slate-600 font-light max-w-xl mx-auto uppercase tracking-widest font-mono">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -44,7 +44,7 @@ export const BentoServices = () => {
                         icon={BarChart3}
                         bgCode="MKT_SYS_01"
                     >
-                        <div className="absolute bottom-0 right-0 w-64 h-32 bg-gradient-to-t from-teal-50 to-transparent opacity-50 pointer-events-none" />
+                        <div className="absolute bottom-0 right-0 w-64 h-32 bg-gradient-to-t from-slate-100 to-transparent opacity-50 pointer-events-none" />
                     </TechCard>
 
                     {/* CARD 2: Branding */}
@@ -72,10 +72,10 @@ export const BentoServices = () => {
                         bgCode="AUTO_BOT_V3"
                     >
                         {/* Abstract Vis */}
-                        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex gap-1 opacity-20">
-                            <div className="w-2 h-12 bg-teal-500 rounded-full animate-pulse" />
-                            <div className="w-2 h-8 bg-teal-500 rounded-full animate-pulse delay-75" />
-                            <div className="w-2 h-16 bg-teal-500 rounded-full animate-pulse delay-150" />
+                        <div className="absolute right-12 top-1/2 -translate-y-1/2 flex gap-1.5 opacity-20">
+                            <div className="w-1.5 h-12 bg-slate-900 rounded-sm animate-pulse" />
+                            <div className="w-1.5 h-8 bg-slate-900 rounded-sm animate-pulse delay-75" />
+                            <div className="w-1.5 h-16 bg-slate-900 rounded-sm animate-pulse delay-150" />
                         </div>
                     </TechCard>
 
@@ -123,35 +123,61 @@ const TechCard = ({
     children?: React.ReactNode;
     bgCode?: string;
 }) => {
+    // Flashlight effect
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    }
+
     return (
-        <div className={cn(
-            "relative group overflow-hidden rounded-3xl bg-slate-50 border border-gray-200 p-6 md:p-8 min-h-[200px] md:min-h-0 transition-all hover:bg-white hover:shadow-xl hover:shadow-teal-900/5 hover:-translate-y-1",
-            className
-        )}>
+        <div
+            onMouseMove={handleMouseMove}
+            className={cn(
+                "relative group overflow-hidden rounded-sm bg-white border border-slate-200 p-8 md:p-12 min-h-[300px] md:min-h-0 transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1",
+                className
+            )}>
+            {/* Flashlight Hover Effect */}
+            <motion.div
+                className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 z-0"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            400px circle at ${mouseX}px ${mouseY}px,
+                            rgba(241, 245, 249, 0.4),
+                            transparent 80%
+                        )
+                    `,
+                }}
+            />
+
             {/* Tech Decoration */}
-            <div className="absolute top-4 right-4 text-[10px] font-mono text-gray-300 group-hover:text-teal-600 transition-colors uppercase tracking-widest">
+            <div className="absolute top-6 right-6 text-[10px] font-mono text-slate-300 group-hover:text-slate-600 transition-colors uppercase tracking-widest z-10">
                 [{bgCode}]
             </div>
 
             {/* Icon */}
-            <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center mb-6 shadow-sm group-hover:border-teal-200 group-hover:scale-110 transition-all">
-                <Icon size={24} className="text-gray-400 group-hover:text-teal-600 transition-colors" />
+            <div className="w-10 h-10 rounded-sm bg-[#F9FAFB] border border-slate-200 flex items-center justify-center mb-8 shadow-sm group-hover:border-slate-300 group-hover:scale-105 transition-all z-10 relative">
+                <Icon size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-slate-900 transition-colors" />
             </div>
 
             {/* Content */}
             <div className="relative z-10">
-                <h3 className="text-xl font-bold text-slate-800 group-hover:text-teal-700 transition-colors mb-2">
+                <h3 className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-slate-950 transition-colors mb-4">
                     {title}
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed font-medium">
+                <p className="text-sm text-slate-500 leading-relaxed font-light max-w-sm">
                     {description}
                 </p>
             </div>
 
-            {children}
+            <div className="relative z-10">{children}</div>
 
             {/* Bottom Accent Line */}
-            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-900 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-10" />
         </div>
     )
 }

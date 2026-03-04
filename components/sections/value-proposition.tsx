@@ -27,15 +27,15 @@ export function ValueProposition() {
     ];
 
     return (
-        <section className="bg-white py-24 sm:py-32 relative overflow-hidden border-b border-gray-100">
+        <section className="bg-transparent py-24 sm:py-32 relative overflow-hidden">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Header */}
-                    <div className="lg:col-span-3 text-center mb-12">
-                        <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl text-balance">
-                            {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                    <div className="lg:col-span-3 text-center mb-16">
+                        <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl text-balance">
+                            {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                         </h2>
-                        <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                        <p className="mt-6 text-base md:text-lg text-slate-600 max-w-2xl mx-auto font-light font-mono uppercase tracking-widest">
                             {t('subtitle')}
                         </p>
                     </div>
@@ -90,26 +90,26 @@ function TiltCard({ val, index }: { val: any, index: number }) {
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                className="bg-slate-50 p-10 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 h-full flex flex-col items-start relative overflow-hidden"
+                className="bg-white p-12 rounded-sm shadow-xl border border-transparent hover:border-slate-200 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 h-full flex flex-col items-start relative overflow-hidden hover:-translate-y-2"
             >
                 {/* Holographic BG on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                <div className="h-16 w-16 bg-white border border-gray-200 text-teal-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform relative z-10 shadow-sm group-hover:bg-teal-50">
-                    <val.icon size={32} strokeWidth={1.5} />
+                <div className="h-12 w-12 bg-[#F9FAFB] border border-slate-200 text-slate-700 rounded-sm flex items-center justify-center mb-8 group-hover:scale-105 transition-transform relative z-10 shadow-sm group-hover:border-slate-300">
+                    <val.icon size={20} strokeWidth={1.5} />
                 </div>
 
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 relative z-10 group-hover:text-teal-700 transition-colors">
+                <h3 className="text-2xl font-black tracking-tight text-slate-900 mb-4 relative z-10 group-hover:text-slate-950 transition-colors">
                     {val.title}
                 </h3>
 
-                <p className="text-slate-600 leading-relaxed text-lg relative z-10 font-medium">
+                <p className="text-slate-500 leading-relaxed text-sm relative z-10 font-light">
                     {val.description}
                 </p>
 
                 {/* Decorative Elements */}
-                <div className="absolute top-4 right-4 text-gray-200 group-hover:text-teal-100 transition-colors pointer-events-none">
-                    <Globe size={48} strokeWidth={0.5} />
+                <div className="absolute -top-4 -right-4 text-slate-50 opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none">
+                    <Globe size={120} strokeWidth={0.5} />
                 </div>
             </motion.div>
         </motion.div>

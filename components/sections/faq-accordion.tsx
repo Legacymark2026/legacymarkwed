@@ -7,20 +7,20 @@ import { useTranslations } from "next-intl";
 export function FaqAccordion() {
     const t = useTranslations("home.faq");
     return (
-        <section className="bg-slate-50 py-24 relative border-y border-gray-200">
+        <section className="bg-transparent py-24 relative">
             <div className="mx-auto max-w-3xl px-6 lg:px-8 relative z-10">
-                <div className="text-center mb-12">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-white text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest shadow-sm">
-                        <HelpCircle size={12} />
+                <div className="text-center mb-16">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                        <HelpCircle size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl text-balance">
-                        {t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span>
+                    <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl text-balance">
+                        {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                     </h2>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
-                    <div className="bg-slate-50 px-4 py-2 border-b border-gray-200 flex items-center gap-2">
+                <div className="bg-white rounded-sm border border-slate-200 shadow-xl hover:shadow-2xl hover:shadow-slate-200/60 transition-shadow duration-500 overflow-hidden">
+                    <div className="bg-[#F9FAFB] px-4 py-3 border-b border-slate-200 flex items-center gap-2">
                         <div className="flex gap-1.5">
                             <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
                             <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
@@ -31,39 +31,39 @@ export function FaqAccordion() {
 
                     <div className="p-6 md:p-8">
                         <Accordion type="single" collapsible className="w-full space-y-4">
-                            <AccordionItem value="item-1" className="border border-gray-100 rounded-lg px-4 data-[state=open]:border-teal-200 data-[state=open]:bg-teal-50/30 transition-all">
-                                <AccordionTrigger className="text-slate-800 hover:text-teal-700 font-medium text-left hover:no-underline">
+                            <AccordionItem value="item-1" className="border border-slate-200 rounded-sm px-4 data-[state=open]:border-slate-400 data-[state=open]:bg-slate-50 transition-all duration-300">
+                                <AccordionTrigger className="text-slate-900 hover:text-slate-600 font-bold text-left hover:no-underline">
                                     <span className="flex items-center gap-3">
-                                        <Terminal size={14} className="text-teal-500 shrink-0" />
+                                        <Terminal size={14} strokeWidth={1.5} className="text-slate-400 shrink-0" />
                                         {t('q1.q')}
                                     </span>
                                 </AccordionTrigger>
-                                <AccordionContent className="text-slate-600 pl-7 leading-relaxed font-normal">
-                                    {t('q1.a')}
+                                <AccordionContent className="text-slate-500 pl-7 leading-relaxed font-light [&>div]:opacity-0 data-[state=open]:[&>div]:animate-in data-[state=open]:[&>div]:fade-in data-[state=open]:[&>div]:slide-in-from-top-2 data-[state=open]:[&>div]:duration-500 data-[state=open]:[&>div]:delay-150">
+                                    <div>{t('q1.a')}</div>
                                 </AccordionContent>
                             </AccordionItem>
 
-                            <AccordionItem value="item-2" className="border border-gray-100 rounded-lg px-4 data-[state=open]:border-teal-200 data-[state=open]:bg-teal-50/30 transition-all">
-                                <AccordionTrigger className="text-slate-800 hover:text-teal-700 font-medium text-left hover:no-underline">
+                            <AccordionItem value="item-2" className="border border-slate-200 rounded-sm px-4 data-[state=open]:border-slate-400 data-[state=open]:bg-slate-50 transition-all duration-300">
+                                <AccordionTrigger className="text-slate-900 hover:text-slate-600 font-bold text-left hover:no-underline">
                                     <span className="flex items-center gap-3">
-                                        <Terminal size={14} className="text-teal-500 shrink-0" />
+                                        <Terminal size={14} strokeWidth={1.5} className="text-slate-400 shrink-0" />
                                         {t('q2.q')}
                                     </span>
                                 </AccordionTrigger>
-                                <AccordionContent className="text-slate-600 pl-7 leading-relaxed font-normal">
-                                    {t('q2.a')}
+                                <AccordionContent className="text-slate-500 pl-7 leading-relaxed font-light [&>div]:opacity-0 data-[state=open]:[&>div]:animate-in data-[state=open]:[&>div]:fade-in data-[state=open]:[&>div]:slide-in-from-top-2 data-[state=open]:[&>div]:duration-500 data-[state=open]:[&>div]:delay-150">
+                                    <div>{t('q2.a')}</div>
                                 </AccordionContent>
                             </AccordionItem>
 
-                            <AccordionItem value="item-3" className="border border-gray-100 rounded-lg px-4 data-[state=open]:border-teal-200 data-[state=open]:bg-teal-50/30 transition-all">
-                                <AccordionTrigger className="text-slate-800 hover:text-teal-700 font-medium text-left hover:no-underline">
+                            <AccordionItem value="item-3" className="border border-slate-200 rounded-sm px-4 data-[state=open]:border-slate-400 data-[state=open]:bg-slate-50 transition-all duration-300">
+                                <AccordionTrigger className="text-slate-900 hover:text-slate-600 font-bold text-left hover:no-underline">
                                     <span className="flex items-center gap-3">
-                                        <Terminal size={14} className="text-teal-500 shrink-0" />
+                                        <Terminal size={14} strokeWidth={1.5} className="text-slate-400 shrink-0" />
                                         {t('q3.q')}
                                     </span>
                                 </AccordionTrigger>
-                                <AccordionContent className="text-slate-600 pl-7 leading-relaxed font-normal">
-                                    {t('q3.a')}
+                                <AccordionContent className="text-slate-500 pl-7 leading-relaxed font-light [&>div]:opacity-0 data-[state=open]:[&>div]:animate-in data-[state=open]:[&>div]:fade-in data-[state=open]:[&>div]:slide-in-from-top-2 data-[state=open]:[&>div]:duration-500 data-[state=open]:[&>div]:delay-150">
+                                    <div>{t('q3.a')}</div>
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>

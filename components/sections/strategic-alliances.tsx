@@ -25,9 +25,9 @@ export function StrategicAlliances() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-200 bg-teal-50 text-teal-700 text-xs font-mono mb-4 uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-[#F9FAFB] text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest"
                     >
-                        <ShieldCheck size={12} />
+                        <ShieldCheck size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </motion.div>
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span></h2>
@@ -42,19 +42,19 @@ export function StrategicAlliances() {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
                             whileHover={{ y: -5 }}
-                            className="group relative flex flex-col items-center justify-between p-6 bg-slate-50 rounded-2xl border border-gray-100 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-900/5 transition-all duration-300"
+                            className="group relative flex flex-col items-center justify-between p-8 bg-transparent rounded-sm hover:-translate-y-2 transition-all duration-500 grayscale opacity-40 hover:grayscale-0 hover:opacity-100"
                         >
-                            <div className={cn("p-4 rounded-xl mb-4 transition-colors", partner.bg)}>
-                                <partner.icon className={cn("w-6 h-6", partner.color)} />
+                            <div className={cn("p-4 rounded-full mb-6 transition-colors", partner.bg)}>
+                                <partner.icon className={cn("w-8 h-8", partner.color)} strokeWidth={1.5} />
                             </div>
 
                             <div className="text-center">
-                                <h3 className="font-bold text-slate-800 mb-1">{partner.name}</h3>
-                                <p className="text-xs font-mono text-gray-400 uppercase tracking-wider mb-3 leading-tight">
+                                <h3 className="font-bold text-slate-900 mb-1 tracking-tight text-lg">{partner.name}</h3>
+                                <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-4">
                                     {partner.tier}
                                 </p>
-                                <div className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded border border-gray-200 text-[10px] font-bold text-gray-600 shadow-sm">
-                                    <CheckCircle2 size={10} className="text-teal-500" />
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white rounded-sm border border-slate-200 text-[10px] font-bold text-slate-700 shadow-sm font-mono tracking-wider">
+                                    <CheckCircle2 size={12} className={partner.color} strokeWidth={1.5} />
                                     {partner.metric}
                                 </div>
                             </div>
@@ -68,8 +68,8 @@ export function StrategicAlliances() {
                         {[...Array(2)].map((_, i) => (
                             <div key={i} className="flex gap-16">
                                 {["SYSTEM STATUS: ONLINE", "AVG. ROAS: 450%", "UPTIME: 99.99%", "SECURE CONNECTION", "LIVE TELEMETRY"].map((text, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                                    <div key={idx} className="flex items-center gap-2 text-[10px] font-mono text-slate-400 uppercase tracking-widest">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
                                         {text}
                                     </div>
                                 ))}

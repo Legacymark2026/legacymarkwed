@@ -64,7 +64,7 @@ export function FuturisticHero() {
 
     return (
         <div
-            className="relative min-h-screen w-full flex items-center justify-center bg-white overflow-hidden group perspective-[2000px]"
+            className="relative min-h-screen w-full flex items-center justify-center bg-[#F9FAFB] overflow-hidden group perspective-[2000px] pt-12"
             onMouseMove={handleMouseMove}
         >
             {/* 0. QUANTUM GRID (Light Mode) */}
@@ -102,58 +102,59 @@ export function FuturisticHero() {
 
                     {/* 3. Badge */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="relative"
+                        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                        className="relative hidden sm:block"
                     >
-                        <span className="relative inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-1.5 text-xs font-bold text-teal-700 shadow-sm uppercase tracking-wider">
+                        <span className="relative inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/60 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-slate-800 shadow-sm uppercase tracking-widest font-mono">
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900"></span>
                             </span>
-                            <span className="hidden sm:inline">{t('systemActive')}</span> {t('systemStatus')}
+                            <span>{t('systemActive')}</span> {t('systemStatus')}
                         </span>
                     </motion.div>
 
                     {/* 4. Main Headline (Dark Text) */}
-                    <div className="max-w-5xl space-y-4 sm:space-y-6 relative w-full">
-                        {/* Decorative Brackets (Light Gray) */}
-                        <div className="absolute -left-12 top-0 text-6xl font-thin text-gray-200 hidden lg:block font-mono">{"{"}</div>
-                        <div className="absolute -right-12 bottom-0 text-6xl font-thin text-gray-200 hidden lg:block font-mono">{"}"}</div>
-
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-4 sm:mb-6 relative z-10 leading-[0.9]">
-                            <span className="block mb-2 drop-shadow-sm">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                        className="max-w-6xl space-y-6 sm:space-y-8 relative w-full"
+                    >
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black tracking-[-0.04em] text-slate-900 mb-6 sm:mb-8 relative z-10 leading-[0.85]">
+                            <span className="block mb-2 drop-shadow-sm text-slate-950">
                                 {t('titleStart')}
                             </span>
-                            <div className="flex justify-center items-center gap-2 sm:gap-4 flex-wrap">
-                                <span className="text-xl sm:text-3xl md:text-5xl font-mono text-teal-600/50 uppercase tracking-widest align-super">{t('titleHighlight')}</span>
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-emerald-500 to-cyan-600 animate-gradient-x font-mono relative">
+                            <div className="flex justify-center items-center gap-3 sm:gap-5 flex-wrap">
+                                <span className="text-2xl sm:text-4xl md:text-6xl font-mono text-slate-300 uppercase tracking-widest align-super font-light">{t('titleHighlight')}</span>
+                                <span className="text-slate-900 font-mono relative tracking-tight">
                                     {glitchText}
                                 </span>
                             </div>
                         </h1>
-                        <p className="mx-auto max-w-2xl text-base md:text-xl text-slate-600 leading-relaxed text-pretty font-medium uppercase font-mono tracking-wide">
+                        <p className="mx-auto max-w-2xl text-base md:text-lg text-slate-600 leading-relaxed text-pretty font-light uppercase tracking-widest font-mono">
                             {t('subtitle')}
                         </p>
-                    </div>
+                    </motion.div>
 
                     {/* 5. Buttons */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
+                        transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
                         className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-6 sm:mt-8 w-full sm:w-auto"
                     >
-                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-xl shadow-teal-700/20 relative overflow-hidden group">
-                            <span className="relative flex items-center gap-2">
-                                Iniciar Protocolo <Rocket className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-sm bg-slate-900 hover:bg-white border border-transparent hover:border-slate-900 text-white hover:text-slate-900 font-bold text-sm sm:text-base transition-colors duration-300 hover:shadow-2xl hover:shadow-slate-900/10 relative overflow-hidden group">
+                            <span className="relative flex items-center gap-2 uppercase tracking-wider font-mono">
+                                Iniciar Protocolo <Rocket className="w-4 h-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={1.5} />
                             </span>
                         </Button>
 
-                        <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-gray-200 text-slate-700 hover:bg-gray-50 hover:text-teal-600 transition-all group relative overflow-hidden">
-                            <span className="flex items-center gap-2 relative z-10 font-semibold">
-                                <Play className="w-4 h-4 fill-current" /> {t('ctaSecondary')}
+                        <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-sm border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 hover:text-slate-900 transition-all group relative overflow-hidden font-mono uppercase tracking-wider text-sm">
+                            <span className="flex items-center gap-2 relative z-10">
+                                <Play className="w-4 h-4 fill-current" strokeWidth={1.5} /> {t('ctaSecondary')}
                             </span>
                         </Button>
                     </motion.div>
@@ -224,8 +225,20 @@ export function FuturisticHero() {
                 </div>
             </div>
 
-            {/* 7. Bottom Haze (White) */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
+            {/* 7. Bottom Haze (Off-White) */}
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#F9FAFB] via-[#F9FAFB]/80 to-transparent z-20 pointer-events-none" />
+
+            {/* Scroll Indicator */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-400 opacity-70">
+                <span className="font-mono text-[10px] tracking-widest uppercase">Scroll</span>
+                <div className="w-px h-8 bg-slate-300 relative overflow-hidden">
+                    <motion.div
+                        className="absolute top-0 left-0 w-full h-full bg-slate-600"
+                        animate={{ y: ["-100%", "100%"] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                    />
+                </div>
+            </div>
         </div>
     );
 }
