@@ -137,7 +137,7 @@ const TechCard = ({
         <div
             onMouseMove={handleMouseMove}
             className={cn(
-                "relative group overflow-hidden rounded-sm bg-white border border-slate-200 p-8 md:p-12 min-h-[300px] md:min-h-0 transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1",
+                "relative group overflow-hidden rounded-sm bg-white border border-slate-200 p-8 md:p-12 min-h-[300px] md:min-h-0 transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(13,148,136,0.1)] hover:-translate-y-1 hover:border-teal-500/30",
                 className
             )}>
             {/* Flashlight Hover Effect */}
@@ -147,7 +147,7 @@ const TechCard = ({
                     background: useMotionTemplate`
                         radial-gradient(
                             400px circle at ${mouseX}px ${mouseY}px,
-                            rgba(241, 245, 249, 0.4),
+                            rgba(45, 212, 191, 0.05),
                             transparent 80%
                         )
                     `,
@@ -160,8 +160,8 @@ const TechCard = ({
             </div>
 
             {/* Icon */}
-            <div className="w-10 h-10 rounded-sm bg-[#F9FAFB] border border-slate-200 flex items-center justify-center mb-8 shadow-sm group-hover:border-slate-300 group-hover:scale-105 transition-all z-10 relative">
-                <Icon size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-slate-900 transition-colors" />
+            <div className="w-10 h-10 rounded-sm bg-[#F9FAFB] border border-slate-200 flex items-center justify-center mb-8 shadow-sm group-hover:border-teal-200 group-hover:bg-teal-50/50 group-hover:scale-105 transition-all z-10 relative">
+                <Icon size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-teal-600 transition-colors" />
             </div>
 
             {/* Content */}
@@ -177,7 +177,7 @@ const TechCard = ({
             <div className="relative z-10">{children}</div>
 
             {/* Bottom Accent Line */}
-            <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-900 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-10" />
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-10" />
         </div>
     )
 }

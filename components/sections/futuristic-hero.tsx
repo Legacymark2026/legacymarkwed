@@ -123,18 +123,21 @@ export function FuturisticHero() {
                         transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                         className="max-w-6xl space-y-6 sm:space-y-8 relative w-full"
                     >
+                        {/* Ambient Glow behind text */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-teal-400/10 blur-[100px] rounded-full pointer-events-none animate-pulse" />
+
                         <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black tracking-[-0.04em] text-slate-900 mb-6 sm:mb-8 relative z-10 leading-[0.85]">
                             <span className="block mb-2 drop-shadow-sm text-slate-950">
                                 {t('titleStart')}
                             </span>
                             <div className="flex justify-center items-center gap-3 sm:gap-5 flex-wrap">
-                                <span className="text-2xl sm:text-4xl md:text-6xl font-mono text-slate-300 uppercase tracking-widest align-super font-light">{t('titleHighlight')}</span>
-                                <span className="text-slate-900 font-mono relative tracking-tight">
+                                <span className="text-2xl sm:text-4xl md:text-6xl font-mono uppercase tracking-widest align-super font-light text-slate-400">{t('titleHighlight')}</span>
+                                <span className="font-mono relative tracking-tight text-transparent bg-clip-text bg-[linear-gradient(110deg,#0d9488,45%,#34d399,55%,#0d9488)] bg-[length:200%_100%] animate-[shine_3s_linear_infinite]">
                                     {glitchText}
                                 </span>
                             </div>
                         </h1>
-                        <p className="mx-auto max-w-2xl text-base md:text-lg text-slate-600 leading-relaxed text-pretty font-light uppercase tracking-widest font-mono">
+                        <p className="mx-auto max-w-2xl text-base md:text-lg text-slate-600 leading-relaxed text-pretty font-light uppercase tracking-widest font-mono relative z-10">
                             {t('subtitle')}
                         </p>
                     </motion.div>
@@ -144,11 +147,13 @@ export function FuturisticHero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-6 sm:mt-8 w-full sm:w-auto"
+                        className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-6 sm:mt-8 w-full sm:w-auto relative z-10"
                     >
-                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-sm bg-slate-900 hover:bg-white border border-transparent hover:border-slate-900 text-white hover:text-slate-900 font-bold text-sm sm:text-base transition-colors duration-300 hover:shadow-2xl hover:shadow-slate-900/10 relative overflow-hidden group">
-                            <span className="relative flex items-center gap-2 uppercase tracking-wider font-mono">
-                                Iniciar Protocolo <Rocket className="w-4 h-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={1.5} />
+                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-sm bg-slate-900 hover:bg-slate-800 border-none text-white font-bold text-sm sm:text-base transition-all duration-300 shadow-[0_0_40px_-10px_rgba(13,148,136,0.3)] hover:shadow-[0_0_60px_-15px_rgba(13,148,136,0.5)] relative overflow-hidden group">
+                            {/* Animated Sweep Shimmer Effect */}
+                            <div className="absolute inset-0 -translate-x-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)] group-hover:animate-[shimmer_1.5s_infinite]" />
+                            <span className="relative z-10 flex items-center gap-2 uppercase tracking-wider font-mono">
+                                Iniciar Protocolo <Rocket className="w-4 h-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1 text-teal-400" strokeWidth={1.5} />
                             </span>
                         </Button>
 

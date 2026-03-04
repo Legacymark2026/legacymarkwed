@@ -66,7 +66,7 @@ export function CaseStudies() {
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                            className="group relative bg-white rounded-sm overflow-hidden border border-slate-200 shadow-xl hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-2 transition-all duration-500"
+                            className="group relative bg-white rounded-sm overflow-hidden border border-slate-200 shadow-xl hover:shadow-[0_30px_60px_-15px_rgba(13,148,136,0.15)] hover:-translate-y-3 transition-all duration-500"
                         >
                             {/* Image Header with Bleed */}
                             <div className="relative h-64 overflow-hidden w-full m-0 p-0">

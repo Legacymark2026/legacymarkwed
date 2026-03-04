@@ -24,6 +24,9 @@ export default async function HomePage() {
             {/* 12. Dense Editorial Noise */}
             <div className="bg-noise fixed inset-0 z-50 pointer-events-none mix-blend-multiply opacity-[0.015]" />
 
+            {/* Global Spotlight Glow for "Wow Factor" */}
+            <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[120%] h-[800px] bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.08)_0%,transparent_60%)] pointer-events-none -z-10" />
+
             <div data-ga-section="hero"><FuturisticHero /></div>
 
             <div className="relative z-10 space-y-0 pb-32">
