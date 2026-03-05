@@ -97,9 +97,9 @@ export async function DashboardSidebar({ role, name, email, image }: DashboardSi
     const badge = ROLE_BADGES[role] ?? ROLE_BADGES[UserRole.GUEST];
 
     return (
-        <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col shadow-sm z-10">
+        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full shadow-sm">
             {/* Logo */}
-            <div className="h-28 flex items-center justify-center border-b border-gray-100 bg-white/50 backdrop-blur-sm px-4">
+            <div className="h-16 md:h-28 flex items-center justify-center border-b border-gray-100 bg-white px-4 shrink-0">
                 <Link href="/" className="flex items-center justify-center group w-full h-full">
                     <div className="relative h-20 w-[200px] transition-all duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-1 group-hover:drop-shadow-[0_10px_15px_rgba(20,184,166,0.3)]">
                         <Image src="/logo.png" alt="LegacyMark" fill className="object-contain" priority />

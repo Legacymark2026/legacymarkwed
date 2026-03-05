@@ -36,8 +36,8 @@ export function ConvertToDealDialog({ leadId, leadName, leadEmail, companyId }: 
             </button>
 
             {open && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+                    <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 max-h-[90vh] overflow-y-auto my-auto">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white font-black text-xl">💼</div>
                             <div>

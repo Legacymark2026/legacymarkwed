@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { UserRole } from "@/types/auth";
 
+import { MobileSidebarWrapper } from "@/components/dashboard/MobileSidebarWrapper";
+
 export default async function DashboardLayout({
     children,
 }: {
@@ -22,24 +24,25 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex text-slate-900 font-sans selection:bg-teal-500 selection:text-white">
-            {/* Sidebar dinámico — filtrado por rol */}
-            <DashboardSidebar
-                role={role}
-                name={session.user.name}
-                email={session.user.email}
-                image={session.user.image}
+        <div className="h-screen bg-slate-50 flex flex-col md:flex-row text-slate-900 font-sans selection:bg-teal-500 selection:text-white overflow-hidden">
+            {/* Sidebar dinámico envuelto para responsiveness */}
+            <MobileSidebarWrapper
+                sidebar={
+                    <DashboardSidebar
+                        role={role}
+                        name={session.user.name}
+                        email={session.user.email}
+                        image={session.user.image}
+                    />
+                }
             />
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 md:hidden">
-                    <span className="font-bold text-slate-900">Dashboard</span>
-                </header>
-                <main className="flex-1 p-8 overflow-auto">
+            <main className="flex-1 overflow-auto p-4 md:p-8 relative">
+                <div className="max-w-[1400px] mx-auto">
                     {children}
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 }
