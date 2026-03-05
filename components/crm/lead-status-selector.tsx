@@ -17,9 +17,10 @@ interface Props {
     leadId: string;
     initialStatus: string;
     isMobile?: boolean;
+    canManageLeads?: boolean;
 }
 
-export function LeadStatusSelector({ leadId, initialStatus, isMobile = false }: Props) {
+export function LeadStatusSelector({ leadId, initialStatus, isMobile = false, canManageLeads = false }: Props) {
     const [status, setStatus] = useState(initialStatus);
     const [isPending, startTransition] = useTransition();
     const [isOpen, setIsOpen] = useState(false);
@@ -51,13 +52,13 @@ export function LeadStatusSelector({ leadId, initialStatus, isMobile = false }: 
     return (
         <div className="relative inline-block text-left">
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                disabled={isPending}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 ${activeConfig.bg} ${activeConfig.color} ${isPending ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}
+                onClick={() => canManageLeads && setIsOpen(!isOpen)}
+                disabled={isPending || !canManageLeads}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 ${activeConfig.bg} ${activeConfig.color} ${isPending ? 'opacity-70 cursor-wait' : canManageLeads ? 'cursor-pointer hover:shadow-sm' : 'cursor-default opacity-80'}`}
             >
                 {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                 {activeConfig.label}
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                {canManageLeads && <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />}
             </button>
 
             {isOpen && (

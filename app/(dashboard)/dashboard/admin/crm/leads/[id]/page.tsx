@@ -6,6 +6,8 @@ import { ConvertToDealDialog } from "@/components/crm/convert-to-deal-dialog";
 import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft, MapPin, Tag, Calendar, Globe } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { Permission, ROLE_PERMISSIONS, UserRole } from "@/types/auth";
 
 // New specialized components
 import { LeadProfileHeader } from "@/components/crm/lead-profile-header";
@@ -13,6 +15,7 @@ import { LeadStatusSelector } from "@/components/crm/lead-status-selector";
 import { LeadTagsEditor } from "@/components/crm/lead-tags-editor";
 import { LeadUnifiedTimeline, LeadUnifiedTimelineSkeleton } from "@/components/crm/lead-unified-timeline";
 import { LeadStickyActions } from "@/components/crm/lead-sticky-actions";
+import { LeadDeleteButton } from "@/components/crm/lead-delete-button";
 
 const SOURCE_ICONS: Record<string, string> = {
     GOOGLE: "🔍", FACEBOOK: "📘", INSTAGRAM: "📷", LINKEDIN: "💼",
@@ -45,6 +48,10 @@ export default async function LeadDetailPage(props: PageProps) {
 
     if (!lead) return notFound();
 
+    const session = await auth();
+    const role = session?.user?.role as UserRole;
+    const canManageLeads = Boolean(session?.user?.permissions?.includes(Permission.MANAGE_LEADS) || (role && ROLE_PERMISSIONS[role]?.includes(Permission.MANAGE_LEADS)));
+
     return (
         <div className="min-h-screen bg-slate-50 relative">
             {/* Sticky Actions */}
@@ -52,9 +59,11 @@ export default async function LeadDetailPage(props: PageProps) {
                 leadName={lead.name || "Sin nombre"}
                 leadEmail={lead.email}
                 leadPhone={lead.phone}
+                canManageLeads={canManageLeads}
+                leadId={lead.id}
             >
                 <div className="scale-90 origin-right">
-                    <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} isMobile={true} />
+                    <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} isMobile={true} canManageLeads={canManageLeads} />
                 </div>
             </LeadStickyActions>
 
@@ -68,7 +77,10 @@ export default async function LeadDetailPage(props: PageProps) {
                         <span className="text-sm font-bold text-slate-800 hidden sm:inline-block">Detalles del Lead</span>
                     </div>
                     {/* Header Action */}
-                    <ConvertAction lead={lead} company={company} />
+                    <div className="flex items-center gap-2">
+                        {canManageLeads && <LeadDeleteButton leadId={lead.id} />}
+                        <ConvertAction lead={lead} company={company} canManageLeads={canManageLeads} />
+                    </div>
                 </div>
             </div>
 
@@ -76,8 +88,8 @@ export default async function LeadDetailPage(props: PageProps) {
                 {/* ── LEFT: Main Info & Timeline ── */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Glassmorphism Profile Header */}
-                    <LeadProfileHeader lead={lead}>
-                        <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} />
+                    <LeadProfileHeader lead={lead} canManageLeads={canManageLeads}>
+                        <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} canManageLeads={canManageLeads} />
                         <div className="mt-1">
                             <LeadTagsEditor leadId={lead.id} initialTags={lead.tags} />
                         </div>
@@ -158,8 +170,8 @@ export default async function LeadDetailPage(props: PageProps) {
 }
 
 // Small helper for the Convert To Deal action
-function ConvertAction({ lead, company }: { lead: any; company: any }) {
-    if (!company || lead.status === "CONVERTED") return null;
+function ConvertAction({ lead, company, canManageLeads }: { lead: any; company: any; canManageLeads: boolean }) {
+    if (!company || lead.status === "CONVERTED" || !canManageLeads) return null;
 
     return (
         <ConvertToDealDialog

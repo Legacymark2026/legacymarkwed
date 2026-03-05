@@ -14,38 +14,12 @@ interface Props {
         message: string | null;
     };
     children?: React.ReactNode; // For status and tags components
+    canManageLeads?: boolean;
 }
 
-// Helper for the radial score chart
-function ScoreRadial({ score }: { score: number }) {
-    const size = 64;
-    const strokeWidth = 6;
-    const center = size / 2;
-    const radius = center - strokeWidth;
-    const dashArray = 2 * Math.PI * radius;
-    const dashOffset = dashArray * ((100 - score) / 100);
+import { LeadScoreEditor } from "./lead-score-editor";
 
-    const scoreColorClass = score >= 70 ? "text-emerald-500" : score >= 40 ? "text-amber-500" : "text-rose-500";
-    const bgGradient = score >= 70 ? "from-emerald-500/10 to-teal-500/10" : score >= 40 ? "from-amber-500/10 to-orange-500/10" : "from-red-500/10 to-rose-500/10";
-
-    return (
-        <div className={`relative flex items-center justify-center p-2 rounded-2xl bg-gradient-to-br ${bgGradient} border border-white/50 backdrop-blur-sm self-start shrink-0`}>
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="transform -rotate-90">
-                <circle cx={center} cy={center} r={radius} fill="none" strokeWidth={strokeWidth} className="stroke-slate-200" />
-                <circle
-                    cx={center} cy={center} r={radius} fill="none" strokeWidth={strokeWidth}
-                    className={`${scoreColorClass} transition-all duration-1000 ease-in-out`}
-                    strokeDasharray={dashArray} strokeDashoffset={dashOffset} strokeLinecap="round"
-                />
-            </svg>
-            <div className={`absolute inset-0 flex flex-col items-center justify-center`}>
-                <span className={`text-xl font-black ${scoreColorClass}`}>{score}</span>
-            </div>
-        </div>
-    );
-}
-
-export function LeadProfileHeader({ lead, children }: Props) {
+export function LeadProfileHeader({ lead, children, canManageLeads = false }: Props) {
     return (
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white shadow-xl shadow-slate-200/40 overflow-hidden relative group">
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 opacity-50 pointer-events-none" />
@@ -101,7 +75,7 @@ export function LeadProfileHeader({ lead, children }: Props) {
 
                 {/* Score component inline */}
                 <div className="hidden sm:block">
-                    <ScoreRadial score={lead.score} />
+                    <LeadScoreEditor leadId={lead.id} initialScore={lead.score} canManageLeads={canManageLeads} />
                 </div>
             </div>
 
@@ -121,7 +95,7 @@ export function LeadProfileHeader({ lead, children }: Props) {
                         )}
                         <div className="sm:hidden flex items-center gap-4 bg-white/60 p-4 rounded-2xl border border-white shadow-sm self-start">
                             <span className="text-xs font-bold text-slate-500 uppercase">Score del Lead</span>
-                            <ScoreRadial score={lead.score} />
+                            <LeadScoreEditor leadId={lead.id} initialScore={lead.score} canManageLeads={canManageLeads} />
                         </div>
                     </div>
                 </div>

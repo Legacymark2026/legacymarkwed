@@ -7,6 +7,27 @@ import { sendMetaCapiEvent } from "@/lib/meta-capi";
 import { sendGa4Event } from "@/lib/ga4-mp";
 import { sendTiktokCapiEvent } from "@/lib/tiktok-capi";
 import { sendLinkedinCapiEvent } from "@/lib/linkedin-capi";
+import { auth } from "@/lib/auth";
+import { Permission, ROLE_PERMISSIONS, UserRole } from "@/types/auth";
+
+/**
+ * Validates if the current user has permission to manage leads.
+ */
+async function checkLeadPermission() {
+    const session = await auth();
+    if (!session?.user) return false;
+
+    if (session.user.permissions?.includes(Permission.MANAGE_LEADS)) {
+        return true;
+    }
+
+    const role = session.user.role as UserRole;
+    if (role && ROLE_PERMISSIONS[role]?.includes(Permission.MANAGE_LEADS)) {
+        return true;
+    }
+
+    return false;
+}
 
 // ==================== LEAD TYPES ====================
 
@@ -285,11 +306,35 @@ export async function getLeads(companyId: string, options?: {
  */
 export async function updateLeadStatus(leadId: string, status: string) {
     try {
+        const hasPermission = await checkLeadPermission();
+        if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
+
         const lead = await prisma.lead.update({
             where: { id: leadId },
             data: { status }
         });
         revalidatePath('/dashboard/admin/crm/leads');
+        return { success: true, data: lead };
+    } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Update lead score
+ */
+export async function updateLeadScore(leadId: string, score: number) {
+    try {
+        const hasPermission = await checkLeadPermission();
+        if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
+
+        const lead = await prisma.lead.update({
+            where: { id: leadId },
+            data: { score }
+        });
+        revalidatePath('/dashboard/admin/crm/leads');
+        revalidatePath(`/dashboard/admin/crm/leads/${leadId}`);
         return { success: true, data: lead };
     } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
         console.error(error);
@@ -306,6 +351,9 @@ export async function convertLeadToDeal(leadId: string, dealData: {
     stage?: string;
 }) {
     try {
+        const hasPermission = await checkLeadPermission();
+        if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
+
         const lead = await prisma.lead.findUnique({ where: { id: leadId } });
         if (!lead) {
             return { success: false, error: "Lead not found" };
@@ -338,6 +386,26 @@ export async function convertLeadToDeal(leadId: string, dealData: {
         revalidatePath('/dashboard/admin/crm/leads');
         revalidatePath('/dashboard/admin/crm/pipeline');
         return { success: true, data: deal };
+    } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Delete a lead unconditionally
+ */
+export async function deleteLead(leadId: string) {
+    try {
+        const hasPermission = await checkLeadPermission();
+        if (!hasPermission) return { success: false, error: "Unauthorized to delete leads" };
+
+        await prisma.lead.delete({
+            where: { id: leadId }
+        });
+
+        revalidatePath('/dashboard/admin/crm/leads');
+        return { success: true };
     } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
         console.error(error);
         return { success: false, error: error.message };
