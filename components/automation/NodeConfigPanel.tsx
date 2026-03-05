@@ -456,6 +456,152 @@ export default function NodeConfigPanel({ selectedNode, onChange, onClose }: Nod
             );
         }
 
+        // --- ADVANCED AI & DATA NODES ---
+        if (type === 'voiceNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2 bg-violet-50 p-3 rounded-lg border border-violet-100">
+                        <Label>URL del Audio a Transcribir</Label>
+                        <Input
+                            value={data.audioUrlVariable || ''}
+                            onChange={(e) => handleChange('audioUrlVariable', e.target.value)}
+                            placeholder="{{trigger.mediaUrl}}"
+                            className="font-mono text-xs bg-white"
+                        />
+                        <p className="text-[10px] text-gray-500">Ej. URL del webhook entrante de WhatsApp.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === 'ragNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Fuente de Documentos</Label>
+                        <Select value={data.documentSource || 'ALL'} onValueChange={(val) => handleChange('documentSource', val)}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="ALL">Todo el repositorio (Global)</SelectItem>
+                                <SelectItem value="SALES">Manual de Ventas</SelectItem>
+                                <SelectItem value="SUPPORT">FAQs de Soporte</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Pregunta / Query</Label>
+                        <Textarea
+                            value={data.queryVariable || ''}
+                            onChange={(e) => handleChange('queryVariable', e.target.value)}
+                            placeholder="{{lead.lastMessage}}"
+                            className="h-20 font-mono text-xs"
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === 'extractorNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Texto de Entrada</Label>
+                        <Input
+                            value={data.textVariable || ''}
+                            onChange={(e) => handleChange('textVariable', e.target.value)}
+                            placeholder="{{lead.lastMessage}}"
+                            className="font-mono text-xs"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Esquema JSON Esperado</Label>
+                        <Textarea
+                            value={data.schemaKeys || '{\n  "producto": "string",\n  "cantidad": "number",\n  "urgencia": "alta|media|baja"\n}'}
+                            onChange={(e) => handleChange('schemaKeys', e.target.value)}
+                            className="h-32 font-mono text-xs bg-gray-900 text-amber-400"
+                        />
+                        <p className="text-[10px] text-gray-500">La IA intentará estructurar el texto según este esquema exacto.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === 'codeNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label className="flex justify-between items-center">
+                            <span>JavaScript (Node.js)</span>
+                        </Label>
+                        <Textarea
+                            value={data.code || 'return { \n  result: true \n};'}
+                            onChange={(e) => handleChange('code', e.target.value)}
+                            className="h-48 font-mono text-[11px] bg-gray-950 text-green-400 border-gray-800"
+                            spellCheck={false}
+                        />
+                        <p className="text-[10px] text-gray-500">Puedes acceder a <code>triggerData</code> y <code>workflowData</code>.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === 'findRecordNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Buscar Por</Label>
+                        <Select value={data.searchBy || 'EMAIL'} onValueChange={(val) => handleChange('searchBy', val)}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="EMAIL">Email</SelectItem>
+                                <SelectItem value="PHONE">Teléfono (WhatsApp)</SelectItem>
+                                <SelectItem value="ID">Lead ID Exacto</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Valor a Buscar</Label>
+                        <Input
+                            value={data.searchValue || ''}
+                            onChange={(e) => handleChange('searchValue', e.target.value)}
+                            placeholder="{{trigger.phone}}"
+                            className="font-mono text-xs"
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === 'calendarNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Título del Evento</Label>
+                        <Input
+                            value={data.eventTitle || 'Consultoría Inicial'}
+                            onChange={(e) => handleChange('eventTitle', e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Email del Invitado</Label>
+                        <Input
+                            value={data.attendeeEmail || '{{lead.email}}'}
+                            onChange={(e) => handleChange('attendeeEmail', e.target.value)}
+                            className="font-mono text-xs"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Duración (Minutos)</Label>
+                        <Input
+                            type="number"
+                            value={data.eventDuration || '30'}
+                            onChange={(e) => handleChange('eventDuration', e.target.value)}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
         // --- AI AGENT ---
         if (type === 'aiNode') {
             return (

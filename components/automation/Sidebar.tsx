@@ -21,8 +21,15 @@ import {
     Tags,
     UserPlus,
     Network,
+    Network,
     GitBranch,
-    Repeat
+    Repeat,
+    Mic,
+    BookOpen,
+    FileJson,
+    Terminal,
+    Search,
+    CalendarPlus
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -189,6 +196,45 @@ export default function Sidebar() {
                     />
                 </Section>
 
+                {/* Advanced AI & Code Section */}
+                <Section title="Agentes IA & Datos Avanzados" description="Procesamiento y Scripts">
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'voiceNode', 'Audio Transcriber')}
+                        icon={<Mic size={16} className="text-violet-600" />}
+                        label="Transcribir Audio (IA)"
+                        color="bg-violet-50 border-violet-200 text-violet-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'ragNode', 'Knowledge Retrieval')}
+                        icon={<BookOpen size={16} className="text-blue-600" />}
+                        label="Buscar en Docs (RAG)"
+                        color="bg-blue-50 border-blue-200 text-blue-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'extractorNode', 'Data Extractor')}
+                        icon={<FileJson size={16} className="text-amber-600" />}
+                        label="Extraer JSON (IA)"
+                        color="bg-amber-50 border-amber-200 text-amber-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'codeNode', 'Run JavaScript')}
+                        icon={<Terminal size={16} className="text-gray-800" />}
+                        label="Ejecutar Código JS"
+                        color="bg-gray-100 border-gray-300 text-gray-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'findRecordNode', 'Find Record')}
+                        icon={<Search size={16} className="text-emerald-600" />}
+                        label="Buscar Contacto"
+                        color="bg-emerald-50 border-emerald-200 text-emerald-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'calendarNode', 'Activity / Calendar')}
+                        icon={<CalendarPlus size={16} className="text-rose-600" />}
+                        label="Agendar Cita"
+                        color="bg-rose-50 border-rose-200 text-rose-900"
+                    />
+                </Section>
             </div>
         </aside>
     );

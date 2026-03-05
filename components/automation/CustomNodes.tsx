@@ -24,7 +24,13 @@ import {
     UserPlus,
     Network,
     GitBranch,
-    Repeat
+    Repeat,
+    Mic,
+    BookOpen,
+    FileJson,
+    Terminal,
+    Search,
+    CalendarPlus
 } from 'lucide-react';
 
 const NodeWrapper = ({ children, selected, colorClass = "border-gray-200", bgClass = "bg-white" }: any) => (
@@ -323,6 +329,91 @@ const LoopNode = memo(({ data, selected }: any) => {
     );
 });
 
+// --- ADVANCED AI & DATA NODES ---
+
+const VoiceNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-violet-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader icon={<Mic size={14} className="text-violet-600" />} label={data.label || "Audio Transcriber"} color="bg-violet-50 border-violet-200" />
+            <NodeBody>
+                <div className="flex items-center gap-1">
+                    <span className="text-violet-600 font-bold truncate max-w-[180px]">Input: {data.audioUrlVariable || '{{trigger.audioUrl}}'}</span>
+                </div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-violet-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+const RagNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-blue-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader icon={<BookOpen size={14} className="text-blue-600" />} label={data.label || "Knowledge Retrieval"} color="bg-blue-50 border-blue-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">Doc: <span className="font-mono text-blue-700">{data.documentSource || 'All Company Docs'}</span></div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-blue-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+const ExtractorNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-amber-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader icon={<FileJson size={14} className="text-amber-600" />} label={data.label || "Data Extractor"} color="bg-amber-50 border-amber-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px] font-mono text-amber-700">Schema: {data.schemaKeys ? data.schemaKeys.toString() : '{ ... }'}</div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-amber-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+const CodeNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-gray-500" bgClass="bg-gray-900 border-gray-800">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-500 border-2 border-gray-900" />
+            <div className="px-4 py-2 border-b flex items-center gap-2 rounded-t-lg bg-gray-800 border-gray-700">
+                <Terminal size={14} className="text-green-400" />
+                <span className="text-sm font-bold text-gray-100">{data.label || "Run JS Code"}</span>
+            </div>
+            <div className="p-3 text-xs bg-gray-900 text-green-400 rounded-b-lg font-mono truncate max-w-[200px]">
+                {data.code ? '{ Script... }' : '// Code Block'}
+            </div>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-green-500 border-2 border-gray-900" />
+        </NodeWrapper>
+    );
+});
+
+const FindRecordNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-emerald-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader icon={<Search size={14} className="text-emerald-600" />} label={data.label || "Find Contact"} color="bg-emerald-50 border-emerald-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">By: <span className="font-bold text-emerald-700">{data.searchBy || 'Email'}</span></div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-emerald-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+const CalendarNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-rose-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader icon={<CalendarPlus size={14} className="text-rose-600" />} label={data.label || "Schedule Meeting"} color="bg-rose-50 border-rose-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">Event: <span className="font-bold text-rose-700">{data.eventTitle || 'Consultation'}</span></div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-rose-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
 const AINode = memo(({ data, selected }: any) => {
     return (
         <NodeWrapper selected={selected} colorClass="border-violet-200">
@@ -349,6 +440,12 @@ export const nodeTypes = {
     httpNode: HttpNode,
     whatsappNode: WhatsappNode,
     smsNode: SmsNode,
+    voiceNode: VoiceNode,
+    ragNode: RagNode,
+    extractorNode: ExtractorNode,
+    codeNode: CodeNode,
+    findRecordNode: FindRecordNode,
+    calendarNode: CalendarNode,
 };
 
 // Required names for proper imports
@@ -364,3 +461,9 @@ WhatsappNode.displayName = "WhatsappNode";
 SmsNode.displayName = "SmsNode";
 HttpNode.displayName = "HttpNode";
 AINode.displayName = "AINode";
+VoiceNode.displayName = "VoiceNode";
+RagNode.displayName = "RagNode";
+ExtractorNode.displayName = "ExtractorNode";
+CodeNode.displayName = "CodeNode";
+FindRecordNode.displayName = "FindRecordNode";
+CalendarNode.displayName = "CalendarNode";

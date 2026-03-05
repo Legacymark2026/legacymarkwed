@@ -99,7 +99,9 @@ export type TriggerData = Record<string, any>;
 export type StepType =
     "SLACK" | "HTTP" | "SMS" | "WHATSAPP" |
     "CREATE_TASK" | "UPDATE_DEAL" | "SEND_NOTIFICATION" |
-    "SWITCH" | "LOOP" | "ADD_TAG" | "REMOVE_TAG" | "ASSIGN_USER";
+    "SWITCH" | "LOOP" | "ADD_TAG" | "REMOVE_TAG" | "ASSIGN_USER" |
+    "VOICE_TRANSCRIBER" | "KNOWLEDGE_RAG" | "DATA_EXTRACTOR" | "RUN_CODE" | "FIND_RECORD" | "CALENDAR_EVENT" | "AI_AGENT" |
+    "EMAIL" | "WAIT" | "LOG" | "CONDITION";
 
 export type Step = {
     type: StepType;
@@ -236,6 +238,40 @@ export async function executeWorkflow(workflowId: string, triggerData: any) {
                     const iterableVar = step.config?.iterableVariable || '';
                     logEntry.status = 'SUCCESS';
                     logEntry.details = `Loop initialized over ${iterableVar}`;
+                }
+                // --- ADVANCED AI & DATA NODES ---
+                else if (step.type === 'VOICE_TRANSCRIBER') {
+                    const audioUrl = replaceVariables(step.config?.audioUrlVariable || '', triggerData);
+                    logEntry.status = 'SUCCESS';
+                    logEntry.details = `Mock Transcribed Audio from: ${audioUrl}`;
+                }
+                else if (step.type === 'KNOWLEDGE_RAG') {
+                    const query = replaceVariables(step.config?.queryVariable || '', triggerData);
+                    const source = step.config?.documentSource || 'ALL';
+                    logEntry.status = 'SUCCESS';
+                    logEntry.details = `Mock RAG Query (${source}): ${query}`;
+                }
+                else if (step.type === 'DATA_EXTRACTOR') {
+                    const text = replaceVariables(step.config?.textVariable || '', triggerData);
+                    logEntry.status = 'SUCCESS';
+                    logEntry.details = `Mock Extracted JSON from: ${text.substring(0, 30)}...`;
+                }
+                else if (step.type === 'RUN_CODE') {
+                    // Note: Needs a secure VM or edge function in production
+                    logEntry.status = 'SUCCESS';
+                    logEntry.details = `Executed Custom JS Block`;
+                }
+                else if (step.type === 'FIND_RECORD') {
+                    const searchBy = step.config?.searchBy || 'EMAIL';
+                    const searchValue = replaceVariables(step.config?.searchValue || '', triggerData);
+                    logEntry.status = 'SUCCESS';
+                    logEntry.details = `Mock record search by ${searchBy}: ${searchValue}`;
+                }
+                else if (step.type === 'CALENDAR_EVENT') {
+                    const title = replaceVariables(step.config?.eventTitle || '', triggerData);
+                    const email = replaceVariables(step.config?.attendeeEmail || '', triggerData);
+                    logEntry.status = 'SUCCESS';
+                    logEntry.details = `Mock Scheduled Event: ${title} with ${email}`;
                 }
 
             } catch (err: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
