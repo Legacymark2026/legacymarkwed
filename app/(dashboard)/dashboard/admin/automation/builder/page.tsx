@@ -11,14 +11,17 @@ import ReactFlow, {
     Connection,
     Edge,
     MarkerType,
-    Node
+    Node,
+    MiniMap,
+    Panel
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Loader2, Save, Play, ChevronLeft } from 'lucide-react';
+import { Loader2, Save, Play, ChevronLeft, LayoutGrid, Undo2, Redo2, Check, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import dagre from 'dagre';
 
 import Sidebar from '../../../../../../components/automation/Sidebar';
 import { nodeTypes } from '../../../../../../components/automation/CustomNodes';
@@ -30,22 +33,66 @@ const initialNodes = [
         id: 'start',
         type: 'triggerNode',
         data: { label: 'Form Submission', triggerType: 'FORM_SUBMISSION' },
-        position: { x: 250, y: 50 },
+        position: { x: 400, y: 50 },
     },
 ];
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
+// --- DAGRE LAYOUT FUNCTION ---
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const nodeWidth = 280;
+const nodeHeight = 150; // Increased spacing
+
+const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
+    const isHorizontal = direction === 'LR';
+    dagreGraph.setGraph({ rankdir: direction });
+
+    nodes.forEach((node) => {
+        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    });
+
+    edges.forEach((edge) => {
+        dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    const newNodes = nodes.map((node) => {
+        const nodeWithPosition = dagreGraph.node(node.id);
+        const newNode = { ...node };
+
+        newNode.position = {
+            x: nodeWithPosition.x - nodeWidth / 2,
+            y: nodeWithPosition.y - nodeHeight / 2,
+        };
+
+        return newNode;
+    });
+
+    return { nodes: newNodes, edges };
+};
+
+// --- MAIN BUILDER ---
 function AutomationBuilder() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
+
+    // UI State
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [workflowId, setWorkflowId] = useState<string | null>(null);
     const [workflowName, setWorkflowName] = useState('New Workflow');
+    const [isSimulating, setIsSimulating] = useState(false);
+
+    // History for Undo/Redo
+    const [history, setHistory] = useState<{ nodes: Node[], edges: Edge[] }[]>([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
 
     // Config Panel State
     const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -62,12 +109,75 @@ function AutomationBuilder() {
             loadWorkflowById(idParam);
         } else if (isNew) {
             setIsLoading(false); // Start fresh
+            saveHistory(initialNodes, []);
         } else {
-            // Fallback: Try load latest if no params
             loadLatestWorkflow();
         }
     }, [searchParams]);
 
+    // --- KEYBOARD SHORTCUTS ---
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ctrl+Z or Cmd+Z
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                if (e.shiftKey) { // Ctrl+Shift+Z = Redo
+                    handleRedo();
+                } else {
+                    handleUndo();
+                }
+            }
+            // Ctrl+Y or Cmd+Y = Redo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                handleRedo();
+            }
+            // Ctrl+S or Cmd+S = Save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSave(false); // save as draft by default on ctrl+s if needed, or active
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [history, historyIndex, nodes, edges, workflowName]);
+
+    // --- HISTORY MGMT ---
+    const saveHistory = (n: Node[], e: Edge[]) => {
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push({ nodes: JSON.parse(JSON.stringify(n)), edges: JSON.parse(JSON.stringify(e)) });
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+    };
+
+    const handleUndo = () => {
+        if (historyIndex > 0) {
+            const prevState = history[historyIndex - 1];
+            setNodes(prevState.nodes);
+            setEdges(prevState.edges);
+            setHistoryIndex(historyIndex - 1);
+            toast.info("Acción deshecha", { duration: 1500 });
+        }
+    };
+
+    const handleRedo = () => {
+        if (historyIndex < history.length - 1) {
+            const nextState = history[historyIndex + 1];
+            setNodes(nextState.nodes);
+            setEdges(nextState.edges);
+            setHistoryIndex(historyIndex + 1);
+            toast.info("Acción re-hecha", { duration: 1500 });
+        }
+    };
+
+    const handleAutoLayout = useCallback(() => {
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges);
+        setNodes([...layoutedNodes]);
+        setEdges([...layoutedEdges]);
+        saveHistory(layoutedNodes, layoutedEdges);
+        setTimeout(() => reactFlowInstance?.fitView({ padding: 0.2 }), 200);
+        toast.success("Nodos auto-organizados");
+    }, [nodes, edges, reactFlowInstance]);
+
+    // --- Loading Logic ---
     const loadWorkflowById = async (id: string) => {
         setIsLoading(true);
         try {
@@ -79,6 +189,7 @@ function AutomationBuilder() {
                     const { nodes: newNodes, edges: newEdges } = transformStepsToGraph(workflow);
                     setNodes(newNodes);
                     setEdges(newEdges);
+                    saveHistory(newNodes, newEdges);
                     setTimeout(() => reactFlowInstance?.fitView(), 100);
                 }
             } else {
@@ -102,6 +213,7 @@ function AutomationBuilder() {
                 const { nodes: newNodes, edges: newEdges } = transformStepsToGraph(workflow);
                 setNodes(newNodes);
                 setEdges(newEdges);
+                saveHistory(newNodes, newEdges);
                 setTimeout(() => reactFlowInstance?.fitView(), 100);
             }
         } catch (error) {
@@ -115,7 +227,7 @@ function AutomationBuilder() {
         const newNodes: Node[] = [];
         const newEdges: Edge[] = [];
         let yPos = 50;
-        const xPos = 250;
+        const xPos = 400;
 
         // 1. Trigger Node
         const triggerId = 'start';
@@ -130,7 +242,7 @@ function AutomationBuilder() {
             }
         });
 
-        yPos += 150;
+        yPos += 180;
         let previousNodeId = triggerId;
 
         // 2. Steps
@@ -141,10 +253,8 @@ function AutomationBuilder() {
                 let type = 'actionNode'; // Default
                 let data = { ...step.config };
 
-                // Map Step Type to Node Type
                 if (step.type === 'WAIT') {
                     type = 'waitNode';
-                    // Convert seconds back to display value
                     const delay = step.delay || 0;
                     if (delay >= 86400 && delay % 86400 === 0) {
                         data = { delayValue: delay / 86400, delayUnit: 'd' };
@@ -176,18 +286,16 @@ function AutomationBuilder() {
                     data
                 });
 
-                // Create Edge
                 newEdges.push({
                     id: `e_${previousNodeId}_${stepId}`,
                     source: previousNodeId,
                     target: stepId,
+                    animated: true, // Edge animation natively enabled
                     markerEnd: { type: MarkerType.ArrowClosed }
                 });
 
                 previousNodeId = stepId;
-                yPos += 150;
-
-                // Ensure ID counter is ahead of steps
+                yPos += 180;
                 id = Math.max(id, index + 2);
             });
         }
@@ -195,9 +303,14 @@ function AutomationBuilder() {
         return { nodes: newNodes, edges: newEdges };
     };
 
+    // --- React Flow Handlers ---
     const onConnect = useCallback(
-        (params: Connection | Edge) => setEdges((eds) => addEdge({ ...params, markerEnd: { type: MarkerType.ArrowClosed } }, eds)),
-        [setEdges],
+        (params: Connection | Edge) => {
+            setEdges((eds) => addEdge({ ...params, animated: true, markerEnd: { type: MarkerType.ArrowClosed } }, eds));
+            // Defer history save until state updates
+            setTimeout(() => saveHistory(nodes, edges), 0);
+        },
+        [setEdges, nodes, edges],
     );
 
     const onDragOver = useCallback((event: React.DragEvent) => {
@@ -230,9 +343,13 @@ function AutomationBuilder() {
                 data: { label: label, ...extraData },
             };
 
-            setNodes((nds) => nds.concat(newNode));
+            setNodes((nds) => {
+                const updated = nds.concat(newNode);
+                saveHistory(updated, edges);
+                return updated;
+            });
         },
-        [reactFlowInstance, setNodes],
+        [reactFlowInstance, setNodes, edges],
     );
 
     const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
@@ -240,14 +357,23 @@ function AutomationBuilder() {
     }, []);
 
     const onNodeDataChange = (nodeId: string, newData: any) => {
-        setNodes((nds) => nds.map((node) => {
-            if (node.id === nodeId) {
-                return { ...node, data: newData };
-            }
-            return node;
-        }));
+        setNodes((nds) => {
+            const updated = nds.map((node) => {
+                if (node.id === nodeId) {
+                    return { ...node, data: newData };
+                }
+                return node;
+            });
+            saveHistory(updated, edges);
+            return updated;
+        });
         setSelectedNode((prev) => prev?.id === nodeId ? { ...prev, data: newData } : prev);
     };
+
+    const handleNodeDelete = useCallback(() => {
+        // Will be called by react flow automatically on pressing Backspace
+        setTimeout(() => saveHistory(nodes, edges), 100);
+    }, [nodes, edges]);
 
     const transformGraphToSteps = () => {
         const steps: any[] = [];
@@ -334,28 +460,34 @@ function AutomationBuilder() {
         return steps;
     };
 
-    const handleSave = async () => {
+    // --- Save & Test Logic ---
+    const handleSave = async (isActive: boolean) => {
         setIsSaving(true);
+        // Validation check for unconnected nodes (aside from trigger)
+        const connectedIds = new Set(edges.flatMap(e => [e.source, e.target]));
+        const isolated = nodes.filter(n => n.type !== 'triggerNode' && !connectedIds.has(n.id));
+        if (isolated.length > 0) {
+            toast.warning(`Advertencia: Hay ${isolated.length} nodos desconectados.`, { duration: 4000 });
+        }
+
         try {
             const steps = transformGraphToSteps();
-            // Get trigger node for config
             const triggerNode = nodes.find(n => n.type === 'triggerNode');
             const triggerType = triggerNode?.data?.triggerType || 'FORM_SUBMISSION';
             const triggerConfig = { ...triggerNode?.data };
-            delete triggerConfig.label; // clean up
+            delete triggerConfig.label;
 
             const result = await saveUserWorkflow({
-                id: workflowId, // Update existing if ID present
-                name: workflowName, // Could add name edit field
+                id: workflowId,
+                name: workflowName,
                 triggerType: triggerType,
                 triggerConfig: triggerConfig,
                 steps: steps,
-                isActive: true
+                isActive: isActive
             });
 
             if (result.success) {
-                toast.success('Workflow saved successfully!');
-                // If new, maybe redirect or set ID? For now, just success.
+                toast.success(isActive ? 'Flujo Activo Guardado!' : 'Borrador Guardado!');
             } else {
                 toast.error(result.error || 'Failed to save');
             }
@@ -365,44 +497,92 @@ function AutomationBuilder() {
         setIsSaving(false);
     };
 
+    const handleTestRun = () => {
+        setIsSimulating(true);
+        toast.info("Iniciando simulación del flujo...");
+
+        let step = 0;
+        const interval = setInterval(() => {
+            if (step >= nodes.length) {
+                clearInterval(interval);
+                setIsSimulating(false);
+                toast.success("Simulación completada con éxito");
+                return;
+            }
+            // Flash node or show progress
+            toast.success(`Ejecutando nodo: ${nodes[step].data.label || nodes[step].type}`);
+            step++;
+        }, 1500);
+    };
+
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] w-full relative">
+        <div className="flex flex-col h-[calc(100vh-64px)] w-full relative bg-gray-50/50">
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 z-50 flex items-center justify-center">
-                    <Loader2 className="animate-spin text-blue-600 h-8 w-8" />
+                    <Loader2 className="animate-spin text-indigo-600 h-10 w-10" />
                 </div>
             )}
 
-            <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-10 w-full">
+            {/* TOP NAVIGATION BAR */}
+            <div className="bg-white border-b border-gray-200 px-6 py-3 flex flex-col md:flex-row justify-between md:items-center shadow-sm z-10 w-full gap-4 md:gap-0">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/admin/automation">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200">
                             <ChevronLeft size={16} />
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-xl font-bold text-gray-800">{workflowName}</h1>
-                        {workflowId && <div className="text-[10px] text-gray-400 font-mono">{workflowId}</div>}
+                        <input
+                            value={workflowName}
+                            onChange={(e) => setWorkflowName(e.target.value)}
+                            className="text-xl font-bold text-gray-800 bg-transparent border-none focus:ring-0 p-0 outline-none hover:bg-gray-50 rounded"
+                        />
+                        {workflowId && <div className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {workflowId}</div>}
                     </div>
                 </div>
-                <div className="flex gap-3">
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-300 px-3 py-1.5 rounded-md transition-all text-sm">
-                        <Play size={16} /> Test Run
-                    </button>
-                    <button
-                        onClick={handleSave}
+
+                <div className="flex items-center gap-2">
+                    {/* Undo / Redo / Layout */}
+                    <div className="flex items-center mr-2 bg-gray-100 rounded-lg p-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-600" onClick={handleUndo} disabled={historyIndex <= 0}>
+                            <Undo2 size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-600" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
+                            <Redo2 size={16} />
+                        </Button>
+                        <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-600" onClick={handleAutoLayout} title="Auto-organizar Nodos">
+                            <LayoutGrid size={16} />
+                        </Button>
+                    </div>
+
+                    <Button variant="outline" className="gap-2 text-gray-700 bg-white shadow-sm border-gray-200" onClick={handleTestRun} disabled={isSimulating}>
+                        <Play size={16} className="text-emerald-500" />
+                        {isSimulating ? "Simulando..." : "Simular Flujo"}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={() => handleSave(false)}
                         disabled={isSaving}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm font-medium shadow-sm"
+                        className="gap-2 text-indigo-700 border-indigo-200 hover:bg-indigo-50 bg-white"
                     >
-                        {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                        Save Changes
-                    </button>
+                        <FileDown size={16} /> Guardar Borrador
+                    </Button>
+                    <Button
+                        onClick={() => handleSave(true)}
+                        disabled={isSaving}
+                        className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
+                    >
+                        {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
+                        Publicar y Activar
+                    </Button>
                 </div>
             </div>
 
+            {/* FLOW BUILDER KERNEL */}
             <div className="flex flex-1 overflow-hidden relative">
                 <Sidebar />
-                <div className="flex-1 h-full bg-gray-50 relative" ref={reactFlowWrapper}>
+                <div className="flex-1 h-full relative" ref={reactFlowWrapper}>
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
@@ -415,10 +595,25 @@ function AutomationBuilder() {
                         onDragOver={onDragOver}
                         onNodeClick={onNodeClick}
                         onPaneClick={() => setSelectedNode(null)}
+                        onNodesDelete={handleNodeDelete}
                         fitView
+                        attributionPosition="bottom-right"
                     >
-                        <Background color="#f1f5f9" gap={16} size={1} />
-                        <Controls className="bg-white shadow-md border-gray-200" />
+                        <Background color="#cbd5e1" gap={16} size={2} />
+                        <Controls className="bg-white shadow-md border border-gray-200 rounded-lg p-1" />
+                        <MiniMap
+                            nodeStrokeColor={(n) => {
+                                if (n.type === 'triggerNode') return '#f59e0b';
+                                if (n.type === 'conditionNode') return '#94a3b8';
+                                return '#6366f1';
+                            }}
+                            nodeColor={(n) => {
+                                if (n.type === 'triggerNode') return '#fef3c7';
+                                if (n.type === 'conditionNode') return '#f8fafc';
+                                return '#e0e7ff';
+                            }}
+                            className="shadow-lg border border-gray-200 rounded-lg bg-white overflow-hidden"
+                        />
                     </ReactFlow>
 
                     {selectedNode && (
@@ -436,7 +631,7 @@ function AutomationBuilder() {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader2 className="animate-spin" /></div>}>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader2 className="animate-spin text-indigo-500 h-12 w-12" /></div>}>
             <ReactFlowProvider>
                 <AutomationBuilder />
             </ReactFlowProvider>

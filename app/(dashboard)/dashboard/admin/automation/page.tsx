@@ -1,5 +1,5 @@
 import { requireCompany } from "@/lib/company-utils";
-import { getWorkflows } from "@/actions/automation";
+import { getWorkflows, getAutomationAnalytics, getRecentExecutions } from "@/actions/automation";
 import WorkflowListClient from "./workflow-list";
 
 export const metadata = {
@@ -10,7 +10,11 @@ export default async function AutomationPage() {
     // This will redirect if no company
     const { companyId } = await requireCompany();
 
-    const workflows = await getWorkflows(companyId);
+    const [workflows, analytics, recentExecutions] = await Promise.all([
+        getWorkflows(companyId),
+        getAutomationAnalytics(companyId),
+        getRecentExecutions(companyId)
+    ]);
 
     // Serialization for client component
     const serializedWorkflows = workflows.map(w => ({
@@ -19,14 +23,13 @@ export default async function AutomationPage() {
         updatedAt: w.updatedAt
     }));
 
-    // Or better, let Next.js handle it if it supports Date serialization, 
-    // but to be safe I'll pass them as is and rely on newer Next.js capabilities 
-    // or TypeScript will complain if I missed string conversion.
-    // The client component interface expects `Date`, so I'll pass Date.
-
     return (
         <div className="h-full flex-1 flex-col space-y-8 p-8 flex">
-            <WorkflowListClient initialWorkflows={serializedWorkflows as any} />
+            <WorkflowListClient
+                initialWorkflows={serializedWorkflows as any}
+                analytics={analytics as any}
+                recentExecutions={recentExecutions as any}
+            />
         </div>
     );
 }

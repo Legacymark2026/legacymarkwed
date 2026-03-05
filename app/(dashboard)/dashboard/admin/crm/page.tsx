@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { requireCompany } from "@/lib/company-utils";
 import {
     getCRMStats,
     getRecentActivity,
@@ -26,6 +27,9 @@ import { getRecentExecutions } from "@/actions/automation";
 import { RecentAutomations } from "@/components/crm/recent-automations";
 
 export default async function CRMDashboardPage() {
+    // Get company ID
+    const { companyId } = await requireCompany();
+
     // Fetch data in parallel
     const [stats, funnelData, activities, topDeals, advancedStats, executions] = await Promise.all([
         getCRMStats(),
@@ -33,7 +37,7 @@ export default async function CRMDashboardPage() {
         getRecentActivity(),
         getTopDeals(),
         getHighPerformanceStats(),
-        getRecentExecutions()
+        getRecentExecutions(companyId)
     ]);
 
     if ('error' in stats || 'error' in advancedStats) {

@@ -6,17 +6,15 @@ import { sendEmail, replaceVariables } from "@/lib/email";
 // import { generateAIResponse } from "@/lib/ai";
 // import { sendSlackMessage, makeHttpRequest, sendSMS, sendWhatsApp } from "@/lib/integrations";
 
-export async function getRecentExecutions() {
-    const session = await auth();
-    if (!session?.user?.id) return [];
-
+export async function getRecentExecutions(companyId: string) {
     try {
         const executions = await prisma.workflowExecution.findMany({
-            take: 5,
+            where: { workflow: { companyId } },
+            take: 10,
             orderBy: { startedAt: 'desc' },
             include: {
                 workflow: {
-                    select: { name: true }
+                    select: { name: true, id: true }
                 }
             }
         });
@@ -24,6 +22,75 @@ export async function getRecentExecutions() {
     } catch (e) {
         console.error(e);
         return [];
+    }
+}
+
+export async function getExecutionById(executionId: string) {
+    try {
+        const execution = await prisma.workflowExecution.findUnique({
+            where: { id: executionId },
+            include: {
+                workflow: true
+            }
+        });
+        return execution;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export async function getAutomationAnalytics(companyId: string) {
+    try {
+        const [totalWorkflows, activeWorkflows, totalExecutions, failedExecutions] = await Promise.all([
+            prisma.workflow.count({ where: { companyId } }),
+            prisma.workflow.count({ where: { companyId, isActive: true } }),
+            prisma.workflowExecution.count({ where: { workflow: { companyId } } }),
+            prisma.workflowExecution.count({ where: { workflow: { companyId }, status: 'FAILED' } })
+        ]);
+
+        const successRate = totalExecutions > 0
+            ? Math.round(((totalExecutions - failedExecutions) / totalExecutions) * 100)
+            : 0;
+
+        // Get executions for the last 30 days for the sparkline
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const recentActivity = await prisma.workflowExecution.groupBy({
+            by: ['status'],
+            where: {
+                workflow: { companyId },
+                startedAt: { gte: thirtyDaysAgo }
+            },
+            _count: true
+        });
+
+        // Top workflows
+        const topWorkflows = await prisma.workflow.findMany({
+            where: { companyId },
+            include: {
+                _count: {
+                    select: { executions: true }
+                }
+            },
+            orderBy: {
+                executions: { _count: 'desc' }
+            },
+            take: 5
+        });
+
+        return {
+            totalWorkflows,
+            activeWorkflows,
+            totalExecutions,
+            successRate,
+            recentActivity,
+            topWorkflows
+        };
+    } catch (e) {
+        console.error("Failed to get automation analytics", e);
+        return null;
     }
 }
 
@@ -289,6 +356,29 @@ export async function toggleWorkflow(id: string, isActive: boolean) {
         });
         return { success: true };
     } catch (e: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function bulkDeleteWorkflows(ids: string[]) {
+    try {
+        await prisma.workflow.deleteMany({
+            where: { id: { in: ids } }
+        });
+        return { success: true };
+    } catch (e: any) {
+        return { success: false, error: e.message };
+    }
+}
+
+export async function bulkToggleWorkflows(ids: string[], isActive: boolean) {
+    try {
+        await prisma.workflow.updateMany({
+            where: { id: { in: ids } },
+            data: { isActive }
+        });
+        return { success: true };
+    } catch (e: any) {
         return { success: false, error: e.message };
     }
 }

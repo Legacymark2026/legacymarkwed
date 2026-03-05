@@ -1,0 +1,31 @@
+scripts/db/seed-crm.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/db/seed-inbox.ts(2,41): error TS2307: Cannot find module '../actions/inbox' or its corresponding type declarations.
+scripts/demo/demo_full_system.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/demo/demo_full_system.ts(3,33): error TS2307: Cannot find module '../actions/automation' or its corresponding type declarations.
+scripts/demo/demo_omnichannel.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/demo/demo_omnichannel.ts(3,33): error TS2307: Cannot find module '../actions/automation' or its corresponding type declarations.
+scripts/testing/check-inbox.ts(1,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/testing/check-inbox.ts(26,31): error TS7006: Parameter 'msg' implicitly has an 'any' type.
+scripts/testing/simple-verify.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/testing/simple-verify.ts(14,23): error TS7006: Parameter 'l' implicitly has an 'any' type.
+scripts/testing/simple-verify.ts(21,23): error TS7006: Parameter 'c' implicitly has an 'any' type.
+scripts/testing/test-graph-api.ts(1,29): error TS2307: Cannot find module '../lib/services/meta-sync' or its corresponding type declarations.
+scripts/testing/test-graph-api.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/testing/test-inbox-flow.ts(3,102): error TS2307: Cannot find module '../actions/inbox' or its corresponding type declarations.
+scripts/testing/test-meta-sync.ts(1,46): error TS2307: Cannot find module '../lib/services/meta-sync' or its corresponding type declarations.
+scripts/testing/test-meta-sync.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/testing/test-meta-sync.ts(18,19): error TS7006: Parameter 'p' implicitly has an 'any' type.
+scripts/testing/test-permissions.ts(1,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/testing/test-scoring.ts(2,38): error TS2307: Cannot find module '../actions/crm-advanced' or its corresponding type declarations.
+scripts/testing/test-scoring.ts(13,13): error TS2322: Type '{ name: string; }' is not assignable to type '(Without<CompanyCreateInput, CompanyUncheckedCreateInput> & CompanyUncheckedCreateInput) | (Without<...> & CompanyCreateInput)'.
+  Type '{ name: string; }' is not assignable to type 'Without<CompanyUncheckedCreateInput, CompanyCreateInput> & CompanyCreateInput'.
+    Property 'slug' is missing in type '{ name: string; }' but required in type 'CompanyCreateInput'.
+scripts/testing/verify-chat.ts(2,58): error TS2307: Cannot find module '../actions/chat' or its corresponding type declarations.
+scripts/testing/verify-chat.ts(3,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/testing/verify-chat.ts(54,73): error TS7006: Parameter 'm' implicitly has an 'any' type.
+scripts/testing/verify-execution.ts(3,33): error TS2307: Cannot find module '../actions/automation' or its corresponding type declarations.
+scripts/testing/verify-instagram-sync.ts(3,29): error TS2307: Cannot find module '../lib/services/meta-sync' or its corresponding type declarations.
+scripts/testing/verify-real-sync.ts(3,33): error TS2307: Cannot find module '../lib/services/meta-sync' or its corresponding type declarations.
+scripts/testing/verify-whatsapp-data.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
+scripts/utils/trigger-meta-sync.ts(1,33): error TS2307: Cannot find module '../lib/services/meta-sync' or its corresponding type declarations.
+scripts/utils/trigger-meta-sync.ts(2,24): error TS2307: Cannot find module '../lib/prisma' or its corresponding type declarations.
