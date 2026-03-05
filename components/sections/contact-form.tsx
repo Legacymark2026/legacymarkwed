@@ -160,19 +160,29 @@ function ContactFormContent() {
     async function onSubmit(data: FormValues) {
         setIsSubmitting(true);
         try {
-            const { triggerWorkflow } = await import("@/actions/automation");
-            await triggerWorkflow('FORM_SUBMISSION', {
+            const { submitContactForm } = await import("@/actions/contact");
+            const result = await submitContactForm({
                 email: data.email,
                 name: data.name,
-                message: `[Servicio: ${data.service}] [Presupuesto: ${data.budget}] [Urgencia: ${data.timeline}] [Empresa: ${data.company || 'N/A'} · ${data.company_size}]\n\nObjetivo: ${data.goal}\n\nCómo nos encontró: ${data.how_found || 'N/A'}`,
                 company: data.company,
                 phone: data.phone,
-                service: data.service,
-                budget: data.budget,
-                timeline: data.timeline,
-                company_size: data.company_size,
+                formData: {
+                    service: data.service,
+                    budget: data.budget,
+                    timeline: data.timeline,
+                    company_size: data.company_size,
+                    goal: data.goal,
+                    how_found: data.how_found,
+                },
+                formId: "main_contact",
             });
-            trackEvent('GENERATE_LEAD', {
+
+            if (!result.success) {
+                console.error("Failed to submit form:", result.error);
+                // We still show success to user so they don"t get stuck
+            }
+
+            trackEvent("GENERATE_LEAD", {
                 source: 'contact_form',
                 email: data.email,
                 company: data.company,
