@@ -358,7 +358,7 @@ export default function WorkflowListClient({ initialWorkflows, analytics, recent
                                             </button>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                                            {workflow._count.executions.toLocaleString()}
+                                            {((workflow as any)._count?.executions || 0).toLocaleString()}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {format(new Date(workflow.updatedAt), 'dd MMM yyyy')}
@@ -454,7 +454,7 @@ export default function WorkflowListClient({ initialWorkflows, analytics, recent
                                 <CardContent className="pt-4 pb-4 border-t mt-4 flex justify-between items-center text-sm text-gray-500">
                                     <div className="flex flex-col">
                                         <span className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-0.5">Ejecuciones</span>
-                                        <span className="font-medium text-gray-900">{workflow._count.executions.toLocaleString()}</span>
+                                        <span className="font-medium text-gray-900">{((workflow as any)._count?.executions || 0).toLocaleString()}</span>
                                     </div>
                                     <div className="flex flex-col text-right">
                                         <span className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-0.5">Actualizado</span>

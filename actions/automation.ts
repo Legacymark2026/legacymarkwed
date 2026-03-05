@@ -326,6 +326,11 @@ export async function getWorkflows(companyId: string) {
     try {
         return await prisma.workflow.findMany({
             where: { companyId },
+            include: {
+                _count: {
+                    select: { executions: true }
+                }
+            },
             orderBy: { createdAt: 'desc' },
         });
     } catch (e) {
