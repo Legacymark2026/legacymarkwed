@@ -11,6 +11,7 @@ interface Rule {
 }
 
 const FIELDS = [
+    // Identity & Source
     { value: "phone", label: "Tiene teléfono" },
     { value: "company", label: "Tiene empresa" },
     { value: "source", label: "Fuente del lead" },
@@ -18,6 +19,22 @@ const FIELDS = [
     { value: "utmCampaign", label: "Viene de campaña" },
     { value: "jobTitle", label: "Tiene cargo" },
     { value: "score", label: "Score actual" },
+
+    // Profile (from Form Data)
+    { value: "formData.companySize", label: "Perfil: Tamaño de la empresa" },
+    { value: "formData.sector", label: "Perfil: Sector o Industria" },
+    { value: "formData.budget", label: "Perfil: Presupuesto" },
+
+    // Interaction Level
+    { value: "events.website_visits", label: "Interacción: Visitas web" },
+    { value: "events.email_opens", label: "Interacción: Correos abiertos" },
+    { value: "events.downloads", label: "Interacción: Descargas de contenido" },
+    { value: "events.webinars", label: "Interacción: Asistencia a eventos/webinars" },
+
+    // Intent
+    { value: "events.quote_requests", label: "Intención: Solicitud de cotización" },
+    { value: "events.demos", label: "Intención: Demo programada" },
+    { value: "events.pricing_visits", label: "Intención: Visitas a página de precios" },
 ];
 
 const OPERATORS: Record<string, string[]> = {
@@ -28,6 +45,20 @@ const OPERATORS: Record<string, string[]> = {
     utmCampaign: ["exists", "equals"],
     jobTitle: ["exists", "contains"],
     score: ["greaterThan", "lessThan"],
+
+    // Profile
+    "formData.companySize": ["exists", "equals", "contains"],
+    "formData.sector": ["exists", "equals", "contains", "in"],
+    "formData.budget": ["exists", "greaterThan", "lessThan", "contains"],
+
+    // Interaction & Intent (Numeric counts)
+    "events.website_visits": ["greaterThan", "lessThan", "equals"],
+    "events.email_opens": ["greaterThan", "lessThan", "equals"],
+    "events.downloads": ["greaterThan", "lessThan", "equals"],
+    "events.webinars": ["greaterThan", "lessThan", "equals"],
+    "events.quote_requests": ["greaterThan", "lessThan", "equals"],
+    "events.demos": ["greaterThan", "lessThan", "equals"],
+    "events.pricing_visits": ["greaterThan", "lessThan", "equals"],
 };
 
 const OPERATOR_LABELS: Record<string, string> = {

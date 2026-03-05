@@ -234,19 +234,65 @@ function evaluateRule(value: unknown, operator: string, ruleValue: string | null
 
 export async function recalculateAllScores(companyId: string) {
     try {
-        const leads = await prisma.lead.findMany({ where: { companyId } });
+        const leads = await prisma.lead.findMany({
+            where: { companyId },
+            include: { marketingEvents: true }
+        });
         let updated = 0;
         for (const lead of leads) {
-            const score = await computeLeadScore(lead as unknown as Record<string, unknown>, companyId);
+            const enrichedLead = enrichLeadWithEvents(lead);
+            const score = await computeLeadScore(enrichedLead as unknown as Record<string, unknown>, companyId);
             await prisma.lead.update({ where: { id: lead.id }, data: { score } });
             updated++;
         }
         revalidatePath("/dashboard/admin/crm/leads");
         return { success: true, updated };
     } catch (error) {
-        console.error(error);
+        console.error("Failed to recalculate all scores:", error);
         return { error: "Failed to recalculate" };
     }
+}
+
+export async function recalculateLeadScore(leadId: string, companyId: string) {
+    try {
+        const lead = await prisma.lead.findUnique({
+            where: { id: leadId, companyId },
+            include: { marketingEvents: true }
+        });
+        if (!lead) return { error: "Lead not found" };
+
+        const enrichedLead = enrichLeadWithEvents(lead);
+        const score = await computeLeadScore(enrichedLead as unknown as Record<string, unknown>, companyId);
+
+        await prisma.lead.update({ where: { id: leadId }, data: { score } });
+
+        revalidatePath(`/dashboard/admin/crm/leads/${leadId}`);
+        revalidatePath("/dashboard/admin/crm/leads");
+        return { success: true, score };
+    } catch (error) {
+        console.error("Failed to recalculate lead score:", error);
+        return { error: "Failed to recalculate" };
+    }
+}
+
+function enrichLeadWithEvents(lead: any) {
+    const events = lead.marketingEvents || [];
+
+    // Aggregations matching the UI field rules
+    const aggregatedEvents = {
+        website_visits: events.filter((e: any) => e.eventType === 'PAGE_VIEW').length,
+        email_opens: events.filter((e: any) => e.eventType === 'EMAIL_OPEN').length,
+        downloads: events.filter((e: any) => e.eventType === 'DOWNLOAD' || (e.eventName && e.eventName.toLowerCase().includes('descarga'))).length,
+        webinars: events.filter((e: any) => e.eventType === 'WEBINAR' || (e.eventName && e.eventName.toLowerCase().includes('webinar'))).length,
+        quote_requests: events.filter((e: any) => e.eventType === 'FORM_SUBMIT' && e.eventName && (e.eventName.toLowerCase().includes('cotiza') || e.eventName.toLowerCase().includes('presupuesto'))).length,
+        demos: events.filter((e: any) => e.eventType === 'FORM_SUBMIT' && e.eventName && e.eventName.toLowerCase().includes('demo')).length,
+        pricing_visits: events.filter((e: any) => e.eventType === 'PAGE_VIEW' && e.url && e.url.toLowerCase().includes('precio')).length,
+    };
+
+    return {
+        ...lead,
+        events: aggregatedEvents
+    };
 }
 
 // ─── DEAL DETAIL ─────────────────────────────────────────────────────────────
