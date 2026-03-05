@@ -1,7 +1,7 @@
 'use server';
 
-import { prisma } from '@/lib/db';
-import { auth } from '@/auth';
+import { db as prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 const FB_GRAPH_URL = 'https://graph.facebook.com/v19.0';
 

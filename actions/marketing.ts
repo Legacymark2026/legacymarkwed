@@ -1,7 +1,7 @@
 'use server';
 
-import { prisma } from '@/lib/db';
-import { auth } from '@/auth';
+import { db as prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 import { getFacebookCampaigns, getFacebookInsights } from './marketing/facebook-ads';
 import { getGoogleCampaigns, getGoogleInsights } from './marketing/google-ads';
 import { getTikTokCampaigns, getTikTokInsights } from './marketing/tiktok-ads';
@@ -203,13 +203,14 @@ export async function getAggregatedSpend() {
         }
     });
 
+    const totalSpend = stats._sum.spend || 0;
+    const totalConversions = stats._sum.conversions || 0;
+
     return {
-        totalSpend: stats._sum.spend || 0,
+        totalSpend,
         totalImpressions: stats._sum.impressions || 0,
         totalClicks: stats._sum.clicks || 0,
-        totalConversions: stats._sum.conversions || 0,
-        cpa: (stats._sum.conversions || 0) > 0
-            ? ((stats._sum.spend || 0) / stats._sum.conversions)
-            : 0
+        totalConversions,
+        cpa: totalConversions > 0 ? (totalSpend / totalConversions) : 0
     };
 }

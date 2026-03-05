@@ -1,7 +1,7 @@
 'use server';
 
-import { prisma } from '@/lib/db';
-import { auth } from '@/auth';
+import { db as prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 const LINKEDIN_API_URL = 'https://api.linkedin.com/rest'; // Uses mostly rest endpoints now
 

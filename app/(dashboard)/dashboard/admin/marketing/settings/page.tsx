@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import MarketingSettingsClient from "@/components/marketing/MarketingSettingsClient";
 import { getFacebookAdsConfig } from "@/actions/marketing/facebook-ads";

@@ -1,7 +1,7 @@
 'use server';
 
-import { prisma } from '@/lib/db';
-import { auth } from '@/auth';
+import { db as prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 const GOOGLE_ADS_REST_URL = 'https://googleads.googleapis.com/v16'; // Adjust version as needed
 const GOOGLE_OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';

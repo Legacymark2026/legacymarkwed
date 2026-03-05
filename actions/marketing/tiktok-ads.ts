@@ -1,7 +1,7 @@
 'use server';
 
-import { prisma } from '@/lib/db';
-import { auth } from '@/auth';
+import { db as prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 const TIKTOK_API_URL = 'https://business-api.tiktok.com/open_api/v1.3';
 
