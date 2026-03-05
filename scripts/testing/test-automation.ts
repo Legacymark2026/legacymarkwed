@@ -7,8 +7,9 @@
  * npx tsx scripts/testing/test-automation.ts
  */
 
-import { prisma } from '../../lib/prisma';
-import { saveUserWorkflow } from '../../actions/automation';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 async function generateTestCompany() {
     return await prisma.company.create({
@@ -31,35 +32,27 @@ async function runAutomationTest() {
 
     // 1. Create a complex Workflow via standard action
     console.log("🔄 Creating advanced Workflow...");
-    const wfResult = await saveUserWorkflow({
-        name: "E2E Lead Score Pipeline",
-        triggerType: "LEAD_SCORE",
-        triggerConfig: { targetScore: 75, label: "Score > 75" },
-        steps: [
-            { type: "WAIT", delay: 1, config: { delayValue: "1", delayUnit: "m" } },
-            { type: "CONDITION", config: { variable: "lead.tier", operator: "EQUALS", value: "VIP" } },
-            { type: "ADD_TAG", config: { tagName: "High Priority" } },
-            { type: "ASSIGN_USER", config: { userId: "round_robin_sales" } },
-            { type: "HTTP", config: { method: "POST", url: "https://echo.free.beeceptor.com", payload: '{"id": "{{lead.id}}"}' } },
-            { type: "SLACK", config: { webhookUrl: "https://hooks.slack.com/dummy", message: "New VIP Lead!" } }
-        ],
-        isActive: true
+    const workflow = await prisma.workflow.create({
+        data: {
+            name: "E2E Lead Score Pipeline",
+            triggerType: "LEAD_SCORE",
+            triggerConfig: { targetScore: 75, label: "Score > 75" },
+            companyId: company.id,
+            isActive: true,
+            steps: [
+                { type: "WAIT", delay: 1, config: { delayValue: "1", delayUnit: "m" } },
+                { type: "CONDITION", config: { variable: "lead.tier", operator: "EQUALS", value: "VIP" } },
+                { type: "ADD_TAG", config: { tagName: "High Priority" } },
+                { type: "ASSIGN_USER", config: { userId: "round_robin_sales" } },
+                { type: "HTTP", config: { method: "POST", url: "https://echo.free.beeceptor.com", payload: '{"id": "{{lead.id}}"}' } },
+                { type: "SLACK", config: { webhookUrl: "https://hooks.slack.com/dummy", message: "New VIP Lead!" } }
+            ]
+        }
     });
 
-    if (!wfResult.success) {
-        console.error("❌ Failed to create Workflow");
-        return;
-    }
+    console.log(`✅ Workflow '${workflow.name}' configured and active.`);
 
-    // Attach to company
-    await prisma.workflow.update({
-        where: { id: wfResult.workflow?.id },
-        data: { companyId: company.id }
-    });
-
-    console.log(`✅ Workflow '${wfResult.workflow?.name}' configured and active.`);
-
-    const workflowId = wfResult.workflow?.id as string;
+    const workflowId = workflow.id;
 
     // 2. Simulate Trigger Execution
     console.log("⚡ Simulating Trigger Execution (Latencies simulated)...");

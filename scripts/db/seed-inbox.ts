@@ -1,5 +1,5 @@
 
-import { simulateIncomingMessage } from "../actions/inbox";
+import { simulateIncomingMessage } from "../../actions/inbox";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
