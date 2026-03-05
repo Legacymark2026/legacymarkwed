@@ -21,7 +21,7 @@ export default async function HomePage() {
     const experts = await getExperts();
 
     return (
-        <main className="relative bg-[#F9FAFB] text-slate-900 overflow-hidden scroll-smooth">
+        <main className="relative bg-slate-950 text-white overflow-hidden scroll-smooth">
             {/* 12. Dense Editorial Noise */}
             <div className="bg-noise fixed inset-0 z-50 pointer-events-none mix-blend-multiply opacity-[0.015]" />
 
@@ -31,29 +31,25 @@ export default async function HomePage() {
             <div data-ga-section="hero"><FuturisticHero /></div>
 
             <div className="relative z-10 space-y-0 pb-32">
-                <div data-ga-section="alianzas" className="pt-8 pb-12"><StrategicAlliances /></div>
-
-                <div data-ga-section="servicios" className="py-12"><BentoServices /></div>
-
-                {/* Dark Themed Showcase for Image */}
+                <div data-ga-section="alianzas"><StrategicAlliances /></div>
+                <div data-ga-section="servicios"><BentoServices /></div>
                 <div data-ga-section="omnichannel"><OmnichannelShowcase /></div>
+                <div data-ga-section="estadisticas"><Stats /></div>
+                <div data-ga-section="propuesta-valor"><ValueProposition /></div>
+                <div data-ga-section="casos-de-exito"><CaseStudies /></div>
+                <div data-ga-section="testimonios"><TestimonialSlider /></div>
 
-                <div data-ga-section="estadisticas" className="py-12"><Stats /></div>
-                <div data-ga-section="propuesta-valor" className="py-12"><ValueProposition /></div>
-                <div data-ga-section="casos-de-exito" className="py-16"><CaseStudies /></div>
-                <div data-ga-section="testimonios" className="py-16"><TestimonialSlider /></div>
-
-                {/* 19. Grid Background for Tech Section - Light Mode */}
+                {/* Grid Background for Tech Section - Dark Mode */}
                 <div className="relative">
-                    <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] -z-10" />
-                    <div data-ga-section="metodologia" className="py-16"><Methodology /></div>
+                    <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] pointer-events-none mix-blend-screen -z-10" />
+                    <div data-ga-section="metodologia"><Methodology /></div>
                 </div>
 
-                <div data-ga-section="equipo" className="py-16"><TeamGrid experts={experts} /></div>
-                <div data-ga-section="faq" className="py-12"><FaqAccordion /></div>
-                <div data-ga-section="cta-principal" className="py-16"><CTA /></div>
-                <div data-ga-section="portfolio-preview" className="pt-12 pb-16"><PortfolioPreview projects={projects} /></div>
-                <div data-ga-section="blog-preview" className="pb-20"><LatestPosts posts={posts} /></div>
+                <div data-ga-section="equipo"><TeamGrid experts={experts} /></div>
+                <div data-ga-section="faq"><FaqAccordion /></div>
+                <div data-ga-section="cta-principal"><CTA /></div>
+                <div data-ga-section="portfolio-preview"><PortfolioPreview projects={projects} /></div>
+                <div data-ga-section="blog-preview"><LatestPosts posts={posts} /></div>
             </div>
         </main>
     );

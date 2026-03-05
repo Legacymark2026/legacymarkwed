@@ -99,25 +99,25 @@ export function Methodology() {
     }, [activeStep]);
 
     return (
-        <section className="bg-transparent py-32 text-slate-900 relative overflow-hidden">
-            {/* 1. Technical Background Overlay - Light Mode Blueprint */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,#ffffff_0%,transparent_100%)] opacity-90" />
+        <section className="bg-transparent py-32 text-white relative overflow-hidden">
+            {/* 1. Technical Background Overlay - Dark Mode Blueprint */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,#020617_0%,transparent_100%)] opacity-90" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 {/* 2. Header with 'System Status' aesthetic */}
                 <div className="text-center mb-16 sm:mb-24 relative">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-teal-900/50 bg-slate-900/60 text-teal-400 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                         </span>
                         {t('badge')}
                     </div>
-                    <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-[-0.04em] mb-6 text-slate-900">
-                        {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
+                    <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-[-0.04em] mb-6 text-white">
+                        {t('titleStart')} <span className="text-teal-400 font-light">{t('titleHighlight')}</span>
                     </h2>
-                    <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg leading-relaxed font-light uppercase tracking-widest font-mono">
+                    <p className="text-slate-400 max-w-2xl mx-auto text-base md:text-lg leading-relaxed font-light uppercase tracking-widest font-mono">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -143,16 +143,16 @@ export function Methodology() {
                                     className={cn(
                                         "group relative flex items-center gap-6 p-4 rounded-sm cursor-pointer transition-all duration-300 border",
                                         activeStep === index
-                                            ? "bg-white border-slate-200 shadow-xl shadow-slate-200/50"
-                                            : "bg-transparent border-transparent hover:bg-white/50 hover:border-slate-100"
+                                            ? "bg-slate-900/80 border-slate-800 shadow-[0_0_30px_rgba(20,184,166,0.1)]"
+                                            : "bg-transparent border-transparent hover:bg-slate-900/40 hover:border-slate-800/50"
                                     )}
                                 >
                                     {/* ID Circle */}
                                     <div className={cn(
                                         "relative h-14 w-14 rounded-full flex items-center justify-center font-mono font-bold text-xl border transition-all duration-300 z-10",
                                         activeStep === index
-                                            ? "bg-slate-900 text-white border-slate-800 scale-110 shadow-lg"
-                                            : "bg-white text-slate-400 border-slate-200 group-hover:border-slate-300 group-hover:text-slate-600 shadow-sm"
+                                            ? "bg-teal-500 text-slate-950 border-teal-400 scale-110 shadow-[0_0_15px_rgba(20,184,166,0.5)]"
+                                            : "bg-slate-900 text-slate-500 border-slate-800 group-hover:border-slate-700 group-hover:text-slate-400 shadow-sm"
                                     )}>
                                         {step.id}
                                     </div>
@@ -162,34 +162,34 @@ export function Methodology() {
                                         <div className="flex justify-between items-center mb-2">
                                             <h3 className={cn(
                                                 "font-black tracking-tight text-lg transition-colors duration-300",
-                                                activeStep === index ? "text-slate-900" : "text-slate-400 group-hover:text-slate-600"
+                                                activeStep === index ? "text-white" : "text-slate-500 group-hover:text-slate-400"
                                             )}>
                                                 {step.title}
                                             </h3>
-                                            {activeStep === index && <ArrowRight size={16} strokeWidth={1.5} className="text-slate-900" />}
+                                            {activeStep === index && <ArrowRight size={16} strokeWidth={1.5} className="text-teal-400" />}
                                         </div>
-                                        <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">{step.subtitle}</p>
+                                        <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">{step.subtitle}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* 4. Visualization Panel - Light Mode Card */}
+                    {/* 4. Visualization Panel - Dark Mode Card */}
                     <div className="relative lg:h-auto min-h-[350px] sm:min-h-[500px] flex items-center">
-                        <div className="absolute inset-0 bg-white rounded-sm border border-slate-200 md:rotate-1 hover:rotate-0 transition-transform duration-700 ease-out-expo shadow-2xl shadow-slate-200/60">
+                        <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md rounded-sm border border-slate-800 md:rotate-1 hover:rotate-0 transition-transform duration-700 ease-out-expo shadow-[0_0_50px_rgba(20,184,166,0.05)]">
                             {/* Inner Grid */}
-                            <div className="absolute inset-4 border border-slate-100 rounded-sm overflow-hidden">
-                                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
+                            <div className="absolute inset-4 border border-slate-800/50 rounded-sm overflow-hidden">
+                                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] pointer-events-none mix-blend-screen" />
 
                                 {/* Corner Decorations */}
-                                <div className="absolute top-0 left-0 w-20 h-20 border-t border-l border-teal-200 rounded-tl-2xl" />
-                                <div className="absolute bottom-0 right-0 w-20 h-20 border-b border-r border-teal-200 rounded-br-2xl" />
+                                <div className="absolute top-0 left-0 w-20 h-20 border-t border-l border-teal-500/30 rounded-tl-2xl" />
+                                <div className="absolute bottom-0 right-0 w-20 h-20 border-b border-r border-teal-500/30 rounded-br-2xl" />
 
                                 <div className="absolute top-6 right-6 flex gap-2">
-                                    <div className="h-2 w-2 rounded-full bg-red-400" />
-                                    <div className="h-2 w-2 rounded-full bg-yellow-400" />
-                                    <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                                    <div className="h-2 w-2 rounded-full bg-red-500/80" />
+                                    <div className="h-2 w-2 rounded-full bg-yellow-500/80" />
+                                    <div className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
                                 </div>
                             </div>
                         </div>
@@ -206,7 +206,7 @@ export function Methodology() {
                                     className="relative"
                                 >
                                     {/* Large Background Letter */}
-                                    <span className="absolute -top-20 -left-10 text-[12rem] font-black text-slate-100 select-none pointer-events-none">
+                                    <span className="absolute -top-20 -left-10 text-[12rem] font-black text-slate-800/30 select-none pointer-events-none mix-blend-overlay">
                                         {STEPS[activeStep].id}
                                     </span>
 
@@ -214,34 +214,34 @@ export function Methodology() {
                                     {(() => {
                                         const ActiveIcon = STEPS[activeStep].icon;
                                         return (
-                                            <div className="inline-flex p-5 rounded-sm mb-10 border border-slate-200 bg-[#F9FAFB] shadow-sm">
-                                                <ActiveIcon className="h-10 w-10 text-slate-800" strokeWidth={1.5} />
+                                            <div className="inline-flex p-5 rounded-sm mb-10 border border-slate-700 bg-slate-800 shadow-sm relative z-20">
+                                                <ActiveIcon className="h-10 w-10 text-teal-400" strokeWidth={1.5} />
                                             </div>
                                         );
                                     })()}
 
                                     {/* Tech Spec Label */}
-                                    <div className="mb-6 inline-flex items-center gap-2 text-[10px] font-mono text-slate-500 bg-white px-3 py-1.5 rounded-sm border border-slate-200 tracking-widest uppercase">
+                                    <div className="mb-6 inline-flex items-center gap-2 text-[10px] font-mono text-teal-500 bg-slate-950/80 px-3 py-1.5 rounded-sm border border-slate-800 tracking-widest uppercase shadow-sm relative z-20">
                                         <CodeIcon />
                                         {STEPS[activeStep].tech_spec}
                                     </div>
 
-                                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 mb-6 font-mono uppercase">
+                                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-6 font-mono uppercase relative z-20">
                                         {STEPS[activeStep].title}
                                     </h3>
 
-                                    <p className="text-lg text-slate-500 leading-relaxed font-light pl-6 relative">
-                                        <span className="absolute left-0 top-0 bottom-0 w-px bg-slate-200" />
-                                        <span className="absolute left-0 top-0 h-1/3 w-px bg-slate-600" />
+                                    <p className="text-lg text-slate-400 leading-relaxed font-light pl-6 relative z-20">
+                                        <span className="absolute left-0 top-0 bottom-0 w-px bg-slate-800" />
+                                        <span className="absolute left-0 top-0 h-1/3 w-px bg-teal-500" />
                                         {STEPS[activeStep].desc}
                                     </p>
 
-                                    <div className="mt-12 flex items-center gap-4 text-[10px] text-slate-400 font-mono tracking-widest uppercase">
+                                    <div className="mt-12 flex items-center gap-4 text-[10px] text-slate-500 font-mono tracking-widest uppercase relative z-20">
                                         <span>STATUS:</span>
-                                        <span className="text-slate-900 font-bold">OPTIMAL</span>
-                                        <span className="w-px h-4 bg-slate-200" />
+                                        <span className="text-teal-400 font-bold">OPTIMAL</span>
+                                        <span className="w-px h-4 bg-slate-800" />
                                         <span>LOAD:</span>
-                                        <span className="text-slate-900 font-bold">{STEPS[activeStep].load}</span>
+                                        <span className="text-white font-bold">{STEPS[activeStep].load}</span>
                                     </div>
                                 </motion.div>
                             </AnimatePresence>

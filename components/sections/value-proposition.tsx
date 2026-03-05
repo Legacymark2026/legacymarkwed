@@ -32,10 +32,10 @@ export function ValueProposition() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Header */}
                     <div className="lg:col-span-3 text-center mb-16">
-                        <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl text-balance">
-                            {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
+                        <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-6xl text-balance">
+                            {t('titleStart')} <span className="text-teal-400 font-light">{t('titleHighlight')}</span>
                         </h2>
-                        <p className="mt-6 text-base md:text-lg text-slate-600 max-w-2xl mx-auto font-light font-mono uppercase tracking-widest">
+                        <p className="mt-6 text-base md:text-lg text-slate-400 max-w-2xl mx-auto font-light font-mono uppercase tracking-widest">
                             {t('subtitle')}
                         </p>
                     </div>
@@ -90,25 +90,25 @@ function TiltCard({ val, index }: { val: any, index: number }) {
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                className="bg-white p-12 rounded-sm shadow-xl border border-transparent hover:border-slate-200 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 h-full flex flex-col items-start relative overflow-hidden hover:-translate-y-2"
+                className="bg-slate-900/50 p-12 rounded-sm shadow-xl border border-slate-800 hover:border-teal-500/30 hover:shadow-[0_20px_50px_-12px_rgba(13,148,136,0.15)] transition-all duration-500 h-full flex flex-col items-start relative overflow-hidden hover:-translate-y-2 backdrop-blur-sm"
             >
                 {/* Holographic BG on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                <div className="h-12 w-12 bg-[#F9FAFB] border border-slate-200 text-slate-700 rounded-sm flex items-center justify-center mb-8 group-hover:scale-105 transition-transform relative z-10 shadow-sm group-hover:border-slate-300">
+                <div className="h-12 w-12 bg-slate-800 border border-slate-700 text-teal-400 rounded-sm flex items-center justify-center mb-8 group-hover:scale-105 transition-transform relative z-10 shadow-sm group-hover:border-teal-800 group-hover:bg-teal-900/50">
                     <val.icon size={20} strokeWidth={1.5} />
                 </div>
 
-                <h3 className="text-2xl font-black tracking-tight text-slate-900 mb-4 relative z-10 group-hover:text-slate-950 transition-colors">
+                <h3 className="text-2xl font-black tracking-tight text-white mb-4 relative z-10 group-hover:text-teal-50 transition-colors">
                     {val.title}
                 </h3>
 
-                <p className="text-slate-500 leading-relaxed text-sm relative z-10 font-light">
+                <p className="text-slate-400 leading-relaxed text-sm relative z-10 font-light">
                     {val.description}
                 </p>
 
                 {/* Decorative Elements */}
-                <div className="absolute -top-4 -right-4 text-slate-50 opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none">
+                <div className="absolute -top-4 -right-4 text-slate-800/50 opacity-0 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none">
                     <Globe size={120} strokeWidth={0.5} />
                 </div>
             </motion.div>

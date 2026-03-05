@@ -40,22 +40,22 @@ export function CaseStudies() {
 
     return (
         <section className="bg-transparent py-20 sm:py-32 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015]" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] pointer-events-none mix-blend-screen" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-6">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-teal-900/50 bg-slate-900/60 text-teal-400 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
                             <Target size={12} strokeWidth={1.5} />
                             {t('badge')}
                         </div>
-                        <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl">
-                            {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
+                        <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-6xl">
+                            {t('titleStart')} <span className="text-teal-400 font-light">{t('titleHighlight')}</span>
                         </h2>
                     </div>
                     <div className="flex gap-2">
-                        <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
-                        <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">{t('liveDb')}</span>
+                        <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.8)]" />
+                        <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">{t('liveDb')}</span>
                     </div>
                 </div>
 
@@ -66,18 +66,18 @@ export function CaseStudies() {
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                            className="group relative bg-white rounded-sm overflow-hidden border border-slate-200 shadow-xl hover:shadow-[0_30px_60px_-15px_rgba(13,148,136,0.15)] hover:-translate-y-3 transition-all duration-500"
+                            className="group relative bg-slate-900/50 backdrop-blur-sm rounded-sm overflow-hidden border border-slate-800 shadow-xl hover:shadow-[0_30px_60px_-15px_rgba(13,148,136,0.15)] hover:border-teal-500/30 hover:-translate-y-3 transition-all duration-500"
                         >
                             {/* Image Header with Bleed */}
-                            <div className="relative h-64 overflow-hidden w-full m-0 p-0">
-                                <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors z-10" />
+                            <div className="relative h-64 overflow-hidden w-full m-0 p-0 border-b border-slate-800">
+                                <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-transparent transition-colors z-10" />
                                 <Image
                                     src={project.image}
                                     alt={project.title}
                                     fill
-                                    className="object-cover transform group-hover:scale-[1.03] transition-transform duration-700"
+                                    className="object-cover transform group-hover:scale-[1.03] transition-transform duration-700 opacity-80 group-hover:opacity-100"
                                 />
-                                <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm text-slate-900 text-[10px] font-mono tracking-widest uppercase px-3 py-1 rounded-sm border border-slate-200/50 shadow-sm">
+                                <div className="absolute top-4 right-4 z-20 bg-slate-900/80 backdrop-blur-md text-teal-400 text-[10px] font-mono tracking-widest uppercase px-3 py-1 rounded-sm border border-slate-700/50 shadow-sm">
                                     {project.id}
                                 </div>
                             </div>
@@ -86,31 +86,31 @@ export function CaseStudies() {
                             <div className="p-8">
                                 <div className="flex justify-between items-start mb-6">
                                     <div>
-                                        <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-2 font-medium">{project.client}</p>
-                                        <h3 className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-slate-950 transition-colors">
+                                        <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-2 font-medium">{project.client}</p>
+                                        <h3 className="text-2xl font-black tracking-tight text-white group-hover:text-teal-50 transition-colors">
                                             {project.title}
                                         </h3>
                                     </div>
-                                    <button className="h-10 w-10 flex-shrink-0 rounded-sm bg-[#F9FAFB] border border-slate-200 flex items-center justify-center text-slate-600 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all duration-300">
+                                    <button className="h-10 w-10 flex-shrink-0 rounded-sm bg-slate-800 border border-slate-700 flex items-center justify-center text-teal-400 group-hover:bg-teal-500 group-hover:text-slate-950 group-hover:border-teal-400 transition-all duration-300">
                                         <ArrowUpRight size={18} strokeWidth={1.5} />
                                     </button>
                                 </div>
 
-                                <p className="text-slate-500 text-sm mb-8 line-clamp-2 font-light leading-relaxed">
+                                <p className="text-slate-400 text-sm mb-8 line-clamp-2 font-light leading-relaxed">
                                     {project.desc}
                                 </p>
 
                                 {/* Footer Metrics */}
-                                <div className="pt-6 border-t border-slate-100 flex justify-between items-center">
+                                <div className="pt-6 border-t border-slate-800 flex justify-between items-center">
                                     <div className="flex gap-2">
                                         {project.tags.map(tag => (
-                                            <span key={tag} className="text-[10px] font-mono uppercase tracking-widest bg-[#F9FAFB] text-slate-500 px-2 py-1 rounded-sm border border-slate-200">
+                                            <span key={tag} className="text-[10px] font-mono uppercase tracking-widest bg-slate-900 text-slate-400 px-2 py-1 rounded-sm border border-slate-800">
                                                 {tag}
                                             </span>
                                         ))}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-slate-900 font-mono text-xs uppercase tracking-widest font-bold">
-                                        <BarChart3 size={14} strokeWidth={1.5} className="text-slate-400" />
+                                    <div className="flex items-center gap-1.5 text-white font-mono text-xs uppercase tracking-widest font-bold">
+                                        <BarChart3 size={14} strokeWidth={1.5} className="text-teal-500" />
                                         {project.metric}
                                     </div>
                                 </div>

@@ -159,8 +159,7 @@ export function OmnichannelShowcase() {
                 </div>
             </div>
 
-            {/* Bottom transition back to light mode */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#F9FAFB] via-[#F9FAFB]/80 to-transparent z-20 pointer-events-none" />
+            {/* Bottom transition removed to stay in dark mode */}
         </section>
     );
 }

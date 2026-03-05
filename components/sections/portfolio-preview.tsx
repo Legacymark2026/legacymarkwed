@@ -25,19 +25,19 @@ export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
     return (
         <section className="bg-transparent py-32 relative overflow-hidden">
             {/* Background */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015]" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] pointer-events-none mix-blend-screen" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="mb-24 flex flex-col items-end justify-between gap-6 md:flex-row md:items-end border-b border-slate-200 pb-12">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-teal-900/50 bg-slate-900/60 text-teal-400 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm">
                             <Layers size={12} strokeWidth={1.5} />
                             {t('badge')}
                         </div>
-                        <h2 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-[-0.04em] text-slate-900 mb-4">
-                            {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
+                        <h2 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-[-0.04em] text-white mb-4">
+                            {t('titleStart')} <span className="text-teal-400 font-light">{t('titleHighlight')}</span>
                         </h2>
-                        <p className="mt-6 text-base md:text-lg text-slate-500 max-w-xl font-light font-mono uppercase tracking-widest">
+                        <p className="mt-6 text-base md:text-lg text-slate-400 max-w-xl font-light font-mono uppercase tracking-widest">
                             {t('subtitle')}
                         </p>
                     </div>
@@ -57,7 +57,7 @@ export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
                             viewport={{ once: true }}
-                            className="group relative aspect-square xl:aspect-video cursor-pointer overflow-hidden rounded-sm bg-[#F9FAFB] border border-slate-200 hover:border-slate-300 shadow-xl hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 hover:-translate-y-2"
+                            className="group relative aspect-square xl:aspect-video cursor-pointer overflow-hidden rounded-sm bg-slate-900/50 backdrop-blur-sm border border-slate-800 hover:border-teal-500/30 shadow-xl hover:shadow-[0_20px_50px_-12px_rgba(13,148,136,0.15)] transition-all duration-500 hover:-translate-y-2"
                         >
                             <Link href={`/portfolio/${project.slug}`} className="block h-full w-full relative">
                                 {/* Image with Overlay - Default Grayscale, color on hover */}
@@ -70,10 +70,10 @@ export function PortfolioPreview({ projects }: PortfolioPreviewProps) {
                                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                     <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                         <div className="flex justify-between items-end mb-4">
-                                            <p className="text-[10px] font-mono text-slate-300 uppercase tracking-widest bg-white/10 w-fit px-3 py-1.5 rounded-sm border border-white/20 backdrop-blur-md">
+                                            <p className="text-[10px] font-mono text-teal-400 uppercase tracking-widest bg-slate-900/80 w-fit px-3 py-1.5 rounded-sm border border-slate-700/50 backdrop-blur-md">
                                                 {project.client || "CONFIDENTIAL"}
                                             </p>
-                                            <div className="w-12 h-12 rounded-sm bg-white text-slate-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                            <div className="w-12 h-12 rounded-sm bg-slate-900 border border-slate-800 text-teal-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg group-hover:bg-teal-500 group-hover:text-slate-950 group-hover:border-teal-400">
                                                 <ArrowUpRight size={20} strokeWidth={1.5} />
                                             </div>
                                         </div>
