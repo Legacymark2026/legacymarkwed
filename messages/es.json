@@ -502,28 +502,28 @@
       "description": "Conoce el equipo de LegacyMark y nuestra filosofía de trabajo enfocada en construir legados y transformar marcas a través de metodologías validadas."
     },
     "hero": {
-      "badge": "LegacyMark Corporate Profile",
-      "titleStart": "Innovación que",
-      "titleHighlight": "Transforma Marcas",
-      "description": "<highlight>No adivinamos, validamos.</highlight> El corazón de Legacy Mark es nuestra metodología de análisis de datos. Nuestro compromiso con la precisión nos permite entregar servicios de gran impacto, donde la eficacia de la inversión está garantizada por la evidencia, no por la intuición.",
-      "btnPrimary": "Iniciar Transformación",
-      "btnSecondary": "Ver Reel de Agencia",
+      "badge": "Agencia Boutique Especializada",
+      "titleStart": "Crecimiento",
+      "titleHighlight": "A Medida",
+      "description": "<highlight>Menos clientes, más atención.</highlight> Somos una agencia nacida con la obsesión por el diseño meticuloso, la rentabilidad y el servicio hiper-personalizado que las grandes corporaciones no pueden ofrecer.",
+      "btnPrimary": "Hablemos de tu Marca",
+      "btnSecondary": "Conoce nuestro enfoque",
       "stats": {
         "precision": {
-          "label": "Precisión",
-          "value": "99.8%"
+          "label": "Trato",
+          "value": "1 a 1"
         },
         "innovation": {
-          "label": "Innovación",
-          "value": "Top 1%"
+          "label": "Enfoque",
+          "value": "ROI"
         },
         "speed": {
-          "label": "Velocidad",
-          "value": "X10"
+          "label": "Agilidad",
+          "value": "Top"
         },
         "impact": {
-          "label": "Impacto",
-          "value": "Global"
+          "label": "Calidad",
+          "value": "Premium"
         }
       }
     },
@@ -533,42 +533,42 @@
       "subtitle": "Más que una agencia, somos arquitectos de crecimiento empresarial.",
       "features": {
         "mission": {
-          "title": "Misión",
-          "description": "Impulsamos el desarrollo de empresas a través de estrategias de marketing y publicidad basadas en el ADN de cada marca. Diagnosticamos y resolvemos los obstáculos de comunicación para transformar el potencial de nuestros clientes en resultados de ventas y posicionamiento real."
+          "title": "Nuestra Gran Promesa",
+          "description": "Trabajamos como una extensión nativa de tu negocio. No somos proveedores lejanos; somos el socio estratégico que cuida tu presupuesto y tu marca como si fueran propios."
         },
         "vision": {
-          "title": "Visión 2030",
-          "description": "Ser el referente del marketing táctico y estratégico en Latinoamérica, reconocidos por transformar marcas emergentes en legados corporativos a través de resultados de alto impacto y crecimiento sostenible."
+          "title": "Hacia Dónde Vamos",
+          "description": "Queremos posicionarnos como la firma boutique de referencia para marcas que exigen distinción estética y brutal eficacia comercial en la era digital."
         },
         "personality": {
-          "title": "Personalidad",
-          "description": "Somos una agencia creativa, innovadora y comprometida. Nuestra amabilidad y cercanía destacará al inicio de una conversación, pues nuestro legado es cultivar la calidez humana en cada empresa que trabaje con nosotros."
+          "title": "Nuestra Esencia",
+          "description": "Hablamos claro, trabajamos rápido y diseñamos con un estándar que exige perfección. La calidez y la cercanía son la base humana de todas nuestras relaciones."
         }
       }
     },
     "values": {
-      "title": "Nuestros Valores",
-      "subtitle": "Los pilares fundamentales que sostienen cada decisión estratégica en LegacyMark.",
+      "title": "Nuestros Estándares",
+      "subtitle": "No somos una agencia masiva. Somos un equipo hiper-enfocado que opera bajo 5 reglas inquebrantables.",
       "items": {
         "creativity": {
-          "title": "Creatividad",
-          "description": "Ideas disruptivas que rompen el status quo."
+          "title": "Estética Premium",
+          "description": "El buen diseño detiene el scroll. Elevar la percepción visual de tu marca es nuestra obsesión diaria."
         },
         "innovation": {
-          "title": "Innovación",
-          "description": "Tecnología de vanguardia aplicada al branding."
+          "title": "IA & Automatización",
+          "description": "Utilizamos tecnología de vanguardia y frameworks omnicanal para que tú vendas en piloto automático."
         },
         "effectiveness": {
-          "title": "Eficacia",
-          "description": "Resultados contundentes, no solo esfuerzos."
+          "title": "Retorno Real (ROI)",
+          "description": "Sin métricas vanidosas. Construimos sistemas orientados puramente a generar ingresos comprobables."
         },
         "efficiency": {
-          "title": "Eficiencia",
-          "description": "Optimización máxima de recursos y tiempo."
+          "title": "Agilidad Extrema",
+          "description": "Sin burocracia corporativa. Iteramos rápido y tomamos decisiones basadas en datos del mercado actual."
         },
         "responsibility": {
-          "title": "Responsabilidad Social",
-          "description": "Impacto positivo en nuestra comunidad y entorno."
+          "title": "Exclusividad",
+          "description": "Trabajamos con un portafolio muy selecto. Porque cuando eres nuestro cliente, tu proyecto se vuelve nuestra prioridad número uno."
         }
       }
     },

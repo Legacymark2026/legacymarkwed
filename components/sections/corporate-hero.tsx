@@ -62,12 +62,12 @@ export function CorporateHero() {
 
     return (
         <div
-            className="relative min-h-[90vh] w-full flex items-center justify-center bg-white overflow-hidden group perspective-[2000px]"
+            className="relative min-h-[90vh] w-full flex items-center justify-center bg-slate-950 overflow-hidden group perspective-[2000px]"
             onMouseMove={handleMouseMove}
         >
-            {/* 0. QUANTUM GRID (Light Mode) */}
+            {/* 0. QUANTUM GRID (Dark Mode) */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                <div className="absolute -inset-[100%] bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 animate-grid-flow transform-gpu perspective-3d rotate-x-60 title-grid" style={{ transform: 'perspective(500px) rotateX(60deg) translateY(-100px) scale(2)' }} />
+                <div className="absolute -inset-[100%] bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 animate-grid-flow transform-gpu perspective-3d rotate-x-60 title-grid" style={{ transform: 'perspective(500px) rotateX(60deg) translateY(-100px) scale(2)' }} />
             </div>
 
             {/* 1. Global Spotlight Follower */}
@@ -77,7 +77,7 @@ export function CorporateHero() {
                     background: useMotionTemplate`
             radial-gradient(
               600px circle at ${mouseX}px ${mouseY}px,
-              rgba(13, 148, 136, 0.05),
+              rgba(20, 184, 166, 0.15),
               transparent 80%
             )
           `,
@@ -94,7 +94,7 @@ export function CorporateHero() {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="relative"
                     >
-                        <span className="relative inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50/50 backdrop-blur-md px-4 py-1.5 text-xs font-bold text-teal-700 shadow-sm uppercase tracking-wider">
+                        <span className="relative inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 backdrop-blur-md px-4 py-1.5 text-xs font-bold text-teal-400 shadow-sm uppercase tracking-wider">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
@@ -105,11 +105,11 @@ export function CorporateHero() {
 
                     {/* 4. Main Headline */}
                     <div className="max-w-5xl space-y-6 relative">
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-4 sm:mb-6 relative z-10 leading-[0.9]">
-                            <span className="block mb-2 drop-shadow-sm text-slate-400 font-thin text-4xl md:text-6xl tracking-widest uppercase">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white mb-4 sm:mb-6 relative z-10 leading-[0.9]">
+                            <span className="block mb-2 drop-shadow-sm text-slate-500 font-thin text-4xl md:text-6xl tracking-widest uppercase">
                                 {t('titleStart')}
                             </span>
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-emerald-500 to-cyan-600 animate-gradient-x font-mono relative">
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400 animate-gradient-x font-mono relative">
                                 {t('titleHighlight')}
                             </span>
                         </h1>
@@ -121,10 +121,10 @@ export function CorporateHero() {
                             className="mx-auto max-w-3xl relative"
                         >
                             <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-teal-500 to-transparent hidden md:block" />
-                            <p className="text-lg md:text-xl text-slate-600 leading-relaxed text-pretty font-medium pl-6 text-left border-l-2 border-teal-500/20 md:border-none">
+                            <p className="text-lg md:text-xl text-slate-400 leading-relaxed text-pretty font-medium pl-6 text-left border-l-2 border-teal-500/20 md:border-none">
                                 {t.rich('description', {
                                     highlight: (chunks) => (
-                                        <span className="text-teal-700 font-bold">{chunks}</span>
+                                        <span className="text-teal-400 font-bold">{chunks}</span>
                                     ),
                                 })}
                             </p>
@@ -139,15 +139,15 @@ export function CorporateHero() {
                         className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 pt-4 pb-8 w-full sm:w-auto px-4 sm:px-0"
                     >
                         <MagneticButton>
-                            <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-base sm:text-lg transition-all shadow-xl shadow-slate-900/20 relative overflow-hidden group">
+                            <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-base sm:text-lg transition-all shadow-xl shadow-teal-500/20 relative overflow-hidden group">
                                 <span className="relative flex items-center gap-2">
-                                    {t('btnPrimary')} <Zap className="w-5 h-5 text-teal-400 group-hover:text-teal-300 transition-colors" />
+                                    {t('btnPrimary')} <Zap className="w-5 h-5 text-slate-900 group-hover:scale-110 transition-transform" />
                                 </span>
                             </Button>
                         </MagneticButton>
 
                         <MagneticButton>
-                            <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-all group relative overflow-hidden">
+                            <Button variant="ghost" size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 rounded-full border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all group relative overflow-hidden">
                                 <span className="flex items-center gap-2 relative z-10 font-semibold">
                                     <Play className="w-4 h-4 fill-current" /> {t('btnSecondary')}
                                 </span>
@@ -160,7 +160,7 @@ export function CorporateHero() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6 }}
-                        className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 pt-12 border-t border-slate-100 w-full max-w-4xl"
+                        className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 pt-12 border-t border-slate-800 w-full max-w-4xl"
                     >
                         {[
                             { label: t("stats.precision.label"), icon: Target, value: t("stats.precision.value") },
@@ -169,11 +169,11 @@ export function CorporateHero() {
                             { label: t("stats.impact.label"), icon: ActivityIcon, value: t("stats.impact.value") },
                         ].map((stat, i) => (
                             <div key={i} className="flex flex-col items-center gap-2 group cursor-default">
-                                <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-teal-50 transition-colors duration-300">
-                                    <stat.icon className="w-6 h-6 text-slate-400 group-hover:text-teal-600 transition-colors" />
+                                <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl group-hover:bg-slate-800 group-hover:border-teal-500/30 transition-colors duration-300">
+                                    <stat.icon className="w-6 h-6 text-slate-500 group-hover:text-teal-400 transition-colors" />
                                 </div>
-                                <div className="font-bold text-2xl text-slate-900">{stat.value}</div>
-                                <div className="text-xs font-mono text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                                <div className="font-bold text-2xl text-white">{stat.value}</div>
+                                <div className="text-xs font-mono text-slate-500 uppercase tracking-widest">{stat.label}</div>
                             </div>
                         ))}
                     </motion.div>
@@ -181,8 +181,8 @@ export function CorporateHero() {
                 </div>
             </div>
 
-            {/* 7. Bottom Haze (White) */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
+            {/* 7. Bottom Haze (Dark) */}
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-20 pointer-events-none" />
         </div>
     );
 }
