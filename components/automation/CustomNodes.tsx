@@ -21,7 +21,6 @@ import {
     ActivitySquare,
     Tags,
     UserPlus,
-    UserPlus,
     Network,
     GitBranch,
     Repeat,

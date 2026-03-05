@@ -21,7 +21,6 @@ import {
     Tags,
     UserPlus,
     Network,
-    Network,
     GitBranch,
     Repeat,
     Mic,
