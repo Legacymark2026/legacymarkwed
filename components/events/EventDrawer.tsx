@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar as CalendarIcon, MapPin, Video, Users, Clock, AlertCircle } from "lucide-react";
-import { createEvent, updateEvent } from "@/actions/events/event-actions";
+import { X, Calendar as CalendarIcon, MapPin, Video, Users, Clock, AlertCircle, Trash2 } from "lucide-react";
+import { createEvent, updateEvent, deleteEvent } from "@/actions/events/event-actions";
 import { toast } from "sonner";
 import { LeadSelector } from "./LeadSelector";
 
@@ -10,10 +10,12 @@ interface EventDrawerProps {
     isOpen: boolean;
     onClose: () => void;
     eventId: string | null;
+    initialEvent?: any;
     onEventSaved: (event: any) => void;
+    onEventDeleted?: (id: string) => void;
 }
 
-export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDrawerProps) {
+export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSaved, onEventDeleted }: EventDrawerProps) {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
@@ -44,22 +46,58 @@ export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDra
     useEffect(() => {
         if (isOpen) {
             setErrorMessage("");
-            if (eventId) {
-                // TODO: Fetch event details and populate if Editing
-                // For now, assume creation
+            if (eventId && initialEvent) {
+                // Populate event details if Editing
+                const start = new Date(initialEvent.startDate);
+                const end = new Date(initialEvent.endDate);
+
+                // Format safely
+                const formatDate = (d: Date) => d.toISOString().split('T')[0];
+                const formatTime = (d: Date) => d.toTimeString().split(' ')[0].substring(0, 5);
+
+                setFormData({
+                    title: initialEvent.title || "",
+                    description: initialEvent.description || "",
+                    type: initialEvent.type || "ONLINE",
+                    startDate: formatDate(start),
+                    startTime: formatTime(start),
+                    endDate: formatDate(end),
+                    endTime: formatTime(end),
+                    isAllDay: initialEvent.isAllDay || false,
+                    timeZone: initialEvent.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    address: initialEvent.metadata?.address || "",
+                    city: initialEvent.metadata?.city || "",
+                    capacity: initialEvent.metadata?.capacity || "",
+                    platform: initialEvent.metadata?.platform || "Zoom",
+                    meetingUrl: initialEvent.metadata?.meetingUrl || "",
+                    meetingId: initialEvent.metadata?.meetingId || "",
+                    passcode: initialEvent.metadata?.passcode || "",
+                });
+
+                const participantIds = initialEvent.participants
+                    ? initialEvent.participants.map((p: any) => p.leadId).filter(Boolean)
+                    : [];
+                setSelectedLeadIds(participantIds);
             } else {
                 // Reset form for New Event
                 const d = new Date();
-                const dateStr = d.toISOString().split('T')[0];
+                const startStr = d.toISOString().split('T')[0];
+
+                d.setHours(d.getHours() + 1);
+                const endStr = d.toISOString().split('T')[0];
+                const endTimeStr = d.toTimeString().split(' ')[0].substring(0, 5);
+
                 setFormData(prev => ({
                     ...prev,
-                    title: "", description: "", startDate: dateStr, endDate: dateStr,
+                    title: "", description: "",
+                    startDate: startStr, endDate: endStr,
+                    startTime: "09:00", endTime: endTimeStr,
                     address: "", city: "", meetingUrl: "", meetingId: ""
                 }));
                 setSelectedLeadIds([]);
             }
         }
-    }, [isOpen, eventId]);
+    }, [isOpen, eventId, initialEvent]);
 
     if (!isOpen) return null;
 
@@ -111,6 +149,20 @@ export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDra
         } else {
             setErrorMessage(res.error || "Ocurrió un error al guardar el evento");
             toast?.error("Error de conflicto o permisos");
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!eventId || !confirm("¿Estás seguro de que quieres eliminar este evento?")) return;
+        setLoading(true);
+        const res = await deleteEvent(eventId);
+        setLoading(false);
+        if (res.success) {
+            toast?.success("Evento eliminado");
+            onEventDeleted?.(eventId);
+        } else {
+            setErrorMessage(res.error || "Ocurrió un error al eliminar el evento");
+            toast?.error("Error al eliminar");
         }
     };
 
@@ -269,9 +321,22 @@ export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDra
                 </div>
 
                 <div className="flex-none p-6 border-t border-slate-100 bg-white flex items-center justify-between">
-                    <button type="button" onClick={onClose} disabled={loading} className="py-3 px-6 text-slate-500 hover:text-slate-800 font-bold transition-colors">
-                        Cancelar
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {eventId && (
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                disabled={loading}
+                                className="p-3 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                                title="Eliminar Evento"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        )}
+                        <button type="button" onClick={onClose} disabled={loading} className="py-3 px-6 text-slate-500 hover:text-slate-800 font-bold transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
                     <button
                         type="submit"
                         form="event-form"

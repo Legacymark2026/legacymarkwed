@@ -12,9 +12,10 @@ interface CalendarBoardProps {
     events: any[];
     filters: any;
     onEventClick: (id: string) => void;
+    onEventDropped: (id: string, start: Date, end: Date | null) => void;
 }
 
-export function CalendarBoard({ events, filters, onEventClick }: CalendarBoardProps) {
+export function CalendarBoard({ events, filters, onEventClick, onEventDropped }: CalendarBoardProps) {
     const calendarRef = useRef<FullCalendar>(null);
 
     // Format events for FullCalendar
@@ -50,8 +51,8 @@ export function CalendarBoard({ events, filters, onEventClick }: CalendarBoardPr
 
     const handleEventDrop = async (dropInfo: any) => {
         // Optimistic UI updates / Drag and drop logic will be wired to server action here
-        console.log(`Event dropped: ${dropInfo.event.title} to ${dropInfo.event.start}`);
-        // In full implementation: await updateEvent(dropInfo.event.id, { startDate, endDate })
+        const { event } = dropInfo;
+        onEventDropped(event.id, event.start, event.end);
     };
 
     return (
