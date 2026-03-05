@@ -5,6 +5,31 @@ import { auth } from "@/lib/auth";
 import { UserRole, Permission, ROLE_PERMISSIONS } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 
+// --- SEARCH LEADS ---
+export async function searchLeadsForEvent(query: string) {
+    try {
+        const { authorized, companyId } = await checkEventPermission('read');
+        if (!authorized || !companyId) return { success: false, data: [], error: "Unauthorized" };
+
+        const leads = await prisma.lead.findMany({
+            where: {
+                companyId,
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { email: { contains: query, mode: 'insensitive' } }
+                ]
+            },
+            take: 10,
+            select: { id: true, name: true, email: true }
+        });
+
+        return { success: true, data: leads };
+    } catch (error: any) {
+        console.error("Error searching leads:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 // --- PERMISSION HELPERS ---
 
 export async function checkEventPermission(action: 'read' | 'write' | 'delete', eventId?: string): Promise<{ authorized: boolean; companyId?: string; userId?: string; error?: string }> {
@@ -284,5 +309,28 @@ export async function getEvents(filters?: { startDate?: string; endDate?: string
     } catch (e: any) {
         console.error("Error fetching events:", e);
         return { success: false, events: [], error: e.message || "Failed to fetch events" };
+    }
+}
+
+export async function getEventsForLead(leadId: string) {
+    try {
+        const { authorized, companyId } = await checkEventPermission('read');
+        if (!authorized || !companyId) return { success: false, events: [], error: "Unauthorized" };
+
+        const events = await prisma.event.findMany({
+            where: {
+                companyId,
+                participants: { some: { leadId } }
+            },
+            include: {
+                organizer: { select: { id: true, name: true, image: true } }
+            },
+            orderBy: { startDate: 'desc' }
+        });
+
+        return { success: true, events };
+    } catch (e: any) {
+        console.error("Error fetching lead events:", e);
+        return { success: false, events: [], error: e.message || "Failed to fetch lead events" };
     }
 }

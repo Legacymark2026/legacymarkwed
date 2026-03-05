@@ -9,13 +9,14 @@ import { ArrowLeft, MapPin, Tag, Calendar, Globe } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { Permission, ROLE_PERMISSIONS, UserRole } from "@/types/auth";
 
-// New specialized components
 import { LeadProfileHeader } from "@/components/crm/lead-profile-header";
 import { LeadStatusSelector } from "@/components/crm/lead-status-selector";
 import { LeadTagsEditor } from "@/components/crm/lead-tags-editor";
 import { LeadUnifiedTimeline, LeadUnifiedTimelineSkeleton } from "@/components/crm/lead-unified-timeline";
 import { LeadStickyActions } from "@/components/crm/lead-sticky-actions";
 import { LeadDeleteButton } from "@/components/crm/lead-delete-button";
+import { LeadEventsWidget } from "@/components/crm/lead-events-widget";
+import { getEventsForLead } from "@/actions/events/event-actions";
 
 const SOURCE_ICONS: Record<string, string> = {
     GOOGLE: "🔍", FACEBOOK: "📘", INSTAGRAM: "📷", LINKEDIN: "💼",
@@ -30,9 +31,10 @@ export default async function LeadDetailPage(props: PageProps) {
     // Direct Prisma query for core Lead + Company
     let lead;
     let company;
+    let eventsRes;
 
     try {
-        [lead, company] = await Promise.all([
+        [lead, company, eventsRes] = await Promise.all([
             prisma.lead.findUnique({
                 where: { id: params.id },
                 include: {
@@ -40,6 +42,7 @@ export default async function LeadDetailPage(props: PageProps) {
                 },
             }),
             prisma.company.findFirst(),
+            getEventsForLead(params.id)
         ]);
     } catch (err) {
         console.error("[LeadDetailPage] Core query failed:", err);
@@ -162,6 +165,9 @@ export default async function LeadDetailPage(props: PageProps) {
                             </div>
                         ))}
                     </div>
+
+                    {/* Events Integration */}
+                    <LeadEventsWidget leadId={lead.id} initialEvents={eventsRes?.events || []} />
                 </div>
             </div>
         </div>

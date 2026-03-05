@@ -122,6 +122,24 @@
       "titleStart": "Alliances that",
       "titleHighlight": "Power your Growth"
     },
+    "omnichannel": {
+      "badge": "Central Intelligence",
+      "titleStart": "Absolute Control.",
+      "titleHighlight": "Total Presence.",
+      "description": "We merge your digital channels into a centralized ecosystem. Dominate your audience's attention with omnipresent content and real-time data analysis.",
+      "features": {
+        "f1": {
+          "title": "Unified Data Core",
+          "desc": "Connect Meta, Google, and TikTok into a single neural system."
+        },
+        "f2": {
+          "title": "Multi-channel Deployment",
+          "desc": "Instant synchronization of campaigns across all fronts."
+        }
+      },
+      "cta": "Explore Infrastructure",
+      "secureBadge": "Encrypted Connection"
+    },
     "valueProp": {
       "titleStart": "Absolute Value",
       "titleHighlight": "Engineering",

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Calendar as CalendarIcon, MapPin, Video, Users, Clock, AlertCircle } from "lucide-react";
 import { createEvent, updateEvent } from "@/actions/events/event-actions";
 import { toast } from "sonner";
+import { LeadSelector } from "./LeadSelector";
 
 interface EventDrawerProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ interface EventDrawerProps {
 export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDrawerProps) {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
 
     // Initial State
     const [formData, setFormData] = useState({
@@ -54,6 +56,7 @@ export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDra
                     title: "", description: "", startDate: dateStr, endDate: dateStr,
                     address: "", city: "", meetingUrl: "", meetingId: ""
                 }));
+                setSelectedLeadIds([]);
             }
         }
     }, [isOpen, eventId]);
@@ -91,7 +94,8 @@ export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDra
             endDate: end,
             isAllDay: formData.isAllDay,
             timeZone: formData.timeZone,
-            metadata
+            metadata,
+            participants: selectedLeadIds.map(id => ({ leadId: id }))
         };
 
         const res = eventId
@@ -171,6 +175,14 @@ export function EventDrawer({ isOpen, onClose, eventId, onEventSaved }: EventDra
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* CRM Leads Selection */}
+                        <div className="pt-2">
+                            <LeadSelector
+                                selectedLeadIds={selectedLeadIds}
+                                onChange={setSelectedLeadIds}
+                            />
                         </div>
 
                         {/* Timing */}
