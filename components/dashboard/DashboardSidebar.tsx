@@ -3,7 +3,7 @@ import {
     LayoutDashboard, Users, Settings, FileText, LogOut,
     Shield, BookOpen, Briefcase, BarChart2, Workflow,
     MessageSquare, Target, TrendingUp, Link2, Building2,
-    Lock, UserCog, DollarSign, CheckSquare, Zap, Mail,
+    Lock, UserCog, DollarSign, CheckSquare, Zap, Mail, Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth";
@@ -30,6 +30,7 @@ const NAV_GROUPS: NavGroup[] = [
         items: [
             { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
             { href: "/dashboard/inbox", label: "Inbox (Omnichannel)", icon: <MessageSquare size={18} /> },
+            { href: "/dashboard/events", label: "Calendario", icon: <Calendar size={18} className="text-orange-500" /> },
         ],
     },
     {

@@ -31,29 +31,29 @@ export default async function HomePage() {
             <div data-ga-section="hero"><FuturisticHero /></div>
 
             <div className="relative z-10 space-y-0 pb-32">
-                <div data-ga-section="alianzas" className="pt-16 pb-24"><StrategicAlliances /></div>
+                <div data-ga-section="alianzas" className="pt-8 pb-12"><StrategicAlliances /></div>
 
-                <div data-ga-section="servicios" className="py-24"><BentoServices /></div>
+                <div data-ga-section="servicios" className="py-12"><BentoServices /></div>
 
                 {/* Dark Themed Showcase for Image */}
                 <div data-ga-section="omnichannel"><OmnichannelShowcase /></div>
 
-                <div data-ga-section="estadisticas" className="py-24"><Stats /></div>
-                <div data-ga-section="propuesta-valor" className="py-24"><ValueProposition /></div>
-                <div data-ga-section="casos-de-exito" className="py-32"><CaseStudies /></div>
-                <div data-ga-section="testimonios" className="py-32"><TestimonialSlider /></div>
+                <div data-ga-section="estadisticas" className="py-12"><Stats /></div>
+                <div data-ga-section="propuesta-valor" className="py-12"><ValueProposition /></div>
+                <div data-ga-section="casos-de-exito" className="py-16"><CaseStudies /></div>
+                <div data-ga-section="testimonios" className="py-16"><TestimonialSlider /></div>
 
                 {/* 19. Grid Background for Tech Section - Light Mode */}
                 <div className="relative">
                     <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] -z-10" />
-                    <div data-ga-section="metodologia" className="py-32"><Methodology /></div>
+                    <div data-ga-section="metodologia" className="py-16"><Methodology /></div>
                 </div>
 
-                <div data-ga-section="equipo" className="py-32"><TeamGrid experts={experts} /></div>
-                <div data-ga-section="faq" className="py-24"><FaqAccordion /></div>
-                <div data-ga-section="cta-principal" className="py-32"><CTA /></div>
-                <div data-ga-section="portfolio-preview" className="pt-24 pb-32"><PortfolioPreview projects={projects} /></div>
-                <div data-ga-section="blog-preview" className="pb-40"><LatestPosts posts={posts} /></div>
+                <div data-ga-section="equipo" className="py-16"><TeamGrid experts={experts} /></div>
+                <div data-ga-section="faq" className="py-12"><FaqAccordion /></div>
+                <div data-ga-section="cta-principal" className="py-16"><CTA /></div>
+                <div data-ga-section="portfolio-preview" className="pt-12 pb-16"><PortfolioPreview projects={projects} /></div>
+                <div data-ga-section="blog-preview" className="pb-20"><LatestPosts posts={posts} /></div>
             </div>
         </main>
     );
