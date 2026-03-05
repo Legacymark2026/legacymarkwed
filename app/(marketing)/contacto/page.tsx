@@ -329,8 +329,8 @@ export default async function ContactPage() {
                             </div>
                             {/* Coordinate badge */}
                             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-white rounded-xl border border-slate-100 shadow-lg text-center whitespace-nowrap">
-                                <p className="text-[10px] font-mono text-slate-400">4.7110° N, 74.0721° W</p>
-                                <p className="text-xs font-bold text-slate-700">📍 Bogotá, Colombia</p>
+                                <p className="text-[10px] font-mono text-slate-400">7.0682° N, 73.1698° W</p>
+                                <p className="text-xs font-bold text-slate-700">📍 Girón, Santander</p>
                             </div>
                         </div>
 
@@ -347,20 +347,7 @@ export default async function ContactPage() {
                                 <p>{t('location.p2')}</p>
                             </div>
 
-                            <div className="mt-8 grid grid-cols-2 gap-4">
-                                {[
-                                    { label: t('location.stats.clients.label'), val: '120+', icon: '🌎' },
-                                    { label: t('location.stats.experience.label'), val: '5+', icon: '📅' },
-                                    { label: t('location.stats.projects.label'), val: '340+', icon: '✅' },
-                                    { label: t('location.stats.countries.label'), val: '6', icon: '🗺️' },
-                                ].map((s) => (
-                                    <div key={s.label} className="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-teal-100 hover:shadow transition-all">
-                                        <span className="text-xl block mb-1">{s.icon}</span>
-                                        <span className="text-2xl font-black text-slate-900 block">{s.val}</span>
-                                        <span className="text-xs text-slate-500">{s.label}</span>
-                                    </div>
-                                ))}
-                            </div>
+                            {/* Stats removed as requested for the starting agency */}
                         </div>
                     </div>
                 </div>
