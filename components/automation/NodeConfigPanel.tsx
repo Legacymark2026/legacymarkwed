@@ -366,6 +366,96 @@ export default function NodeConfigPanel({ selectedNode, onChange, onClose }: Nod
             );
         }
 
+        // --- LOGIC: SWITCH ---
+        if (type === 'switchNode') {
+            const branches = Array.isArray(data.branches) ? data.branches : [
+                { id: 'case_1', label: 'Case 1', value: 'value1' },
+                { id: 'case_2', label: 'Case 2', value: 'value2' }
+            ];
+
+            const updateBranch = (index: number, key: string, val: string) => {
+                const newBranches = [...branches];
+                newBranches[index] = { ...newBranches[index], [key]: val };
+                handleChange('branches', newBranches);
+            };
+
+            const addBranch = () => {
+                const newId = `case_${Date.now()}`;
+                handleChange('branches', [...branches, { id: newId, label: `Case ${branches.length + 1}`, value: '' }]);
+            };
+
+            const removeBranch = (index: number) => {
+                if (branches.length <= 1) return;
+                const newBranches = [...branches];
+                newBranches.splice(index, 1);
+                handleChange('branches', newBranches);
+            };
+
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2 bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-4">
+                        <Label>Variable a Evaluar</Label>
+                        <Input
+                            value={data.variable || ''}
+                            onChange={(e) => handleChange('variable', e.target.value)}
+                            placeholder="{{lead.tier}}"
+                            className="font-mono text-xs bg-white"
+                        />
+                        <p className="text-[10px] text-gray-500">Ej. {'{{lead.status}}'}</p>
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label className="flex justify-between items-center">
+                            <span>Casos / Caminos</span>
+                            <Button variant="outline" size="sm" onClick={addBranch} className="h-6 text-xs px-2">+ Añadir</Button>
+                        </Label>
+
+                        {branches.map((b: any, i: number) => (
+                            <div key={b.id || i} className="flex gap-2 items-start bg-gray-50 p-2 rounded border border-gray-100">
+                                <div className="space-y-2 flex-1">
+                                    <Input
+                                        value={b.label}
+                                        onChange={e => updateBranch(i, 'label', e.target.value)}
+                                        placeholder={`Etiqueta Camino ${i + 1}`}
+                                        className="h-7 text-xs bg-white"
+                                    />
+                                    <Input
+                                        value={b.value}
+                                        onChange={e => updateBranch(i, 'value', e.target.value)}
+                                        placeholder={`Valor para igualar`}
+                                        className="h-7 text-xs font-mono bg-white"
+                                    />
+                                </div>
+                                <Button variant="ghost" size="icon" onClick={() => removeBranch(i)} className="h-7 w-7 text-red-500 hover:bg-red-50" disabled={branches.length <= 1}>
+                                    ×
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- LOGIC: LOOP ---
+        if (type === 'loopNode') {
+            return (
+                <div className="space-y-4">
+                    <div className="space-y-2 bg-teal-50 p-3 rounded-lg border border-teal-100">
+                        <Label>Variable a Iterar (Array/Lista)</Label>
+                        <Input
+                            value={data.iterableVariable || ''}
+                            onChange={(e) => handleChange('iterableVariable', e.target.value)}
+                            placeholder="{{lead.purchases}}"
+                            className="font-mono text-xs bg-white"
+                        />
+                        <p className="text-[10px] text-gray-500">
+                            Itera sobre una lista. Dentro del bucle usa {'{{item}}'} para acceder al valor actual.
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
         // --- AI AGENT ---
         if (type === 'aiNode') {
             return (

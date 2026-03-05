@@ -20,7 +20,9 @@ import {
     ActivitySquare,
     Tags,
     UserPlus,
-    Network
+    Network,
+    GitBranch,
+    Repeat
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -160,6 +162,18 @@ export default function Sidebar() {
                         icon={<Split size={16} className="text-gray-600" />}
                         label="Condición (Si/Sino)"
                         color="bg-gray-50 border-gray-300 text-gray-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'switchNode', 'Switch (Múltiples caminos)')}
+                        icon={<GitBranch size={16} className="text-indigo-600" />}
+                        label="Switch (Múltiples)"
+                        color="bg-indigo-50 border-indigo-200 text-indigo-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'loopNode', 'Loop (Bucle)')}
+                        icon={<Repeat size={16} className="text-teal-600" />}
+                        label="Loop (Bucle)"
+                        color="bg-teal-50 border-teal-200 text-teal-900"
                     />
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'aiNode', 'AI Agent')}

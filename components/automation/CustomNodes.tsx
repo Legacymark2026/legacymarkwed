@@ -21,7 +21,10 @@ import {
     ActivitySquare,
     Tags,
     UserPlus,
-    Network
+    UserPlus,
+    Network,
+    GitBranch,
+    Repeat
 } from 'lucide-react';
 
 const NodeWrapper = ({ children, selected, colorClass = "border-gray-200", bgClass = "bg-white" }: any) => (
@@ -246,6 +249,80 @@ const ConditionNode = memo(({ data, selected }: any) => {
     );
 });
 
+const SwitchNode = memo(({ data, selected }: any) => {
+    // We expect data.branches to be an array of strings/objects representing branch labels/values
+    const branches = Array.isArray(data.branches) && data.branches.length > 0
+        ? data.branches
+        : [{ id: 'case_1', label: 'Case 1' }, { id: 'case_2', label: 'Case 2' }];
+
+    return (
+        <NodeWrapper selected={selected} colorClass="border-indigo-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <div className="px-4 py-2 bg-indigo-50 border-b border-indigo-200 rounded-t-lg flex items-center gap-2">
+                <GitBranch size={14} className="text-indigo-600" />
+                <span className="font-bold text-sm text-gray-800">{data.label || "Switch Paths"}</span>
+            </div>
+            <div className="p-3 bg-white text-xs space-y-2 font-mono border-b border-gray-100">
+                <div className="text-center bg-indigo-50/50 p-1 rounded border border-indigo-100 text-indigo-700">
+                    Evaluate: {data.variable || 'Variable'}
+                </div>
+            </div>
+
+            {/* Dynamic Branch Handles */}
+            <div className="flex justify-evenly px-2 pb-5 pt-3 rounded-b-lg bg-white relative">
+                {branches.map((branch: any, index: number) => {
+                    // Calculate left percentage to evenly distribute handles
+                    const leftPos = branches.length > 1
+                        ? `${(index / (branches.length - 1)) * 100}%`
+                        : '50%';
+
+                    return (
+                        <div key={branch.id} className="absolute flex flex-col items-center" style={{ left: leftPos, transform: 'translateX(-50%)', bottom: '-4px' }}>
+                            <span className="absolute -bottom-5 whitespace-nowrap text-[10px] font-bold text-indigo-600 max-w-[50px] truncate" title={branch.label || branch.value}>
+                                {branch.label || branch.value || `Path ${index + 1}`}
+                            </span>
+                            <Handle
+                                type="source"
+                                id={branch.id}
+                                position={Position.Bottom}
+                                className="w-3 h-3 bg-indigo-500 border-2 border-white !static !transform-none"
+                            />
+                        </div>
+                    );
+                })}
+            </div>
+        </NodeWrapper>
+    );
+});
+
+const LoopNode = memo(({ data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-teal-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <div className="px-4 py-2 bg-teal-50 border-b border-teal-200 rounded-t-lg flex items-center gap-2">
+                <Repeat size={14} className="text-teal-600" />
+                <span className="font-bold text-sm text-gray-800">{data.label || "Loop / For-Each"}</span>
+            </div>
+            <div className="p-3 bg-white text-xs space-y-2 font-mono">
+                <div className="text-center bg-teal-50/50 p-1 rounded border border-teal-100 text-teal-700">
+                    Iterate: {data.iterableVariable || 'List'}
+                </div>
+            </div>
+
+            <div className="flex justify-between px-3 pb-3 rounded-b-lg bg-white mt-4 relative">
+                <div className="relative">
+                    <span className="absolute -bottom-6 -left-4 text-[10px] font-bold text-teal-600 whitespace-nowrap">NEXT ITEM</span>
+                    <Handle type="source" id="loop" position={Position.Bottom} className="w-3 h-3 bg-teal-500 border-2 border-white" style={{ left: 10 }} />
+                </div>
+                <div className="relative">
+                    <span className="absolute -bottom-6 -right-4 text-[10px] font-bold text-gray-500 whitespace-nowrap">DONE</span>
+                    <Handle type="source" id="done" position={Position.Bottom} className="w-3 h-3 bg-gray-500 border-2 border-white" style={{ left: 'auto', right: 10 }} />
+                </div>
+            </div>
+        </NodeWrapper>
+    );
+});
+
 const AINode = memo(({ data, selected }: any) => {
     return (
         <NodeWrapper selected={selected} colorClass="border-violet-200">
@@ -265,6 +342,8 @@ export const nodeTypes = {
     crmActionNode: CRMActionNode,
     waitNode: WaitNode,
     conditionNode: ConditionNode,
+    switchNode: SwitchNode,
+    loopNode: LoopNode,
     slackNode: SlackNode,
     aiNode: AINode,
     httpNode: HttpNode,
@@ -278,6 +357,8 @@ CRMActionNode.displayName = "CRMActionNode";
 ActionNode.displayName = "ActionNode";
 WaitNode.displayName = "WaitNode";
 ConditionNode.displayName = "ConditionNode";
+SwitchNode.displayName = "SwitchNode";
+LoopNode.displayName = "LoopNode";
 SlackNode.displayName = "SlackNode";
 WhatsappNode.displayName = "WhatsappNode";
 SmsNode.displayName = "SmsNode";
