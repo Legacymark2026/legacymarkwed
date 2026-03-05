@@ -1,6 +1,7 @@
 import { FuturisticHero } from "@/components/sections/futuristic-hero";
 import { StrategicAlliances } from "@/components/sections/strategic-alliances";
 import { BentoServices } from "@/components/sections/bento-services";
+import { OmnichannelShowcase } from "@/components/sections/omnichannel-showcase";
 import { ValueProposition } from "@/components/sections/value-proposition";
 import { CaseStudies } from "@/components/sections/case-studies";
 import { Methodology } from "@/components/sections/methodology";
@@ -33,6 +34,9 @@ export default async function HomePage() {
                 <div data-ga-section="alianzas" className="pt-16 pb-24"><StrategicAlliances /></div>
 
                 <div data-ga-section="servicios" className="py-24"><BentoServices /></div>
+
+                {/* Dark Themed Showcase for Image */}
+                <div data-ga-section="omnichannel"><OmnichannelShowcase /></div>
 
                 <div data-ga-section="estadisticas" className="py-24"><Stats /></div>
                 <div data-ga-section="propuesta-valor" className="py-24"><ValueProposition /></div>
