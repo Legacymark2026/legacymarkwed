@@ -59,6 +59,7 @@ export default async function LeadDetailPage(props: PageProps) {
                 leadName={lead.name || "Sin nombre"}
                 leadEmail={lead.email}
                 leadPhone={lead.phone}
+                leadId={lead.id}
             >
                 <div className="scale-90 origin-right">
                     <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} isMobile={true} canManageLeads={canManageLeads} />

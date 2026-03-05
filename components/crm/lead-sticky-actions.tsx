@@ -1,17 +1,41 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { Mail, Phone } from "lucide-react";
+import { logLeadContact } from "@/actions/inbox";
+import { toast } from "sonner";
 
 interface Props {
     leadName: string;
     leadEmail: string;
     leadPhone: string | null;
+    leadId: string;
     children?: React.ReactNode; // For the status selector clone
 }
 
-export function LeadStickyActions({ leadName, leadEmail, leadPhone, children }: Props) {
+export function LeadStickyActions({ leadName, leadEmail, leadPhone, leadId, children }: Props) {
     const [isVisible, setIsVisible] = useState(false);
+    const [isPending, startTransition] = useTransition();
+
+    const handleContact = (channel: string, target: string) => {
+        startTransition(async () => {
+            try {
+                const res = await logLeadContact(leadId, channel);
+                if (!res.success) {
+                    toast.error("Error al registrar contacto en Inbox: " + res.error);
+                }
+            } catch (error) {
+                console.error("Failed to log contact", error);
+            } finally {
+                // Proceder independientemente del resultado del log
+                if (channel === "WHATSAPP") {
+                    window.open(target, "_blank");
+                } else {
+                    window.location.href = target;
+                }
+            }
+        });
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -49,13 +73,33 @@ export function LeadStickyActions({ leadName, leadEmail, leadPhone, children }: 
                     <div className="w-px h-6 bg-slate-200 hidden sm:block mx-1" />
 
                     <div className="flex items-center gap-2">
-                        <a href={`mailto:${leadEmail}`} className="p-2 rounded-xl text-slate-600 hover:text-teal-600 hover:bg-teal-50 border border-transparent hover:border-teal-100 transition-all focus:outline-none" title="Enviar Email">
+                        <button
+                            disabled={isPending}
+                            onClick={() => handleContact('EMAIL', `mailto:${leadEmail}`)}
+                            className="p-2 rounded-xl text-slate-600 hover:text-teal-600 hover:bg-teal-50 border border-transparent hover:border-teal-100 transition-all focus:outline-none disabled:opacity-50"
+                            title="Enviar Email"
+                        >
                             <Mail className="w-4 h-4" />
-                        </a>
+                        </button>
                         {leadPhone && (
-                            <a href={`tel:${leadPhone}`} className="p-2 rounded-xl text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all focus:outline-none" title="Llamar">
+                            <button
+                                disabled={isPending}
+                                onClick={() => handleContact('PHONE', `tel:${leadPhone}`)}
+                                className="p-2 rounded-xl text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all focus:outline-none disabled:opacity-50"
+                                title="Llamar"
+                            >
                                 <Phone className="w-4 h-4" />
-                            </a>
+                            </button>
+                        )}
+                        {leadPhone && (
+                            <button
+                                disabled={isPending}
+                                onClick={() => handleContact('WHATSAPP', `https://wa.me/${leadPhone.replace(/\D/g, "")}`)}
+                                className="p-2 rounded-xl text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all focus:outline-none disabled:opacity-50"
+                                title="WhatsApp"
+                            >
+                                <span className="text-sm leading-none">💬</span>
+                            </button>
                         )}
                     </div>
                 </div>

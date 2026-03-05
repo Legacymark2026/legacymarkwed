@@ -1,6 +1,9 @@
 "use client";
 
 import { Mail, Phone } from "lucide-react";
+import { logLeadContact } from "@/actions/inbox";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 
 interface Props {
     lead: {
@@ -20,6 +23,27 @@ interface Props {
 import { LeadScoreEditor } from "./lead-score-editor";
 
 export function LeadProfileHeader({ lead, children, canManageLeads = false }: Props) {
+    const [isPending, startTransition] = useTransition();
+
+    const handleContact = (channel: string, target: string) => {
+        startTransition(async () => {
+            try {
+                const res = await logLeadContact(lead.id, channel);
+                if (!res.success) {
+                    toast.error("Error al registrar contacto en Inbox: " + res.error);
+                }
+            } catch (error) {
+                console.error("Failed to log contact", error);
+            } finally {
+                if (channel === "WHATSAPP") {
+                    window.open(target, "_blank");
+                } else {
+                    window.location.href = target;
+                }
+            }
+        });
+    };
+
     return (
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white shadow-xl shadow-slate-200/40 overflow-hidden relative group">
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 opacity-50 pointer-events-none" />
@@ -54,21 +78,33 @@ export function LeadProfileHeader({ lead, children, canManageLeads = false }: Pr
 
                     <div className="flex flex-wrap gap-2.5 pt-1">
                         {lead.email && (
-                            <a href={`mailto:${lead.email}`} className="group/btn flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white rounded-xl border border-slate-200 hover:border-teal-300 hover:shadow-md hover:shadow-teal-100 transition-all shadow-sm">
+                            <button
+                                onClick={() => handleContact('EMAIL', `mailto:${lead.email}`)}
+                                disabled={isPending}
+                                className="group/btn flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white rounded-xl border border-slate-200 hover:border-teal-300 hover:shadow-md hover:shadow-teal-100 transition-all shadow-sm disabled:opacity-50"
+                            >
                                 <Mail className="w-4 h-4 text-slate-400 group-hover/btn:text-teal-500 transition-colors" />
                                 {lead.email}
-                            </a>
+                            </button>
                         )}
                         {lead.phone && (
-                            <a href={`tel:${lead.phone}`} className="group/btn flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white rounded-xl border border-slate-200 hover:border-teal-300 hover:shadow-md hover:shadow-teal-100 transition-all shadow-sm">
+                            <button
+                                onClick={() => handleContact('PHONE', `tel:${lead.phone}`)}
+                                disabled={isPending}
+                                className="group/btn flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white rounded-xl border border-slate-200 hover:border-teal-300 hover:shadow-md hover:shadow-teal-100 transition-all shadow-sm disabled:opacity-50"
+                            >
                                 <Phone className="w-4 h-4 text-slate-400 group-hover/btn:text-teal-500 transition-colors" />
                                 {lead.phone}
-                            </a>
+                            </button>
                         )}
                         {lead.phone && (
-                            <a href={`https://wa.me/${lead.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:shadow-md hover:shadow-emerald-100/50 transition-all shadow-sm">
+                            <button
+                                onClick={() => handleContact('WHATSAPP', `https://wa.me/${lead.phone!.replace(/\D/g, "")}`)}
+                                disabled={isPending}
+                                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:shadow-md hover:shadow-emerald-100/50 transition-all shadow-sm disabled:opacity-50"
+                            >
                                 <span className="text-base leading-none">💬</span> WhatsApp
-                            </a>
+                            </button>
                         )}
                     </div>
                 </div>

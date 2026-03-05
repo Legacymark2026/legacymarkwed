@@ -280,6 +280,65 @@ export async function updateConversationStatus(conversationId: string, status: s
     }
 }
 
+/**
+ * Logs a contact attempt from the CRM Lead profile into the Inbox
+ * by creating or ensuring an open conversation exists for the channel.
+ */
+export async function logLeadContact(leadId: string, channel: string) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
+        const lead = await db.lead.findUnique({
+            where: { id: leadId },
+            select: { companyId: true, email: true, phone: true }
+        });
+
+        if (!lead) return { success: false, error: "Lead not found" };
+
+        // 1. Ensure conversation exists
+        let conversation = await db.conversation.findFirst({
+            where: {
+                companyId: lead.companyId,
+                leadId: leadId,
+                channel: channel
+            }
+        });
+
+        if (!conversation) {
+            let platformId = undefined;
+            if (channel === 'WHATSAPP' || channel === 'PHONE' || channel === 'SMS') platformId = lead.phone;
+            if (channel === 'EMAIL') platformId = lead.email;
+
+            conversation = await db.conversation.create({
+                data: {
+                    companyId: lead.companyId,
+                    leadId: leadId,
+                    channel: channel,
+                    status: 'OPEN',
+                    platformId: platformId,
+                    lastMessageAt: new Date(),
+                    lastMessagePreview: `Contact initiated via ${channel}`
+                }
+            });
+        } else if (conversation.status === 'ARCHIVED' || conversation.status === 'CLOSED') {
+            conversation = await db.conversation.update({
+                where: { id: conversation.id },
+                data: { status: 'OPEN', lastMessageAt: new Date(), lastMessagePreview: `Contact initiated via ${channel} (Reopened)` }
+            });
+        }
+
+        // Note: For a true OmniChannel feeling, we could also log a system message here.
+        // But simply creating the conversation is enough for the inbox to track it.
+
+        revalidatePath('/dashboard/inbox');
+        return { success: true, conversationId: conversation.id };
+    } catch (error: any) {
+        console.error("Error logging lead contact:", error);
+        return { success: false, error: error?.message || "Failed to log contact" };
+    }
+}
+
 export async function simulateIncomingMessage(params: {
     channel: ChannelType;
     senderName: string;
