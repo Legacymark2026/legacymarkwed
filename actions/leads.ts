@@ -309,12 +309,51 @@ export async function updateLeadStatus(leadId: string, status: string) {
         const hasPermission = await checkLeadPermission();
         if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
 
-        const lead = await prisma.lead.update({
+        const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+        if (!lead) return { success: false, error: "Lead not found" };
+
+        let dealId = lead.convertedToDealId;
+
+        // Auto-create or Auto-sync Deal if status implies pipeline progress
+        const dealStages = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'WON', 'LOST'];
+
+        if (dealStages.includes(status) && !dealId) {
+            // Auto-create deal to maintain complete sync with Sales Channel
+            const deal = await prisma.deal.create({
+                data: {
+                    title: `Deal - ${lead.name || lead.email}`,
+                    value: 0,
+                    stage: status,
+                    contactName: lead.name,
+                    contactEmail: lead.email,
+                    source: lead.source,
+                    priority: lead.score >= 70 ? 'HIGH' : lead.score >= 40 ? 'MEDIUM' : 'LOW',
+                    companyId: lead.companyId,
+                }
+            });
+            dealId = deal.id;
+        } else if (dealId && dealStages.includes(status)) {
+            // Sync status to the existing deal
+            await prisma.deal.update({
+                where: { id: dealId },
+                data: { stage: status }
+            });
+        }
+
+        const dataToUpdate: any = { status };
+        if (dealId && !lead.convertedToDealId) {
+            dataToUpdate.convertedToDealId = dealId;
+            dataToUpdate.convertedAt = new Date();
+        }
+
+        const updatedLead = await prisma.lead.update({
             where: { id: leadId },
-            data: { status }
+            data: dataToUpdate
         });
+
         revalidatePath('/dashboard/admin/crm/leads');
-        return { success: true, data: lead };
+        revalidatePath('/dashboard/admin/crm/pipeline');
+        return { success: true, data: updatedLead };
     } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
         console.error(error);
         return { success: false, error: error.message };

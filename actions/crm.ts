@@ -182,6 +182,14 @@ export async function updateDealStage(dealId: string, stage: string) {
     if (authCheck) return { error: "Unauthorized" };
     try {
         await prisma.deal.update({ where: { id: dealId }, data: { stage, updatedAt: new Date() } });
+
+        // BI-DIRECTIONAL SYNC: Sync stage back to the original lead
+        const lead = await prisma.lead.findFirst({ where: { convertedToDealId: dealId } });
+        if (lead) {
+            await prisma.lead.update({ where: { id: lead.id }, data: { status: stage, updatedAt: new Date() } });
+            revalidatePath("/dashboard/admin/crm/leads");
+        }
+
         revalidatePath("/dashboard/admin/crm");
         return { success: true };
     } catch (error) {
