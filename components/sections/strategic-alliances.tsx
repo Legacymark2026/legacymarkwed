@@ -18,19 +18,19 @@ export function StrategicAlliances() {
     const t = useTranslations("home.alliances");
 
     return (
-        <section className="py-24 bg-white border-y border-gray-100 overflow-hidden relative">
+        <section className="py-24 bg-slate-950 border-b border-transparent overflow-hidden relative">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
 
                 <div className="text-center mb-16">
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-[#F9FAFB] text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-teal-900/50 bg-slate-900/60 text-teal-400 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm"
                     >
                         <ShieldCheck size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </motion.div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t('titleStart')} <span className="text-teal-600">{t('titleHighlight')}</span></h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-white">{t('titleStart')} <span className="text-teal-400">{t('titleHighlight')}</span></h2>
                 </div>
 
                 {/* Partners Grid */}
@@ -48,12 +48,12 @@ export function StrategicAlliances() {
                                 <partner.icon className={cn("w-8 h-8", partner.color)} strokeWidth={1.5} />
                             </div>
 
-                            <div className="text-center">
-                                <h3 className="font-bold text-slate-900 mb-1 tracking-tight text-lg">{partner.name}</h3>
+                            <div className="text-center transition-all group-hover:opacity-100 opacity-60">
+                                <h3 className="font-bold text-white mb-1 tracking-tight text-lg">{partner.name}</h3>
                                 <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-4">
                                     {partner.tier}
                                 </p>
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white rounded-sm border border-slate-200 text-[10px] font-bold text-slate-700 shadow-sm font-mono tracking-wider">
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-900 rounded-sm border border-slate-800 text-[10px] font-bold text-slate-300 shadow-sm font-mono tracking-wider">
                                     <CheckCircle2 size={12} className={partner.color} strokeWidth={1.5} />
                                     {partner.metric}
                                 </div>
@@ -63,13 +63,13 @@ export function StrategicAlliances() {
                 </div>
 
                 {/* Performance Ticker */}
-                <div className="mt-16 relative flex overflow-hidden border-y border-gray-100 bg-slate-50/50 py-3">
+                <div className="mt-16 relative flex overflow-hidden border-y border-transparent bg-slate-900/50 py-3">
                     <div className="animate-marquee whitespace-nowrap flex gap-16 items-center">
                         {[...Array(2)].map((_, i) => (
                             <div key={i} className="flex gap-16">
                                 {["SYSTEM STATUS: ONLINE", "AVG. ROAS: 450%", "UPTIME: 99.99%", "SECURE CONNECTION", "LIVE TELEMETRY"].map((text, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 text-[10px] font-mono text-slate-400 uppercase tracking-widest">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
+                                    <div key={idx} className="flex items-center gap-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.8)] animate-pulse" />
                                         {text}
                                     </div>
                                 ))}

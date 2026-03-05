@@ -51,20 +51,20 @@
   },
   "home": {
     "hero": {
-      "badge": "Agencia de Marketing Digital",
+      "badge": "Agencia Boutique Especializada",
       "systemActive": "System v2.4 ::",
-      "systemStatus": "Listo para Lanzamiento",
-      "titleStart": "Transformamos",
-      "titleHighlight": "El Futuro",
-      "subtitle": "LegacyMark fusiona INTELIGENCIA ARTIFICIAL con estrategia de élite para construir ecosistemas digitales que dominan mercados.",
-      "ctaPrimary": "Iniciar Protocolo",
-      "ctaSecondary": "Ver Demo Táctico"
+      "systemStatus": "Lanzamiento Exclusivo",
+      "titleStart": "Diseñamos",
+      "titleHighlight": "Autoridad",
+      "subtitle": "No hacemos ruido. Construimos ecosistemas digitales de alto rendimiento que posicionan a tu marca como el líder indiscutible de su categoría.",
+      "ctaPrimary": "Agenda tu auditoría",
+      "ctaSecondary": "Ver nuestro trabajo"
     },
     "services": {
-      "badge": "Service Architecture",
+      "badge": "Ecosistema Estratégico",
       "titleStart": "Soluciones",
-      "titleHighlight": "Integrales",
-      "subtitle": "Infraestructura digital diseñada para escalar. Desde la estrategia hasta el código.",
+      "titleHighlight": "Bespoke",
+      "subtitle": "No ofrecemos paquetes genéricos. Diseñamos infraestructura digital a la medida para escalar marcas selectas.",
       "items": {
         "marketing": {
           "title": "Marketing Estratégico",
@@ -141,29 +141,29 @@
       "secureBadge": "Encrypted Connection"
     },
     "valueProp": {
-      "titleStart": "Ingeniería de Valor",
-      "titleHighlight": "Absoluto",
-      "subtitle": "Eliminamos la fricción entre la estrategia y la tecnología.",
+      "titleStart": "Valor Estratégico",
+      "titleHighlight": "Exclusivo",
+      "subtitle": "Transformamos visión en activos digitales de alto rendimiento.",
       "items": {
         "execution": {
           "title": "Visión a Ejecución",
-          "desc": "No solo entregamos reportes. Construimos, desplegamos y operamos la infraestructura que tu negocio necesita."
+          "desc": "No solo diseñamos. Construimos y operamos la infraestructura digital que posiciona a tu marca como referente del mercado."
         },
         "engineering": {
-          "title": "Ingeniería de Primer Nivel",
-          "desc": "Código limpio, arquitecturas escalables y estándares de seguridad bancaria. Calidad técnica sin compromisos."
+          "title": "Diseño & Tecnología Premium",
+          "desc": "Desarrollos a la medida con estética impecable y arquitecturas escalables. Calidad técnica sin compromisos."
         },
         "growth": {
-          "title": "Crecimiento Predecible",
-          "desc": "Sistemas de adquisición de clientes automatizados que generan resultados constantes, mes a mes."
+          "title": "Adquisición de Alto Valor",
+          "desc": "Sistemas de marketing diseñados para atraer, retener y convertir a los clientes más rentables de tu industria."
         }
       }
     },
     "caseStudies": {
-      "badge": "Project Holodeck",
-      "liveDb": "Live Database",
+      "badge": "Portafolio Selecto",
+      "liveDb": "Casos de Éxito",
       "titleStart": "Resultados que",
-      "titleHighlight": "Definen",
+      "titleHighlight": "Inspiran",
       "projects": {
         "cs1": {
           "client": "FinTech Global",
@@ -195,7 +195,7 @@
       }
     },
     "testimonials": {
-      "badge": "Encrypted Transmissions",
+      "badge": "Reseñas Exclusivas",
       "titleStart": "Lo que dicen nuestros",
       "titleHighlight": "Aliados",
       "reviews": {
@@ -222,30 +222,30 @@
       }
     },
     "methodology": {
-      "badge": "Protocolo Activo v2.4",
-      "titleStart": "SISTEMA",
-      "titleHighlight": "A.C.T.I.O.N™",
-      "subtitle": "Nuestro framework propietario de ejecución. Una metodología probada para transformar caos en resultados predecibles y escalables.",
+      "badge": "Nuestro Proceso",
+      "titleStart": "La Metodología",
+      "titleHighlight": "LegacyMark",
+      "subtitle": "Un enfoque boutique donde cada fase está diseñada meticulosamente para maximizar la estética, el valor y el retorno de inversión.",
       "steps": {
         "s1": {
-          "title": "Audit (Auditoría)",
-          "subtitle": "DIAGNÓSTICO PROFUNDO",
-          "desc": "Análisis forense de tu infraestructura digital actual, detectando cuellos de botella y fugas de eficiencia."
+          "title": "Auditoría de Marca",
+          "subtitle": "ESTADO DEL ARTE",
+          "desc": "Análisis exhaustivo de tu presencia digital actual, detectando oportunidades de posicionamiento y mejora visual."
         },
         "s2": {
-          "title": "Conceptualize (Conceptualización)",
-          "subtitle": "ESTRATEGIA DE ARQUITECTURA",
-          "desc": "Diseño de soluciones personalizadas donde fusionamos objetivos de negocio con factibilidad técnica."
+          "title": "Arquitectura Conceptual",
+          "subtitle": "DISEÑO DE SOLUCIÓN",
+          "desc": "Creación de un ecosistema digital a la medida, alineando tu visión de negocio con ejecución premium."
         },
         "s3": {
-          "title": "Tactical Plan (Plan Táctico)",
-          "subtitle": "HOJA DE RUTA OPERATIVA",
-          "desc": "Desglose granular de hitos, asignación de recursos y definición de KPIs críticos para el éxito."
+          "title": "Planificación Estratégica",
+          "subtitle": "HOJA DE RUTA",
+          "desc": "Desglose de hitos de diseño, desarrollo y marketing, garantizando lanzamientos perfectos de alta fricción."
         },
         "s4": {
-          "title": "Implement (Implementación)",
-          "subtitle": "DESPLIEGUE DE CÓDIGO",
-          "desc": "Ejecución ágil con estándares de calidad Enterprise. CI/CD pipelines y testing automatizado."
+          "title": "Ejecución & Código",
+          "subtitle": "CONSTRUCCIÓN",
+          "desc": "Desarrollo con estándares web de última generación. Sitios rápidos, animaciones fluidas y solidez técnica."
         },
         "s5": {
           "title": "Optimize (Optimización)",
@@ -282,16 +282,16 @@
       }
     },
     "cta": {
-      "badge": "Secure Channel Open",
-      "titleStart": "Listo para",
-      "titleHighlight": "Escalar?",
-      "subtitle": "No más excusas. Inicia la transformación digital de tu marca hoy. Agenda una sesión de estrategia táctica.",
-      "btn1": "Iniciar Misión",
-      "btn2": "Consultar Disponibilidad",
+      "badge": "Aplicaciones Abiertas",
+      "titleStart": "¿Listo para el",
+      "titleHighlight": "Siguiente Nivel?",
+      "subtitle": "Solo trabajamos con un número selecto de proyectos al mes para garantizar resultados excepcionales. Reserva tu espacio estratégico.",
+      "btn1": "Agendar Auditoría",
+      "btn2": "Ver Servicios VIP",
       "footerInfo": {
-        "f1": "EST. TIME: 2-4 WEEKS",
-        "f2": "SLOTS: LIMITED",
-        "f3": "REGION: GLOBAL"
+        "f1": "TIEMPO PROM.: 2-4 SEMANAS",
+        "f2": "CUPOS: MUY LIMITADOS",
+        "f3": "CLIENTES: SELECCIÓN PREVIA"
       }
     },
     "portfolioPreview": {

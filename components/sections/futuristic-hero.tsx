@@ -64,13 +64,13 @@ export function FuturisticHero() {
 
     return (
         <div
-            className="relative min-h-screen w-full flex items-center justify-center bg-[#F9FAFB] overflow-hidden group perspective-[2000px] pt-12"
+            className="relative min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-hidden group perspective-[2000px] pt-12"
             onMouseMove={handleMouseMove}
         >
-            {/* 0. QUANTUM GRID (Light Mode) */}
+            {/* 0. QUANTUM GRID (Dark Mode) */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                {/* Light Gray/Teal Grid on White */}
-                <div className="absolute -inset-[100%] bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50 animate-grid-flow transform-gpu perspective-3d rotate-x-60 title-grid" style={{ transform: 'perspective(500px) rotateX(60deg) translateY(-100px) scale(2)' }} />
+                {/* Dark/Teal Grid on Slate */}
+                <div className="absolute -inset-[100%] bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 animate-grid-flow transform-gpu perspective-3d rotate-x-60 title-grid" style={{ transform: 'perspective(500px) rotateX(60deg) translateY(-100px) scale(2)' }} />
             </div>
 
             {/* 1. Global Spotlight Follower (Subtle Shadow/Highlight) */}
@@ -87,12 +87,12 @@ export function FuturisticHero() {
                 }}
             />
 
-            {/* 2. HUD Overlay Elements (Teal Text on White) */}
+            {/* 2. HUD Overlay Elements (Teal Text on Dark) */}
             <div className="absolute top-24 left-8 hidden lg:flex flex-col gap-2 pointer-events-none z-20">
-                <div className="flex items-center gap-2 text-[10px] font-mono text-teal-600 uppercase tracking-widest border border-teal-200 px-2 py-1 bg-white/80 backdrop-blur-sm rounded-sm shadow-sm">
+                <div className="flex items-center gap-2 text-[10px] font-mono text-teal-400 uppercase tracking-widest border border-teal-900/50 px-2 py-1 bg-slate-900/80 backdrop-blur-sm rounded-sm shadow-sm">
                     <Wifi size={10} className="animate-pulse text-teal-500" /> NET: SECURE
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-teal-600 uppercase tracking-widest border border-teal-200 px-2 py-1 bg-white/80 backdrop-blur-sm rounded-sm shadow-sm">
+                <div className="flex items-center gap-2 text-[10px] font-mono text-teal-400 uppercase tracking-widest border border-teal-900/50 px-2 py-1 bg-slate-900/80 backdrop-blur-sm rounded-sm shadow-sm">
                     <Activity size={10} className="text-teal-500" /> SYS: OPTIMAL
                 </div>
             </div>
@@ -107,12 +107,12 @@ export function FuturisticHero() {
                         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                         className="relative hidden sm:block"
                     >
-                        <span className="relative inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/60 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-slate-800 shadow-sm uppercase tracking-widest font-mono">
+                        <span className="relative inline-flex items-center gap-2 rounded-full border border-teal-900/50 bg-slate-900/60 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-teal-50 shadow-sm uppercase tracking-widest font-mono">
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                             </span>
-                            <span>{t('systemActive')}</span> {t('systemStatus')}
+                            <span className="text-teal-400">{t('systemActive')}</span> {t('systemStatus')}
                         </span>
                     </motion.div>
 
@@ -126,8 +126,8 @@ export function FuturisticHero() {
                         {/* Ambient Glow behind text */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-teal-400/10 blur-[100px] rounded-full pointer-events-none animate-pulse" />
 
-                        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black tracking-[-0.04em] text-slate-900 mb-6 sm:mb-8 relative z-10 leading-[0.85]">
-                            <span className="block mb-2 drop-shadow-sm text-slate-950">
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-black tracking-[-0.04em] text-white mb-6 sm:mb-8 relative z-10 leading-[0.85]">
+                            <span className="block mb-2 drop-shadow-sm text-white">
                                 {t('titleStart')}
                             </span>
                             <div className="flex justify-center items-center gap-3 sm:gap-5 flex-wrap">
@@ -137,7 +137,7 @@ export function FuturisticHero() {
                                 </span>
                             </div>
                         </h1>
-                        <p className="mx-auto max-w-2xl text-base md:text-lg text-slate-600 leading-relaxed text-pretty font-light uppercase tracking-widest font-mono relative z-10">
+                        <p className="mx-auto max-w-2xl text-base md:text-lg text-slate-400 leading-relaxed text-pretty font-light uppercase tracking-widest font-mono relative z-10">
                             {t('subtitle')}
                         </p>
                     </motion.div>
@@ -230,8 +230,8 @@ export function FuturisticHero() {
                 </div>
             </div>
 
-            {/* 7. Bottom Haze (Off-White) */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#F9FAFB] via-[#F9FAFB]/80 to-transparent z-20 pointer-events-none" />
+            {/* 7. Bottom Haze (Dark) */}
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-20 pointer-events-none" />
 
             {/* Scroll Indicator */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-400 opacity-70">

@@ -10,9 +10,9 @@ export const BentoServices = () => {
     const t = useTranslations("home.services");
 
     return (
-        <div className="relative bg-[#F9FAFB] py-24 sm:py-32 overflow-hidden border-b border-transparent">
+        <div className="relative bg-slate-950 py-24 sm:py-32 overflow-hidden border-b border-transparent">
             {/* Background Grid */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.015] pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] pointer-events-none mix-blend-screen" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl text-center mb-24">
@@ -20,16 +20,16 @@ export const BentoServices = () => {
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-slate-200 bg-white text-slate-800 text-[10px] font-mono mb-6 uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-teal-900/50 bg-slate-900/60 text-teal-400 text-[10px] font-mono mb-6 uppercase tracking-widest shadow-sm"
                     >
                         <Briefcase size={12} strokeWidth={1.5} />
                         {t('badge')}
                     </motion.div>
 
-                    <h2 className="text-4xl font-black tracking-[-0.04em] text-slate-900 sm:text-6xl">
+                    <h2 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-6xl">
                         {t('titleStart')} <span className="text-slate-400 font-light">{t('titleHighlight')}</span>
                     </h2>
-                    <p className="mt-6 text-base md:text-lg leading-relaxed text-slate-600 font-light max-w-xl mx-auto uppercase tracking-widest font-mono">
+                    <p className="mt-6 text-base md:text-lg leading-relaxed text-slate-400 font-light max-w-xl mx-auto uppercase tracking-widest font-mono">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -44,7 +44,7 @@ export const BentoServices = () => {
                         icon={BarChart3}
                         bgCode="MKT_SYS_01"
                     >
-                        <div className="absolute bottom-0 right-0 w-64 h-32 bg-gradient-to-t from-slate-100 to-transparent opacity-50 pointer-events-none" />
+                        <div className="absolute bottom-0 right-0 w-64 h-32 bg-gradient-to-t from-slate-900 to-transparent opacity-50 pointer-events-none" />
                     </TechCard>
 
                     {/* CARD 2: Branding */}
@@ -73,9 +73,9 @@ export const BentoServices = () => {
                     >
                         {/* Abstract Vis */}
                         <div className="absolute right-12 top-1/2 -translate-y-1/2 flex gap-1.5 opacity-20">
-                            <div className="w-1.5 h-12 bg-slate-900 rounded-sm animate-pulse" />
-                            <div className="w-1.5 h-8 bg-slate-900 rounded-sm animate-pulse delay-75" />
-                            <div className="w-1.5 h-16 bg-slate-900 rounded-sm animate-pulse delay-150" />
+                            <div className="w-1.5 h-12 bg-slate-700 rounded-sm animate-pulse" />
+                            <div className="w-1.5 h-8 bg-slate-700 rounded-sm animate-pulse delay-75" />
+                            <div className="w-1.5 h-16 bg-slate-700 rounded-sm animate-pulse delay-150" />
                         </div>
                     </TechCard>
 
@@ -137,7 +137,7 @@ const TechCard = ({
         <div
             onMouseMove={handleMouseMove}
             className={cn(
-                "relative group overflow-hidden rounded-sm bg-white border border-slate-200 p-8 md:p-12 min-h-[300px] md:min-h-0 transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(13,148,136,0.1)] hover:-translate-y-1 hover:border-teal-500/30",
+                "relative group overflow-hidden rounded-sm bg-slate-900/50 border border-slate-800 p-8 md:p-12 min-h-[300px] md:min-h-0 transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(13,148,136,0.15)] hover:-translate-y-1 hover:border-teal-500/30",
                 className
             )}>
             {/* Flashlight Hover Effect */}
@@ -155,21 +155,21 @@ const TechCard = ({
             />
 
             {/* Tech Decoration */}
-            <div className="absolute top-6 right-6 text-[10px] font-mono text-slate-300 group-hover:text-slate-600 transition-colors uppercase tracking-widest z-10">
+            <div className="absolute top-6 right-6 text-[10px] font-mono text-slate-600 group-hover:text-slate-400 transition-colors uppercase tracking-widest z-10">
                 [{bgCode}]
             </div>
 
             {/* Icon */}
-            <div className="w-10 h-10 rounded-sm bg-[#F9FAFB] border border-slate-200 flex items-center justify-center mb-8 shadow-sm group-hover:border-teal-200 group-hover:bg-teal-50/50 group-hover:scale-105 transition-all z-10 relative">
-                <Icon size={18} strokeWidth={1.5} className="text-slate-600 group-hover:text-teal-600 transition-colors" />
+            <div className="w-10 h-10 rounded-sm bg-slate-800 border border-slate-700 flex items-center justify-center mb-8 shadow-sm group-hover:border-teal-800 group-hover:bg-teal-900/50 group-hover:scale-105 transition-all z-10 relative">
+                <Icon size={18} strokeWidth={1.5} className="text-slate-400 group-hover:text-teal-400 transition-colors" />
             </div>
 
             {/* Content */}
             <div className="relative z-10">
-                <h3 className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-slate-950 transition-colors mb-4">
+                <h3 className="text-2xl font-black tracking-tight text-white group-hover:text-teal-50 transition-colors mb-4">
                     {title}
                 </h3>
-                <p className="text-sm text-slate-500 leading-relaxed font-light max-w-sm">
+                <p className="text-sm text-slate-400 leading-relaxed font-light max-w-sm">
                     {description}
                 </p>
             </div>

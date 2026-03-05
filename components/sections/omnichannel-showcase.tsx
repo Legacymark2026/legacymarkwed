@@ -22,8 +22,11 @@ export function OmnichannelShowcase() {
 
     return (
         <section className="relative bg-slate-950 py-24 sm:py-32 overflow-hidden text-white" onMouseMove={handleMouseMove}>
+            {/* Top Slanted Divider to separate from StrategicAlliances */}
+            <div className="absolute top-0 inset-x-0 h-32 bg-slate-950 transform -skew-y-2 origin-top-left -translate-y-16 z-0 pointer-events-none" />
+
             {/* Background Texture & Glow Elements */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05] pointer-events-none mix-blend-screen" />
 
             <motion.div
                 className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 z-0"
@@ -156,9 +159,8 @@ export function OmnichannelShowcase() {
                 </div>
             </div>
 
-            {/* Top and Bottom Divider Lines */}
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
+            {/* Bottom transition back to light mode */}
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#F9FAFB] via-[#F9FAFB]/80 to-transparent z-20 pointer-events-none" />
         </section>
     );
 }
