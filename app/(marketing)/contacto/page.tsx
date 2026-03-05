@@ -77,7 +77,7 @@ export default async function ContactPage() {
         <main className="min-h-screen bg-white overflow-hidden">
 
             {/* ── HERO SECTION ─────────────────────────────────────────────── */}
-            <section className="relative pt-28 pb-20 overflow-hidden" style={{ background: 'radial-gradient(ellipse 130% 70% at 50% 0%, #f0fdf4 0%, #f8fafc 60%, #eff6ff 100%)' }}>
+            <section className="relative pt-20 sm:pt-28 pb-12 sm:pb-20 overflow-hidden" style={{ background: 'radial-gradient(ellipse 130% 70% at 50% 0%, #f0fdf4 0%, #f8fafc 60%, #eff6ff 100%)' }}>
 
                 {/* Animated radial blobs */}
                 <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-teal-100/50 rounded-full blur-[120px] pointer-events-none animate-pulse" style={{ animationDuration: '6s' }} />
@@ -152,7 +152,7 @@ export default async function ContactPage() {
             </section>
 
             {/* ── PROCESS STEPS ────────────────────────────────────────────── */}
-            <section className="py-16 bg-white border-y border-slate-100">
+            <section className="py-10 sm:py-16 bg-white border-y border-slate-100">
                 <div className="container mx-auto px-4 md:px-6 max-w-5xl">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
                         {processStepsConfig.map((step, i) => (
@@ -174,7 +174,7 @@ export default async function ContactPage() {
             </section>
 
             {/* ── MAIN: INFO + FORM ─────────────────────────────────────────── */}
-            <section className="py-20 bg-white">
+            <section className="py-12 sm:py-20 bg-white">
                 <div className="container mx-auto px-4 md:px-6 max-w-6xl">
                     <div className="grid gap-12 lg:grid-cols-5 items-start">
 
@@ -244,12 +244,12 @@ export default async function ContactPage() {
                         {/* ─── RIGHT COLUMN: Form ─── */}
                         <div className="lg:col-span-3">
                             {/* Form wrapper with premium feel */}
-                            <div className="relative rounded-3xl border border-slate-100 bg-white shadow-2xl shadow-slate-100 overflow-hidden">
+                            <div className="relative rounded-2xl sm:rounded-3xl border border-slate-100 bg-white shadow-xl sm:shadow-2xl shadow-slate-100 overflow-hidden mx-auto max-w-full">
                                 {/* Gradient top bar */}
                                 <div className="h-1.5 bg-gradient-to-r from-teal-400 via-sky-500 to-violet-500" />
 
                                 {/* Form header */}
-                                <div className="px-8 pt-8 pb-4 border-b border-slate-50">
+                                <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-slate-50">
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <h2 className="text-xl font-black text-slate-900">{t('form.title')}</h2>
@@ -272,12 +272,12 @@ export default async function ContactPage() {
                                 </div>
 
                                 {/* The form itself */}
-                                <div className="p-8">
+                                <div className="p-5 sm:p-8">
                                     <ContactForm />
                                 </div>
 
                                 {/* Form footer trust signals */}
-                                <div className="px-8 pb-8 pt-2 flex flex-wrap gap-4 text-xs text-slate-400">
+                                <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-2 flex flex-wrap gap-4 text-xs text-slate-400">
                                     {[t('form.trust.t1'), t('form.trust.t2'), t('form.trust.t3')].map((tStr, i) => (
                                         <span key={i} dangerouslySetInnerHTML={{ __html: tStr }} />
                                     ))}
@@ -289,7 +289,7 @@ export default async function ContactPage() {
             </section>
 
             {/* ── SOCIAL PROOF STRIP ───────────────────────────────────────── */}
-            <section className="py-14 bg-slate-50 border-y border-slate-100">
+            <section className="py-8 sm:py-14 bg-slate-50 border-y border-slate-100">
                 <div className="container mx-auto px-4 md:px-6 max-w-5xl">
                     <div className="grid grid-cols-3 md:grid-cols-6 gap-6 items-center">
                         {trustedBy.map((name) => (
@@ -302,7 +302,7 @@ export default async function ContactPage() {
             </section>
 
             {/* ── MAP SECTION ──────────────────────────────────────────────── */}
-            <section className="py-20 bg-white">
+            <section className="py-12 sm:py-20 bg-white">
                 <div className="container mx-auto px-4 md:px-6 max-w-5xl">
                     <div className="grid md:grid-cols-2 gap-10 items-center">
 
@@ -367,7 +367,7 @@ export default async function ContactPage() {
             </section>
 
             {/* ── FINAL CTA BANNER ─────────────────────────────────────────── */}
-            <section className="py-20 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #134e4a 60%, #0c2340 100%)' }}>
+            <section className="py-12 sm:py-20 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #134e4a 60%, #0c2340 100%)' }}>
                 {/* Radial glow */}
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(13,148,136,0.15),transparent)] pointer-events-none" />
                 {/* Dot pattern */}
