@@ -3,6 +3,7 @@ import { JetBrains_Mono } from "next/font/google";
 import "../styles/globals.css";
 import { Providers } from "@/components/providers";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
+import { AnalyticsProvider as InternalAnalyticsProvider } from "@/modules/analytics/components/analytics-provider";
 import { getPublicIntegrations } from "@/actions/settings";
 import { auth } from "@/lib/auth";
 import { Suspense } from "react";
@@ -103,26 +104,28 @@ export default async function RootLayout({
         className={`font-sans ${jetbrainsMono.variable} antialiased selection:bg-teal-500 selection:text-white bg-white text-slate-900`}
       >
         <Providers>
-          <Suspense fallback={null}>
-            <AnalyticsProvider config={{
-              ...integrations,
-              userData,
-              debug: process.env.NODE_ENV === 'development'
-            }} />
-          </Suspense>
+          <InternalAnalyticsProvider userId={session?.user?.id}>
+            <Suspense fallback={null}>
+              <AnalyticsProvider config={{
+                ...integrations,
+                userData,
+                debug: process.env.NODE_ENV === 'development'
+              }} />
+            </Suspense>
 
-          <ScrollProgress />
-          <CustomCursor />
-          <AmbientBackground />
-          <JsonLd />
-          <CommandMenu />
-          <SocialShare url={siteConfig.url} title={siteConfig.description} />
-          <PageTransition>
-            {children}
-          </PageTransition>
-          <BackToTop />
-          <CookieConsent />
-          <ChatWidget />
+            <ScrollProgress />
+            <CustomCursor />
+            <AmbientBackground />
+            <JsonLd />
+            <CommandMenu />
+            <SocialShare url={siteConfig.url} title={siteConfig.description} />
+            <PageTransition>
+              {children}
+            </PageTransition>
+            <BackToTop />
+            <CookieConsent />
+            <ChatWidget />
+          </InternalAnalyticsProvider>
         </Providers>
       </body>
     </html>
