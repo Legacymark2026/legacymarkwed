@@ -25,7 +25,7 @@ ssh ssh root@187.77.195.9
 
 ```bash
 # Descargar script
-wget https://raw.githubusercontent.com/tu-repo/legacymark/main/scripts/vps-setup.sh
+wget https://raw.githubusercontent.com/tu-repo/legacymark/main/scripts/setup/vps-setup.sh
 
 # Dar permisos
 chmod +x vps-setup.sh
@@ -78,10 +78,9 @@ OPENAI_API_KEY="sk-..."
 
 ```bash
 # Dar permisos al script
-chmod +x scripts/deploy.sh
-
-# Ejecutar
-bash scripts/deploy.sh
+chmod +x scripts/setup/deploy.sh
+# 2. Ejecutar (como tú mismo, no sudo)
+bash scripts/setup/deploy.sh
 ```
 
 ---
@@ -196,7 +195,7 @@ sudo tail -f /var/log/nginx/legacymark_error.log
 
 ```bash
 cd /var/www/legacymark
-bash scripts/deploy.sh
+bash scripts/setup/deploy.sh
 ```
 
 ### Deploy Automático (GitHub Actions)

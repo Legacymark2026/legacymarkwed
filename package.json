@@ -19,8 +19,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "prisma:generate": "prisma generate",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
-    "verify:deployment": "node scripts/verify-deployment.js",
-    "generate:secrets": "node scripts/generate-secrets.js"
+    "verify:deployment": "node scripts/testing/verify-deployment.js",
+    "generate:secrets": "node scripts/utils/generate-secrets.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

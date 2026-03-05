@@ -151,16 +151,16 @@ maxmemory-policy allkeys-lru
 
 ```bash
 # 1. Setup básico del VPS
-sudo bash scripts/vps-setup.sh
+sudo bash scripts/setup/vps-setup.sh
 
 # 2. Configurar swap
-sudo bash scripts/setup-swap.sh
+sudo bash scripts/setup/setup-swap.sh
 
 # 3. Optimizar PostgreSQL
-sudo bash scripts/optimize-postgresql.sh
+sudo bash scripts/setup/optimize-postgresql.sh
 
 # 4. Configurar monitoreo
-sudo bash scripts/setup-monitoring.sh
+sudo bash scripts/setup/setup-monitoring.sh
 ```
 
 ### Comandos de Monitoreo
