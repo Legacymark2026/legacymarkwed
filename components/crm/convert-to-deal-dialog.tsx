@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { convertLeadToDeal } from "@/actions/crm";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 
 interface Props { leadId: string; leadName: string; leadEmail: string; companyId: string; }
 
@@ -12,6 +13,11 @@ export function ConvertToDealDialog({ leadId, leadName, leadEmail, companyId }: 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [form, setForm] = useState({ title: `Deal — ${leadName}`, value: "", probability: "30", expectedClose: "" });
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,16 +38,16 @@ export function ConvertToDealDialog({ leadId, leadName, leadEmail, companyId }: 
     return (
         <>
             <button onClick={() => setOpen(true)} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold rounded-xl hover:from-teal-600 hover:to-emerald-600 transition-all shadow-lg shadow-teal-200 text-sm">
-                🔄 Convertir a Deal
+                🔄 Convertir una oferta
             </button>
 
-            {open && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+            {open && mounted && createPortal(
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 overflow-y-auto" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
                     <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 max-h-[90vh] overflow-y-auto my-auto">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white font-black text-xl">💼</div>
                             <div>
-                                <h2 className="text-xl font-black text-slate-900">Convertir a Deal</h2>
+                                <h2 className="text-xl font-black text-slate-900">Convertir una oferta</h2>
                                 <p className="text-xs text-slate-400 mt-0.5">{leadEmail}</p>
                             </div>
                         </div>
@@ -80,7 +86,8 @@ export function ConvertToDealDialog({ leadId, leadName, leadEmail, companyId }: 
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

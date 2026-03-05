@@ -45,7 +45,8 @@ model User {
   createdTasks          Task[]            @relation("TaskCreator")
 
   // Marketing
-  marketingEvents MarketingEvent[]
+  marketingEvents   MarketingEvent[]
+  approvedCampaigns Campaign[]       @relation("ApprovedCampaigns")
 
   // Security
   mfaEnabled Boolean @default(false) @map("mfa_enabled")
@@ -845,6 +846,17 @@ model Campaign {
 
   companyId String  @map("company_id")
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Centralized Management
+  parameters  Json? // For platform specific configs (targeting, bidding)
+  trackingConfig Json? @map("tracking_config") // pixels, UTMs, events
+  
+  // Workflows
+  approvalStatus String @default("DRAFT") @map("approval_status") // DRAFT, PENDING_APPROVAL, APPROVED, REJECTED
+  launchStatus   String @default("PENDING") @map("launch_status") // PENDING, LAUNCHING, LAUNCHED, FAILED
+  approvedById   String? @map("approved_by_id")
+  approvedBy     User?   @relation("ApprovedCampaigns", fields: [approvedById], references: [id])
+  launchedAt     DateTime? @map("launched_at")
 
   leads           Lead[]
   adSpends        AdSpend[]
