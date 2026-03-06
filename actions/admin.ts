@@ -226,9 +226,26 @@ export async function updateUserRole(
 
     try {
         // Obtenemos los custom roles para saber qué permisos asignarle ahora al usuario
-        const companyUserCheck = await prisma.companyUser.findFirst({
+        let companyUserCheck = await prisma.companyUser.findFirst({
             where: { userId }
         });
+
+        // FIX PARA USUARIOS ANTIGUOS: Si el usuario no tiene relación con la compañía,
+        // se la creamos usando la compañía del admin que está realizando el cambio.
+        if (!companyUserCheck && currentUserId) {
+            const adminCompanyUser = await prisma.companyUser.findFirst({
+                where: { userId: currentUserId }
+            });
+            if (adminCompanyUser) {
+                companyUserCheck = await prisma.companyUser.create({
+                    data: {
+                        userId: userId,
+                        companyId: adminCompanyUser.companyId,
+                        permissions: []
+                    }
+                });
+            }
+        }
 
         if (companyUserCheck) {
             const company = await prisma.company.findUnique({
