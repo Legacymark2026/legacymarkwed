@@ -183,6 +183,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
         form.setValue("title", e.target.value);
         if (!project) {
             const slug = e.target.value
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/(^-|-$)+/g, "");

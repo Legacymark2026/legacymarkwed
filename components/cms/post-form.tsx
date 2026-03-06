@@ -126,9 +126,11 @@ export function PostForm({ post, availableCategories = [], availableTags = [] }:
         form.setValue("title", e.target.value);
         if (!post) {
             const slug = e.target.value
+                .normalize("NFD") // Decomposes accented characters into their base character and accent mark
+                .replace(/[\u0300-\u036f]/g, "") // Removes the accent marks
                 .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)+/g, "");
+                .replace(/[^a-z0-9]+/g, "-") // Replaces spaces and non-alphanumeric with dashes
+                .replace(/(^-|-$)+/g, ""); // Trims dashes from start and end
             form.setValue("slug", slug);
         }
     };
