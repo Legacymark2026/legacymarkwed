@@ -225,6 +225,36 @@ export async function updateUserRole(
     }
 
     try {
+        // Obtenemos los custom roles para saber qué permisos asignarle ahora al usuario
+        const companyUserCheck = await prisma.companyUser.findFirst({
+            where: { userId }
+        });
+
+        if (companyUserCheck) {
+            const company = await prisma.company.findUnique({
+                where: { id: companyUserCheck.companyId },
+                select: { defaultCompanySettings: true }
+            });
+            const settings = (company?.defaultCompanySettings as any) || {};
+            const rolesArray = settings.customRoles || [];
+
+            const selectedCustomRole = rolesArray.find((r: any) => r.id === newRole);
+            let newPermissions: string[] = [];
+
+            if (selectedCustomRole) {
+                newPermissions = selectedCustomRole.permissions || [];
+            } else if (newRole === UserRole.SUPER_ADMIN || newRole === UserRole.ADMIN) {
+                // If standard admin fallback
+                newPermissions = ["admin.all"];
+            }
+
+            // Aplicar los permisos a la relación user-company
+            await prisma.companyUser.updateMany({
+                where: { userId, companyId: companyUserCheck.companyId },
+                data: { permissions: newPermissions }
+            });
+        }
+
         await prisma.user.update({
             where: { id: userId },
             data: { role: newRole },
@@ -397,6 +427,22 @@ export async function saveCustomRoles(customRoles: any[]) {
             where: { id: companyUser.companyId },
             data: { defaultCompanySettings: settings }
         });
+
+        // Cascading the updated permissions to all existing users that hold these custom roles
+        const usersInCompany = await prisma.companyUser.findMany({
+            where: { companyId: companyUser.companyId },
+            include: { user: { select: { role: true } } }
+        });
+
+        for (const cu of usersInCompany) {
+            const matchedCustomRole = customRoles.find(r => r.id === cu.user.role);
+            if (matchedCustomRole) {
+                await prisma.companyUser.update({
+                    where: { id: cu.id },
+                    data: { permissions: matchedCustomRole.permissions || [] }
+                });
+            }
+        }
 
         revalidatePath("/dashboard/settings/members");
         return { success: true };
