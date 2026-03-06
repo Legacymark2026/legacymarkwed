@@ -86,7 +86,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
     };
 
     return (
-        <div className="border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-black">
+        <div className="border border-gray-300 rounded-md overflow-hidden bg-white text-gray-900 focus-within:ring-2 focus-within:ring-black">
             {/* Toolbar */}
             <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
                 <button

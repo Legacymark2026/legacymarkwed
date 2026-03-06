@@ -276,7 +276,7 @@ export function PostForm({ post, availableCategories = [], availableTags = [] }:
                                 </div>
                                 <textarea
                                     {...form.register("metaDescription")}
-                                    className="w-full min-h-[80px] p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                                    className="w-full min-h-[80px] p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black text-sm text-gray-900 bg-white"
                                     placeholder="SEO description for search engines"
                                 />
                                 <p className="text-xs text-gray-500">
