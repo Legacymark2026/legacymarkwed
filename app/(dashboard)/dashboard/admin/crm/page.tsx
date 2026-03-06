@@ -44,21 +44,9 @@ export default async function CRMDashboardPage() {
         return <div className="p-8 text-red-500">Error loading CRM data</div>;
     }
 
-    // Check for total empty state (no deals at all)
-    if (stats.activeDeals === 0 && topDeals.length === 0 && advancedStats.wonValue === 0) {
-        return (
-            <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-3xl font-bold tracking-tight">CRM Command Center</h2>
-                </div>
-                <CRMEmptyState
-                    title="Bienvenido a tu CRM"
-                    description="Comienza creando tu primer deal para ver las métricas de rendimiento."
-                    actionLabel="Crear Primer Deal"
-                />
-            </div>
-        );
-    }
+    // Removed the early return for the total empty state so the user still sees
+    // the header, KPI cards (even if 0), and basic UI structure.
+    const isTotalEmpty = stats.activeDeals === 0 && topDeals.length === 0 && advancedStats.wonValue === 0;
 
     return (
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -76,59 +64,69 @@ export default async function CRMDashboardPage() {
             </div>
 
             <Suspense fallback={<DashboardSkeleton />}>
-                <div className="space-y-4">
-                    <KPICards stats={stats} />
+                {isTotalEmpty ? (
+                    <div className="mt-8">
+                        <CRMEmptyState
+                            title="Bienvenido a tu CRM"
+                            description="Comienza creando tu primer deal para ver las métricas de rendimiento."
+                            actionLabel="Crear Primer Deal"
+                        />
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        <KPICards stats={stats} />
 
-                    {/* ROW 1: Forecast & Goal */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <div className="col-span-4">
-                            <RevenueForecast data={advancedStats.forecastData} />
+                        {/* ROW 1: Forecast & Goal */}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                            <div className="col-span-4">
+                                <RevenueForecast data={advancedStats.forecastData} />
+                            </div>
+                            <div className="col-span-3">
+                                <GoalProgress
+                                    wonValue={advancedStats.wonValue}
+                                    monthlyTarget={advancedStats.monthlyTarget}
+                                    progress={advancedStats.goalProgress}
+                                />
+                            </div>
                         </div>
-                        <div className="col-span-3">
-                            <GoalProgress
-                                wonValue={advancedStats.wonValue}
-                                monthlyTarget={advancedStats.monthlyTarget}
-                                progress={advancedStats.goalProgress}
-                            />
+
+                        {/* ROW 2: Automation & Funnel */}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                            <div className="col-span-3">
+                                <RecentAutomations data={executions} />
+                            </div>
+                            <div className="col-span-4">
+                                <SalesFunnel data={funnelData} />
+                            </div>
+                        </div>
+
+                        {/* ROW 3: Sources & Leaderboard */}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                            <div className="col-span-3">
+                                <LeadSources data={advancedStats.leadSources} />
+                            </div>
+                            <div className="col-span-4">
+                                <SalesLeaderboard data={advancedStats.leaderboard} />
+                            </div>
+                        </div>
+
+                        {/* ROW 4: Deals & Activity */}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                            <div className="col-span-4">
+                                <TopDeals deals={topDeals} />
+                            </div>
+                            <div className="col-span-3">
+                                <RecentActivity activities={activities} />
+                            </div>
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                            <div className="col-span-4">
+                                <LostReasonChart data={advancedStats.lostReasons} />
+                            </div>
                         </div>
                     </div>
-
-                    {/* ROW 2: Automation & Funnel */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <div className="col-span-3">
-                            <RecentAutomations data={executions} />
-                        </div>
-                        <div className="col-span-4">
-                            <SalesFunnel data={funnelData} />
-                        </div>
-                    </div>
-
-                    {/* ROW 3: Sources & Leaderboard */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <div className="col-span-3">
-                            <LeadSources data={advancedStats.leadSources} />
-                        </div>
-                        <div className="col-span-4">
-                            <SalesLeaderboard data={advancedStats.leaderboard} />
-                        </div>
-                    </div>
-
-                    {/* ROW 4: Deals & Activity */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <div className="col-span-4">
-                            <TopDeals deals={topDeals} />
-                        </div>
-                        <div className="col-span-3">
-                            <RecentActivity activities={activities} />
-                        </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <div className="col-span-4">
-                            <LostReasonChart data={advancedStats.lostReasons} />
-                        </div>
-                    </div>
-                </div>
+                )}
             </Suspense>
         </div>
     );
