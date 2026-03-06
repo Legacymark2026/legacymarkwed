@@ -76,6 +76,8 @@ export async function createPost(data: PostFormData) {
             }
         });
         revalidatePath('/dashboard/posts');
+        revalidatePath('/blog'); // Revalidate blog index list
+        revalidatePath(`/blog/${postData.slug}`, 'page'); // Revalidate specific post page 
         return { success: true };
     } catch (error) {
         console.error("Failed to create post:", error);
@@ -134,7 +136,11 @@ export async function updatePost(id: string, data: PostFormData) {
             }
         });
         revalidatePath('/dashboard/posts');
-        revalidatePath(`/blog/${postData.slug}`); // Update public page
+        revalidatePath('/blog'); // Revalidate blog listing
+        revalidatePath(`/blog/${postData.slug}`, 'page'); // Revalidate specific new slug
+        if (currentPost.slug !== postData.slug) {
+            revalidatePath(`/blog/${currentPost.slug}`, 'page'); // Invalidar el viejo también
+        }
         return { success: true };
     } catch (error) {
         console.error("Failed to update post:", error);
@@ -204,6 +210,8 @@ export async function createProject(data: ProjectFormData) {
     try {
         await prisma.project.create({ data: validated });
         revalidatePath('/dashboard/projects');
+        revalidatePath('/portfolio');
+        revalidatePath(`/portfolio/${validated.slug}`, 'page');
         return { success: true };
     } catch (error) {
         console.error(error);
@@ -218,12 +226,18 @@ export async function updateProject(id: string, data: ProjectFormData) {
     const validated = ProjectSchema.parse(data);
 
     try {
+        const currentProject = await prisma.project.findUnique({ where: { id } });
+
         await prisma.project.update({
             where: { id },
             data: validated
         });
         revalidatePath('/dashboard/projects');
-        // revalidatePath(`/portfolio/${validated.slug}`); 
+        revalidatePath('/portfolio');
+        revalidatePath(`/portfolio/${validated.slug}`, 'page');
+        if (currentProject && currentProject.slug !== validated.slug) {
+            revalidatePath(`/portfolio/${currentProject.slug}`, 'page');
+        }
         return { success: true };
     } catch (error) {
         console.error(error);
