@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
+import { motion, useMotionValue, useMotionTemplate, useTransform, useSpring } from "framer-motion";
 import { MouseEvent } from "react";
 import Image from "next/image";
 import { Database, Network, Shield, Zap, TrendingUp, Globe, PenTool, Layers, MousePointerClick } from "lucide-react";
@@ -19,6 +19,16 @@ export function OmnichannelShowcase() {
         mouseX.set(e.clientX - left);
         mouseY.set(e.clientY - top);
     }
+
+    const springConfig = { damping: 25, stiffness: 150 };
+    const px1 = useSpring(useTransform(mouseX, [0, 1500], [-15, 15]), springConfig);
+    const py1 = useSpring(useTransform(mouseY, [0, 1000], [-15, 15]), springConfig);
+    const px2 = useSpring(useTransform(mouseX, [0, 1500], [15, -15]), springConfig);
+    const py2 = useSpring(useTransform(mouseY, [0, 1000], [15, -15]), springConfig);
+    const px3 = useSpring(useTransform(mouseX, [0, 1500], [-10, 10]), springConfig);
+    const py3 = useSpring(useTransform(mouseY, [0, 1000], [10, -10]), springConfig);
+    const px4 = useSpring(useTransform(mouseX, [0, 1500], [10, -10]), springConfig);
+    const py4 = useSpring(useTransform(mouseY, [0, 1000], [-10, 10]), springConfig);
 
     return (
         <section className="relative bg-slate-950 py-24 sm:py-32 overflow-hidden text-white" onMouseMove={handleMouseMove}>
@@ -147,16 +157,18 @@ export function OmnichannelShowcase() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.5 }}
-                            className="absolute top-[12%] -left-4 sm:-left-8 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                            className="absolute top-[12%] -left-4 sm:-left-8 z-30"
                         >
-                            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} className="flex items-center gap-3">
-                                <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
-                                    <TrendingUp size={16} />
-                                </div>
-                                <div className="hidden sm:block">
-                                    <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Meta Ads ROAS</p>
-                                    <p className="text-sm font-bold text-white">+245%</p>
-                                </div>
+                            <motion.div style={{ x: px1, y: py1 }} className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                                <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} className="flex items-center gap-3">
+                                    <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
+                                        <TrendingUp size={16} />
+                                    </div>
+                                    <div className="hidden sm:block">
+                                        <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Meta Ads ROAS</p>
+                                        <p className="text-sm font-bold text-white">+245%</p>
+                                    </div>
+                                </motion.div>
                             </motion.div>
                         </motion.div>
 
@@ -166,16 +178,18 @@ export function OmnichannelShowcase() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.7 }}
-                            className="absolute top-[30%] -right-4 sm:-right-8 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                            className="absolute top-[30%] -right-4 sm:-right-8 z-30"
                         >
-                            <motion.div animate={{ y: [5, -5, 5] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="flex items-center gap-3">
-                                <div className="p-2 bg-teal-500/20 rounded-lg text-teal-400">
-                                    <Globe size={16} />
-                                </div>
-                                <div className="hidden sm:block text-left">
-                                    <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Web Traffic</p>
-                                    <p className="text-sm font-bold text-white">45k visitors</p>
-                                </div>
+                            <motion.div style={{ x: px2, y: py2 }} className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-[0_0_30px_rgba(45,212,191,0.3)]">
+                                <motion.div animate={{ y: [5, -5, 5] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="flex items-center gap-3">
+                                    <div className="p-2 bg-teal-500/20 rounded-lg text-teal-400">
+                                        <Globe size={16} />
+                                    </div>
+                                    <div className="hidden sm:block text-left">
+                                        <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Web Traffic</p>
+                                        <p className="text-sm font-bold text-white">45k visitors</p>
+                                    </div>
+                                </motion.div>
                             </motion.div>
                         </motion.div>
 
@@ -185,17 +199,19 @@ export function OmnichannelShowcase() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.9 }}
-                            className="absolute bottom-[35%] -left-6 sm:-left-10 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                            className="absolute bottom-[35%] -left-6 sm:-left-10 z-30"
                         >
-                            <motion.div animate={{ y: [-4, 4, -4] }} transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }} className="flex items-center gap-3">
-                                <div className="flex -space-x-2">
-                                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center border-2 border-slate-900 shadow-sm"><PenTool size={12} className="text-white" /></div>
-                                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center border-2 border-slate-900 shadow-sm"><Layers size={12} className="text-white" /></div>
-                                </div>
-                                <div className="hidden sm:block">
-                                    <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Auto-Design</p>
-                                    <p className="text-xs font-bold text-white">Generating...</p>
-                                </div>
+                            <motion.div style={{ x: px3, y: py3 }} className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-[0_0_30px_rgba(168,85,247,0.3)]">
+                                <motion.div animate={{ y: [-4, 4, -4] }} transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }} className="flex items-center gap-3">
+                                    <div className="flex -space-x-2">
+                                        <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center border-2 border-slate-900 shadow-sm"><PenTool size={12} className="text-white" /></div>
+                                        <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center border-2 border-slate-900 shadow-sm"><Layers size={12} className="text-white" /></div>
+                                    </div>
+                                    <div className="hidden sm:block">
+                                        <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Auto-Design</p>
+                                        <p className="text-xs font-bold text-white">Generating...</p>
+                                    </div>
+                                </motion.div>
                             </motion.div>
                         </motion.div>
 
@@ -205,16 +221,18 @@ export function OmnichannelShowcase() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 1.1 }}
-                            className="absolute bottom-[20%] -right-2 sm:-right-4 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                            className="absolute bottom-[20%] -right-2 sm:-right-4 z-30"
                         >
-                            <motion.div animate={{ y: [6, -6, 6] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }} className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
-                                    <MousePointerClick size={16} />
-                                </div>
-                                <div className="hidden sm:block">
-                                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider whitespace-nowrap">Google CPC</p>
-                                    <p className="text-sm font-bold text-white">$0.45</p>
-                                </div>
+                            <motion.div style={{ x: px4, y: py4 }} className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                                <motion.div animate={{ y: [6, -6, 6] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }} className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                                        <MousePointerClick size={16} />
+                                    </div>
+                                    <div className="hidden sm:block">
+                                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider whitespace-nowrap">Google CPC</p>
+                                        <p className="text-sm font-bold text-white">$0.45</p>
+                                    </div>
+                                </motion.div>
                             </motion.div>
                         </motion.div>
 
