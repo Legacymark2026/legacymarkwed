@@ -17,10 +17,24 @@ const INITIAL_ROLES = [
 
 const PERMISSIONS = [
     {
+        module: "Dashboard Principal",
+        actions: [
+            { id: "dashboard.view", label: "Ver Dashboard" },
+        ]
+    },
+    {
         module: "Configuración del Sistema",
         actions: [
             { id: "manage_settings", label: "Gestionar Configuraciones" },
             { id: "view_security", label: "Ver Privacidad y Seguridad" },
+        ]
+    },
+    {
+        module: "Calendario",
+        actions: [
+            { id: "calendar.view", label: "Ver Calendario y Eventos" },
+            { id: "calendar.edit", label: "Crear/Editar Eventos" },
+            { id: "calendar.delete", label: "Eliminar Eventos" },
         ]
     },
     {
