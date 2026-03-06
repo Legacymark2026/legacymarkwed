@@ -376,3 +376,34 @@ export async function revokeSession(sessionId: string) {
         return { success: false, error: "Failed to revoke session" };
     }
 }
+
+export async function getMyLoginHistory() {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
+    try {
+        const logs = await prisma.userActivityLog.findMany({
+            where: {
+                userId: session.user.id,
+                action: {
+                    in: ["LOGIN_SUCCESS", "LOGIN_FAILED", "LOGIN_ERROR", "ADMIN_FORCED_PASSWORD_RESET"]
+                }
+            },
+            orderBy: { createdAt: "desc" },
+            take: 10
+        });
+
+        return logs.map(log => ({
+            id: log.id,
+            date: log.createdAt,
+            action: log.action,
+            ip: log.ipAddress || "Desconocida",
+            userAgent: log.userAgent || "Dispositivo Desconocido",
+            status: log.action.includes("SUCCESS") ? "success" : "failed",
+        }));
+    } catch (error) {
+        console.error("Failed to fetch login history:", error);
+        return [];
+    }
+}
+

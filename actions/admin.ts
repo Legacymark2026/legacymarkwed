@@ -229,7 +229,18 @@ export async function updateUserRole(
             where: { id: userId },
             data: { role: newRole },
         });
+
+        await prisma.userActivityLog.create({
+            data: {
+                userId: userId, // The user whose role was updated
+                action: `ROLE_UPDATED_TO_${newRole.toUpperCase().replace(/\s+/g, "_")}`,
+                ipAddress: "System", // Depending on where this is called, we don't have request IP readily in server actions unless passed
+                userAgent: "Admin Dashboard",
+            }
+        });
+
         revalidatePath("/dashboard/users");
+        revalidatePath("/dashboard/settings/members");
         return { success: true };
     } catch (error) {
         console.error("Failed to update user role:", error);
@@ -335,3 +346,91 @@ export async function getSecurityStats() {
         return { totalEvents: 0, failedLogins: 0, uniqueUsers: 0 };
     }
 }
+
+export async function getCustomRoles() {
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error, roles: [] };
+
+    try {
+        const session = await auth();
+        // Obtener el companyId del admin actual
+        const companyUser = await prisma.companyUser.findFirst({
+            where: { userId: session?.user?.id }
+        });
+
+        if (!companyUser) return { success: false, error: "No company tied to user.", roles: [] };
+
+        const company = await prisma.company.findUnique({
+            where: { id: companyUser.companyId },
+            select: { defaultCompanySettings: true }
+        });
+
+        const settings = (company?.defaultCompanySettings as any) || {};
+        return { success: true, roles: settings.customRoles || [] };
+    } catch (error) {
+        console.error("Error fetching custom roles:", error);
+        return { success: false, error: "Failed to fetch roles.", roles: [] };
+    }
+}
+
+export async function saveCustomRoles(customRoles: any[]) {
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error };
+
+    try {
+        const session = await auth();
+        const companyUser = await prisma.companyUser.findFirst({
+            where: { userId: session?.user?.id }
+        });
+
+        if (!companyUser) return { success: false, error: "No company tied to user." };
+
+        const company = await prisma.company.findUnique({
+            where: { id: companyUser.companyId },
+            select: { defaultCompanySettings: true }
+        });
+
+        const settings = (company?.defaultCompanySettings as any) || {};
+        settings.customRoles = customRoles;
+
+        await prisma.company.update({
+            where: { id: companyUser.companyId },
+            data: { defaultCompanySettings: settings }
+        });
+
+        revalidatePath("/dashboard/settings/members");
+        return { success: true };
+    } catch (error) {
+        console.error("Error saving custom roles:", error);
+        return { success: false, error: "Failed to save custom roles." };
+    }
+}
+
+export async function getUserAuditLogs(userId: string) {
+    const authCheck = await checkAdmin();
+    if (authCheck) return { success: false, error: authCheck.error, logs: [] };
+
+    try {
+        const logs = await prisma.userActivityLog.findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+            take: 5
+        });
+
+        return {
+            success: true,
+            logs: logs.map(log => ({
+                id: log.id,
+                action: log.action,
+                ipAddress: log.ipAddress || "Unknown",
+                userAgent: log.userAgent || "Unknown",
+                createdAt: log.createdAt.toISOString()
+            }))
+        };
+    } catch (error) {
+        console.error("Error fetching user audit logs:", error);
+        return { success: false, error: "Failed to fetch logs.", logs: [] };
+    }
+}
+
+

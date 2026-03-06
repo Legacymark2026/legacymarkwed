@@ -5,7 +5,7 @@ import { DangerZone } from "@/components/settings/danger-zone";
 import { LoginHistoryTable } from "@/components/settings/login-history-table";
 import { BackupCodesModal } from "@/components/settings/backup-codes-modal";
 import { PasswordPolicies } from "@/components/settings/password-policies";
-import { getActiveSessions } from "@/actions/settings";
+import { getActiveSessions, getMyLoginHistory } from "@/actions/settings";
 import { fetchSecuritySettings } from "@/app/actions/settings";
 import { auth } from "@/lib/auth";
 
@@ -14,6 +14,7 @@ export const dynamic = 'force-dynamic';
 export default async function SettingsSecurityPage() {
     const securityData = await fetchSecuritySettings();
     const sessions = await getActiveSessions();
+    const loginHistory = await getMyLoginHistory();
     const currentSession = await auth();
     const currentToken = currentSession?.sessionToken || "";
 
@@ -48,7 +49,7 @@ export default async function SettingsSecurityPage() {
             </section>
 
             <section className="space-y-4 pt-4">
-                <LoginHistoryTable />
+                <LoginHistoryTable logs={loginHistory} />
             </section>
 
             <section className="space-y-4 pt-8">

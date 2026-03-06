@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import { headers } from "next/headers";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import LinkedIn from "next-auth/providers/linkedin";
@@ -36,6 +37,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async signIn({ user, account }) {
             logger.auth("signIn callback triggered");
             logger.auth("Provider:", account?.provider);
+
+            let ip = "Unknown IP";
+            let userAgent = "Unknown Device";
+            try {
+                const headersList = await headers();
+                ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "Unknown IP";
+                userAgent = headersList.get("user-agent") || "Unknown Device";
+            } catch (e) {
+                // headers() may throw if called outside of request context
+            }
 
             // Para providers OAuth, guardar el account en BD
             if (account && account.provider !== "credentials") {
@@ -102,10 +113,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     } else {
                         logger.auth("Account already linked, skipping.");
                     }
+
+                    // Log initial success
+                    await prisma.userActivityLog.create({
+                        data: {
+                            userId: dbUser.id,
+                            action: `LOGIN_SUCCESS_OAUTH_${account.provider.toUpperCase()}`,
+                            ipAddress: ip,
+                            userAgent: userAgent,
+                        }
+                    });
+
                 } catch (error) {
                     logger.error("Error saving OAuth account:", error);
                     return false;
                 }
+            } else if (account?.provider === "credentials" && user?.id) {
+                // Log credentials success
+                await prisma.userActivityLog.create({
+                    data: {
+                        userId: user.id,
+                        action: "LOGIN_SUCCESS",
+                        ipAddress: ip,
+                        userAgent: userAgent,
+                    }
+                });
             }
 
             return true;
@@ -277,6 +309,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 logger.warn("Invalid credentials attempt.");
+
+                if (parsedCredentials.success) {
+                    try {
+                        const { email } = parsedCredentials.data;
+                        const user = await prisma.user.findUnique({ where: { email } });
+                        if (user) {
+                            let ip = "Unknown IP";
+                            let userAgent = "Unknown Device";
+                            try {
+                                const headersList = await headers();
+                                ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "Unknown IP";
+                                userAgent = headersList.get("user-agent") || "Unknown Device";
+                            } catch (e) { }
+
+                            await prisma.userActivityLog.create({
+                                data: {
+                                    userId: user.id,
+                                    action: "LOGIN_FAILED_BAD_PASSWORD",
+                                    ipAddress: ip,
+                                    userAgent: userAgent,
+                                }
+                            });
+                        }
+                    } catch (e) { }
+                }
+
                 return null;
             },
         }),

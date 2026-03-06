@@ -8,7 +8,7 @@ import {
     Smartphone, Copy, AlertTriangle, Download,
     Briefcase, MapPin, AtSign
 } from "lucide-react";
-import { forcePasswordReset, revokeAllSessions, updateUserMeta } from "@/actions/admin";
+import { forcePasswordReset, revokeAllSessions, updateUserMeta, getUserAuditLogs } from "@/actions/admin";
 
 interface UserRecord {
     id: string;
@@ -37,8 +37,22 @@ export function UserDrawer({ user, onClose, onUpdate }: UserDrawerProps) {
     const [isResetting, setIsResetting] = useState(false);
     const [isRevoking, setIsRevoking] = useState(false);
     const [notes, setNotes] = useState(user?.adminNotes || "");
+    const [auditLogs, setAuditLogs] = useState<any[]>([]);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
 
     if (!user) return null;
+
+    const handleTabChange = async (tab: "info" | "security" | "audit") => {
+        setActiveTab(tab);
+        if (tab === "audit" && auditLogs.length === 0) {
+            setIsLoadingLogs(true);
+            const res = await getUserAuditLogs(user.id);
+            if (res.success) {
+                setAuditLogs(res.logs || []);
+            }
+            setIsLoadingLogs(false);
+        }
+    };
 
     const handleForceReset = async () => {
         setIsResetting(true);
@@ -115,9 +129,9 @@ export function UserDrawer({ user, onClose, onUpdate }: UserDrawerProps) {
 
                         {/* Tabs */}
                         <div className="flex border-b border-slate-200 text-sm font-semibold text-slate-500 px-6">
-                            <button onClick={() => setActiveTab('info')} className={`py-3 px-4 border-b-2 transition-colors ${activeTab === 'info' ? 'border-indigo-600 text-indigo-700' : 'border-transparent hover:text-slate-800'}`}>Perfil HR</button>
-                            <button onClick={() => setActiveTab('security')} className={`py-3 px-4 border-b-2 transition-colors flex gap-1 ${activeTab === 'security' ? 'border-red-500 text-red-600' : 'border-transparent hover:text-slate-800'}`}>Seguridad <ShieldAlert size={14} /></button>
-                            <button onClick={() => setActiveTab('audit')} className={`py-3 px-4 border-b-2 transition-colors flex gap-1 ${activeTab === 'audit' ? 'border-amber-500 text-amber-600' : 'border-transparent hover:text-slate-800'}`}>Auditoría <Activity size={14} /></button>
+                            <button onClick={() => handleTabChange('info')} className={`py-3 px-4 border-b-2 transition-colors ${activeTab === 'info' ? 'border-indigo-600 text-indigo-700' : 'border-transparent hover:text-slate-800'}`}>Perfil HR</button>
+                            <button onClick={() => handleTabChange('security')} className={`py-3 px-4 border-b-2 transition-colors flex gap-1 ${activeTab === 'security' ? 'border-red-500 text-red-600' : 'border-transparent hover:text-slate-800'}`}>Seguridad <ShieldAlert size={14} /></button>
+                            <button onClick={() => handleTabChange('audit')} className={`py-3 px-4 border-b-2 transition-colors flex gap-1 ${activeTab === 'audit' ? 'border-amber-500 text-amber-600' : 'border-transparent hover:text-slate-800'}`}>Auditoría <Activity size={14} /></button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-slate-50/30">
@@ -220,26 +234,28 @@ export function UserDrawer({ user, onClose, onUpdate }: UserDrawerProps) {
                                         </div>
                                     </div>
 
-                                    {/* Mock Timeline */}
                                     <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
                                         <h3 className="font-bold text-xs uppercase tracking-widest text-slate-800 mb-4 flex items-center gap-2"><Activity size={12} /> Timeline Breve</h3>
 
                                         <div className="relative border-l border-slate-200 ml-2 space-y-4">
-                                            <div className="relative pl-5">
-                                                <div className="absolute w-2.5 h-2.5 bg-emerald-500 rounded-full -left-[5.5px] top-1.5 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                                                <p className="text-xs font-bold text-slate-800">Login Exitoso</p>
-                                                <p className="text-[10px] text-slate-500">Hace 3 horas desde <span className="text-indigo-600">Miami, US (192.168.x.x)</span></p>
-                                            </div>
-                                            <div className="relative pl-5">
-                                                <div className="absolute w-2.5 h-2.5 bg-slate-300 rounded-full -left-[5.5px] top-1.5" />
-                                                <p className="text-xs font-bold text-slate-800">Actualización de Rol</p>
-                                                <p className="text-[10px] text-slate-500">Hace 2 días por <span className="text-indigo-600">SuperAdmin</span></p>
-                                            </div>
-                                            <div className="relative pl-5">
-                                                <div className="absolute w-2.5 h-2.5 bg-red-400 rounded-full -left-[5.5px] top-1.5 shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
-                                                <p className="text-xs font-bold text-slate-800">Falló Contraseña x3</p>
-                                                <p className="text-[10px] text-slate-500">Hace 5 días desde Chrome/Windows</p>
-                                            </div>
+                                            {isLoadingLogs ? (
+                                                <p className="text-xs text-slate-400 ml-4 py-2">Cargando registros...</p>
+                                            ) : auditLogs.length === 0 ? (
+                                                <p className="text-xs text-slate-400 ml-4 py-2">No hay actividad reciente.</p>
+                                            ) : auditLogs.map((log) => {
+                                                const isAlert = log.action.includes("FAIL") || log.action.includes("RESET");
+                                                const colorClass = isAlert ? "bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)]" : "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]";
+
+                                                return (
+                                                    <div key={log.id} className="relative pl-5">
+                                                        <div className={`absolute w-2.5 h-2.5 rounded-full -left-[5.5px] top-1.5 ${colorClass}`} />
+                                                        <p className="text-xs font-bold text-slate-800 truncate" title={log.action}>{log.action}</p>
+                                                        <p className="text-[10px] text-slate-500 truncate" title={log.userAgent}>
+                                                            {new Date(log.createdAt).toLocaleString()} desde <span className="text-indigo-600">{log.ipAddress}</span>
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </motion.div>

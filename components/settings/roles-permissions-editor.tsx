@@ -4,8 +4,9 @@ import { ShieldCheck, UserCheck, Eye, Edit3, Trash, Check, Lock, Settings } from
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { saveCustomRoles } from "@/actions/admin";
 
 // Roles Mocked
 const INITIAL_ROLES = [
@@ -109,10 +110,17 @@ const PERMISSIONS = [
     }
 ];
 
-export function RolesPermissionsEditor() {
-    const [roles, setRoles] = useState(INITIAL_ROLES);
-    const [selectedRole, setSelectedRole] = useState(INITIAL_ROLES[1]);
-    const [activePermissions, setActivePermissions] = useState<string[]>(["crm.view_own", "crm.view_all", "crm.edit", "mkt.view", "team.view"]);
+export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any[] }) {
+    const initialRolesState = customRoles.length > 0 ? customRoles : INITIAL_ROLES;
+    const [roles, setRoles] = useState(initialRolesState);
+    const [selectedRole, setSelectedRole] = useState(initialRolesState[1] || initialRolesState[0]);
+    const [activePermissions, setActivePermissions] = useState<string[]>(selectedRole.permissions || ["crm.view_own", "crm.view_all", "crm.edit", "mkt.view", "team.view"]);
+
+    useEffect(() => {
+        if (selectedRole) {
+            setActivePermissions(selectedRole.permissions || []);
+        }
+    }, [selectedRole]);
 
     // New Role State
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -124,11 +132,19 @@ export function RolesPermissionsEditor() {
         );
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const toastId = toast.loading(`Actualizando permisos para ${selectedRole.name}...`);
-        setTimeout(() => {
+
+        const updatedRoles = roles.map(r => r.id === selectedRole.id ? { ...r, permissions: activePermissions } : r);
+        setRoles(updatedRoles);
+
+        const res = await saveCustomRoles(updatedRoles);
+
+        if (res?.success) {
             toast.success("Rol actualizado con éxito.", { id: toastId });
-        }, 1200);
+        } else {
+            toast.error("Error al guardar los cambios.", { id: toastId });
+        }
     };
 
     const handleCreateRole = () => {
@@ -140,7 +156,8 @@ export function RolesPermissionsEditor() {
         const newRole = {
             id: newRoleName.toLowerCase().replace(/\s+/g, "_"),
             name: newRoleName,
-            color: "blue" // default color
+            color: "blue", // default color
+            permissions: []
         };
 
         setRoles([...roles, newRole]);

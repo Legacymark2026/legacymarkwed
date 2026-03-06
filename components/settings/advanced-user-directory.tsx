@@ -3,8 +3,31 @@
 import { Users, Search, MoreHorizontal, UserPlus, Filter, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { updateUserRole } from "@/actions/admin";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
-export function AdvancedUserDirectory({ initialUsers }: { initialUsers: any[] }) {
+export function AdvancedUserDirectory({ initialUsers, customRoles = [] }: { initialUsers: any[], customRoles?: any[] }) {
+    const defaultRoles = customRoles.length > 0 ? customRoles : [
+        { id: "admin", name: "Administrador" },
+        { id: "manager", name: "Jefe de Ventas" },
+        { id: "agent", name: "Agente de Ventas" },
+        { id: "viewer", name: "Solo Lectura" }
+    ];
+    const [isPending, startTransition] = useTransition();
+
+    const handleRoleChange = (userId: string, newRole: string) => {
+        startTransition(async () => {
+            const res = await updateUserRole(userId, newRole as any);
+            if (res.success) {
+                toast.success("Rol actualizado exitosamente");
+            } else {
+                toast.error(res.error || "Error al actualizar el rol");
+            }
+        });
+    };
+
     return (
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden mt-6">
             <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -88,9 +111,26 @@ export function AdvancedUserDirectory({ initialUsers }: { initialUsers: any[] })
                                         {user._count?.sessions > 0 ? `${user._count.sessions} sesiones` : 'Nunca'}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
-                                            <MoreHorizontal className="w-4 h-4" />
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900" disabled={isPending}>
+                                                    <MoreHorizontal className="w-4 h-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-48">
+                                                <DropdownMenuLabel>Asignar Rol</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                {defaultRoles.map((role: any) => (
+                                                    <DropdownMenuItem
+                                                        key={role.id}
+                                                        onClick={() => handleRoleChange(user.id, role.id)}
+                                                        className={user.role === role.id ? "bg-slate-100 font-semibold" : ""}
+                                                    >
+                                                        {role.name}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </td>
                                 </tr>
                             )

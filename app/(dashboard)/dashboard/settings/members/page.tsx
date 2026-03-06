@@ -2,13 +2,16 @@ import { AdvancedUserDirectory } from "@/components/settings/advanced-user-direc
 import { RolesPermissionsEditor } from "@/components/settings/roles-permissions-editor";
 import { CustomFieldsBuilder } from "@/components/settings/custom-fields-builder";
 import { fetchCustomFields } from "@/app/actions/crm-settings";
-import { getUsers } from "@/actions/admin";
+import { getUsers, getCustomRoles } from "@/actions/admin";
 
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsMembersPage() {
     const fields = await fetchCustomFields() || [];
     const usersRes = await getUsers();
+    const rolesRes = await getCustomRoles();
+    const customRoles = rolesRes.success ? rolesRes.roles : [];
+
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">
             <div>
@@ -21,11 +24,14 @@ export default async function SettingsMembersPage() {
             </div>
 
             <section className="space-y-4">
-                <AdvancedUserDirectory initialUsers={'users' in usersRes ? usersRes.users || [] : []} />
+                <AdvancedUserDirectory
+                    initialUsers={'users' in usersRes ? usersRes.users || [] : []}
+                    customRoles={customRoles}
+                />
             </section>
 
             <section className="space-y-4 pt-4">
-                <RolesPermissionsEditor />
+                <RolesPermissionsEditor customRoles={customRoles} />
             </section>
 
             <section className="space-y-4 pt-4">
