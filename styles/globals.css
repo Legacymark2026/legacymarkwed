@@ -78,6 +78,46 @@
   --radius: 0.75rem;
 }
 
+.dark {
+  --background: #020617;
+  /* Slate-950 */
+  --foreground: #f8fafc;
+  /* Slate-50 */
+
+  --card: #0f172a;
+  /* Slate-900 */
+  --card-foreground: #f8fafc;
+
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+
+  --primary: #10b981;
+  /* Emerald-500 */
+  --primary-foreground: #ffffff;
+
+  --secondary: #1e293b;
+  /* Slate-800 */
+  --secondary-foreground: #f8fafc;
+
+  --muted: #0f172a;
+  /* Slate-900 */
+  --muted-foreground: #94a3b8;
+  /* Slate-400 */
+
+  --accent: #064e3b;
+  /* Emerald-900 */
+  --accent-foreground: #10b981;
+
+  --destructive: #7f1d1d;
+  /* Red-900 */
+  --destructive-foreground: #f8fafc;
+
+  --border: #1e293b;
+  /* Slate-800 */
+  --input: #1e293b;
+  --ring: #10b981;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -91,21 +131,39 @@ html {
 }
 
 /* Custom Scrollbar - Light Version */
-::-webkit-scrollbar {
+html.light ::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
+html.light ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 
-::-webkit-scrollbar-thumb {
+html.light ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+html.light ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Custom Scrollbar - Dark Version */
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #0f172a; /* background or Slate-900 */
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155; /* Slate-700 */
+  border-radius: 4px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* Slate-600 */
 }
 
 /* Cloudinary Widget Fix */
