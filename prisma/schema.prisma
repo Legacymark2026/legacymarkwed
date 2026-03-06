@@ -704,6 +704,7 @@ model Deal {
 
   priority   String        @default("MEDIUM") // LOW, MEDIUM, HIGH
   activities CRMActivity[]
+  events     Event[]
 
   assignedTo   String? @map("assigned_to")
   assignedUser User?   @relation("AssignedDeals", fields: [assignedTo], references: [id])
@@ -1444,6 +1445,8 @@ model Event {
 
   // Link to CRM 
   clientId String? @map("client_id") // Optional direct CRM link (could be Lead or Deal ID)
+  dealId   String? @map("deal_id")
+  deal     Deal?   @relation(fields: [dealId], references: [id], onDelete: SetNull)
 
   // System features
   tags       String[] @default([]) // ["FAIR", "WEBINAR", "INTERNAL"]

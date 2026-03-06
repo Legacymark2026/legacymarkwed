@@ -1,22 +1,32 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import resourcePlugin from "@fullcalendar/resource";
 import esLocale from "@fullcalendar/core/locales/es";
-import { format } from "date-fns";
 
 interface CalendarBoardProps {
     events: any[];
+    resources?: any[]; // optional for now
     filters: any;
+    selectedDate?: Date;
     onEventClick: (id: string) => void;
     onEventDropped: (id: string, start: Date, end: Date | null) => void;
+    onDateSelect?: (start: Date, end: Date, allDay: boolean) => void;
 }
 
-export function CalendarBoard({ events, filters, onEventClick, onEventDropped }: CalendarBoardProps) {
+export function CalendarBoard({ events, resources = [], filters, selectedDate, onEventClick, onEventDropped, onDateSelect }: CalendarBoardProps) {
     const calendarRef = useRef<FullCalendar>(null);
+
+    useEffect(() => {
+        if (selectedDate && calendarRef.current) {
+            calendarRef.current.getApi().gotoDate(selectedDate);
+        }
+    }, [selectedDate]);
 
     // Format events for FullCalendar
     const calendarEvents = useMemo(() => {
@@ -53,6 +63,14 @@ export function CalendarBoard({ events, filters, onEventClick, onEventDropped }:
         // Optimistic UI updates / Drag and drop logic will be wired to server action here
         const { event } = dropInfo;
         onEventDropped(event.id, event.start, event.end);
+    };
+
+    const handleDateSelect = (selectInfo: any) => {
+        if (onDateSelect) {
+            onDateSelect(selectInfo.start, selectInfo.end, selectInfo.allDay);
+        }
+        // Unselect after callback
+        selectInfo.view.calendar.unselect();
     };
 
     return (
@@ -136,16 +154,24 @@ export function CalendarBoard({ events, filters, onEventClick, onEventDropped }:
 
             <FullCalendar
                 ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                plugins={[
+                    dayGridPlugin,
+                    timeGridPlugin,
+                    interactionPlugin,
+                    resourcePlugin,
+                    resourceTimelinePlugin
+                ]}
                 initialView="dayGridMonth"
                 headerToolbar={{
                     left: "prev,next today",
                     center: "title",
-                    right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                    right: "dayGridMonth,timeGridWeek,timeGridDay,resourceTimelineDay,listWeek"
                 }}
                 locales={[esLocale]}
                 locale="es"
+                timeZone="local"
                 events={calendarEvents}
+                resources={resources}
                 editable={true} // Enables Drag & Drop
                 selectable={true}
                 selectMirror={true}
@@ -153,6 +179,7 @@ export function CalendarBoard({ events, filters, onEventClick, onEventDropped }:
                 height="100%"
                 eventClick={handleEventClick}
                 eventDrop={handleEventDrop}
+                select={handleDateSelect}
                 nowIndicator={true}
                 slotMinTime="06:00:00"
                 slotMaxTime="23:00:00"
@@ -162,7 +189,8 @@ export function CalendarBoard({ events, filters, onEventClick, onEventDropped }:
                     month: 'Mes',
                     week: 'Semana',
                     day: 'Día',
-                    list: 'Agenda'
+                    list: 'Agenda',
+                    resourceTimelineDay: 'Equipo (Hoy)',
                 }}
             />
         </div>

@@ -1,24 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar as CalendarIcon, MapPin, Video, Users, Clock, AlertCircle, Trash2 } from "lucide-react";
+import { X, Calendar as CalendarIcon, MapPin, Video, Users, Clock, AlertCircle, Trash2, Sparkles } from "lucide-react";
 import { createEvent, updateEvent, deleteEvent } from "@/actions/events/event-actions";
 import { toast } from "sonner";
 import { LeadSelector } from "./LeadSelector";
+import { DealSelector } from "./DealSelector";
 
 interface EventDrawerProps {
     isOpen: boolean;
     onClose: () => void;
     eventId: string | null;
     initialEvent?: any;
+    prefilledDates?: { start: Date; end: Date } | null;
     onEventSaved: (event: any) => void;
     onEventDeleted?: (id: string) => void;
 }
 
-export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSaved, onEventDeleted }: EventDrawerProps) {
+export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledDates, onEventSaved, onEventDeleted }: EventDrawerProps) {
     const [loading, setLoading] = useState(false);
+    const [generatingAgenda, setGeneratingAgenda] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
+    const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
 
     // Initial State
     const [formData, setFormData] = useState({
@@ -31,6 +35,7 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
         endTime: "10:00",
         isAllDay: false,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        recurrenceRule: "",
         // PHYSICAL Meta
         address: "",
         city: "",
@@ -65,6 +70,7 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
                     endTime: formatTime(end),
                     isAllDay: initialEvent.isAllDay || false,
                     timeZone: initialEvent.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    recurrenceRule: initialEvent.recurrenceRule || "",
                     address: initialEvent.metadata?.address || "",
                     city: initialEvent.metadata?.city || "",
                     capacity: initialEvent.metadata?.capacity || "",
@@ -78,28 +84,59 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
                     ? initialEvent.participants.map((p: any) => p.leadId).filter(Boolean)
                     : [];
                 setSelectedLeadIds(participantIds);
+                setSelectedDealId(initialEvent.dealId || null);
             } else {
                 // Reset form for New Event
-                const d = new Date();
-                const startStr = d.toISOString().split('T')[0];
+                let startStr, endTimeStr, endStr;
+                let startTimeStr = "09:00";
 
-                d.setHours(d.getHours() + 1);
-                const endStr = d.toISOString().split('T')[0];
-                const endTimeStr = d.toTimeString().split(' ')[0].substring(0, 5);
+                if (prefilledDates) {
+                    const start = prefilledDates.start;
+                    const end = prefilledDates.end;
+
+                    startStr = start.toISOString().split('T')[0];
+                    endStr = end.toISOString().split('T')[0];
+
+                    startTimeStr = start.toTimeString().split(' ')[0].substring(0, 5);
+                    endTimeStr = end.toTimeString().split(' ')[0].substring(0, 5);
+                } else {
+                    const d = new Date();
+                    startStr = d.toISOString().split('T')[0];
+
+                    d.setHours(d.getHours() + 1);
+                    endStr = d.toISOString().split('T')[0];
+                    endTimeStr = d.toTimeString().split(' ')[0].substring(0, 5);
+                }
 
                 setFormData(prev => ({
                     ...prev,
                     title: "", description: "",
                     startDate: startStr, endDate: endStr,
-                    startTime: "09:00", endTime: endTimeStr,
-                    address: "", city: "", meetingUrl: "", meetingId: ""
+                    startTime: startTimeStr, endTime: endTimeStr,
+                    address: "", city: "", meetingUrl: "", meetingId: "", recurrenceRule: ""
                 }));
                 setSelectedLeadIds([]);
+                setSelectedDealId(null);
             }
         }
-    }, [isOpen, eventId, initialEvent]);
+    }, [isOpen, eventId, initialEvent, prefilledDates]);
 
     if (!isOpen) return null;
+
+    const handleGenerateAgenda = async () => {
+        if (!formData.title) {
+            toast?.error("Por favor ingresa un título primero.");
+            return;
+        }
+        setGeneratingAgenda(true);
+        // Simulate API call for AI generation
+        setTimeout(() => {
+            const agenda = `### Agenda Propuesta: ${formData.title}\n\n1. Bienvenida y contexto (5 min)\n2. Revisión del estado actual (15 min)\n3. Discusión de puntos clave (20 min)\n4. Acuerdos y próximos pasos (10 min)\n\n*Nota: Agenda generada automáticamente.*`;
+            setFormData(prev => ({ ...prev, description: agenda }));
+            setGeneratingAgenda(false);
+            toast?.success("Agenda generada.");
+        }, 1200);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -132,7 +169,9 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
             endDate: end,
             isAllDay: formData.isAllDay,
             timeZone: formData.timeZone,
+            recurrenceRule: formData.recurrenceRule || undefined,
             metadata,
+            dealId: selectedDealId,
             participants: selectedLeadIds.map(id => ({ leadId: id }))
         };
 
@@ -205,8 +244,19 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
                                 <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm font-medium" placeholder="Ej. Lanzamiento Q3" />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Descripción</label>
-                                <textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm resize-none" placeholder="Agenda o notas adicionales..." />
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">Descripción / Agenda</label>
+                                    <button
+                                        type="button"
+                                        onClick={handleGenerateAgenda}
+                                        disabled={generatingAgenda || !formData.title}
+                                        className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50"
+                                    >
+                                        {generatingAgenda ? <span className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                        Generar con IA
+                                    </button>
+                                </div>
+                                <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm resize-none" placeholder="Agenda o notas adicionales..." />
                             </div>
                         </div>
 
@@ -234,6 +284,14 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
                             <LeadSelector
                                 selectedLeadIds={selectedLeadIds}
                                 onChange={setSelectedLeadIds}
+                            />
+                        </div>
+
+                        {/* CRM Deal Selection */}
+                        <div className="pt-2">
+                            <DealSelector
+                                selectedDealId={selectedDealId}
+                                onChange={setSelectedDealId}
                             />
                         </div>
 
@@ -267,6 +325,20 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, onEventSav
                                 <input type="checkbox" checked={formData.isAllDay} onChange={e => setFormData({ ...formData, isAllDay: e.target.checked })} className="rounded text-teal-500 focus:ring-teal-500" />
                                 <span className="text-xs font-bold text-slate-600">Evento de todo el día</span>
                             </label>
+
+                            <div className="pt-2 border-t border-slate-100">
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Repetición</label>
+                                <select
+                                    value={formData.recurrenceRule}
+                                    onChange={(e) => setFormData({ ...formData, recurrenceRule: e.target.value })}
+                                    className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm font-medium"
+                                >
+                                    <option value="">No repetir</option>
+                                    <option value="FREQ=DAILY">Diariamente</option>
+                                    <option value="FREQ=WEEKLY">Semanalmente</option>
+                                    <option value="FREQ=MONTHLY">Mensualmente</option>
+                                </select>
+                            </div>
                         </div>
 
                         {/* Conditional Metadata: ONLINE */}

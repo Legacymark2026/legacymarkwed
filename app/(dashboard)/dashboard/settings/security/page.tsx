@@ -16,7 +16,7 @@ export default async function SettingsSecurityPage() {
     const sessions = await getActiveSessions();
     const loginHistory = await getMyLoginHistory();
     const currentSession = await auth();
-    const currentToken = currentSession?.sessionToken || "";
+    const currentToken = (currentSession as any)?.sessionToken || "";
 
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">

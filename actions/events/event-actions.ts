@@ -30,6 +30,28 @@ export async function searchLeadsForEvent(query: string) {
     }
 }
 
+// --- SEARCH DEALS ---
+export async function searchDealsForEvent(query: string) {
+    try {
+        const { authorized, companyId } = await checkEventPermission('read');
+        if (!authorized || !companyId) return { success: false, data: [], error: "Unauthorized" };
+
+        const deals = await prisma.deal.findMany({
+            where: {
+                companyId,
+                title: { contains: query, mode: 'insensitive' }
+            },
+            take: 10,
+            select: { id: true, title: true, stage: true, value: true }
+        });
+
+        return { success: true, data: deals };
+    } catch (error: any) {
+        console.error("Error searching deals:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 // --- PERMISSION HELPERS ---
 
 export async function checkEventPermission(action: 'read' | 'write' | 'delete', eventId?: string): Promise<{ authorized: boolean; companyId?: string; userId?: string; error?: string }> {
@@ -148,6 +170,7 @@ export async function createEvent(data: {
     recurrenceRule?: string;
     metadata?: any;
     tags?: string[];
+    dealId?: string | null;
     participants?: { userId?: string; leadId?: string }[];
 }) {
     try {
@@ -179,6 +202,7 @@ export async function createEvent(data: {
                 recurrenceRule: data.recurrenceRule,
                 metadata: data.metadata || {},
                 tags: data.tags || [],
+                dealId: data.dealId || null,
                 organizerId: userId,
                 companyId: companyId,
                 status: "SCHEDULED",
@@ -332,5 +356,50 @@ export async function getEventsForLead(leadId: string) {
     } catch (e: any) {
         console.error("Error fetching lead events:", e);
         return { success: false, events: [], error: e.message || "Failed to fetch lead events" };
+    }
+}
+
+// --- NOTIFICATIONS & REMINDERS ---
+export async function sendAutomatedEventReminders() {
+    try {
+        // Scaffold for Triggering Email/WhatsApp Reminders 24 hours before event
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const upcomingEvents = await prisma.event.findMany({
+            where: {
+                status: "SCHEDULED",
+                startDate: {
+                    gte: new Date(),
+                    lte: tomorrow
+                }
+            },
+            include: {
+                participants: {
+                    include: { lead: true, user: true }
+                }
+            }
+        });
+
+        // Loop through and fire notifications to Omnichannel / Email Service
+        let notificationsQueued = 0;
+        for (const event of upcomingEvents) {
+            for (const participant of event.participants) {
+                // Determine contact info
+                const contactEmail = participant.lead?.email || participant.user?.email || participant.guestEmail;
+                const contactPhone = participant.lead?.phone;
+
+                if (contactEmail || contactPhone) {
+                    console.log(`[Notification Engine]: Mock sending reminder for ${event.title} to ${contactEmail || contactPhone}`);
+                    // await omnichannel.send({ type: "WHATSAPP", to: contactPhone, template: "event_reminder", ... })
+                    notificationsQueued++;
+                }
+            }
+        }
+
+        return { success: true, queued: notificationsQueued };
+    } catch (e: any) {
+        console.error("Error sending reminders:", e);
+        return { success: false, error: e.message || "Failed to trigger reminders" };
     }
 }
