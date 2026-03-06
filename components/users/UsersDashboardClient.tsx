@@ -33,6 +33,7 @@ type UserRecord = {
 interface UsersClientProps {
     initialUsers: UserRecord[];
     currentUserId: string;
+    customRoles?: any[];
 }
 
 const ROLE_INFO: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
@@ -44,7 +45,7 @@ const ROLE_INFO: Record<string, { icon: React.ReactNode; label: string; color: s
     guest: { icon: <Users size={12} />, label: "Invitado", color: "bg-gray-50 text-gray-500 border-gray-200" },
 };
 
-export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClientProps) {
+export function UsersDashboardClient({ initialUsers, currentUserId, customRoles = [] }: UsersClientProps) {
     const [users, setUsers] = useState<UserRecord[]>(initialUsers);
     const [searchQuery, setSearchQuery] = useState("");
     const [isTyping, setIsTyping] = useState(false);
@@ -58,6 +59,21 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
     const [showMetrics, setShowMetrics] = useState(true);
     const [selectedUserForDrawer, setSelectedUserForDrawer] = useState<UserRecord | null>(null);
     const [contextMenu, setContextMenu] = useState<{ x: number, y: number, userId: string } | null>(null);
+
+    const dynamicRoleInfo = useMemo(() => {
+        const map: Record<string, { icon: React.ReactNode; label: string; color: string }> = { ...ROLE_INFO };
+        if (customRoles.length > 0) {
+            customRoles.forEach(role => {
+                const c = role.color || "slate";
+                map[role.id] = {
+                    icon: <Briefcase size={12} />,
+                    label: role.name,
+                    color: `bg-${c}-50 text-${c}-700 border-${c}-200`,
+                };
+            });
+        }
+        return map;
+    }, [customRoles]);
 
     useEffect(() => {
         setIsClient(true);
@@ -206,7 +222,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
                 <div className="flex w-full xl:w-auto items-center gap-3 overflow-x-auto pb-1 xl:pb-0 hide-scrollbar">
                     <div className="flex gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
                         <button onClick={() => setRoleFilter('all')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${roleFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Todos</button>
-                        {Object.entries(ROLE_INFO).filter(([k]) => k !== 'guest').map(([k, info]) => (
+                        {Object.entries(dynamicRoleInfo).filter(([k]) => k !== 'guest').map(([k, info]) => (
                             <button key={k} onClick={() => setRoleFilter(k)} className={`px-3 py-1.5 flex items-center gap-1.5 text-xs font-bold rounded-lg transition-all ${roleFilter === k ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
                                 {info.icon} <span className="hidden sm:inline">{info.label}</span>
                             </button>
@@ -278,7 +294,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
                                                 </td>
 
                                                 <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
-                                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} />
+                                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} customRoles={customRoles} />
                                                     {user.jobTitle && <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1"><Briefcase size={10} /> {user.jobTitle}</p>}
                                                 </td>
 
@@ -332,7 +348,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId }: UsersClien
                                 <p className="text-xs text-slate-500 font-mono truncate mb-4">{user.email}</p>
 
                                 <div className="flex items-center gap-2 mb-4" onClick={(e) => e.stopPropagation()}>
-                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={user.id === currentUserId} />
+                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={user.id === currentUserId} customRoles={customRoles} />
                                 </div>
 
                                 <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">

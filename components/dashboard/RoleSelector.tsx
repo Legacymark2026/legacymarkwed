@@ -17,17 +17,26 @@ interface RoleSelectorProps {
     userId: string;
     currentRole: string;
     isSelf: boolean;
+    customRoles?: any[];
 }
 
-export function RoleSelector({ userId, currentRole, isSelf }: RoleSelectorProps) {
+export function RoleSelector({ userId, currentRole, isSelf, customRoles = [] }: RoleSelectorProps) {
     const [isPending, startTransition] = useTransition();
     const [selected, setSelected] = useState<string>(currentRole);
     const [open, setOpen] = useState(false);
 
-    const currentOption = ROLE_OPTIONS.find((r) => r.value === selected)
+    const dynamicRoles = customRoles.length > 0
+        ? customRoles.map(r => ({
+            value: r.id,
+            label: r.name,
+            color: `bg-${r.color || 'slate'}-100 text-${r.color || 'slate'}-700 border-${r.color || 'slate'}-200`
+        }))
+        : ROLE_OPTIONS;
+
+    const currentOption = dynamicRoles.find((r) => r.value === selected)
         ?? { label: selected, color: "bg-gray-100 text-gray-600 border-gray-200" };
 
-    const handleSelect = (newRole: UserRole) => {
+    const handleSelect = (newRole: string) => {
         if (newRole === selected) { setOpen(false); return; }
 
         setOpen(false);
@@ -35,7 +44,7 @@ export function RoleSelector({ userId, currentRole, isSelf }: RoleSelectorProps)
             const result = await updateUserRole(userId, newRole);
             if (result.success) {
                 setSelected(newRole);
-                toast.success(`Rol actualizado a ${ROLE_OPTIONS.find(r => r.value === newRole)?.label}`);
+                toast.success(`Rol actualizado a ${dynamicRoles.find(r => r.value === newRole)?.label}`);
             } else {
                 toast.error(result.error ?? "Error al actualizar el rol");
             }
@@ -77,10 +86,10 @@ export function RoleSelector({ userId, currentRole, isSelf }: RoleSelectorProps)
                         <p className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 mb-1">
                             Cambiar rol
                         </p>
-                        {ROLE_OPTIONS.map((option) => (
+                        {dynamicRoles.map((option) => (
                             <button
                                 key={option.value}
-                                onClick={() => handleSelect(option.value)}
+                                onClick={() => handleSelect(option.value as any)}
                                 className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-50 transition-colors ${selected === option.value ? "font-semibold" : "text-gray-700"
                                     }`}
                             >

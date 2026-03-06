@@ -1,9 +1,9 @@
-import { getUsers } from "@/actions/admin";
+import { getUsers, getCustomRoles } from "@/actions/admin";
 import { auth } from "@/lib/auth";
 import { UsersDashboardClient } from "@/components/users/UsersDashboardClient";
 
 export default async function UsersPage() {
-    const [result, session] = await Promise.all([getUsers(), auth()]);
+    const [result, session, rolesRes] = await Promise.all([getUsers(), auth(), getCustomRoles()]);
 
     if ('error' in result) {
         return (
@@ -18,12 +18,14 @@ export default async function UsersPage() {
 
     const { users } = result;
     const currentUserId = session?.user?.id ?? "";
+    const customRoles = rolesRes.success ? rolesRes.roles : [];
 
     return (
         <div className="h-full">
             <UsersDashboardClient
                 initialUsers={users as any}
                 currentUserId={currentUserId}
+                customRoles={customRoles}
             />
         </div>
     );
