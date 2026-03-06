@@ -337,3 +337,42 @@ export async function getPublicIntegrations() {
     }
 }
 
+
+export async function getActiveSessions() {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    try {
+        const activeSessions = await prisma.session.findMany({
+            where: { userId: session.user.id },
+            orderBy: { expires: "desc" }
+        });
+
+        return activeSessions.map(s => ({
+            id: s.id,
+            sessionToken: s.sessionToken,
+            ipAddress: s.ipAddress,
+            userAgent: s.userAgent,
+            expires: s.expires.toISOString(),
+        }));
+    } catch (error) {
+        console.error("Failed to fetch active sessions:", error);
+        return [];
+    }
+}
+
+export async function revokeSession(sessionId: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    try {
+        await prisma.session.delete({
+            where: { id: sessionId, userId: session.user.id }
+        });
+        revalidatePath("/dashboard/settings/security");
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to revoke session:", error);
+        return { success: false, error: "Failed to revoke session" };
+    }
+}

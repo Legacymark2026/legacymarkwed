@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { LayoutDashboard } from "lucide-react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { useTranslations } from "next-intl";
+import { UserRole } from "@/types/auth";
 
 interface NavLink {
     name: string;
@@ -26,6 +27,8 @@ export function Header() {
     const { data: session } = useSession();
     const t = useTranslations("nav");
     const tFooter = useTranslations("footer.links");
+
+    const isAgency = session?.user?.role && [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_MANAGER].includes(session.user.role as UserRole);
 
     const navLinks: NavLink[] = [
         { name: tFooter("strategy") === "Brand Strategy" ? "Home" : "Inicio", href: "/" }, // Hardcoding a bit based on current English string absence for "Inicio" in nav. Better to use existing ones or fallback. Wait, let's just use what's available.
@@ -117,9 +120,10 @@ export function Header() {
                     <LanguageSwitcher />
                     {session ? (
                         <Link href="/dashboard">
-                            <Button size="sm" className="rounded-full px-6 shadow-lg hover:shadow-xl transition-all bg-teal-600 text-white hover:bg-teal-700 flex items-center gap-2">
-                                <LayoutDashboard size={15} />
-                                Panel de Control
+                            <Button size="sm" className="rounded-full px-4 lg:px-6 shadow-lg hover:shadow-xl transition-all bg-teal-600 text-white hover:bg-teal-700 flex items-center gap-2 whitespace-nowrap">
+                                <LayoutDashboard size={15} className="shrink-0" />
+                                <span className="hidden xl:block whitespace-nowrap">{isAgency ? 'Panel de Control' : 'Portal Cliente'}</span>
+                                <span className="block xl:hidden whitespace-nowrap">{isAgency ? 'Panel' : 'Portal'}</span>
                             </Button>
                         </Link>
                     ) : (
@@ -187,8 +191,8 @@ export function Header() {
                                 {session && (
                                     <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                                         <Button className="w-full h-12 rounded-full text-base bg-teal-600 text-white hover:bg-teal-700 flex items-center justify-center gap-2">
-                                            <LayoutDashboard size={18} />
-                                            Panel de Control
+                                            <LayoutDashboard size={18} className="shrink-0" />
+                                            {isAgency ? 'Panel de Control' : 'Portal Cliente'}
                                         </Button>
                                     </Link>
                                 )}

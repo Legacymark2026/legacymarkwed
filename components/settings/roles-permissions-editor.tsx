@@ -17,6 +17,13 @@ const INITIAL_ROLES = [
 
 const PERMISSIONS = [
     {
+        module: "Configuración del Sistema",
+        actions: [
+            { id: "manage_settings", label: "Gestionar Configuraciones" },
+            { id: "view_security", label: "Ver Privacidad y Seguridad" },
+        ]
+    },
+    {
         module: "CRM (Ventas)",
         actions: [
             { id: "crm.view_own", label: "Ver Leads Asignados" },
@@ -27,12 +34,55 @@ const PERMISSIONS = [
         ]
     },
     {
-        module: "Marketing & Automatización",
+        module: "Marketing & Campañas",
         actions: [
             { id: "mkt.view", label: "Ver Campañas" },
             { id: "mkt.edit", label: "Crear/Editar Campañas" },
             { id: "mkt.send", label: "Enviar Correos Masivos" },
             { id: "mkt.integrations", label: "Gestionar Integraciones" },
+        ]
+    },
+    {
+        module: "Automatización",
+        actions: [
+            { id: "automation.view", label: "Ver Flujos de Automatización" },
+            { id: "automation.manage", label: "Crear/Editar Automatizaciones" },
+        ]
+    },
+    {
+        module: "Inbox Omnicanal",
+        actions: [
+            { id: "inbox.view", label: "Ver Bandeja de Entrada" },
+            { id: "inbox.send", label: "Responder Mensajes" },
+        ]
+    },
+    {
+        module: "Contenido (Blog y Web)",
+        actions: [
+            { id: "content.create", label: "Crear/Editar Contenido" },
+            { id: "content.publish", label: "Publicar Contenido" },
+            { id: "content.delete", label: "Eliminar Contenido" },
+        ]
+    },
+    {
+        module: "Proyectos y Portafolio",
+        actions: [
+            { id: "projects.view", label: "Ver Proyectos" },
+            { id: "projects.manage", label: "Gestionar Proyectos" },
+        ]
+    },
+    {
+        module: "Analítica y Reportes",
+        actions: [
+            { id: "analytics.view", label: "Ver Analíticas Generales" },
+            { id: "reports.view", label: "Visualizar Reportes" },
+        ]
+    },
+    {
+        module: "Gestión de Archivos",
+        actions: [
+            { id: "assets.upload", label: "Subir y Gestionar Archivos" },
+            { id: "client.dashboard", label: "Acceso a Portal de Clientes" },
         ]
     },
     {
