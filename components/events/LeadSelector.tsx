@@ -97,7 +97,7 @@ export function LeadSelector({ selectedLeadIds, onChange }: LeadSelectorProps) {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => { if (results.length > 0) setIsOpen(true); }}
-                    className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm font-medium placeholder-slate-400 shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm font-medium text-slate-900 placeholder-slate-400 shadow-sm"
                     placeholder="Buscar lead por nombre o email..."
                 />
 

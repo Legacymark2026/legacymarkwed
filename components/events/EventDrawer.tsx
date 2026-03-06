@@ -241,7 +241,7 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledD
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Título del Evento *</label>
-                                <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm font-medium" placeholder="Ej. Lanzamiento Q3" />
+                                <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm text-slate-900 font-medium" placeholder="Ej. Lanzamiento Q3" />
                             </div>
                             <div>
                                 <div className="flex items-center justify-between mb-2">
@@ -256,7 +256,7 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledD
                                         Generar con IA
                                     </button>
                                 </div>
-                                <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm resize-none" placeholder="Agenda o notas adicionales..." />
+                                <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm text-slate-900 resize-none" placeholder="Agenda o notas adicionales..." />
                             </div>
                         </div>
 
@@ -304,21 +304,21 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledD
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Fecha Inicio</label>
-                                    <input type="date" required value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm" />
+                                    <input type="date" required value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900" />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Hora Inicio</label>
-                                    <input type="time" required value={formData.startTime} onChange={e => setFormData({ ...formData, startTime: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm" />
+                                    <input type="time" required value={formData.startTime} onChange={e => setFormData({ ...formData, startTime: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Fecha Fin</label>
-                                    <input type="date" required value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm" />
+                                    <input type="date" required value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900" />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Hora Fin</label>
-                                    <input type="time" required value={formData.endTime} onChange={e => setFormData({ ...formData, endTime: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm" />
+                                    <input type="time" required value={formData.endTime} onChange={e => setFormData({ ...formData, endTime: e.target.value })} className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900" />
                                 </div>
                             </div>
                             <label className="flex items-center gap-2 pt-2 cursor-pointer">
@@ -331,7 +331,7 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledD
                                 <select
                                     value={formData.recurrenceRule}
                                     onChange={(e) => setFormData({ ...formData, recurrenceRule: e.target.value })}
-                                    className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm font-medium"
+                                    className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm text-slate-900 font-medium"
                                 >
                                     <option value="">No repetir</option>
                                     <option value="FREQ=DAILY">Diariamente</option>
@@ -350,16 +350,16 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledD
                                 </h3>
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Enlace de Reunión (URL)</label>
-                                    <input type="url" value={formData.meetingUrl} onChange={e => setFormData({ ...formData, meetingUrl: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="https://zoom.us/j/..." />
+                                    <input type="url" value={formData.meetingUrl} onChange={e => setFormData({ ...formData, meetingUrl: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900" placeholder="https://zoom.us/j/..." />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">ID Reunión</label>
-                                        <input value={formData.meetingId} onChange={e => setFormData({ ...formData, meetingId: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Opcional" />
+                                        <input value={formData.meetingId} onChange={e => setFormData({ ...formData, meetingId: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900" placeholder="Opcional" />
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Código / Key</label>
-                                        <input value={formData.passcode} onChange={e => setFormData({ ...formData, passcode: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Opcional" />
+                                        <input value={formData.passcode} onChange={e => setFormData({ ...formData, passcode: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900" placeholder="Opcional" />
                                     </div>
                                 </div>
                             </div>
@@ -374,16 +374,16 @@ export function EventDrawer({ isOpen, onClose, eventId, initialEvent, prefilledD
                                 </h3>
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Dirección Exacta</label>
-                                    <input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Centro de Convenciones..." />
+                                    <input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900" placeholder="Centro de Convenciones..." />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Ciudad</label>
-                                        <input value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Madrid, MX..." />
+                                        <input value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900" placeholder="Madrid, MX..." />
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Aforo Máximo</label>
-                                        <input type="number" value={formData.capacity} onChange={e => setFormData({ ...formData, capacity: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Ej. 150" />
+                                        <input type="number" value={formData.capacity} onChange={e => setFormData({ ...formData, capacity: e.target.value })} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900" placeholder="Ej. 150" />
                                     </div>
                                 </div>
                             </div>

@@ -87,7 +87,7 @@ export function DealSelector({ selectedDealId, onChange }: DealSelectorProps) {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onFocus={() => { if (results.length > 0) setIsOpen(true); }}
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all text-sm font-medium placeholder-slate-400 shadow-sm"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all text-sm font-medium text-slate-900 placeholder-slate-400 shadow-sm"
                         placeholder="Buscar negocio por título..."
                     />
 
