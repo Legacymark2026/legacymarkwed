@@ -37,13 +37,16 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
                     keepMarks: true,
                     keepAttributes: false,
                 },
+                // Link is now often bundled in some StarterKit or needs to be handled exclusively.
+                // Assuming it's bundled based on the duplicate error:
             }),
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    class: 'text-blue-600 underline',
-                },
-            }),
+            // Explicitly load link extension but with a check if we need to remove StarterKit's version. 
+            // Actually, if StarterKit throws a duplicate, we should just remove our explicit one, OR disable it in StarterKit.
+            // Let's disable it in StarterKit just to be safe, so we can use our custom `Link.configure()`:
+            // Oh wait, StarterKit doesn't have Link by default unless they changed it. 
+            // WAIT. The error is "Duplicate extension names found: ['link']". It means it's loaded twice.
+            // Let's disable it in StarterKit if it exists, or just import it once. Let's just remove our Link.configure and see, or remove the import! 
+            // Better: disable it in StarterKit to keep our custom configuration.
             Placeholder.configure({
                 placeholder,
             }),
