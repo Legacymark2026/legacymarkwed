@@ -167,10 +167,9 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
         return rtf.format(-Math.floor(daysDiff / 365), 'year');
     };
 
-    if (!isClient) return <Skeleton className="w-full h-[600px] rounded-2xl" />;
-
     return (
-        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500 pb-20">
+        <div className={`space-y-6 transition-opacity duration-500 pb-20 ${!isClient ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 animate-in fade-in zoom-in-95'}`}>
+            {!isClient && <Skeleton className="w-full h-[600px] rounded-2xl mb-8" />}
             {/* HERO HEADER */}
             <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 rounded-2xl p-8 text-white shadow-xl">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 text-indigo-500/10">
@@ -325,7 +324,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
                 </div>
             ) : (
                 /* GRID VIEW */
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredUsers.map(user => {
                         const avatarGradient = generateAvatarColor(user.name);
                         return (
@@ -354,7 +353,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
                             </div>
                         )
                     })}
-                </motion.div>
+                </div>
             )}
 
             {filteredUsers.length === 0 && (
@@ -366,28 +365,23 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
             )}
 
             {/* CONTEXT MENU COMPONENT */}
-            <AnimatePresence>
-                {contextMenu && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        style={{ top: contextMenu.y, left: contextMenu.x }}
-                        className="fixed z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-1.5 min-w-[180px]"
-                    >
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-2 pb-1 border-b border-slate-100 mb-1">Opciones Rápidas</p>
-                        <button onClick={() => { setSelectedUserForDrawer(users.find(u => u.id === contextMenu.userId) || null); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 rounded-lg transition-colors">
-                            Abrir Ficha Técnica
-                        </button>
-                        <button onClick={() => { handleToggleStatus(contextMenu.userId); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                            Alterar Estado
-                        </button>
-                        <button className="w-full text-left px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                            Eliminar del Hub
-                        </button>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {contextMenu && (
+                <div
+                    style={{ top: contextMenu.y, left: contextMenu.x }}
+                    className="fixed z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-1.5 min-w-[180px]"
+                >
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-2 pb-1 border-b border-slate-100 mb-1">Opciones Rápidas</p>
+                    <button onClick={() => { setSelectedUserForDrawer(users.find(u => u.id === contextMenu.userId) || null); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 rounded-lg transition-colors">
+                        Abrir Ficha Técnica
+                    </button>
+                    <button onClick={() => { handleToggleStatus(contextMenu.userId); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                        Alterar Estado
+                    </button>
+                    <button className="w-full text-left px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        Eliminar del Hub
+                    </button>
+                </div>
+            )}
 
             {/* USER DRAWER (SIDE PANEL) */}
             <UserDrawer
