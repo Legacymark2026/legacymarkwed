@@ -123,6 +123,12 @@ export function RolesPermissionsEditor({ customRoles = [], currentUserRole }: { 
         }
     }, [selectedRole]);
 
+    useEffect(() => {
+        if (customRoles?.length > 0) {
+            setRoles(customRoles);
+        }
+    }, [customRoles]);
+
     // New Role State
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [newRoleName, setNewRoleName] = useState("");
@@ -168,11 +174,16 @@ export function RolesPermissionsEditor({ customRoles = [], currentUserRole }: { 
         setNewRoleName("");
         setIsDialogOpen(false);
 
-        toast.promise(saveCustomRoles(updatedRoles), {
-            loading: `Creando rol ${newRoleName}...`,
-            success: `Rol ${newRoleName} creado exitosamente`,
-            error: "Error al crear el rol en la base de datos"
-        });
+        const toastId = toast.loading(`Creando rol ${newRoleName}...`);
+        const res = await saveCustomRoles(updatedRoles);
+
+        if (res?.success) {
+            toast.success(`Rol ${newRoleName} creado exitosamente`, { id: toastId });
+        } else {
+            toast.error(res?.error || "Error al crear el rol en la base de datos", { id: toastId });
+            // Revert on failure
+            setRoles(roles);
+        }
     };
 
     return (

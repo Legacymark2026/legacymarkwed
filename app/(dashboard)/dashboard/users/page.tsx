@@ -2,6 +2,8 @@ import { getUsers, getCustomRoles } from "@/actions/admin";
 import { auth } from "@/lib/auth";
 import { UsersDashboardClient } from "@/components/users/UsersDashboardClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function UsersPage() {
     const [result, session, rolesRes] = await Promise.all([getUsers(), auth(), getCustomRoles()]);
 

@@ -41,7 +41,7 @@ export function RoleSelector({ userId, currentRole, isSelf, customRoles = [] }: 
 
         setOpen(false);
         startTransition(async () => {
-            const result = await updateUserRole(userId, newRole);
+            const result = await updateUserRole(userId, newRole as UserRole);
             if (result.success) {
                 setSelected(newRole);
                 toast.success(`Rol actualizado a ${dynamicRoles.find(r => r.value === newRole)?.label}`);
