@@ -171,7 +171,7 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
     };
 
     return (
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full shadow-sm">
+        <aside className="w-64 bg-white border-r border-slate-200/60 flex flex-col h-full shadow-[2px_0_8px_-4px_rgba(0,0,0,0.05)] z-10">
             {/* Logo */}
             <div className="h-16 md:h-28 flex items-center justify-center border-b border-gray-100 bg-white px-4 shrink-0">
                 <Link href="/" className="flex items-center justify-center group w-full h-full">
@@ -206,9 +206,9 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-teal-50 hover:text-teal-700 rounded-md transition-colors group"
+                                    className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-semibold text-slate-600 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-transparent hover:text-teal-700 rounded-lg transition-all border border-transparent hover:border-teal-100/50 group"
                                 >
-                                    <span className="text-slate-400 group-hover:text-teal-500 transition-colors">
+                                    <span className="text-slate-400 group-hover:text-teal-500 transition-colors group-hover:drop-shadow-[0_2px_4px_rgba(20,184,166,0.2)]">
                                         {item.icon}
                                     </span>
                                     {item.label}
@@ -220,20 +220,20 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
             </nav>
 
             {/* Footer: usuario + rol + logout */}
-            <div className="p-4 border-t border-gray-100 bg-slate-50/50">
-                <div className="flex items-center gap-3 mb-2">
+            <div className="p-4 border-t border-slate-200/60 bg-slate-50/80">
+                <div className="flex items-center gap-3 mb-3">
                     {image ? (
-                        <div className="relative h-8 w-8 rounded-full overflow-hidden border border-gray-300 shrink-0 shadow-sm">
+                        <div className="relative h-9 w-9 rounded-full overflow-hidden border border-white shrink-0 shadow-sm ring-1 ring-slate-200/50">
                             <Image src={image} alt={name ?? "User avatar"} fill className="object-cover" />
                         </div>
                     ) : (
-                        <div className="h-8 w-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold border border-gray-300 shrink-0 shadow-sm">
+                        <div className="h-9 w-9 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold border border-white shrink-0 shadow-sm ring-1 ring-slate-200/50">
                             {name?.[0]?.toUpperCase() ?? "U"}
                         </div>
                     )}
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-sm font-bold text-slate-900 truncate">{name}</p>
-                        <p className="text-xs text-gray-500 truncate">{email}</p>
+                        <p className="text-[13px] font-bold text-slate-900 truncate tracking-tight">{name}</p>
+                        <p className="text-[11px] font-medium text-slate-500 truncate">{email}</p>
                     </div>
                 </div>
                 {/* Badge de rol */}

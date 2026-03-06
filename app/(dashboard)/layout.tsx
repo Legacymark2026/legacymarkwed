@@ -35,7 +35,7 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="h-screen flex flex-col md:flex-row font-sans selection:bg-teal-500 selection:text-white overflow-hidden">
+        <div className="h-screen flex flex-col md:flex-row font-sans selection:bg-teal-500 selection:text-white overflow-hidden bg-slate-50/50">
             {/* Sidebar dinámico envuelto para responsiveness */}
             <MobileSidebarWrapper
                 sidebar={
@@ -50,7 +50,7 @@ export default async function DashboardLayout({
             />
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto p-4 md:p-8 relative">
+            <main className="flex-1 overflow-auto p-4 md:p-8 relative w-full h-full">
                 <div className="max-w-[1400px] mx-auto">
                     {children}
                 </div>
