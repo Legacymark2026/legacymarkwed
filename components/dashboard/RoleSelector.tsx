@@ -44,7 +44,8 @@ export function RoleSelector({ userId, currentRole, isSelf, customRoles = [] }: 
             const result = await updateUserRole(userId, newRole as UserRole);
             if (result.success) {
                 setSelected(newRole);
-                toast.success(`Rol actualizado a ${dynamicRoles.find(r => r.value === newRole)?.label}`);
+                const roleLabel = dynamicRoles.find(r => r.value === newRole)?.label || newRole;
+                toast.success(`Rol actualizado a ${roleLabel}`);
             } else {
                 toast.error(result.error ?? "Error al actualizar el rol");
             }
