@@ -101,7 +101,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`font-sans ${jetbrainsMono.variable} antialiased selection:bg-teal-500 selection:text-white bg-white text-slate-900`}
+        className={`font-sans ${jetbrainsMono.variable} antialiased selection:bg-teal-500 selection:text-white`}
       >
         <Providers>
           <InternalAnalyticsProvider userId={session?.user?.id}>
