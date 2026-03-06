@@ -445,6 +445,7 @@ export async function saveCustomRoles(customRoles: any[]) {
         }
 
         revalidatePath("/dashboard/settings/members");
+        revalidatePath("/dashboard/users");
         return { success: true };
     } catch (error) {
         console.error("Error saving custom roles:", error);

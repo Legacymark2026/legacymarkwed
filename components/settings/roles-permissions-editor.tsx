@@ -110,9 +110,10 @@ const PERMISSIONS = [
     }
 ];
 
-export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any[] }) {
+export function RolesPermissionsEditor({ customRoles = [], currentUserRole }: { customRoles?: any[], currentUserRole?: string }) {
     const initialRolesState = customRoles.length > 0 ? customRoles : INITIAL_ROLES;
     const [roles, setRoles] = useState(initialRolesState);
+    const canManageRoles = currentUserRole === "super_admin" || currentUserRole === "admin";
     const [selectedRole, setSelectedRole] = useState(initialRolesState[1] || initialRolesState[0]);
     const [activePermissions, setActivePermissions] = useState<string[]>(selectedRole.permissions || ["crm.view_own", "crm.view_all", "crm.edit", "mkt.view", "team.view"]);
 
@@ -147,7 +148,7 @@ export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any
         }
     };
 
-    const handleCreateRole = () => {
+    const handleCreateRole = async () => {
         if (!newRoleName.trim()) {
             toast.error("El nombre del rol no puede estar vacío");
             return;
@@ -160,12 +161,18 @@ export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any
             permissions: []
         };
 
-        setRoles([...roles, newRole]);
+        const updatedRoles = [...roles, newRole];
+        setRoles(updatedRoles);
         setSelectedRole(newRole);
         setActivePermissions([]);
         setNewRoleName("");
         setIsDialogOpen(false);
-        toast.success(`Rol ${newRoleName} creado exitosamente`);
+
+        toast.promise(saveCustomRoles(updatedRoles), {
+            loading: `Creando rol ${newRoleName}...`,
+            success: `Rol ${newRoleName} creado exitosamente`,
+            error: "Error al crear el rol en la base de datos"
+        });
     };
 
     return (
@@ -204,7 +211,7 @@ export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any
 
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="outline" className="w-full mt-4 bg-white border-dashed text-slate-500 hover:text-indigo-600 hover:border-indigo-300">
+                            <Button variant="outline" className="w-full mt-4 bg-white border-dashed text-slate-500 hover:text-indigo-600 hover:border-indigo-300" disabled={!canManageRoles}>
                                 + Crear Nuevo Rol
                             </Button>
                         </DialogTrigger>
@@ -240,7 +247,7 @@ export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any
                                 {activePermissions.length} permisos habilitados
                             </p>
                         </div>
-                        <Button onClick={handleSave} className="bg-slate-900 hover:bg-slate-800 text-white">
+                        <Button onClick={handleSave} className="bg-slate-900 hover:bg-slate-800 text-white" disabled={!canManageRoles}>
                             Guardar Cambios
                         </Button>
                     </div>
@@ -265,10 +272,11 @@ export function RolesPermissionsEditor({ customRoles = [] }: { customRoles?: any
                                                 <button
                                                     key={action.id}
                                                     onClick={() => handleToggle(action.id)}
+                                                    disabled={!canManageRoles}
                                                     className={`text-left flex items-start gap-3 p-3 rounded-lg border transition-all ${isActive
                                                         ? "bg-indigo-50/50 border-indigo-200 hover:border-indigo-300"
                                                         : "bg-white border-slate-200 hover:border-slate-300"
-                                                        }`}
+                                                        } ${!canManageRoles ? "opacity-75 cursor-not-allowed" : ""}`}
                                                 >
                                                     <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${isActive ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-300"
                                                         }`}>

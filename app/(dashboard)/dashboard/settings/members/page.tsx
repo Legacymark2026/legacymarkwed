@@ -3,6 +3,7 @@ import { RolesPermissionsEditor } from "@/components/settings/roles-permissions-
 import { CustomFieldsBuilder } from "@/components/settings/custom-fields-builder";
 import { fetchCustomFields } from "@/app/actions/crm-settings";
 import { getUsers, getCustomRoles } from "@/actions/admin";
+import { auth } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,8 @@ export default async function SettingsMembersPage() {
     const usersRes = await getUsers();
     const rolesRes = await getCustomRoles();
     const customRoles = rolesRes.success ? rolesRes.roles : [];
+    const session = await auth();
+    const userRole = (session?.user as any)?.role;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-300 pb-10">
@@ -31,7 +34,7 @@ export default async function SettingsMembersPage() {
             </section>
 
             <section className="space-y-4 pt-4">
-                <RolesPermissionsEditor customRoles={customRoles} />
+                <RolesPermissionsEditor customRoles={customRoles} currentUserRole={userRole} />
             </section>
 
             <section className="space-y-4 pt-4">
