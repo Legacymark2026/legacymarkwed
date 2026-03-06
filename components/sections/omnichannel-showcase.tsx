@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { MouseEvent } from "react";
 import Image from "next/image";
-import { Database, Network, Shield, Zap } from "lucide-react";
+import { Database, Network, Shield, Zap, TrendingUp, Globe, PenTool, Layers, MousePointerClick } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function OmnichannelShowcase() {
@@ -136,10 +136,87 @@ export function OmnichannelShowcase() {
                             src="/images/IMG_20260305_152613.png"
                             alt="Omnichannel Intelligence Showcase"
                             fill
-                            className="object-cover object-center z-0"
+                            className="object-cover object-center z-0 scale-95"
                             priority
                             sizes="(max-width: 768px) 100vw, 50vw"
                         />
+
+                        {/* Floating Element 1: Analytics / Meta Ads */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                            className="absolute top-[12%] -left-4 sm:-left-8 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                        >
+                            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} className="flex items-center gap-3">
+                                <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
+                                    <TrendingUp size={16} />
+                                </div>
+                                <div className="hidden sm:block">
+                                    <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Meta Ads ROAS</p>
+                                    <p className="text-sm font-bold text-white">+245%</p>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Floating Element 2: Web Dev / Traffic */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.7 }}
+                            className="absolute top-[30%] -right-4 sm:-right-8 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                        >
+                            <motion.div animate={{ y: [5, -5, 5] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="flex items-center gap-3">
+                                <div className="p-2 bg-teal-500/20 rounded-lg text-teal-400">
+                                    <Globe size={16} />
+                                </div>
+                                <div className="hidden sm:block text-left">
+                                    <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Web Traffic</p>
+                                    <p className="text-sm font-bold text-white">45k visitors</p>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Floating Element 3: Content / Design */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.9 }}
+                            className="absolute bottom-[35%] -left-6 sm:-left-10 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                        >
+                            <motion.div animate={{ y: [-4, 4, -4] }} transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }} className="flex items-center gap-3">
+                                <div className="flex -space-x-2">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center border-2 border-slate-900 shadow-sm"><PenTool size={12} className="text-white" /></div>
+                                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center border-2 border-slate-900 shadow-sm"><Layers size={12} className="text-white" /></div>
+                                </div>
+                                <div className="hidden sm:block">
+                                    <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Auto-Design</p>
+                                    <p className="text-xs font-bold text-white">Generating...</p>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Floating Element 4: Google Ads */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 1.1 }}
+                            className="absolute bottom-[20%] -right-2 sm:-right-4 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl"
+                        >
+                            <motion.div animate={{ y: [6, -6, 6] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }} className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                                    <MousePointerClick size={16} />
+                                </div>
+                                <div className="hidden sm:block">
+                                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider whitespace-nowrap">Google CPC</p>
+                                    <p className="text-sm font-bold text-white">$0.45</p>
+                                </div>
+                            </motion.div>
+                        </motion.div>
 
                         {/* Tech Data Overlay */}
                         <div className="absolute bottom-6 left-6 right-6 z-20 flex justify-between items-end">
