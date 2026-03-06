@@ -57,7 +57,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
         },
         editorProps: {
             attributes: {
-                class: 'focus:outline-none min-h-[300px] p-4 [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:my-1 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:my-3 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:my-2 [&_h4]:text-lg [&_h4]:font-medium [&_h4]:my-2',
+                class: 'prose prose-gray max-w-none focus:outline-none min-h-[300px] p-4',
             },
         },
     });
