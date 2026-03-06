@@ -101,25 +101,37 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
     let badge = ROLE_BADGES[role];
     let userPermissions: string[] = [];
 
-    if (!badge && userId) {
-        // Find custom roles for this user's company
-        const companyUser = await prisma.companyUser.findFirst({
-            where: { userId }
+    // ── Fase 1: Permisos directos del usuario (siempre, sin excepción) ──────
+    // Se leen de `companyUser.permissions`, que es exactamente el campo que
+    // `updateUserRole` actualiza en el Server Action. Esta es la fuente de
+    // verdad para los permisos del usuario en tiempo real.
+    if (userId) {
+        const companyUserRecord = await prisma.companyUser.findFirst({
+            where: { userId },
+            select: { permissions: true, companyId: true },
         });
-        if (companyUser) {
-            const company = await prisma.company.findUnique({
-                where: { id: companyUser.companyId },
-                select: { defaultCompanySettings: true }
-            });
-            const settings = (company?.defaultCompanySettings as any) || {};
-            const customRoles = settings.customRoles || [];
-            const customRole = customRoles.find((r: any) => r.id === role);
-            if (customRole) {
-                userPermissions = customRole.permissions || [];
-                badge = {
-                    label: customRole.name,
-                    color: `bg-${customRole.color || 'slate'}-100 text-${customRole.color || 'slate'}-700`
-                };
+
+        if (companyUserRecord) {
+            // `permissions` es un campo JSON/String[] en Prisma — cast seguro.
+            userPermissions = (companyUserRecord.permissions as string[]) ?? [];
+
+            // ── Fase 2: Badge del rol (solo para roles custom sin badge estándar) ──
+            // Si el rol no está en ROLE_BADGES (es un rol custom definido por el admin),
+            // buscamos su nombre y color en la configuración de la compañía.
+            if (!badge) {
+                const company = await prisma.company.findUnique({
+                    where: { id: companyUserRecord.companyId },
+                    select: { defaultCompanySettings: true },
+                });
+                const settings = (company?.defaultCompanySettings as any) ?? {};
+                const customRoles: any[] = settings.customRoles ?? [];
+                const customRole = customRoles.find((r: any) => r.id === role);
+                if (customRole) {
+                    badge = {
+                        label: customRole.name,
+                        color: `bg-${customRole.color ?? "slate"}-100 text-${customRole.color ?? "slate"}-700`,
+                    };
+                }
             }
         }
     }

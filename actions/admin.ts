@@ -269,6 +269,12 @@ export async function updateUserRole(
             }
         });
 
+        // ── Cache Invalidation ─────────────────────────────────────────
+        // Revalidar el layout raíz del dashboard invalida el Server Component
+        // del sidebar y el layout para TODOS los segmentos hijos.
+        // Esto garantiza que el usuario afectado vea el nuevo rol en el
+        // próximo request sin necesidad de cerrar sesión ("layout revalidation").
+        revalidatePath("/dashboard", "layout");
         revalidatePath("/dashboard/users");
         revalidatePath("/dashboard/settings/members");
         return { success: true };
