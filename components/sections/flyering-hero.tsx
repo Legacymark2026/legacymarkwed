@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Play, Wifi, Rocket, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExitIntentPopup } from "@/components/ui/exit-intent-popup";
-import { StickyCountdownBar, ScarcityTimer } from "@/components/ui/scarcity-timer";
 import { useHeroParallax } from "./flyering-hero/use-hero-parallax";
 import { useGlitchText } from "./flyering-hero/use-glitch-text";
 import { HeroBackground } from "./flyering-hero/hero-background";
@@ -23,25 +22,10 @@ export function FlyeringHero() {
         >
             <HeroBackground mouseX={mouseX} mouseY={mouseY} />
 
-            <div className="container relative z-20 px-4 md:px-6 pt-20">
+            <div className="container relative z-20 px-4 md:px-6 pt-32">
                 <div className="flex flex-col items-center text-center space-y-10">
 
-
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="relative flex flex-col items-center gap-2"
-                    >
-                        <span className="relative inline-flex items-center gap-2 rounded-full border border-red-500/50 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-400 shadow-sm uppercase tracking-wider backdrop-blur-md animate-pulse">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                            </span>
-                            <span className="hidden sm:inline">⚠️ ÚLTIMOS 3 CUPOS ::</span> OFERTA POR TIEMPO LIMITADO
-                        </span>
-                        <ScarcityTimer />
-                    </motion.div>
+                    {/* Removed overlapping badge (viñeta) */}
 
                     {/* 4. Main Headline */}
                     <div className="max-w-5xl space-y-6 relative">
@@ -138,7 +122,6 @@ export function FlyeringHero() {
 
             {/* 10. Aggressive Acquisition Modules */}
             <ExitIntentPopup />
-            <StickyCountdownBar />
         </div >
     );
 }
