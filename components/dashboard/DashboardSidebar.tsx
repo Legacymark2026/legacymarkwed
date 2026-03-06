@@ -129,16 +129,25 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
     // Helper to check access checking both RBAC and custom permissions
     const checkAccess = (href: string) => {
         // Standard RBAC check
-        if (canAccessRoute(href, role)) return true;
+        if (canAccessRoute(href, role as UserRole)) return true;
+
+        // Custom Roles always get the basic shared routes (Dashboard & Calendar by default)
+        if (href === "/dashboard") return true;
+        if (href === "/dashboard/events") return true; // Asumiendo que el calendario es global o tiene permiso propio
+        if (href === "/dashboard/inbox" && userPermissions.includes("view_inbox")) return true;
 
         // Custom permissions check based on the menu paths
         if (href.startsWith("/dashboard/users") && userPermissions.includes("manage_users")) return true;
-        if (href.startsWith("/dashboard/admin/crm") && (userPermissions.includes("view_crm") || userPermissions.includes("manage_crm"))) return true;
-        if (href.startsWith("/dashboard/admin/marketing") && (userPermissions.includes("view_marketing") || userPermissions.includes("manage_marketing"))) return true;
-        if (href.startsWith("/dashboard/posts") && userPermissions.includes("create_content")) return true;
-        if (href.startsWith("/dashboard/projects") && userPermissions.includes("view_projects")) return true;
-        if (href.startsWith("/dashboard/analytics") && userPermissions.includes("view_analytics")) return true;
-        if (href.startsWith("/dashboard/inbox") && userPermissions.includes("view_inbox")) return true;
+        if (href.startsWith("/dashboard/experts") && (userPermissions.includes("view_team") || userPermissions.includes("manage_team"))) return true;
+        if (href.startsWith("/dashboard/security") && userPermissions.includes("view_security")) return true;
+        if (href.startsWith("/dashboard/settings") && userPermissions.includes("manage_settings")) return true;
+
+        if (href.startsWith("/dashboard/admin/crm") && (userPermissions.includes("view_crm") || userPermissions.includes("manage_crm") || userPermissions.includes("view_leads"))) return true;
+        if (href.startsWith("/dashboard/admin/marketing") && (userPermissions.includes("view_marketing") || userPermissions.includes("manage_marketing") || userPermissions.includes("view_campaigns"))) return true;
+
+        if (href.startsWith("/dashboard/posts") && (userPermissions.includes("create_content") || userPermissions.includes("edit_content"))) return true;
+        if (href.startsWith("/dashboard/projects") && (userPermissions.includes("view_projects") || userPermissions.includes("manage_projects"))) return true;
+        if (href.startsWith("/dashboard/analytics") && (userPermissions.includes("view_analytics") || userPermissions.includes("view_reports"))) return true;
 
         return false;
     };
