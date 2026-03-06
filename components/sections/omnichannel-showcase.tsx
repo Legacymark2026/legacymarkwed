@@ -133,7 +133,7 @@ export function OmnichannelShowcase() {
                         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-slate-950/80 to-transparent z-10 pointer-events-none" />
 
                         <Image
-                            src="/images/IMG_20260305_152613.jpg"
+                            src="/images/IMG_20260305_152613.png"
                             alt="Omnichannel Intelligence Showcase"
                             fill
                             className="object-cover object-center z-0"
