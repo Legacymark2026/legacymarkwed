@@ -36,7 +36,7 @@ export class ForbiddenError extends Error {
 
 // ── Helper interno ─────────────────────────────────────────
 
-async function getSessionRole(): Promise<{ userId: string; role: UserRole }> {
+async function getSessionRole(): Promise<{ userId: string; role: UserRole; permissions: string[] }> {
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -44,7 +44,8 @@ async function getSessionRole(): Promise<{ userId: string; role: UserRole }> {
     }
 
     const role = (session.user.role as UserRole) || UserRole.GUEST;
-    return { userId: session.user.id, role };
+    const permissions = (session.user.permissions as string[]) || [];
+    return { userId: session.user.id, role, permissions };
 }
 
 // ── Guards públicos ────────────────────────────────────────
@@ -56,16 +57,16 @@ async function getSessionRole(): Promise<{ userId: string; role: UserRole }> {
  * @example
  *   await requireRole([UserRole.SUPER_ADMIN, UserRole.ADMIN]);
  */
-export async function requireRole(allowedRoles: UserRole[]): Promise<{ userId: string; role: UserRole }> {
-    const { userId, role } = await getSessionRole();
+export async function requireRole(allowedRoles: UserRole[]): Promise<{ userId: string; role: UserRole; permissions: string[] }> {
+    const ctx = await getSessionRole();
 
-    if (!allowedRoles.includes(role)) {
+    if (!allowedRoles.includes(ctx.role)) {
         throw new ForbiddenError(
-            `Se requiere uno de los siguientes roles: ${allowedRoles.join(", ")}. Tu rol actual es: ${role}`
+            `Se requiere uno de los siguientes roles: ${allowedRoles.join(", ")}. Tu rol actual es: ${ctx.role}`
         );
     }
 
-    return { userId, role };
+    return ctx;
 }
 
 /**
@@ -75,11 +76,14 @@ export async function requireRole(allowedRoles: UserRole[]): Promise<{ userId: s
  * @example
  *   await requirePermission([Permission.MANAGE_USERS]);
  */
-export async function requirePermission(required: Permission[]): Promise<{ userId: string; role: UserRole }> {
-    const { userId, role } = await getSessionRole();
+export async function requirePermission(required: (Permission | string)[]): Promise<{ userId: string; role: UserRole; permissions: string[] }> {
+    const ctx = await getSessionRole();
 
-    const userPermissions = ROLE_PERMISSIONS[role] || [];
-    const missingPermissions = required.filter((p) => !userPermissions.includes(p));
+    const rolePermissions = ROLE_PERMISSIONS[ctx.role] || [];
+
+    const missingPermissions = required.filter(
+        (p) => !ctx.permissions.includes(p as string) && !rolePermissions.includes(p as Permission)
+    );
 
     if (missingPermissions.length > 0) {
         throw new ForbiddenError(
@@ -87,14 +91,14 @@ export async function requirePermission(required: Permission[]): Promise<{ userI
         );
     }
 
-    return { userId, role };
+    return ctx;
 }
 
 /**
  * Verifica solo que el usuario está autenticado (cualquier rol).
  * Útil para server actions que no requieren un rol específico.
  */
-export async function requireAuth(): Promise<{ userId: string; role: UserRole }> {
+export async function requireAuth(): Promise<{ userId: string; role: UserRole; permissions: string[] }> {
     return getSessionRole();
 }
 
@@ -113,7 +117,7 @@ export async function requireAuth(): Promise<{ userId: string; role: UserRole }>
  */
 export async function withRbac<T>(
     allowedRoles: UserRole[],
-    fn: (ctx: { userId: string; role: UserRole }) => Promise<T>
+    fn: (ctx: { userId: string; role: UserRole; permissions: string[] }) => Promise<T>
 ): Promise<T | { success: false; error: string; status: 401 | 403 }> {
     try {
         const ctx = await requireRole(allowedRoles);

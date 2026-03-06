@@ -12,15 +12,27 @@ import { Permission, ROLE_PERMISSIONS, UserRole } from "@/types/auth";
 
 /**
  * Validates if the current user has permission to manage leads.
+ * Supports granular string scopes from custom UI roles.
  */
-async function checkLeadPermission() {
+async function checkLeadPermission(action: 'manage' | 'edit' | 'delete' | 'export' = 'manage') {
     const session = await auth();
     if (!session?.user) return false;
 
-    if (session.user.permissions?.includes(Permission.MANAGE_LEADS)) {
-        return true;
+    // Check custom UI (string) permissions first
+    const uiPerms = (session.user.permissions as string[]) || [];
+
+    // Always allow if they have legacy manage_leads or the new super scope
+    if (uiPerms.includes(Permission.MANAGE_LEADS) || uiPerms.includes("manage_settings")) {
+        // Though manage_settings is global, we can fallback to role below.
     }
 
+    // Granular UI permission matching
+    if (action === 'delete' && uiPerms.includes("crm.delete")) return true;
+    if (action === 'edit' && (uiPerms.includes("crm.edit") || uiPerms.includes("crm.manage"))) return true;
+    if (action === 'export' && uiPerms.includes("crm.export")) return true;
+    if (action === 'manage' && (uiPerms.includes("crm.edit") || uiPerms.includes("crm.delete") || uiPerms.includes(Permission.MANAGE_LEADS))) return true;
+
+    // Legacy fallback using static Role Matrix
     const role = session.user.role as UserRole;
     if (role && ROLE_PERMISSIONS[role]?.includes(Permission.MANAGE_LEADS)) {
         return true;
@@ -306,7 +318,7 @@ export async function getLeads(companyId: string, options?: {
  */
 export async function updateLeadStatus(leadId: string, status: string) {
     try {
-        const hasPermission = await checkLeadPermission();
+        const hasPermission = await checkLeadPermission('edit');
         if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
 
         const lead = await prisma.lead.findUnique({ where: { id: leadId } });
@@ -365,7 +377,7 @@ export async function updateLeadStatus(leadId: string, status: string) {
  */
 export async function updateLeadScore(leadId: string, score: number) {
     try {
-        const hasPermission = await checkLeadPermission();
+        const hasPermission = await checkLeadPermission('edit');
         if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
 
         const lead = await prisma.lead.update({
@@ -390,7 +402,7 @@ export async function convertLeadToDeal(leadId: string, dealData: {
     stage?: string;
 }) {
     try {
-        const hasPermission = await checkLeadPermission();
+        const hasPermission = await checkLeadPermission('edit');
         if (!hasPermission) return { success: false, error: "Unauthorized to manage leads" };
 
         const lead = await prisma.lead.findUnique({ where: { id: leadId } });
@@ -436,7 +448,7 @@ export async function convertLeadToDeal(leadId: string, dealData: {
  */
 export async function deleteLead(leadId: string) {
     try {
-        const hasPermission = await checkLeadPermission();
+        const hasPermission = await checkLeadPermission('delete');
         if (!hasPermission) return { success: false, error: "Unauthorized to delete leads" };
 
         await prisma.lead.delete({

@@ -6,6 +6,13 @@ export default async function DashboardPage() {
     const session = await auth();
     const user = session?.user;
 
+    // Fetch fresh user data to ensure the role displayed is accurate
+    const dbUser = user?.id ? await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: true }
+    }) : null;
+    const currentRole = dbUser?.role || user?.role || 'Guest';
+
     // Fetch recent activity
     const activityLogs: any[] = user?.id ? await prisma.userActivityLog.findMany({
         where: { userId: user.id },
@@ -21,7 +28,7 @@ export default async function DashboardPage() {
                     <p className="text-sm text-gray-500">Aquí tienes un resumen de tu actividad reciente.</p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium capitalize">
-                    {user?.role || 'Guest'}
+                    {currentRole}
                 </span>
             </div>
 

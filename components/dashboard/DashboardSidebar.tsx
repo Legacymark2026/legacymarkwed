@@ -10,6 +10,7 @@ import { signOut } from "@/lib/auth";
 import Image from "next/image";
 import { canAccessRoute } from "@/lib/rbac";
 import { UserRole } from "@/types/auth";
+import { prisma } from "@/lib/prisma";
 
 interface NavItem {
     href: string;
@@ -93,10 +94,35 @@ interface DashboardSidebarProps {
     name: string | null | undefined;
     email: string | null | undefined;
     image?: string | null | undefined;
+    userId?: string;
 }
 
-export async function DashboardSidebar({ role, name, email, image }: DashboardSidebarProps) {
-    const badge = ROLE_BADGES[role] ?? ROLE_BADGES[UserRole.GUEST];
+export async function DashboardSidebar({ role, name, email, image, userId }: DashboardSidebarProps) {
+    let badge = ROLE_BADGES[role];
+
+    if (!badge && userId) {
+        // Find custom roles for this user's company
+        const companyUser = await prisma.companyUser.findFirst({
+            where: { userId }
+        });
+        if (companyUser) {
+            const company = await prisma.company.findUnique({
+                where: { id: companyUser.companyId },
+                select: { defaultCompanySettings: true }
+            });
+            const settings = (company?.defaultCompanySettings as any) || {};
+            const customRoles = settings.customRoles || [];
+            const customRole = customRoles.find((r: any) => r.id === role);
+            if (customRole) {
+                badge = {
+                    label: customRole.name,
+                    color: `bg-${customRole.color || 'slate'}-100 text-${customRole.color || 'slate'}-700`
+                };
+            }
+        }
+    }
+
+    badge = badge ?? ROLE_BADGES[UserRole.GUEST];
 
     return (
         <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full shadow-sm">

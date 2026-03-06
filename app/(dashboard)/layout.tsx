@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { UserRole } from "@/types/auth";
+import { prisma } from "@/lib/prisma";
 
 import { MobileSidebarWrapper } from "@/components/dashboard/MobileSidebarWrapper";
 
@@ -16,7 +17,17 @@ export default async function DashboardLayout({
         redirect("/auth/login");
     }
 
-    const role = (session.user.role as UserRole) || UserRole.GUEST;
+    let role = (session.user.role as UserRole) || UserRole.GUEST;
+
+    // Fetch freshest role from DB to avoid staleness when roles are updated
+    const dbUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true }
+    });
+
+    if (dbUser?.role) {
+        role = dbUser.role as UserRole;
+    }
 
     // Invitados sin rol asignado → redirigir a página de acceso denegado
     if (role === UserRole.GUEST) {
@@ -33,6 +44,7 @@ export default async function DashboardLayout({
                         name={session.user.name}
                         email={session.user.email}
                         image={session.user.image}
+                        userId={session.user.id}
                     />
                 }
             />
