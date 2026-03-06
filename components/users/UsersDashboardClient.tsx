@@ -257,72 +257,68 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                <AnimatePresence>
-                                    {filteredUsers.map((user) => {
-                                        const isSelf = user.id === currentUserId;
-                                        const isDeactivated = !!user.deactivatedAt;
-                                        const avatarGradient = generateAvatarColor(user.name);
-                                        const isStarred = starredIds.has(user.id);
+                                {filteredUsers.map((user) => {
+                                    const isSelf = user.id === currentUserId;
+                                    const isDeactivated = !!user.deactivatedAt;
+                                    const avatarGradient = generateAvatarColor(user.name);
+                                    const isStarred = starredIds.has(user.id);
 
-                                        return (
-                                            <motion.tr
-                                                key={user.id}
-                                                layout
-                                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                                onContextMenu={(e) => handleRightClick(e, user.id)}
-                                                onClick={() => setSelectedUserForDrawer(user)}
-                                                className={`group transition-colors hover:bg-slate-50 cursor-pointer ${isDeactivated ? 'opacity-60 grayscale' : ''} ${isStarred ? 'bg-amber-50/10' : ''}`}
-                                            >
-                                                <td className="py-4 px-6" onClick={(e) => toggleStar(user.id, e)}>
-                                                    <Star size={16} className={`transition-colors hover:text-amber-500 ${isStarred ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`} />
-                                                </td>
+                                    return (
+                                        <tr
+                                            key={user.id}
+                                            onContextMenu={(e) => handleRightClick(e, user.id)}
+                                            onClick={() => setSelectedUserForDrawer(user)}
+                                            className={`group transition-colors hover:bg-slate-50 cursor-pointer ${isDeactivated ? 'opacity-60 grayscale' : ''} ${isStarred ? 'bg-amber-50/10' : ''}`}
+                                        >
+                                            <td className="py-4 px-6" onClick={(e) => toggleStar(user.id, e)}>
+                                                <Star size={16} className={`transition-colors hover:text-amber-500 ${isStarred ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`} />
+                                            </td>
 
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`h-10 w-10 shrink-0 rounded-full bg-gradient-to-br border flex items-center justify-center font-bold text-sm ${avatarGradient} shadow-sm group-hover:scale-105 transition-transform`}>
+                                                        {user.name?.[0]?.toUpperCase() ?? "U"}
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="text-sm font-bold text-slate-900">{user.name || "Sin Nombre"}</p>
+                                                            {isSelf && <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Tú</span>}
+                                                            {user.mfaEnabled && <span title="MFA Activado"><Shield size={12} className="text-emerald-500" /></span>}
+                                                        </div>
+                                                        <p className="text-xs text-slate-500 font-medium font-mono mt-0.5">{user.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
+                                                <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} customRoles={customRoles} />
+                                                {user.jobTitle && <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1"><Briefcase size={10} /> {user.jobTitle}</p>}
+                                            </td>
+
+                                            {showMetrics && (
                                                 <td className="py-4 px-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`h-10 w-10 shrink-0 rounded-full bg-gradient-to-br border flex items-center justify-center font-bold text-sm ${avatarGradient} shadow-sm group-hover:scale-105 transition-transform`}>
-                                                            {user.name?.[0]?.toUpperCase() ?? "U"}
-                                                        </div>
-                                                        <div>
-                                                            <div className="flex items-center gap-2">
-                                                                <p className="text-sm font-bold text-slate-900">{user.name || "Sin Nombre"}</p>
-                                                                {isSelf && <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Tú</span>}
-                                                                {user.mfaEnabled && <span title="MFA Activado"><Shield size={12} className="text-emerald-500" /></span>}
-                                                            </div>
-                                                            <p className="text-xs text-slate-500 font-medium font-mono mt-0.5">{user.email}</p>
-                                                        </div>
+                                                    <div className="flex flex-col gap-1">
+                                                        <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                                                            {user._count?.sessions ?? 0} Inicios de sesión
+                                                        </p>
+                                                        <p className="text-[10px] text-slate-400">Ingreso: {getRelativeDate(new Date(user.createdAt))}</p>
                                                     </div>
                                                 </td>
+                                            )}
 
-                                                <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
-                                                    <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} customRoles={customRoles} />
-                                                    {user.jobTitle && <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1"><Briefcase size={10} /> {user.jobTitle}</p>}
-                                                </td>
-
-                                                {showMetrics && (
-                                                    <td className="py-4 px-6">
-                                                        <div className="flex flex-col gap-1">
-                                                            <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                                                                {user._count?.sessions ?? 0} Inicios de sesión
-                                                            </p>
-                                                            <p className="text-[10px] text-slate-400">Ingreso: {getRelativeDate(new Date(user.createdAt))}</p>
-                                                        </div>
-                                                    </td>
-                                                )}
-
-                                                <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id); }}
-                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border transition-all hover:shadow-sm ${isDeactivated ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
-                                                        disabled={isSelf}
-                                                    >
-                                                        {isDeactivated ? <><EyeOff size={12} /> Suspendido</> : 'Suspender'}
-                                                    </button>
-                                                </td>
-                                            </motion.tr>
-                                        );
-                                    })}
-                                </AnimatePresence>
+                                            <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id); }}
+                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border transition-all hover:shadow-sm ${isDeactivated ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+                                                    disabled={isSelf}
+                                                >
+                                                    {isDeactivated ? <><EyeOff size={12} /> Suspendido</> : 'Suspender'}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
