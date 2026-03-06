@@ -4,16 +4,74 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Extension } from '@tiptap/core';
 import {
     Bold,
     Italic,
     List,
     ListOrdered,
     Link2,
+    Heading1,
     Heading2,
     Heading3,
-    Heading4
+    Heading4,
+    Type
 } from 'lucide-react';
+
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        fontSize: {
+            setFontSize: (size: string) => ReturnType
+            unsetFontSize: () => ReturnType
+        }
+    }
+}
+
+const FontSize = Extension.create({
+    name: 'fontSize',
+    addOptions() {
+        return {
+            types: ['textStyle'],
+        }
+    },
+    addGlobalAttributes() {
+        return [
+            {
+                types: this.options.types,
+                attributes: {
+                    fontSize: {
+                        default: null,
+                        parseHTML: element => element.style.fontSize.replace(/['"]+/g, ''),
+                        renderHTML: attributes => {
+                            if (!attributes.fontSize) {
+                                return {}
+                            }
+                            return {
+                                style: `font-size: ${attributes.fontSize}`,
+                            }
+                        },
+                    },
+                },
+            },
+        ]
+    },
+    addCommands() {
+        return {
+            setFontSize: fontSize => ({ chain }) => {
+                return chain()
+                    .setMark('textStyle', { fontSize })
+                    .run()
+            },
+            unsetFontSize: () => ({ chain }) => {
+                return chain()
+                    .setMark('textStyle', { fontSize: null })
+                    .removeEmptyTextStyle()
+                    .run()
+            },
+        }
+    },
+})
 
 interface RichTextEditorProps {
     initialValue: string;
@@ -27,7 +85,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
         extensions: [
             StarterKit.configure({
                 heading: {
-                    levels: [2, 3, 4],
+                    levels: [1, 2, 3, 4],
                 },
                 bulletList: {
                     keepMarks: true,
@@ -37,19 +95,12 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
                     keepMarks: true,
                     keepAttributes: false,
                 },
-                // Link is now often bundled in some StarterKit or needs to be handled exclusively.
-                // Assuming it's bundled based on the duplicate error:
             }),
-            // Explicitly load link extension but with a check if we need to remove StarterKit's version. 
-            // Actually, if StarterKit throws a duplicate, we should just remove our explicit one, OR disable it in StarterKit.
-            // Let's disable it in StarterKit just to be safe, so we can use our custom `Link.configure()`:
-            // Oh wait, StarterKit doesn't have Link by default unless they changed it. 
-            // WAIT. The error is "Duplicate extension names found: ['link']". It means it's loaded twice.
-            // Let's disable it in StarterKit if it exists, or just import it once. Let's just remove our Link.configure and see, or remove the import! 
-            // Better: disable it in StarterKit to keep our custom configuration.
             Placeholder.configure({
                 placeholder,
             }),
+            TextStyle,
+            FontSize,
         ],
         content: initialValue,
         onUpdate: ({ editor }) => {
@@ -57,13 +108,10 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
         },
         editorProps: {
             attributes: {
-                class: 'prose prose-gray max-w-none focus:outline-none min-h-[300px] p-4',
+                class: 'prose prose-gray prose-lg max-w-none focus:outline-none min-h-[300px] p-4 [&_p:empty]:h-6',
             },
         },
     });
-
-    // Note: We use initialValue for the initial content only.
-    // The editor manages its own state - no external sync needed.
 
     if (!editor) {
         return null;
@@ -71,7 +119,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
 
     const toggleLink = () => {
         const previousUrl = editor.getAttributes('link').href;
-        const url = window.prompt('Enter URL:', previousUrl);
+        const url = window.prompt('Enter URL:', previousUrl || '');
 
         if (url === null) {
             return;
@@ -88,7 +136,44 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
     return (
         <div className="border border-gray-300 rounded-md overflow-hidden bg-white text-gray-900 focus-within:ring-2 focus-within:ring-black">
             {/* Toolbar */}
-            <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
+            <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+
+                <div className="flex items-center space-x-1 mr-2 bg-white rounded border border-gray-200 p-0.5">
+                    <Type className="h-4 w-4 text-gray-400 ml-2" />
+                    <select
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                editor.chain().focus().setFontSize(e.target.value).run();
+                            } else {
+                                editor.chain().focus().unsetFontSize().run();
+                            }
+                        }}
+                        value={editor.getAttributes('textStyle').fontSize || ''}
+                        className="p-1 rounded bg-transparent hover:bg-gray-50 focus:outline-none text-sm text-gray-700 font-medium cursor-pointer"
+                        title="Tamaño de Letra"
+                    >
+                        <option value="">Automático</option>
+                        <option value="12px">12px (Mini)</option>
+                        <option value="14px">14px (Pequeño)</option>
+                        <option value="16px">16px (Normal)</option>
+                        <option value="18px">18px (Lectura)</option>
+                        <option value="20px">20px (Grande)</option>
+                        <option value="24px">24px (Subtítulo)</option>
+                        <option value="30px">30px (Título)</option>
+                    </select>
+                </div>
+
+                <div className="w-px bg-gray-300 mx-1 h-6" />
+
+                <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                    className={`p-2 rounded hover:bg-gray-200 transition ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-300' : ''
+                        }`}
+                    title="Heading 1"
+                >
+                    <Heading1 className="h-4 w-4" />
+                </button>
                 <button
                     type="button"
                     onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
@@ -117,7 +202,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
                     <Heading4 className="h-4 w-4" />
                 </button>
 
-                <div className="w-px bg-gray-300 mx-1" />
+                <div className="w-px bg-gray-300 mx-1 h-6" />
 
                 <button
                     type="button"
@@ -138,7 +223,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
                     <Italic className="h-4 w-4" />
                 </button>
 
-                <div className="w-px bg-gray-300 mx-1" />
+                <div className="w-px bg-gray-300 mx-1 h-6" />
 
                 <button
                     type="button"
@@ -159,7 +244,7 @@ export function RichTextEditor({ initialValue, onChange, placeholder = "Write yo
                     <ListOrdered className="h-4 w-4" />
                 </button>
 
-                <div className="w-px bg-gray-300 mx-1" />
+                <div className="w-px bg-gray-300 mx-1 h-6" />
 
                 <button
                     type="button"
