@@ -99,6 +99,7 @@ interface DashboardSidebarProps {
 
 export async function DashboardSidebar({ role, name, email, image, userId }: DashboardSidebarProps) {
     let badge = ROLE_BADGES[role];
+    let userPermissions: string[] = [];
 
     if (!badge && userId) {
         // Find custom roles for this user's company
@@ -114,6 +115,7 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
             const customRoles = settings.customRoles || [];
             const customRole = customRoles.find((r: any) => r.id === role);
             if (customRole) {
+                userPermissions = customRole.permissions || [];
                 badge = {
                     label: customRole.name,
                     color: `bg-${customRole.color || 'slate'}-100 text-${customRole.color || 'slate'}-700`
@@ -123,6 +125,23 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
     }
 
     badge = badge ?? ROLE_BADGES[UserRole.GUEST];
+
+    // Helper to check access checking both RBAC and custom permissions
+    const checkAccess = (href: string) => {
+        // Standard RBAC check
+        if (canAccessRoute(href, role)) return true;
+
+        // Custom permissions check based on the menu paths
+        if (href.startsWith("/dashboard/users") && userPermissions.includes("manage_users")) return true;
+        if (href.startsWith("/dashboard/admin/crm") && (userPermissions.includes("view_crm") || userPermissions.includes("manage_crm"))) return true;
+        if (href.startsWith("/dashboard/admin/marketing") && (userPermissions.includes("view_marketing") || userPermissions.includes("manage_marketing"))) return true;
+        if (href.startsWith("/dashboard/posts") && userPermissions.includes("create_content")) return true;
+        if (href.startsWith("/dashboard/projects") && userPermissions.includes("view_projects")) return true;
+        if (href.startsWith("/dashboard/analytics") && userPermissions.includes("view_analytics")) return true;
+        if (href.startsWith("/dashboard/inbox") && userPermissions.includes("view_inbox")) return true;
+
+        return false;
+    };
 
     return (
         <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full shadow-sm">
@@ -135,12 +154,11 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
                 </Link>
             </div>
 
-            {/* Nav filtrada por rol */}
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                 {NAV_GROUPS.map((group) => {
                     // Filtrar items accesibles para este rol
                     const accessibleItems = group.items.filter((item) =>
-                        canAccessRoute(item.href, role)
+                        checkAccess(item.href)
                     );
 
                     // No renderizar el grupo si no hay items accesibles
