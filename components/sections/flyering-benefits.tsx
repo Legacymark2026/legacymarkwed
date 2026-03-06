@@ -96,21 +96,21 @@ export function FlyeringBenefits() {
                         {/* Main Card */}
                         <motion.div
                             style={{ y }}
-                            className="relative z-20 bg-white rounded-3xl p-8 shadow-2xl border border-gray-100"
+                            className="relative z-20 bg-slate-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10"
                         >
                             {/* Header Stats */}
-                            <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+                            <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
                                 <div>
                                     <div className="text-sm text-gray-500 font-medium">Crecimiento Mensual</div>
-                                    <div className="text-3xl font-bold text-slate-900">+127%</div>
+                                    <div className="text-3xl font-bold text-white">+127%</div>
                                 </div>
                                 <div className="flex gap-1">
-                                    {[1, 2, 3, 4].map(i => <div key={i} className="w-8 h-8 rounded-full bg-gray-100 border-2 border-white -ml-3 first:ml-0" />)}
+                                    {[1, 2, 3, 4].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-900 -ml-3 first:ml-0" />)}
                                 </div>
                             </div>
 
                             {/* Chart Visual (CSS only) */}
-                            <div className="h-64 flex items-end gap-2 px-4 pb-4 bg-slate-900/5 rounded-xl border border-dashed border-gray-200 relative overflow-hidden group-hover:bg-slate-900/10 transition-colors">
+                            <div className="h-64 flex items-end gap-2 px-4 pb-4 bg-white/5 rounded-xl border border-dashed border-white/10 relative overflow-hidden group-hover:bg-white/10 transition-colors">
                                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.2]" />
                                 {[30, 45, 35, 60, 50, 75, 60, 80, 70, 95].map((h, i) => (
                                     <motion.div
@@ -132,12 +132,12 @@ export function FlyeringBenefits() {
                             <motion.div
                                 animate={{ y: [0, -10, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 flex items-center gap-3 z-30"
+                                className="absolute -top-6 -right-6 bg-slate-800 p-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] border border-white/10 flex items-center gap-3 z-30"
                             >
                                 <div className="p-2 bg-green-100 text-green-600 rounded-lg"><CheckCircle2 size={20} /></div>
                                 <div>
                                     <div className="text-xs font-bold text-gray-500">Objetivo</div>
-                                    <div className="text-sm font-bold text-slate-900">Completado</div>
+                                    <div className="text-sm font-bold text-white">Completado</div>
                                 </div>
                             </motion.div>
 

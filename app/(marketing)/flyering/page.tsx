@@ -14,7 +14,13 @@ export const metadata: Metadata = {
 
 export default function FlyeringPage() {
     return (
-        <main className="bg-white min-h-screen">
+        <main className="relative bg-slate-950 text-white overflow-hidden scroll-smooth min-h-screen">
+            {/* Dense Editorial Noise */}
+            <div className="bg-noise fixed inset-0 z-50 pointer-events-none mix-blend-multiply opacity-[0.015]" />
+
+            {/* Global Spotlight Glow */}
+            <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[120%] h-[800px] bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.08)_0%,transparent_60%)] pointer-events-none -z-10" />
+
             <FlyeringHero />
             <StrategicAlliances />
             <FlyeringServices />
