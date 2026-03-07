@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { exportToCSV } from "@/lib/csv-export";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface CRMExportButtonProps {
     stats: Record<string, any>;
@@ -28,6 +29,7 @@ export function CRMExportButton({ stats, advancedStats }: CRMExportButtonProps) 
             ];
 
             exportToCSV(exportData, `CRM_Performance_Report_${new Date().toISOString().split('T')[0]}`);
+            toast.success("¡Exportación exitosa!", { description: "Tu reporte CSV se ha descargado correctamente." });
             setIsExporting(false);
         }, 600); // Fake delay for UX animation
     };
