@@ -140,6 +140,8 @@ model Company {
   adSpends                AdSpend[]
   apiKeys                 ApiKey[]
   campaigns               Campaign[]
+  campaignAssets          CampaignAsset[]
+  abTests                 ABTest[]
   members                 CompanyUser[]
   conversations           Conversation[]
   deals                   Deal[]
@@ -701,6 +703,8 @@ model Campaign {
   parameters      Json?
   trackingConfig  Json?            @map("tracking_config")
   adSpends        AdSpend[]
+  assets          CampaignAsset[]
+  abTests         ABTest[]
   approvedBy      User?            @relation("ApprovedCampaigns", fields: [approvedById], references: [id])
   company         Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   leads           Lead[]
@@ -791,24 +795,89 @@ model MarketingEvent {
 }
 
 model AdSpend {
-  id          String    @id @default(uuid())
-  date        DateTime  @db.Date
-  platform    String
-  amount      Float
-  currency    String    @default("USD")
-  impressions Int       @default(0)
-  clicks      Int       @default(0)
-  conversions Int       @default(0)
-  campaignId  String?   @map("campaign_id")
-  companyId   String    @map("company_id")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  campaign    Campaign? @relation(fields: [campaignId], references: [id])
-  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id           String    @id @default(uuid())
+  date         DateTime  @db.Date
+  platform     String
+  amount       Float
+  currency     String    @default("USD")
+  impressions  Int       @default(0)
+  clicks       Int       @default(0)
+  conversions  Int       @default(0)
+  revenue      Float     @default(0)
+  ctr          Float     @default(0)
+  cpc          Float     @default(0)
+  roas         Float     @default(0)
+  cpm          Float     @default(0)
+  campaignId   String?   @map("campaign_id")
+  companyId    String    @map("company_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  campaign     Campaign? @relation(fields: [campaignId], references: [id])
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([date, campaignId, platform])
   @@index([companyId])
   @@index([date])
   @@map("ad_spend")
+}
+
+model CampaignAsset {
+  id         String    @id @default(uuid())
+  campaignId String?   @map("campaign_id")
+  companyId  String    @map("company_id")
+  url        String
+  type       String    // IMAGE | VIDEO | COPY
+  width      Int?
+  height     Int?
+  sizeBytes  Int?      @map("size_bytes")
+  duration   Int?      // seconds for video
+  altText    String?   @map("alt_text")
+  mimeType   String?   @map("mime_type")
+  name       String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  abVariants ABTestVariant[]
+
+  @@index([companyId])
+  @@index([campaignId])
+  @@map("campaign_assets")
+}
+
+model ABTest {
+  id         String         @id @default(uuid())
+  campaignId String         @map("campaign_id")
+  companyId  String         @map("company_id")
+  name       String
+  metric     String         // CTR | ROAS | CPC
+  status     String         @default("RUNNING") // RUNNING | COMPLETED | PAUSED
+  winnerId   String?        @map("winner_id")
+  startDate  DateTime       @map("start_date")
+  endDate    DateTime?      @map("end_date")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  campaign   Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  company    Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  variants   ABTestVariant[]
+
+  @@index([campaignId])
+  @@index([companyId])
+  @@map("ab_tests")
+}
+
+model ABTestVariant {
+  id        String        @id @default(uuid())
+  abTestId  String        @map("ab_test_id")
+  assetId   String?       @map("asset_id")
+  name      String
+  weight    Float         @default(0.5) // 0..1
+  impressions Int         @default(0)
+  clicks    Int           @default(0)
+  conversions Int         @default(0)
+  spend     Float         @default(0)
+  abTest    ABTest        @relation(fields: [abTestId], references: [id], onDelete: Cascade)
+  asset     CampaignAsset? @relation(fields: [assetId], references: [id], onDelete: SetNull)
+
+  @@index([abTestId])
+  @@map("ab_test_variants")
 }
 
 model ShortLink {

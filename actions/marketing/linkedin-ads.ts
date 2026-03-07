@@ -106,9 +106,59 @@ export async function getLinkedInCampaigns() {
 }
 
 /**
- * Fetches campaign performance insights from LinkedIn API
+ * Fetches campaign performance insights from LinkedIn Analytics API.
+ * Returns last 30 days metrics per campaign.
  */
-export async function getLinkedInInsights() {
-    // LinkedIn stats fetch
-    return [];
+export async function getLinkedInInsights(dateRange: { startDate: string; endDate: string } = {
+    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+}) {
+    const config = await getLinkedInAdsConfig();
+    if (!config || !config.isEnabled) {
+        throw new Error("LinkedIn Ads is not configured or is disabled.");
+    }
+
+    const { adAccountId, accessToken } = config.config as any;
+    const LINKEDIN_API_VERSION = '202306';
+
+    try {
+        const [startYear, startMonth, startDay] = dateRange.startDate.split('-');
+        const [endYear, endMonth, endDay] = dateRange.endDate.split('-');
+
+        const params = new URLSearchParams({
+            q: 'analytics',
+            pivot: 'CAMPAIGN',
+            dateRange: JSON.stringify({
+                start: { year: parseInt(startYear), month: parseInt(startMonth), day: parseInt(startDay) },
+                end: { year: parseInt(endYear), month: parseInt(endMonth), day: parseInt(endDay) },
+            }),
+            fields: 'impressions,clicks,costInLocalCurrency,leadGenerationMailContactInfoShares,externalWebsiteConversions,dateRange',
+            accounts: `List(urn:li:sponsoredAccount:${adAccountId})`,
+        });
+
+        const response = await fetch(
+            `${LINKEDIN_API_URL}/adAnalytics?${params.toString()}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'LinkedIn-Version': LINKEDIN_API_VERSION,
+                    'X-RestLi-Protocol-Version': '2.0.0',
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.error("LinkedIn Insights API Error:", errBody);
+            throw new Error(`Failed to fetch LinkedIn insights: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.elements ?? [];
+    } catch (error) {
+        console.error("Failed to get LinkedIn insights:", error);
+        throw error;
+    }
 }
