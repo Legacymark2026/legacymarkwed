@@ -273,7 +273,41 @@ export async function createDeal(data: Record<string, unknown>) {
                 updatedAt: new Date(),
             },
         });
+
+        // ====================================================================
+        // INTEGRACIÓN BIDIRECCIONAL: Si el Deal incluye email, crear/verificar Lead
+        // ====================================================================
+        if (data.contactEmail && typeof data.contactEmail === "string") {
+            const existingLead = await prisma.lead.findFirst({
+                where: {
+                    email: data.contactEmail.toLowerCase(),
+                    companyId: data.companyId as string
+                }
+            });
+
+            if (!existingLead) {
+                // Crear el Lead espejo automáticamente
+                await prisma.lead.create({
+                    data: {
+                        name: (data.contactName as string) || null,
+                        email: data.contactEmail.toLowerCase(),
+                        phone: (data.contactPhone as string) || null,
+                        company: (data.contactCompany as string) || null,
+                        message: (data.notes as string) || `Creado automáticamente desde Pipeline para el Deal: ${deal.title}`,
+                        source: (data.source as string) || "DIRECT",
+                        utmSource: (data.utmSource as string) || null,
+                        utmMedium: (data.utmMedium as string) || null,
+                        utmCampaign: (data.utmCampaign as string) || null,
+                        companyId: data.companyId as string,
+                        status: "NEW", // Lead enters as NEW
+                    }
+                });
+                revalidatePath("/dashboard/admin/crm/leads");
+            }
+        }
+
         revalidatePath("/dashboard/admin/crm");
+        revalidatePath("/dashboard/admin/crm/pipeline");
         return { success: true, id: deal.id };
     } catch (error) {
         console.error(error);
