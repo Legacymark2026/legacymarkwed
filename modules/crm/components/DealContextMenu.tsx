@@ -55,99 +55,114 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                     {/* Usamos Portal para sacar el menú del flujo de dnd-kit */}
                     <DropdownMenuPortal>
                         <DropdownMenuContent
-                            className="w-60 p-2 bg-white/95 backdrop-blur-xl border border-gray-100/60 shadow-[0_12px_45px_-12px_rgba(0,0,0,0.15)] rounded-2xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-4"
+                            className="w-60 p-2 bg-white/95 backdrop-blur-xl border border-gray-100/60 shadow-[0_12px_45px_-12px_rgba(0,0,0,0.15)] rounded-2xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-4 z-[9999]"
                             align="end"
                             sideOffset={6}
                         >
-                            <DropdownMenuItem
-                                onSelect={() => setTimeout(() => onEdit(), 50)}
-                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-blue-50 focus:bg-blue-50 text-gray-700 font-medium"
-                            >
-                                <div className="p-1.5 rounded-md bg-blue-100/50 text-blue-600 group-hover:scale-110 transition-transform">
-                                    <Edit className="h-3.5 w-3.5" />
+                            <DropdownMenuItem asChild>
+                                <div
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                                    className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-blue-50 focus:bg-blue-50 text-gray-700 font-medium"
+                                >
+                                    <div className="p-1.5 rounded-md bg-blue-100/50 text-blue-600 group-hover:scale-110 transition-transform">
+                                        <Edit className="h-3.5 w-3.5" />
+                                    </div>
+                                    Editar Oportunidad
                                 </div>
-                                Editar Oportunidad
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                onSelect={() => setTimeout(() => handleDuplicate(), 50)}
-                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-emerald-50 focus:bg-emerald-50 text-gray-700 font-medium mt-1"
-                            >
-                                <div className="p-1.5 rounded-md bg-emerald-100/50 text-emerald-600 group-hover:scale-110 transition-transform">
-                                    <CopyPlus className="h-3.5 w-3.5" />
+                            <DropdownMenuItem asChild>
+                                <div
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => { e.stopPropagation(); handleDuplicate(); }}
+                                    className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-emerald-50 focus:bg-emerald-50 text-gray-700 font-medium mt-1"
+                                >
+                                    <div className="p-1.5 rounded-md bg-emerald-100/50 text-emerald-600 group-hover:scale-110 transition-transform">
+                                        <CopyPlus className="h-3.5 w-3.5" />
+                                    </div>
+                                    Duplicar Negocio
                                 </div>
-                                Duplicar Negocio
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                onSelect={() => setTimeout(() => handleCopyEmail(), 50)}
-                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-gray-100 focus:bg-gray-100 text-gray-700 font-medium mt-1"
-                            >
-                                <div className="p-1.5 rounded-md bg-gray-200/50 text-gray-600 group-hover:scale-110 transition-transform">
-                                    <Copy className="h-3.5 w-3.5" />
+                            <DropdownMenuItem asChild>
+                                <div
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => { e.stopPropagation(); handleCopyEmail(); }}
+                                    className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-gray-100 focus:bg-gray-100 text-gray-700 font-medium mt-1"
+                                >
+                                    <div className="p-1.5 rounded-md bg-gray-200/50 text-gray-600 group-hover:scale-110 transition-transform">
+                                        <Copy className="h-3.5 w-3.5" />
+                                    </div>
+                                    Copiar Email
                                 </div>
-                                Copiar Email
                             </DropdownMenuItem>
 
                             <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
 
                             {deal.contactEmail && (
-                                <DropdownMenuItem
-                                    onSelect={() => {
-                                        setTimeout(() => {
-                                            window.location.href = `mailto:${deal.contactEmail}`;
-                                        }, 50);
-                                    }}
-                                    className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-indigo-50 focus:bg-indigo-50 text-gray-700 font-medium"
-                                >
-                                    <div className="p-1.5 rounded-md bg-indigo-100/50 text-indigo-600 group-hover:scale-110 transition-transform">
-                                        <Mail className="h-3.5 w-3.5" />
-                                    </div>
-                                    Enviar Correo
+                                <DropdownMenuItem asChild>
+                                    <a
+                                        href={`mailto:${deal.contactEmail}`}
+                                        onPointerDown={(e) => e.stopPropagation()}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-indigo-50 focus:bg-indigo-50 text-gray-700 font-medium"
+                                    >
+                                        <div className="p-1.5 rounded-md bg-indigo-100/50 text-indigo-600 group-hover:scale-110 transition-transform">
+                                            <Mail className="h-3.5 w-3.5" />
+                                        </div>
+                                        Enviar Correo
+                                    </a>
                                 </DropdownMenuItem>
                             )}
 
                             {deal.contactPhone && (
-                                <DropdownMenuItem
-                                    onSelect={() => {
-                                        setTimeout(() => {
-                                            window.location.href = `tel:${deal.contactPhone}`;
-                                        }, 50);
-                                    }}
-                                    className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-teal-50 focus:bg-teal-50 text-gray-700 font-medium mt-1"
-                                >
-                                    <div className="p-1.5 rounded-md bg-teal-100/50 text-teal-600 group-hover:scale-110 transition-transform">
-                                        <Phone className="h-3.5 w-3.5" />
-                                    </div>
-                                    Llamar Contacto
+                                <DropdownMenuItem asChild>
+                                    <a
+                                        href={`tel:${deal.contactPhone}`}
+                                        onPointerDown={(e) => e.stopPropagation()}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-teal-50 focus:bg-teal-50 text-gray-700 font-medium mt-1"
+                                    >
+                                        <div className="p-1.5 rounded-md bg-teal-100/50 text-teal-600 group-hover:scale-110 transition-transform">
+                                            <Phone className="h-3.5 w-3.5" />
+                                        </div>
+                                        Llamar Contacto
+                                    </a>
                                 </DropdownMenuItem>
                             )}
 
                             {onArchive && (
                                 <>
                                     <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
-                                    <DropdownMenuItem
-                                        onSelect={() => setTimeout(() => onArchive(), 50)}
-                                        className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-amber-50 focus:bg-amber-50 text-amber-700 font-medium"
-                                    >
-                                        <div className="p-1.5 rounded-md bg-amber-100/50 text-amber-600 group-hover:scale-110 transition-transform">
-                                            <Archive className="h-3.5 w-3.5" />
+                                    <DropdownMenuItem asChild>
+                                        <div
+                                            onPointerDown={(e) => e.stopPropagation()}
+                                            onClick={(e) => { e.stopPropagation(); onArchive(); }}
+                                            className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-amber-50 focus:bg-amber-50 text-amber-700 font-medium"
+                                        >
+                                            <div className="p-1.5 rounded-md bg-amber-100/50 text-amber-600 group-hover:scale-110 transition-transform">
+                                                <Archive className="h-3.5 w-3.5" />
+                                            </div>
+                                            Archivar Deal
                                         </div>
-                                        Archivar Deal
                                     </DropdownMenuItem>
                                 </>
                             )}
 
                             <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
 
-                            <DropdownMenuItem
-                                onSelect={() => setTimeout(() => onDelete(), 50)}
-                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-red-50 focus:bg-red-50 text-red-700 font-medium"
-                            >
-                                <div className="p-1.5 rounded-md bg-red-100/50 text-red-600 group-hover:scale-110 transition-transform">
-                                    <Trash2 className="h-3.5 w-3.5" />
+                            <DropdownMenuItem asChild>
+                                <div
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                                    className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-red-50 focus:bg-red-50 text-red-700 font-medium"
+                                >
+                                    <div className="p-1.5 rounded-md bg-red-100/50 text-red-600 group-hover:scale-110 transition-transform">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </div>
+                                    <span className="font-bold">Eliminar Definitivamente</span>
                                 </div>
-                                <span className="font-bold">Eliminar Definitivamente</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenuPortal>
