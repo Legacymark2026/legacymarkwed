@@ -111,26 +111,37 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
             select: { permissions: true, companyId: true },
         });
 
-        if (companyUserRecord) {
-            // `permissions` es un campo JSON/String[] en Prisma — cast seguro.
-            userPermissions = (companyUserRecord.permissions as string[]) ?? [];
+        let companyIdToUse: string | null = null;
 
-            // ── Fase 2: Badge del rol (solo para roles custom sin badge estándar) ──
-            // Si el rol no está en ROLE_BADGES (es un rol custom definido por el admin),
-            // buscamos su nombre y color en la configuración de la compañía.
-            if (!badge) {
-                const company = await prisma.company.findUnique({
-                    where: { id: companyUserRecord.companyId },
-                    select: { defaultCompanySettings: true },
-                });
-                const settings = (company?.defaultCompanySettings as any) ?? {};
-                const customRoles: any[] = settings.customRoles ?? [];
-                const customRole = customRoles.find((r: any) => r.id === role);
-                if (customRole) {
-                    badge = {
-                        label: customRole.name,
-                        color: `bg-${customRole.color ?? "slate"}-100 text-${customRole.color ?? "slate"}-700`,
-                    };
+        if (companyUserRecord) {
+            userPermissions = (companyUserRecord.permissions as string[]) ?? [];
+            companyIdToUse = companyUserRecord.companyId;
+        } else {
+            // ORPHANED USER FALLBACK: Recovery for legacy/failed assignments
+            const fallbackConfig = await prisma.company.findFirst({ select: { id: true } });
+            if (fallbackConfig) companyIdToUse = fallbackConfig.id;
+        }
+
+        // ── Fase 2: Badge del rol (solo para roles custom sin badge estándar) ──
+        if (companyIdToUse && !badge) {
+            const company = await prisma.company.findUnique({
+                where: { id: companyIdToUse },
+                select: { defaultCompanySettings: true },
+            });
+            const settings = (company?.defaultCompanySettings as any) ?? {};
+            const customRoles: any[] = settings.customRoles ?? [];
+            const customRole = customRoles.find((r: any) => r.id === role);
+
+            if (customRole) {
+                badge = {
+                    label: customRole.name,
+                    color: `bg-${customRole.color ?? "slate"}-100 text-${customRole.color ?? "slate"}-700`,
+                };
+
+                // Si el usuario era orphaned, inyectar temporalmente los permisos correctos
+                // para que pasen el constraint de menús
+                if (!companyUserRecord && customRole.permissions) {
+                    userPermissions = customRole.permissions;
                 }
             }
         }

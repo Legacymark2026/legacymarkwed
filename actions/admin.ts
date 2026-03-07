@@ -236,11 +236,13 @@ export async function updateUserRole(
             const adminCompanyUser = await prisma.companyUser.findFirst({
                 where: { userId: currentUserId }
             });
-            if (adminCompanyUser) {
+            const fallbackCompanyId = adminCompanyUser?.companyId || (await prisma.company.findFirst())?.id;
+
+            if (fallbackCompanyId) {
                 companyUserCheck = await prisma.companyUser.create({
                     data: {
                         userId: userId,
-                        companyId: adminCompanyUser.companyId,
+                        companyId: fallbackCompanyId,
                         permissions: []
                     }
                 });
@@ -467,6 +469,7 @@ export async function saveCustomRoles(customRoles: any[]) {
             }
         }
 
+        revalidatePath("/dashboard", "layout");
         revalidatePath("/dashboard/settings/members");
         revalidatePath("/dashboard/users");
         return { success: true };

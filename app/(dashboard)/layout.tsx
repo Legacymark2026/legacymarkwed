@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { UserRole } from "@/types/auth";
 import { prisma } from "@/lib/prisma";
-
 import { MobileSidebarWrapper } from "@/components/dashboard/MobileSidebarWrapper";
+
+export const dynamic = 'force-dynamic';
 
 export default async function DashboardLayout({
     children,
