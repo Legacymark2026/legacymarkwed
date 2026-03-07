@@ -60,7 +60,7 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                             sideOffset={6}
                         >
                             <DropdownMenuItem
-                                onSelect={() => onEdit()}
+                                onSelect={() => setTimeout(() => onEdit(), 50)}
                                 className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-blue-50 focus:bg-blue-50 text-gray-700 font-medium"
                             >
                                 <div className="p-1.5 rounded-md bg-blue-100/50 text-blue-600 group-hover:scale-110 transition-transform">
@@ -70,7 +70,7 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                                onSelect={() => handleDuplicate()}
+                                onSelect={() => setTimeout(() => handleDuplicate(), 50)}
                                 className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-emerald-50 focus:bg-emerald-50 text-gray-700 font-medium mt-1"
                             >
                                 <div className="p-1.5 rounded-md bg-emerald-100/50 text-emerald-600 group-hover:scale-110 transition-transform">
@@ -80,7 +80,7 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                                onSelect={() => handleCopyEmail()}
+                                onSelect={() => setTimeout(() => handleCopyEmail(), 50)}
                                 className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-gray-100 focus:bg-gray-100 text-gray-700 font-medium mt-1"
                             >
                                 <div className="p-1.5 rounded-md bg-gray-200/50 text-gray-600 group-hover:scale-110 transition-transform">
@@ -94,7 +94,9 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                             {deal.contactEmail && (
                                 <DropdownMenuItem
                                     onSelect={() => {
-                                        window.location.href = `mailto:${deal.contactEmail}`;
+                                        setTimeout(() => {
+                                            window.location.href = `mailto:${deal.contactEmail}`;
+                                        }, 50);
                                     }}
                                     className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-indigo-50 focus:bg-indigo-50 text-gray-700 font-medium"
                                 >
@@ -108,7 +110,9 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                             {deal.contactPhone && (
                                 <DropdownMenuItem
                                     onSelect={() => {
-                                        window.location.href = `tel:${deal.contactPhone}`;
+                                        setTimeout(() => {
+                                            window.location.href = `tel:${deal.contactPhone}`;
+                                        }, 50);
                                     }}
                                     className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-teal-50 focus:bg-teal-50 text-gray-700 font-medium mt-1"
                                 >
@@ -123,7 +127,7 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                                 <>
                                     <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
                                     <DropdownMenuItem
-                                        onSelect={() => onArchive()}
+                                        onSelect={() => setTimeout(() => onArchive(), 50)}
                                         className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-amber-50 focus:bg-amber-50 text-amber-700 font-medium"
                                     >
                                         <div className="p-1.5 rounded-md bg-amber-100/50 text-amber-600 group-hover:scale-110 transition-transform">
@@ -137,7 +141,7 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
                             <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
 
                             <DropdownMenuItem
-                                onSelect={() => onDelete()}
+                                onSelect={() => setTimeout(() => onDelete(), 50)}
                                 className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-red-50 focus:bg-red-50 text-red-700 font-medium"
                             >
                                 <div className="p-1.5 rounded-md bg-red-100/50 text-red-600 group-hover:scale-110 transition-transform">
