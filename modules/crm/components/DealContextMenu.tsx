@@ -6,6 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuPortal
 } from "@/components/ui/dropdown-menu"
 import { Edit, Trash2, Mail, Phone, Copy, CopyPlus, Archive, MoreVertical } from "lucide-react"
 import { toast } from "sonner"
@@ -23,9 +24,9 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
     const handleCopyEmail = () => {
         if (deal.contactEmail) {
             navigator.clipboard.writeText(deal.contactEmail)
-            toast.success("Email copied to clipboard")
+            toast.success("Email copiado al portapapeles")
         } else {
-            toast.error("No email to copy")
+            toast.error("No hay correo para copiar")
         }
     }
 
@@ -33,79 +34,119 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
         if (onDuplicate) {
             onDuplicate()
         } else {
-            // Default: just copy deal info to clipboard
-            navigator.clipboard.writeText(JSON.stringify({
-                title: `${deal.title} (Copy)`,
-                value: deal.value,
-                priority: deal.priority,
-                contactName: deal.contactName,
-                contactEmail: deal.contactEmail,
-            }))
-            toast.success("Deal info copied for duplication")
+            toast.error("Función duplicar no disponible")
         }
     }
 
     return (
-        <div className="relative group/context w-full">
+        <div className="relative group/context w-full h-full">
             {children}
-            <div className="absolute top-3 right-12 opacity-0 group-hover/context:opacity-100 transition-opacity z-20">
+            <div className="absolute top-3 right-4 opacity-0 group-hover/context:opacity-100 transition-opacity z-20">
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                         <button
-                            className="p-1.5 flex items-center justify-center bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 text-gray-500 hover:text-gray-800 transition-colors"
-                            onPointerDown={(e) => {
-                                // Stop dnd-kit drag
-                                e.stopPropagation()
-                            }}
-                            onClick={(e) => {
-                                e.stopPropagation(); // Stop parent click
-                            }}
+                            className="p-1.5 flex items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-lg shadow-sm hover:bg-white text-gray-400 hover:text-gray-800 transition-all hover:scale-110 active:scale-95 z-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <MoreVertical className="w-4 h-4" />
                         </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" sideOffset={8}>
-                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); onEdit(); }}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Editar Deal
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleDuplicate(); }}>
-                            <CopyPlus className="mr-2 h-4 w-4" />
-                            Duplicar Deal
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleCopyEmail(); }}>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copiar Email
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {deal.contactEmail && (
-                            <DropdownMenuItem asChild>
-                                <a href={`mailto:${deal.contactEmail}`} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    Enviar Email
-                                </a>
+                    {/* Usamos Portal para sacar el menú del flujo de dnd-kit */}
+                    <DropdownMenuPortal>
+                        <DropdownMenuContent
+                            className="w-60 p-2 bg-white/95 backdrop-blur-xl border border-gray-100/60 shadow-[0_12px_45px_-12px_rgba(0,0,0,0.15)] rounded-2xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-4"
+                            align="end"
+                            sideOffset={6}
+                        >
+                            <DropdownMenuItem
+                                onSelect={() => onEdit()}
+                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-blue-50 focus:bg-blue-50 text-gray-700 font-medium"
+                            >
+                                <div className="p-1.5 rounded-md bg-blue-100/50 text-blue-600 group-hover:scale-110 transition-transform">
+                                    <Edit className="h-3.5 w-3.5" />
+                                </div>
+                                Editar Oportunidad
                             </DropdownMenuItem>
-                        )}
-                        {deal.contactPhone && (
-                            <DropdownMenuItem asChild>
-                                <a href={`tel:${deal.contactPhone}`} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-                                    <Phone className="mr-2 h-4 w-4" />
+
+                            <DropdownMenuItem
+                                onSelect={() => handleDuplicate()}
+                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-emerald-50 focus:bg-emerald-50 text-gray-700 font-medium mt-1"
+                            >
+                                <div className="p-1.5 rounded-md bg-emerald-100/50 text-emerald-600 group-hover:scale-110 transition-transform">
+                                    <CopyPlus className="h-3.5 w-3.5" />
+                                </div>
+                                Duplicar Negocio
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onSelect={() => handleCopyEmail()}
+                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-gray-100 focus:bg-gray-100 text-gray-700 font-medium mt-1"
+                            >
+                                <div className="p-1.5 rounded-md bg-gray-200/50 text-gray-600 group-hover:scale-110 transition-transform">
+                                    <Copy className="h-3.5 w-3.5" />
+                                </div>
+                                Copiar Email
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
+
+                            {deal.contactEmail && (
+                                <DropdownMenuItem
+                                    onSelect={() => {
+                                        window.location.href = `mailto:${deal.contactEmail}`;
+                                    }}
+                                    className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-indigo-50 focus:bg-indigo-50 text-gray-700 font-medium"
+                                >
+                                    <div className="p-1.5 rounded-md bg-indigo-100/50 text-indigo-600 group-hover:scale-110 transition-transform">
+                                        <Mail className="h-3.5 w-3.5" />
+                                    </div>
+                                    Enviar Correo
+                                </DropdownMenuItem>
+                            )}
+
+                            {deal.contactPhone && (
+                                <DropdownMenuItem
+                                    onSelect={() => {
+                                        window.location.href = `tel:${deal.contactPhone}`;
+                                    }}
+                                    className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-teal-50 focus:bg-teal-50 text-gray-700 font-medium mt-1"
+                                >
+                                    <div className="p-1.5 rounded-md bg-teal-100/50 text-teal-600 group-hover:scale-110 transition-transform">
+                                        <Phone className="h-3.5 w-3.5" />
+                                    </div>
                                     Llamar Contacto
-                                </a>
+                                </DropdownMenuItem>
+                            )}
+
+                            {onArchive && (
+                                <>
+                                    <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
+                                    <DropdownMenuItem
+                                        onSelect={() => onArchive()}
+                                        className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-amber-50 focus:bg-amber-50 text-amber-700 font-medium"
+                                    >
+                                        <div className="p-1.5 rounded-md bg-amber-100/50 text-amber-600 group-hover:scale-110 transition-transform">
+                                            <Archive className="h-3.5 w-3.5" />
+                                        </div>
+                                        Archivar Deal
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+
+                            <DropdownMenuSeparator className="my-1.5 bg-gray-100/80" />
+
+                            <DropdownMenuItem
+                                onSelect={() => onDelete()}
+                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-red-50 focus:bg-red-50 text-red-700 font-medium"
+                            >
+                                <div className="p-1.5 rounded-md bg-red-100/50 text-red-600 group-hover:scale-110 transition-transform">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                </div>
+                                <span className="font-bold">Eliminar Definitivamente</span>
                             </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                        {onArchive && (
-                            <DropdownMenuItem onSelect={(e) => { e.preventDefault(); onArchive(); }} className="text-amber-600 focus:bg-amber-50 focus:text-amber-700">
-                                <Archive className="mr-2 h-4 w-4" />
-                                Archivar Deal
-                            </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); onDelete(); }} className="text-red-600 focus:bg-red-50 focus:text-red-700">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Eliminar Deal
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
+                        </DropdownMenuContent>
+                    </DropdownMenuPortal>
                 </DropdownMenu>
             </div>
         </div>
