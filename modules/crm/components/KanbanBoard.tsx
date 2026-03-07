@@ -23,6 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DealCard } from "./DealCard";
 import { DealContextMenu } from "./DealContextMenu";
+import { toast } from "sonner";
+import { createDeal, deleteDeal } from "@/actions/crm";
 
 function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, stagnantCount, avgDaysInStage }: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -116,8 +118,7 @@ function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, st
     );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function DraggableDeal({ deal, onClick, onEdit }: { deal: any, onClick: () => void, onEdit: () => void }) {
+function DraggableDeal({ deal, onClick, onEdit, onDuplicate, onDelete }: { deal: any, onClick: () => void, onEdit: () => void, onDuplicate: () => void, onDelete: () => void }) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: deal.id,
         data: deal
@@ -143,7 +144,8 @@ function DraggableDeal({ deal, onClick, onEdit }: { deal: any, onClick: () => vo
             <DealContextMenu
                 deal={deal}
                 onEdit={onEdit}
-                onDelete={onEdit} // We open details dialog to delete for now, or can implement direct delete
+                onDelete={onDelete}
+                onDuplicate={onDuplicate}
             >
                 <div onClick={onClick} className="group">
                     <DealCard deal={deal} />
@@ -241,6 +243,33 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
                 await updateDealStage(dealId, newStage);
             } catch (e) {
                 console.error(e);
+            }
+        }
+    }
+
+    // Handlers for Context Menu
+    async function executeDuplicate(dealToDupe: any) {
+        try {
+            const { id, createdAt, updatedAt, ...dealData } = dealToDupe;
+            const res = await createDeal({
+                ...dealData,
+                title: `${dealData.title} (Copy)`,
+            });
+            if (res.error) toast.error("Error al duplicar deal");
+            else toast.success("Deal duplicado con éxito");
+        } catch (e) {
+            toast.error("Error intentando duplicar...");
+        }
+    }
+
+    async function executeDelete(dealId: string) {
+        if (confirm("¿Estás seguro de que deseas eliminar este Deal? Esta acción no se puede deshacer.")) {
+            try {
+                const res = await deleteDeal(dealId);
+                if (res.error) toast.error("Error al eliminar deal");
+                else toast.success("Deal eliminado");
+            } catch (e) {
+                toast.error("Error inesperado al borrar");
             }
         }
     }
@@ -397,6 +426,8 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
                                         deal={deal}
                                         onClick={() => setSelectedDeal(deal)}
                                         onEdit={() => setSelectedDeal(deal)}
+                                        onDuplicate={() => executeDuplicate(deal)}
+                                        onDelete={() => executeDelete(deal.id)}
                                     />
                                 ))}
                             </DroppableStage>

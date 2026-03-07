@@ -451,6 +451,23 @@ export async function deleteLead(leadId: string) {
         const hasPermission = await checkLeadPermission('delete');
         if (!hasPermission) return { success: false, error: "Unauthorized to delete leads" };
 
+        const lead = await prisma.lead.findUnique({
+            where: { id: leadId },
+            select: { email: true, companyId: true, name: true }
+        });
+
+        if (lead) {
+            // ELIMINACIÓN EN CASCADA: Borrar Deals asociados a este correo en esta empresa
+            await prisma.deal.deleteMany({
+                where: {
+                    companyId: lead.companyId,
+                    contactEmail: lead.email,
+                }
+            });
+            revalidatePath('/dashboard/admin/crm/pipeline');
+            revalidatePath('/dashboard/admin/crm');
+        }
+
         await prisma.lead.delete({
             where: { id: leadId }
         });
