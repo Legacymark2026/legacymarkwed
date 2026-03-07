@@ -29,7 +29,7 @@ export function BlogPostHeader({
                     {categories.map((category) => (
                         <span
                             key={category.id}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-100"
+                            className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-100 dark:from-blue-900/40 dark:to-indigo-900/40 dark:text-blue-300 dark:border-blue-800"
                         >
                             {category.name}
                         </span>
@@ -38,15 +38,15 @@ export function BlogPostHeader({
             )}
 
             {/* Title */}
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl leading-tight">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl leading-tight">
                 {title}
             </h1>
 
             {/* Meta Info */}
-            <div className="flex flex-wrap items-center gap-4 text-gray-600">
+            <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400">
                 {/* Author */}
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-800 dark:to-gray-950 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
                         {authorImage ? (
                             <img src={authorImage} alt={authorName || "Author"} className="h-full w-full object-cover" />
                         ) : (
@@ -54,11 +54,11 @@ export function BlogPostHeader({
                         )}
                     </div>
                     <div>
-                        <p className="font-medium text-gray-900">{authorName || "Autor"}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{authorName || "Autor"}</p>
                     </div>
                 </div>
 
-                <span className="text-gray-300">|</span>
+                <span className="text-gray-300 dark:text-gray-700">|</span>
 
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm">
@@ -72,7 +72,7 @@ export function BlogPostHeader({
                     </time>
                 </div>
 
-                <span className="text-gray-300">|</span>
+                <span className="text-gray-300 dark:text-gray-700">|</span>
 
                 {/* Reading Time */}
                 <div className="flex items-center gap-2 text-sm">
@@ -165,8 +165,8 @@ interface AuthorBioProps {
 
 export function AuthorBio({ name, image, bio }: AuthorBioProps) {
     return (
-        <div className="flex items-start gap-4 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
-            <div className="flex-shrink-0 h-16 w-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white text-xl font-bold overflow-hidden">
+        <div className="flex items-start gap-4 p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl border border-gray-200 dark:border-gray-800">
+            <div className="flex-shrink-0 h-16 w-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-800 dark:to-gray-950 flex items-center justify-center text-white text-xl font-bold overflow-hidden">
                 {image ? (
                     <img src={image} alt={name} className="h-full w-full object-cover" />
                 ) : (
@@ -174,10 +174,10 @@ export function AuthorBio({ name, image, bio }: AuthorBioProps) {
                 )}
             </div>
             <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500 mb-1">Escrito por</p>
-                <h3 className="text-lg font-bold text-gray-900">{name}</h3>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Escrito por</p>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{name}</h3>
                 {bio && (
-                    <p className="mt-2 text-gray-600 text-sm leading-relaxed">{bio}</p>
+                    <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{bio}</p>
                 )}
             </div>
         </div>
@@ -201,15 +201,15 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Artículos Relacionados</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Artículos Relacionados</h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {posts.map((post) => (
                     <a
                         key={post.id}
                         href={`/blog/${post.slug}`}
-                        className="group block overflow-hidden rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                        className="group block overflow-hidden rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
                     >
-                        <div className="aspect-[16/9] w-full overflow-hidden bg-gray-100">
+                        <div className="aspect-[16/9] w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                             <div
                                 className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                                 style={{
@@ -218,11 +218,11 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
                             />
                         </div>
                         <div className="p-4">
-                            <h3 className="font-semibold text-gray-900 group-hover:text-gray-600 transition-colors line-clamp-2">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors line-clamp-2">
                                 {post.title}
                             </h3>
                             {post.excerpt && (
-                                <p className="mt-2 text-sm text-gray-600 line-clamp-2">{post.excerpt}</p>
+                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{post.excerpt}</p>
                             )}
                         </div>
                     </a>
@@ -252,8 +252,8 @@ export function TableOfContents({ content }: TableOfContentsProps) {
     if (headings.length < 2) return null;
 
     return (
-        <nav className="p-5 bg-gray-50 rounded-xl border border-gray-200">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+        <nav className="p-5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
                 En este artículo
             </h2>
             <ul className="space-y-2">
@@ -264,7 +264,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                     >
                         <a
                             href={`#${heading.id}`}
-                            className="text-sm text-gray-600 hover:text-gray-900 transition-colors block py-1"
+                            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors block py-1"
                         >
                             {heading.text}
                         </a>

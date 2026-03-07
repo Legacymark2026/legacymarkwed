@@ -44,67 +44,70 @@ function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, st
     return (
         <div
             ref={setNodeRef}
-            className={`min-w-[280px] w-[300px] flex flex-col rounded-xl border transition-colors ${stage.color} ${isOver ? 'ring-2 ring-blue-400 bg-blue-50/50' : 'border-gray-200'} ${isBottleneck ? 'ring-2 ring-red-400' : ''}`}
+            className={`min-w-[320px] w-[320px] shrink-0 flex flex-col rounded-2xl border transition-all duration-300 ease-out ${isOver ? 'ring-2 ring-blue-500 bg-blue-50/80 shadow-inner' : 'border-gray-200/60 bg-gray-50/30'} ${isBottleneck ? 'ring-1 ring-red-300 bg-red-50/20' : ''}`}
         >
-            <div className={`p-3 border-b border-gray-200/50 bg-white/50 backdrop-blur-sm rounded-t-xl ${isBottleneck ? 'bg-red-50/50' : ''}`}>
-                <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center gap-1">
-                        <h3 className="font-semibold text-sm text-gray-700">{stage.label}</h3>
-                        {/* Phase 15: Bottleneck Indicator */}
+            <div className={`p-4 border-b border-gray-200/50 bg-white/60 backdrop-blur-md rounded-t-2xl shadow-sm z-10 sticky top-0 ${isBottleneck ? 'bg-red-50/80' : ''}`}>
+                <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${stage.color.replace('bg-', 'bg-').replace('border-', 'bg-')} shadow-sm`} />
+                        <h3 className="font-bold text-sm text-gray-800 tracking-tight uppercase">{stage.label}</h3>
                         {isBottleneck && (
-                            <span className="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium" title="Bottleneck: Too many stagnant deals">
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-100/80 text-[10px] ring-1 ring-red-300" title="Alerta: Acumulación (+2) de deals estancados">
                                 ⚠️
                             </span>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        {/* Phase 15: Quick Add Button */}
                         {onQuickAdd && (
                             <button
                                 onClick={onQuickAdd}
-                                className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded p-0.5 transition-colors"
-                                title="Quick Add Deal"
+                                className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md p-1 transition-all active:scale-95"
+                                title="Añadir Deal Rápido"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
                             </button>
                         )}
-                        <div className="text-xs font-mono font-medium text-gray-600">
+                        <Badge variant="outline" className="bg-white/50 text-[11px] font-mono text-gray-600 border-gray-200 shadow-sm">
                             ${(totalValue / 1000).toFixed(1)}k
-                        </div>
+                        </Badge>
                     </div>
                 </div>
-                <div className="flex justify-between items-center text-[10px] text-gray-500">
-                    <div className="flex gap-2">
-                        <span>{dealCount} deals</span>
-                        {/* Phase 15: Deal Velocity */}
+
+                {/* Advanced Stage Metrics (Fase 1) */}
+                <div className="flex justify-between items-center text-[11px] text-gray-500 font-medium">
+                    <div className="flex gap-3">
+                        <span className="flex items-center gap-1">
+                            <Rows className="w-3 h-3 opacity-70" /> {dealCount}
+                        </span>
                         {avgDaysInStage !== undefined && avgDaysInStage > 0 && (
-                            <span className="text-blue-600" title="Avg days in stage">
-                                ~{avgDaysInStage}d
+                            <span className="text-blue-600 flex items-center gap-1" title="Promedio de días en etapa">
+                                ⏱️ ~{avgDaysInStage}d
                             </span>
                         )}
                     </div>
                     <div className="flex gap-2">
-                        {dealCount > 0 && (
-                            <span>Avg: ${(avgValue / 1000).toFixed(1)}k</span>
-                        )}
-                        {/* Phase 15: Stagnant Count */}
                         {(stagnantCount || 0) > 0 && (
-                            <span className="text-amber-600">{stagnantCount} old</span>
+                            <span className="text-amber-600 bg-amber-50 px-1.5 rounded-sm flex items-center gap-1 shadow-sm border border-amber-100/50">
+                                ⏳ {stagnantCount} estancados
+                            </span>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="flex-1 p-2 overflow-y-auto min-h-0">
-                <div className="space-y-1 min-h-[100px]">
+            <div className="flex-1 p-3 overflow-y-auto min-h-0 relative">
+                {/* Subtle Background Pattern */}
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] pointer-events-none mix-blend-multiply" />
+
+                <div className="space-y-3 min-h-[150px] relative z-10">
                     {dealCount === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-32 text-gray-400">
-                            <svg className="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                        <div className="flex flex-col items-center justify-center h-40 text-gray-400/80 border-2 border-dashed border-gray-200/50 rounded-xl m-2 bg-white/20">
+                            <svg className="w-10 h-10 mb-3 opacity-40 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                             </svg>
-                            <span className="text-xs">Drop deals here</span>
+                            <span className="text-xs font-medium tracking-wide">Arrastra aquí</span>
                         </div>
                     ) : children}
                 </div>
@@ -122,25 +125,30 @@ function DraggableDeal({ deal, onClick, onEdit }: { deal: any, onClick: () => vo
 
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: 50, // Keep dragged item above others
     } : undefined;
 
     if (isDragging) {
         return (
-            <div ref={setNodeRef} style={style} className="opacity-50">
-                <DealCard deal={deal} />
+            <div ref={setNodeRef} style={style} className="opacity-40 scale-105 transition-transform duration-200 cursor-grabbing">
+                <div className="pointer-events-none shadow-2xl ring-2 ring-blue-500 rounded-xl relative">
+                    <DealCard deal={deal} />
+                </div>
             </div>
         );
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="touch-none cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform duration-200">
             <DealContextMenu
                 deal={deal}
                 onEdit={onEdit}
                 onDelete={onEdit} // We open details dialog to delete for now, or can implement direct delete
             >
-                <div onClick={onClick}>
+                <div onClick={onClick} className="group">
                     <DealCard deal={deal} />
+                    {/* Visual Hover Feedback Ring */}
+                    <div className="absolute inset-0 rounded-xl ring-2 ring-transparent group-hover:ring-blue-200 transition-colors pointer-events-none" />
                 </div>
             </DealContextMenu>
         </div>

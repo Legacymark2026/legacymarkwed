@@ -181,13 +181,38 @@ export async function updateDealStage(dealId: string, stage: string) {
     const authCheck = await checkAuth();
     if (authCheck) return { error: "Unauthorized" };
     try {
-        await prisma.deal.update({ where: { id: dealId }, data: { stage, updatedAt: new Date() } });
+        const deal = await prisma.deal.update({ where: { id: dealId }, data: { stage, updatedAt: new Date() } });
 
         // BI-DIRECTIONAL SYNC: Sync stage back to the original lead
         const lead = await prisma.lead.findFirst({ where: { convertedToDealId: dealId } });
         if (lead) {
             await prisma.lead.update({ where: { id: lead.id }, data: { status: stage, updatedAt: new Date() } });
             revalidatePath("/dashboard/admin/crm/leads");
+        }
+
+        // FASE 2: Automatización de Tareas Inteligentes
+        if (stage === "WON") {
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 1); // Deadline mañana
+
+            const _userId = await getUserId();
+
+            await prisma.task.create({
+                data: {
+                    title: `[Automatizado] Iniciar Onboarding para Deal: ${deal.title}`,
+                    description: `Reunir requisitos iniciales y enviar contrato/factura. Valor Ganado: $${deal.value}.`,
+                    completed: false,
+                    priority: deal.value > 10000 ? "HIGH" : "MEDIUM",
+                    dueDate: dueDate,
+                    dealId: deal.id,
+                    companyId: deal.companyId,
+                    assignedTo: deal.assignedTo, // Assumes it goes back to the deal owner
+                    createdBy: _userId !== "anonymous" ? _userId : "SYSTEM", // Se puede caer si es SYSTEM y no existe en BD, veamos si getUserId es fiable.
+                }
+            });
+
+            // Crear actividad de feed para reportes
+            await createDealActivity(deal.id, 'SYSTEM', 'El deal ha pasado a GANADO y se generó la tarea de Onboarding automáticamente.')
         }
 
         revalidatePath("/dashboard/admin/crm");

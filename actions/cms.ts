@@ -169,8 +169,66 @@ export async function getCategories() {
     if (!session?.user) throw new Error("Unauthorized");
 
     return prisma.category.findMany({
-        orderBy: { name: 'asc' }
+        orderBy: { name: 'asc' },
+        include: {
+            _count: {
+                select: { posts: true }
+            }
+        }
     });
+}
+
+export async function createCategory(data: { name: string, slug: string }) {
+    const session = await auth();
+    if (!session?.user) throw new Error("Unauthorized");
+
+    try {
+        await prisma.category.create({
+            data: {
+                name: data.name,
+                slug: data.slug,
+            }
+        });
+        revalidatePath('/dashboard/posts/categories');
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to create category:", error);
+        return { success: false, error: "Failed to create category (slug or name might exist)" };
+    }
+}
+
+export async function updateCategory(id: string, data: { name: string, slug: string }) {
+    const session = await auth();
+    if (!session?.user) throw new Error("Unauthorized");
+
+    try {
+        await prisma.category.update({
+            where: { id },
+            data: {
+                name: data.name,
+                slug: data.slug,
+            }
+        });
+        revalidatePath('/dashboard/posts/categories');
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to update category:", error);
+        return { success: false, error: "Failed to update category" };
+    }
+}
+
+export async function deleteCategory(id: string) {
+    const session = await auth();
+    if (!session?.user) throw new Error("Unauthorized");
+
+    try {
+        await prisma.category.delete({ where: { id } });
+        revalidatePath('/dashboard/posts/categories');
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to delete category:", error);
+        return { success: false, error: "Failed to delete category. Ensure no posts are linked to it." };
+    }
 }
 
 export async function getTags() {

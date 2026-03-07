@@ -47,6 +47,7 @@ const NAV_GROUPS: NavGroup[] = [
         title: "Content & Assets",
         items: [
             { href: "/dashboard/posts", label: "Blog", icon: <BookOpen size={18} /> },
+            { href: "/dashboard/posts/categories", label: "Categorías Blog", icon: <FileText size={18} className="text-slate-400" /> },
             { href: "/dashboard/projects", label: "Portafolio", icon: <Briefcase size={18} /> },
             { href: "/dashboard/analytics", label: "Analítica", icon: <BarChart2 size={18} /> },
         ],
