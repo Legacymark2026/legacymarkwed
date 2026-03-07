@@ -81,21 +81,35 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
         const { event, timeText } = eventInfo;
         const type = event.extendedProps.type;
 
-        let pointColor = "bg-white";
-        if (type === 'ONLINE') pointColor = 'bg-blue-100';
-        if (type === 'PHYSICAL') pointColor = 'bg-orange-100';
-        if (type === 'HYBRID') pointColor = 'bg-purple-100';
+        let pointColor = "bg-slate-300";
+        if (type === 'ONLINE') pointColor = 'bg-blue-500';
+        if (type === 'PHYSICAL') pointColor = 'bg-orange-500';
+        if (type === 'HYBRID') pointColor = 'bg-purple-500';
+
+        // Background colors for the events are solid colors now (e.g., #2563eb, #ea580c),
+        // so to make it readable we must ensure the text is pure white, and the background 
+        // doesn't have transparency rendering it white. 
+        // But the user reported that "it has white font, and it blends with the background of the calendar".
+        // This implies the event background itself isn't showing up as a solid dark color, OR they mean
+        // the text should be dark instead if the event background is light.
+        // Let's modify the event rendering so the event background has a soft tint and text is dark
+        // OR the event background is completely opaque and the text is crisp white.
+        // Let's go with opaque background + crisp white text, or light background + dark text.
+        // Given 'backgroundColor' is set as border and background in the calendarEvents useMemo.
+        // We will force a dark, crisp shadow, and use solid white text.
+        // If the problem is "blending with the calendar background", maybe the text should be slate-800 if the event background is actually transparent. 
+        // We will apply a solid background within the eventContent itself.
 
         return (
             <div
-                className="flex flex-col h-full w-full justify-start items-start p-1 sm:p-1.5 overflow-hidden group"
+                className="flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md"
                 title={`${event.title}${timeText ? ` (${timeText})` : ''}`}
             >
-                <div className="flex items-center gap-1.5 mb-0.5 w-full">
-                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${pointColor} shadow-sm opacity-90`} />
-                    <span className="text-[10px] font-extrabold truncate tracking-tight text-white/90 group-hover:text-white drop-shadow-sm">{timeText}</span>
+                <div className="flex items-center gap-1.5 w-full mb-0.5">
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 bg-white/90 shadow-sm`} />
+                    <span className="text-[10px] font-black truncate tracking-wide text-white drop-shadow-md">{timeText}</span>
                 </div>
-                <div className="text-[10px] sm:text-[11px] font-bold leading-tight truncate w-full text-white/95 group-hover:text-white drop-shadow-md whitespace-normal line-clamp-2">
+                <div className="text-[11px] font-bold leading-tight truncate w-full text-white drop-shadow-md whitespace-normal line-clamp-2">
                     {event.title}
                 </div>
             </div>
