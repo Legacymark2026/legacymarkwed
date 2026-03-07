@@ -59,8 +59,8 @@ export function DealCard({ deal }: { deal: any }) {
     const dealScore = calculateDealScore();
 
     return (
-        <Card className={`mb-3 cursor-grab active:cursor-grabbing hover:shadow-lg transition-all duration-300 group relative border-l-4 overflow-hidden bg-white/95 backdrop-blur-sm ${isStagnant ? 'ring-1 ring-amber-400/50 shadow-[0_0_15px_-3px_rgba(251,191,36,0.3)]' : ''} ${isOverdue ? 'ring-1 ring-red-400/50 shadow-[0_0_15px_-3px_rgba(248,113,113,0.3)]' : ''}`} style={{ borderLeftColor: deal.priority === 'HIGH' ? '#ef4444' : deal.priority === 'MEDIUM' ? '#3b82f6' : '#e5e7eb' }}>
-            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-gray-50/50 to-transparent pointer-events-none" />
+        <Card className={`mb-3 cursor-grab active:cursor-grabbing hover:shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] transition-all duration-300 group relative border-l-4 overflow-hidden bg-white/80 backdrop-blur-md border border-slate-200/50 hover:bg-white/95 ${isStagnant ? 'ring-2 ring-amber-400/30' : ''} ${isOverdue ? 'ring-2 ring-red-400/30' : ''}`} style={{ borderLeftColor: deal.priority === 'HIGH' ? '#ef4444' : deal.priority === 'MEDIUM' ? '#3b82f6' : '#e5e7eb' }}>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-slate-100/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
             <CardContent className="p-3.5 relative z-10">
                 {/* Phase 15: Deal Age Badge & AI Score - Top Right Corner */}
@@ -98,33 +98,33 @@ export function DealCard({ deal }: { deal: any }) {
                 {/* Value Row with Trend */}
                 <div className="flex items-end justify-between mb-3 bg-gray-50/50 rounded-lg p-2 border border-gray-100/50">
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">Valor Estimado</span>
-                        <div className="flex items-center gap-1.5">
-                            <span className="text-[15px] font-black tracking-tight text-gray-900">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.1em] mb-0.5">Valor Estimado</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[17px] font-extrabold tracking-tighter text-slate-800 font-mono">
                                 {formatCurrency(deal.value)}
                             </span>
                             {/* Phase 15: Value Trend Icon */}
-                            {valueTrend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-green-500 stroke-[3]" />}
-                            {valueTrend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-red-500 stroke-[3]" />}
+                            {valueTrend === 'up' && <TrendingUp className="w-4 h-4 text-emerald-500 stroke-[3]" />}
+                            {valueTrend === 'down' && <TrendingDown className="w-4 h-4 text-rose-500 stroke-[3]" />}
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-end gap-1.5">
                         {isOverdue && (
-                            <div className="flex items-center text-[10px] font-bold text-red-600 bg-red-100/80 px-2 py-0.5 rounded-full shadow-sm" title="Overdue!">
+                            <div className="flex items-center text-[9px] font-extrabold uppercase tracking-wide text-rose-600 bg-rose-100/90 px-2 py-0.5 rounded-md shadow-sm border border-rose-200/50" title="Overdue!">
                                 <Calendar className="w-3 h-3 mr-1" />
                                 Vencido
                             </div>
                         )}
                         {isStagnant && (
-                            <div className="group/stagnant flex items-center bg-amber-100/80 rounded-full shadow-sm pr-0.5 pl-2 py-0.5 transition-all" title="Stagnant: > 7 days">
-                                <Clock className="w-3 h-3 mr-1 text-amber-700" />
-                                <span className="text-[10px] font-bold text-amber-700 mr-1.5">
-                                    Estancado ({daysSinceAction}d)
+                            <div className="group/stagnant flex items-center bg-amber-50/80 rounded-md shadow-sm pl-1.5 pr-1 py-0.5 border border-amber-200/60" title="Stagnant: > 7 days">
+                                <Clock className="w-3 h-3 mr-1 text-amber-500" />
+                                <span className="text-[9px] font-bold text-amber-700 mr-1 opacity-90">
+                                    {daysSinceAction} días estanc.
                                 </span>
                                 {deal.contactEmail && (
                                     <a href={`mailto:${deal.contactEmail}?subject=Seguimiento%20sobre:%20${encodeURIComponent(deal.title)}&body=Hola%20${encodeURIComponent(deal.contactName?.split(' ')[0] || 'allí')},%0A%0A`}
-                                        className="bg-white p-1 rounded-full text-amber-600 hover:bg-amber-600 hover:text-white transition-colors shadow-sm border border-amber-200"
+                                        className="bg-white p-1 rounded-md text-amber-500 hover:bg-amber-500 hover:text-white transition-all shadow-sm border border-amber-200/50 ml-0.5"
                                         title="Enviar Email Rápido"
                                         onClick={(e) => { e.stopPropagation(); }}
                                         onPointerDown={(e) => e.stopPropagation()}
@@ -138,24 +138,24 @@ export function DealCard({ deal }: { deal: any }) {
                 </div>
 
                 {/* Company & Probability */}
-                <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-md border shadow-sm max-w-[50%]">
+                <div className="flex justify-between items-center mb-0 gap-2">
+                    <div className="flex items-center gap-2 bg-white/60 px-2 py-1.5 rounded-lg border border-slate-200/50 shadow-sm max-w-[50%] group-hover:bg-white transition-colors">
                         <img
                             src={`https://logo.clearbit.com/${deal.company?.domain || deal.contactEmail?.split('@')[1] || 'example.com'}`}
                             alt=""
-                            className="w-4 h-4 rounded-full bg-gray-100 ring-1 ring-gray-200"
+                            className="w-4 h-4 rounded-full bg-slate-100 ring-1 ring-slate-200"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
-                        <span className="text-[11px] font-semibold text-gray-700 truncate">{deal.company?.name || 'Empresa'}</span>
+                        <span className="text-[11px] font-bold text-slate-700 truncate">{deal.company?.name || 'Empresa'}</span>
                     </div>
 
                     {deal.probability > 0 ? (
-                        <div className="w-[40%] flex flex-col items-end">
-                            <span className="text-[10px] font-bold text-gray-500 mb-1">{deal.probability}% Prob</span>
-                            <Progress value={deal.probability} className="h-1.5 w-full bg-gray-100 [&>div]:bg-blue-500" />
+                        <div className="w-[45%] flex flex-col items-end">
+                            <span className="text-[10px] font-extrabold text-slate-400 mb-1">{deal.probability}% WIN PROB.</span>
+                            <Progress value={deal.probability} className="h-1.5 w-full bg-slate-100 [&>div]:bg-gradient-to-r [&>div]:from-blue-400 [&>div]:to-blue-600" />
                         </div>
                     ) : (
-                        <span className="text-[10px] text-gray-400">Sin prob.</span>
+                        <span className="text-[10px] font-bold text-slate-400">Sin prob.</span>
                     )}
                 </div>
 

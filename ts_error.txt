@@ -1,0 +1,1 @@
+modules/crm/components/KanbanBoard.tsx(494,5): error TS1128: Declaration or statement expected.
