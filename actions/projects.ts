@@ -46,7 +46,6 @@ export async function getProjects(options?: {
         ],
         include: {
             category: true,
-            tags: true,
             _count: {
                 select: { views: true }
             }
@@ -62,7 +61,6 @@ export async function getProject(id: string) {
         where: { id },
         include: {
             category: true,
-            tags: true,
             // relatedProjects: {
             //     select: { id: true, title: true, slug: true, coverImage: true }
             // }
@@ -93,7 +91,6 @@ export async function getPublicProjects(options?: {
         ],
         include: {
             category: true,
-            tags: true,
             _count: {
                 select: { views: true }
             }
@@ -132,7 +129,6 @@ export async function createProject(data: ProjectFormData) {
                 techStack: techStack || [],
                 team: team || [],
                 categoryId: categoryId || null,
-                tags: tagConnections
             }
         });
 
@@ -178,7 +174,6 @@ export async function updateProject(id: string, data: ProjectFormData) {
                 techStack: techStack || [],
                 team: team || [],
                 categoryId: categoryId || null,
-                tags: tagConnections
             }
         });
 
@@ -199,7 +194,7 @@ export async function duplicateProject(id: string) {
     try {
         const project = await prisma.project.findUnique({
             where: { id },
-            include: { tags: true }
+            include: {}
         });
 
         if (!project) return { success: false, error: "Project not found" };
@@ -222,9 +217,6 @@ export async function duplicateProject(id: string) {
                 status: 'draft',
                 published: false,
                 displayOrder: 0,
-                tags: {
-                    connect: project.tags.map(t => ({ id: t.id }))
-                },
                 // Skip related projects or copy them? Copying them seems better but strictly they are new relations.
                 // Let's copy them.
                 // relatedProjects: { connect: ... } // Complexity. Skip for now.

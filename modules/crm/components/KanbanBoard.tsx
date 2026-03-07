@@ -47,8 +47,8 @@ function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, st
         <div
             ref={setNodeRef}
             className={`min-w-[320px] w-[320px] shrink-0 flex flex-col rounded-[24px] border transition-all duration-500 ease-out overlay-gradient relative overflow-hidden group/stage ${isOver ? 'ring-2 ring-blue-500/50 bg-blue-50/90 shadow-[inset_0_4px_20px_rgba(59,130,246,0.1)] scale-[1.01]' :
-                    isBottleneck ? 'border-red-200/60 bg-red-50/40 shadow-sm' :
-                        'border-slate-200/50 bg-slate-50/40 hover:bg-slate-50/60 shadow-sm'
+                isBottleneck ? 'border-red-200/60 bg-red-50/40 shadow-sm' :
+                    'border-slate-200/50 bg-slate-50/40 hover:bg-slate-50/60 shadow-sm'
                 }`}
         >
             <div className={`p-4 border-b border-slate-200/40 bg-white/70 backdrop-blur-xl rounded-t-[24px] z-10 sticky top-0 transition-colors ${isBottleneck ? 'bg-red-50/90 border-red-200/50' : ''}`}>
@@ -306,190 +306,191 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
     }));
     const maxFunnelCount = Math.max(...funnelData.map(d => d.count), 1);
 
-    <div className="flex flex-col h-full space-y-5">
-        {/* Phase 15 & Fase 1: Pipeline Intelligence Dashboard (Premium Glassmorphism) */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500" />
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                    Total Pipeline
-                    <span className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+    return (
+        <div className="flex flex-col h-full space-y-5">
+            {/* Phase 15 & Fase 1: Pipeline Intelligence Dashboard (Premium Glassmorphism) */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500" />
+                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
+                        Total Pipeline
+                        <span className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                    </div>
+                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
+                        ${(totalPipeline / 1000).toFixed(1)}<span className="text-lg text-slate-400">k</span>
+                    </div>
                 </div>
-                <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                    ${(totalPipeline / 1000).toFixed(1)}<span className="text-lg text-slate-400">k</span>
-                </div>
-            </div>
 
-            <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                <div className="absolute -right-4 -top-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500" />
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                    Forecast Ponderado
-                    <span className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
+                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500" />
+                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
+                        Forecast Ponderado
+                        <span className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
+                    </div>
+                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
+                        ${(weightedForecast / 1000).toFixed(1)}<span className="text-lg text-slate-400">k</span>
+                    </div>
                 </div>
-                <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                    ${(weightedForecast / 1000).toFixed(1)}<span className="text-lg text-slate-400">k</span>
-                </div>
-            </div>
 
-            <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                <div className="absolute -right-4 -top-4 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all duration-500" />
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                    Win Rate
-                    <span className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></span>
+                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all duration-500" />
+                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
+                        Win Rate
+                        <span className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></span>
+                    </div>
+                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
+                        {winRate}<span className="text-xl text-slate-400">%</span>
+                    </div>
                 </div>
-                <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                    {winRate}<span className="text-xl text-slate-400">%</span>
-                </div>
-            </div>
 
-            <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500" />
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                    Active Deals
-                    <span className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><Rows className="w-3.5 h-3.5" /></span>
+                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500" />
+                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
+                        Active Deals
+                        <span className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><Rows className="w-3.5 h-3.5" /></span>
+                    </div>
+                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
+                        {deals.filter(d => d.stage !== 'WON' && d.stage !== 'LOST').length}
+                    </div>
                 </div>
-                <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                    {deals.filter(d => d.stage !== 'WON' && d.stage !== 'LOST').length}
-                </div>
-            </div>
 
-            {/* Funnel Visual */}
-            <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-3 shadow-sm flex flex-col justify-end relative h-full">
-                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 absolute top-4 left-4">Conversion Funnel</div>
-                <div className="flex items-end gap-1.5 h-12 mt-6">
-                    {funnelData.map((stage, i) => (
-                        <div
-                            key={stage.name}
-                            className="flex-1 rounded-t-sm transition-all duration-700 hover:opacity-100 opacity-80 group/bar relative"
-                            style={{
-                                height: `${Math.max((stage.count / maxFunnelCount) * 100, 15)}%`,
-                                background: `linear-gradient(to top, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, ${0.4 + (i * 0.1)}))`
-                            }}
-                        >
-                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-600 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-white px-1 shadow-sm rounded">
-                                {stage.count}
+                {/* Funnel Visual */}
+                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-3 shadow-sm flex flex-col justify-end relative h-full">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 absolute top-4 left-4">Conversion Funnel</div>
+                    <div className="flex items-end gap-1.5 h-12 mt-6">
+                        {funnelData.map((stage, i) => (
+                            <div
+                                key={stage.name}
+                                className="flex-1 rounded-t-sm transition-all duration-700 hover:opacity-100 opacity-80 group/bar relative"
+                                style={{
+                                    height: `${Math.max((stage.count / maxFunnelCount) * 100, 15)}%`,
+                                    background: `linear-gradient(to top, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, ${0.4 + (i * 0.1)}))`
+                                }}
+                            >
+                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-600 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-white px-1 shadow-sm rounded">
+                                    {stage.count}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {/* Toolbar Principal */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 bg-white/50 backdrop-blur-md border border-slate-200/50 rounded-2xl">
-            <div className="relative w-full sm:max-w-md group">
-                <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                <Input
-                    placeholder="Buscar deals, clientes, emails..."
-                    className="pl-10 lg:w-[400px] h-10 bg-white/80 border-slate-200/60 focus-visible:ring-blue-500/30 focus-visible:border-blue-500 rounded-xl shadow-sm transition-all text-sm"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </div>
+            {/* Toolbar Principal */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 bg-white/50 backdrop-blur-md border border-slate-200/50 rounded-2xl">
+                <div className="relative w-full sm:max-w-md group">
+                    <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <Input
+                        placeholder="Buscar deals, clientes, emails..."
+                        className="pl-10 lg:w-[400px] h-10 bg-white/80 border-slate-200/60 focus-visible:ring-blue-500/30 focus-visible:border-blue-500 rounded-xl shadow-sm transition-all text-sm"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="flex items-center bg-white/80 border border-slate-200/60 rounded-xl shadow-sm p-1">
-                    <ArrowUpDown className="w-4 h-4 text-slate-400 mx-2" />
-                    <select
-                        className="text-sm bg-transparent border-none focus:ring-0 text-slate-600 font-medium cursor-pointer pl-0 py-1.5 outline-none appearance-none"
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as "date" | "value")}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <div className="flex items-center bg-white/80 border border-slate-200/60 rounded-xl shadow-sm p-1">
+                        <ArrowUpDown className="w-4 h-4 text-slate-400 mx-2" />
+                        <select
+                            className="text-sm bg-transparent border-none focus:ring-0 text-slate-600 font-medium cursor-pointer pl-0 py-1.5 outline-none appearance-none"
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as "date" | "value")}
+                        >
+                            <option value="date">Ordenar por Fecha</option>
+                            <option value="value">Ordenar por Valor</option>
+                        </select>
+                    </div>
+
+                    <div className="flex items-center bg-white/80 border border-slate-200/60 rounded-xl shadow-sm p-1">
+                        <Filter className="w-4 h-4 text-slate-400 mx-2" />
+                        <select
+                            className="text-sm bg-transparent border-none focus:ring-0 text-slate-600 font-medium cursor-pointer pl-0 py-1.5 outline-none appearance-none"
+                            value={priorityFilter}
+                            onChange={(e) => setPriorityFilter(e.target.value)}
+                        >
+                            <option value="ALL">Todo</option>
+                            <option value="HIGH">Alta Prioridad 🔥</option>
+                            <option value="MEDIUM">Prioridad Media</option>
+                            <option value="LOW">Baja Prioridad</option>
+                        </select>
+                    </div>
+
+                    {/* Batch 3: Compact Mode Toggle */}
+                    <button
+                        onClick={() => setCompactMode(!compactMode)}
+                        className={`p-2.5 rounded-xl border border-transparent transition-all shadow-sm ${compactMode ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-white/80 border-slate-200/60 text-slate-500 hover:bg-white hover:text-slate-800'}`}
+                        title={compactMode ? 'Vista Extendida' : 'Vista Compacta'}
                     >
-                        <option value="date">Ordenar por Fecha</option>
-                        <option value="value">Ordenar por Valor</option>
-                    </select>
+                        <Rows className="w-4 h-4" />
+                    </button>
                 </div>
-
-                <div className="flex items-center bg-white/80 border border-slate-200/60 rounded-xl shadow-sm p-1">
-                    <Filter className="w-4 h-4 text-slate-400 mx-2" />
-                    <select
-                        className="text-sm bg-transparent border-none focus:ring-0 text-slate-600 font-medium cursor-pointer pl-0 py-1.5 outline-none appearance-none"
-                        value={priorityFilter}
-                        onChange={(e) => setPriorityFilter(e.target.value)}
-                    >
-                        <option value="ALL">Todo</option>
-                        <option value="HIGH">Alta Prioridad 🔥</option>
-                        <option value="MEDIUM">Prioridad Media</option>
-                        <option value="LOW">Baja Prioridad</option>
-                    </select>
-                </div>
-
-                {/* Batch 3: Compact Mode Toggle */}
-                <button
-                    onClick={() => setCompactMode(!compactMode)}
-                    className={`p-2.5 rounded-xl border border-transparent transition-all shadow-sm ${compactMode ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-white/80 border-slate-200/60 text-slate-500 hover:bg-white hover:text-slate-800'}`}
-                    title={compactMode ? 'Vista Extendida' : 'Vista Compacta'}
-                >
-                    <Rows className="w-4 h-4" />
-                </button>
             </div>
-        </div>
 
-        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            <div className="flex gap-5 h-[calc(100vh-320px)] overflow-x-auto pb-6 pt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {STAGES.map(stage => {
-                    const stageDeals = sortedDeals.filter(d => d.stage === stage.id);
-                    const totalValue = stageDeals.reduce((sum, d) => sum + d.value, 0);
+            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+                <div className="flex gap-5 h-[calc(100vh-320px)] overflow-x-auto pb-6 pt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    {STAGES.map(stage => {
+                        const stageDeals = sortedDeals.filter(d => d.stage === stage.id);
+                        const totalValue = stageDeals.reduce((sum, d) => sum + d.value, 0);
 
-                    // Phase 15: Calculate stagnant count (deals > 7 days in stage)
-                    const stagnantCount = stageDeals.filter(d => {
-                        const daysInStage = d.lastActivity
-                            ? Math.floor((new Date().getTime() - new Date(d.lastActivity).getTime()) / (1000 * 3600 * 24))
-                            : 0;
-                        return daysInStage > 7;
-                    }).length;
-
-                    // Phase 15: Calculate avg days in stage
-                    const avgDaysInStage = stageDeals.length > 0
-                        ? Math.round(stageDeals.reduce((sum, d) => {
-                            const days = d.lastActivity
+                        // Phase 15: Calculate stagnant count (deals > 7 days in stage)
+                        const stagnantCount = stageDeals.filter(d => {
+                            const daysInStage = d.lastActivity
                                 ? Math.floor((new Date().getTime() - new Date(d.lastActivity).getTime()) / (1000 * 3600 * 24))
                                 : 0;
-                            return sum + days;
-                        }, 0) / stageDeals.length)
-                        : 0;
+                            return daysInStage > 7;
+                        }).length;
 
-                    return (
-                        <DroppableStage
-                            key={stage.id}
-                            stage={stage}
-                            totalValue={totalValue}
-                            dealCount={stageDeals.length}
-                            stagnantCount={stagnantCount}
-                            avgDaysInStage={avgDaysInStage}
-                        >
-                            {stageDeals.map(deal => (
-                                <DraggableDeal
-                                    key={deal.id}
-                                    deal={deal}
-                                    onClick={() => setSelectedDeal(deal)}
-                                    onEdit={() => setSelectedDeal(deal)}
-                                    onDuplicate={() => executeDuplicate(deal)}
-                                    onDelete={() => executeDelete(deal.id)}
-                                />
-                            ))}
-                        </DroppableStage>
-                    )
-                })}
-            </div>
+                        // Phase 15: Calculate avg days in stage
+                        const avgDaysInStage = stageDeals.length > 0
+                            ? Math.round(stageDeals.reduce((sum, d) => {
+                                const days = d.lastActivity
+                                    ? Math.floor((new Date().getTime() - new Date(d.lastActivity).getTime()) / (1000 * 3600 * 24))
+                                    : 0;
+                                return sum + days;
+                            }, 0) / stageDeals.length)
+                            : 0;
 
-            {createPortal(
-                <DragOverlay>
-                    {activeDeal ? <DealCard deal={activeDeal} /> : null}
-                </DragOverlay>,
-                document.body
+                        return (
+                            <DroppableStage
+                                key={stage.id}
+                                stage={stage}
+                                totalValue={totalValue}
+                                dealCount={stageDeals.length}
+                                stagnantCount={stagnantCount}
+                                avgDaysInStage={avgDaysInStage}
+                            >
+                                {stageDeals.map(deal => (
+                                    <DraggableDeal
+                                        key={deal.id}
+                                        deal={deal}
+                                        onClick={() => setSelectedDeal(deal)}
+                                        onEdit={() => setSelectedDeal(deal)}
+                                        onDuplicate={() => executeDuplicate(deal)}
+                                        onDelete={() => executeDelete(deal.id)}
+                                    />
+                                ))}
+                            </DroppableStage>
+                        )
+                    })}
+                </div>
+
+                {createPortal(
+                    <DragOverlay>
+                        {activeDeal ? <DealCard deal={activeDeal} /> : null}
+                    </DragOverlay>,
+                    document.body
+                )}
+            </DndContext>
+
+            {selectedDeal && (
+                <DealDetailsDialog
+                    deal={selectedDeal}
+                    open={!!selectedDeal}
+                    onOpenChange={(open) => {
+                        if (!open) setSelectedDeal(null);
+                    }}
+                />
             )}
-        </DndContext>
-
-        {selectedDeal && (
-            <DealDetailsDialog
-                deal={selectedDeal}
-                open={!!selectedDeal}
-                onOpenChange={(open) => {
-                    if (!open) setSelectedDeal(null);
-                }}
-            />
-        )}
-    </div>
+        </div>
     )
 }

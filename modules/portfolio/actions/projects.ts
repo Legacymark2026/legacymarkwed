@@ -46,7 +46,6 @@ export async function getProjects(options?: {
         ],
         include: {
             category: true,
-            tags: true,
             _count: {
                 select: { views: true }
             }
@@ -61,8 +60,7 @@ export async function getProject(id: string) {
     return prisma.project.findUnique({
         where: { id },
         include: {
-            category: true,
-            tags: true
+            category: true
         }
     });
 }
@@ -90,7 +88,6 @@ export async function getPublicProjects(options?: {
         ],
         include: {
             category: true,
-            tags: true,
             _count: {
                 select: { views: true }
             }
@@ -123,7 +120,6 @@ export async function createProject(data: ProjectFormData) {
                 results: results || [],
                 gallery: gallery || [],
                 categoryId: categoryId || null,
-                tags: tagConnections,
             }
         });
 
@@ -163,7 +159,6 @@ export async function updateProject(id: string, data: ProjectFormData) {
                 results: results || [],
                 gallery: gallery || [],
                 categoryId: categoryId || null,
-                tags: tagConnections,
             }
         });
 
