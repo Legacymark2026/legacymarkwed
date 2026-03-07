@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ChevronDown } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -22,23 +22,28 @@ export function CalendarDateRangePicker({
                 id="date"
                 variant={"outline"}
                 className={cn(
-                    "w-[260px] justify-start text-left font-normal",
+                    "w-[280px] justify-between text-left font-medium bg-white/70 backdrop-blur-md border-slate-200/60 shadow-sm hover:bg-white hover:border-blue-300 transition-all duration-300 rounded-xl h-10",
                     !date && "text-muted-foreground"
                 )}
             >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                    date.to ? (
-                        <>
-                            {format(date.from, "LLL dd, y", { locale: es })} -{" "}
-                            {format(date.to, "LLL dd, y", { locale: es })}
-                        </>
+                <div className="flex items-center">
+                    <div className="bg-blue-100 p-1.5 rounded-lg mr-2 text-blue-600">
+                        <CalendarIcon className="h-4 w-4" />
+                    </div>
+                    {date?.from ? (
+                        date.to ? (
+                            <span className="text-slate-700 tracking-tight">
+                                {format(date.from, "LLL dd", { locale: es })} -{" "}
+                                {format(date.to, "LLL dd, y", { locale: es })}
+                            </span>
+                        ) : (
+                            format(date.from, "LLL dd, y", { locale: es })
+                        )
                     ) : (
-                        format(date.from, "LLL dd, y", { locale: es })
-                    )
-                ) : (
-                    <span>Seleccionar fechas</span>
-                )}
+                        <span>Seleccionar fechas</span>
+                    )}
+                </div>
+                <ChevronDown className="h-4 w-4 text-slate-400 opacity-50" />
             </Button>
         </div>
     );
