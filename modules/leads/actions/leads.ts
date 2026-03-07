@@ -169,7 +169,22 @@ export async function createLead(input: CreateLeadInput) {
             }
         });
 
+        // Automatización CRM: Generar un Deal (Negocio) inicial en el Kanban apenas entra el Lead
+        await prisma.deal.create({
+            data: {
+                title: input.name ? `Lead: ${input.name}` : `Lead: ${input.email}`,
+                value: 0,
+                stage: "NEW",
+                priority: score >= 70 ? "HIGH" : score >= 40 ? "MEDIUM" : "LOW",
+                contactName: input.name || "",
+                contactEmail: input.email,
+                source: sourceResult.source || "Unknown",
+                companyId: input.companyId,
+            }
+        });
+
         revalidatePath('/dashboard/admin/crm/leads');
+        revalidatePath('/dashboard/admin/crm/pipeline');
         return { success: true, data: lead };
     } catch (error: any) /* eslint-disable-line @typescript-eslint/no-explicit-any */ {
         console.error("Error creating lead:", error);

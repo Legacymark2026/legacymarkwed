@@ -1,13 +1,13 @@
 "use client"
 
 import {
-    ContextMenu,
-    ContextMenuContent,
-    ContextMenuItem,
-    ContextMenuSeparator,
-    ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { Edit, Trash2, Mail, Phone, Copy, CopyPlus, Archive } from "lucide-react"
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Edit, Trash2, Mail, Phone, Copy, CopyPlus, Archive, MoreVertical } from "lucide-react"
 import { toast } from "sonner"
 
 interface DealContextMenuProps {
@@ -46,52 +46,63 @@ export function DealContextMenu({ children, deal, onEdit, onDelete, onDuplicate,
     }
 
     return (
-        <ContextMenu>
-            <ContextMenuTrigger>{children}</ContextMenuTrigger>
-            <ContextMenuContent className="w-64">
-                <ContextMenuItem onClick={onEdit}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Deal
-                </ContextMenuItem>
-                {/* Phase 15: Duplicate Deal */}
-                <ContextMenuItem onClick={handleDuplicate}>
-                    <CopyPlus className="mr-2 h-4 w-4" />
-                    Duplicate Deal
-                </ContextMenuItem>
-                <ContextMenuItem onClick={handleCopyEmail}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy Email
-                </ContextMenuItem>
-                <ContextMenuSeparator />
-                {deal.contactEmail && (
-                    <ContextMenuItem asChild>
-                        <a href={`mailto:${deal.contactEmail}`}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Send Email
-                        </a>
-                    </ContextMenuItem>
-                )}
-                {deal.contactPhone && (
-                    <ContextMenuItem asChild>
-                        <a href={`tel:${deal.contactPhone}`}>
-                            <Phone className="mr-2 h-4 w-4" />
-                            Call Contact
-                        </a>
-                    </ContextMenuItem>
-                )}
-                <ContextMenuSeparator />
-                {/* Phase 15: Archive instead of Delete */}
-                {onArchive && (
-                    <ContextMenuItem onClick={onArchive} className="text-amber-600">
-                        <Archive className="mr-2 h-4 w-4" />
-                        Archive Deal
-                    </ContextMenuItem>
-                )}
-                <ContextMenuItem onClick={onDelete} className="text-red-600">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Deal
-                </ContextMenuItem>
-            </ContextMenuContent>
-        </ContextMenu>
+        <div className="relative group/context">
+            {children}
+            <div className="absolute top-2 right-16 opacity-0 group-hover/context:opacity-100 transition-opacity z-20">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button
+                            className="p-1 flex items-center justify-center bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 text-gray-500 hover:text-gray-800 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}
+                        >
+                            <MoreVertical className="w-3.5 h-3.5" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end">
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(); }}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar Deal
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicate(); }}>
+                            <CopyPlus className="mr-2 h-4 w-4" />
+                            Duplicar Deal
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCopyEmail(); }}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Copiar Email
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {deal.contactEmail && (
+                            <DropdownMenuItem asChild>
+                                <a href={`mailto:${deal.contactEmail}`} onClick={(e) => e.stopPropagation()}>
+                                    <Mail className="mr-2 h-4 w-4" />
+                                    Enviar Email
+                                </a>
+                            </DropdownMenuItem>
+                        )}
+                        {deal.contactPhone && (
+                            <DropdownMenuItem asChild>
+                                <a href={`tel:${deal.contactPhone}`} onClick={(e) => e.stopPropagation()}>
+                                    <Phone className="mr-2 h-4 w-4" />
+                                    Llamar Contacto
+                                </a>
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        {onArchive && (
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onArchive(); }} className="text-amber-600 focus:bg-amber-50 focus:text-amber-700">
+                                <Archive className="mr-2 h-4 w-4" />
+                                Archivar Deal
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-red-600 focus:bg-red-50 focus:text-red-700">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Eliminar Deal
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+        </div>
     )
 }
