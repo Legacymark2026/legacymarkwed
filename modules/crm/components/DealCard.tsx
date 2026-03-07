@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Mail, Phone, Clock, Calendar, Tag, Star, TrendingUp, TrendingDown, Bell } from "lucide-react";
 import { formatDistanceToNow, differenceInDays } from "date-fns";
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 
 // Helper: Star Rating component
 function StarRating({ priority }: { priority: string }) {
@@ -21,7 +23,7 @@ function StarRating({ priority }: { priority: string }) {
     );
 }
 
-export function DealCard({ deal }: { deal: any }) {
+export function DealCard({ deal, onQuickUpdate }: { deal: any, onQuickUpdate?: (id: string, updates: any) => void }) {
     const daysSinceAction = deal.lastActivity
         ? Math.floor((new Date().getTime() - new Date(deal.lastActivity).getTime()) / (1000 * 3600 * 24))
         : 0;
@@ -31,6 +33,27 @@ export function DealCard({ deal }: { deal: any }) {
 
     const isStagnant = daysSinceAction > 7;
     const isOverdue = deal.expectedClose && new Date(deal.expectedClose) < new Date();
+    const isHot = daysSinceAction <= 1; // Fuego: Actividad muy reciente
+
+    // State for Inline Editing
+    const [isEditingValue, setIsEditingValue] = useState(false);
+    const [editValue, setEditValue] = useState(deal.value?.toString() || "0");
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (isEditingValue && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isEditingValue]);
+
+    const handleSaveValue = () => {
+        setIsEditingValue(false);
+        const numVal = parseFloat(editValue);
+        if (!isNaN(numVal) && numVal !== deal.value && onQuickUpdate) {
+            onQuickUpdate(deal.id, { value: numVal });
+        }
+    };
+
 
     // Phase 15: Value Trend (simulated - would come from DB in real app)
     const valueTrend = deal.previousValue ? (deal.value > deal.previousValue ? 'up' : deal.value < deal.previousValue ? 'down' : null) : null;
@@ -59,7 +82,11 @@ export function DealCard({ deal }: { deal: any }) {
     const dealScore = calculateDealScore();
 
     return (
-        <Card className={`mb-3 cursor-grab active:cursor-grabbing hover:shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] transition-all duration-300 group relative border-l-4 overflow-hidden bg-white/80 backdrop-blur-md border border-slate-200/50 hover:bg-white/95 ${isStagnant ? 'ring-2 ring-amber-400/30' : ''} ${isOverdue ? 'ring-2 ring-red-400/30' : ''}`} style={{ borderLeftColor: deal.priority === 'HIGH' ? '#ef4444' : deal.priority === 'MEDIUM' ? '#3b82f6' : '#e5e7eb' }}>
+        <Card className={`mb-3 cursor-grab active:cursor-grabbing hover:shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] transition-all duration-300 group relative border-l-4 overflow-hidden bg-white/80 backdrop-blur-md border border-slate-200/50 hover:bg-white/95 
+            ${isStagnant ? 'ring-2 ring-cyan-200/40 bg-cyan-50/10' : ''} 
+            ${isHot ? 'ring-2 ring-orange-200/50 bg-orange-50/10' : ''} 
+            ${isOverdue ? 'ring-2 ring-red-400/30' : ''}`}
+            style={{ borderLeftColor: deal.priority === 'HIGH' ? '#ef4444' : deal.priority === 'MEDIUM' ? '#3b82f6' : '#e5e7eb' }}>
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-slate-100/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
             <CardContent className="p-3.5 relative z-10">
@@ -99,10 +126,31 @@ export function DealCard({ deal }: { deal: any }) {
                 <div className="flex items-end justify-between mb-3 bg-gray-50/50 rounded-lg p-2 border border-gray-100/50">
                     <div className="flex flex-col">
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.1em] mb-0.5">Valor Estimado</span>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[17px] font-extrabold tracking-tighter text-slate-800 font-mono">
-                                {formatCurrency(deal.value)}
-                            </span>
+                        <div
+                            className="flex items-center gap-2 cursor-pointer group/value"
+                            title="Haz doble clic para editar"
+                            onDoubleClick={(e) => { e.stopPropagation(); setIsEditingValue(true); }}
+                        >
+                            {isEditingValue ? (
+                                <Input
+                                    ref={inputRef}
+                                    type="number"
+                                    className="h-6 w-24 text-sm font-extrabold px-1 font-mono border-blue-400 focus-visible:ring-1"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onBlur={handleSaveValue}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSaveValue();
+                                        if (e.key === 'Escape') setIsEditingValue(false);
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                />
+                            ) : (
+                                <span className="text-[17px] font-extrabold tracking-tighter text-slate-800 font-mono group-hover/value:text-blue-600 transition-colors">
+                                    {formatCurrency(deal.value)}
+                                </span>
+                            )}
                             {/* Phase 15: Value Trend Icon */}
                             {valueTrend === 'up' && <TrendingUp className="w-4 h-4 text-emerald-500 stroke-[3]" />}
                             {valueTrend === 'down' && <TrendingDown className="w-4 h-4 text-rose-500 stroke-[3]" />}
@@ -117,21 +165,26 @@ export function DealCard({ deal }: { deal: any }) {
                             </div>
                         )}
                         {isStagnant && (
-                            <div className="group/stagnant flex items-center bg-amber-50/80 rounded-md shadow-sm pl-1.5 pr-1 py-0.5 border border-amber-200/60" title="Stagnant: > 7 days">
-                                <Clock className="w-3 h-3 mr-1 text-amber-500" />
-                                <span className="text-[9px] font-bold text-amber-700 mr-1 opacity-90">
-                                    {daysSinceAction} días estanc.
+                            <div className="group/stagnant flex items-center bg-cyan-50/80 rounded-md shadow-sm pl-1.5 pr-1 py-0.5 border border-cyan-200/60" title="Ice: Stagnant > 7 days">
+                                ❄️
+                                <span className="text-[9px] font-bold text-cyan-700 mr-1 opacity-90 ml-1">
+                                    {daysSinceAction}d congelado
                                 </span>
                                 {deal.contactEmail && (
                                     <a href={`mailto:${deal.contactEmail}?subject=Seguimiento%20sobre:%20${encodeURIComponent(deal.title)}&body=Hola%20${encodeURIComponent(deal.contactName?.split(' ')[0] || 'allí')},%0A%0A`}
-                                        className="bg-white p-1 rounded-md text-amber-500 hover:bg-amber-500 hover:text-white transition-all shadow-sm border border-amber-200/50 ml-0.5"
-                                        title="Enviar Email Rápido"
+                                        className="bg-white p-1 rounded-md text-cyan-500 hover:bg-cyan-500 hover:text-white transition-all shadow-sm border border-cyan-200/50 ml-0.5"
+                                        title="Enviar Email para calentar deal"
                                         onClick={(e) => { e.stopPropagation(); }}
                                         onPointerDown={(e) => e.stopPropagation()}
                                     >
                                         <Mail className="w-2.5 h-2.5" />
                                     </a>
                                 )}
+                            </div>
+                        )}
+                        {isHot && !isStagnant && !isOverdue && (
+                            <div className="group/hot flex items-center bg-orange-50/80 rounded-md shadow-sm px-1.5 py-0.5 border border-orange-200/60" title="Hot Deal! Activity < 24h">
+                                🔥 <span className="text-[9px] font-bold text-orange-700 ml-1">Caliente</span>
                             </div>
                         )}
                     </div>

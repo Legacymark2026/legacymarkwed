@@ -9,11 +9,11 @@ import {
     DragStartEvent,
     DragEndEvent
 } from "@dnd-kit/core";
-import { updateDealStage } from "@/actions/crm";
+import { updateDealStage, updateDeal } from "@/actions/crm";
 import { createPortal } from "react-dom";
 import { DealDetailsDialog } from "./DealDetailsDialog";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowUpDown, Rows, Filter } from "lucide-react";
+import { Search, ArrowUpDown, Rows, Filter, CheckSquare } from "lucide-react";
 import { STAGES } from "@/lib/crm-config";
 import confetti from "canvas-confetti";
 import { formatCurrency } from "@/lib/utils";
@@ -122,7 +122,16 @@ function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, st
     );
 }
 
-function DraggableDeal({ deal, onClick, onEdit, onDuplicate, onDelete }: { deal: any, onClick: () => void, onEdit: () => void, onDuplicate: () => void, onDelete: () => void }) {
+function DraggableDeal({
+    deal, onClick, onEdit, onDuplicate, onDelete,
+    onQuickUpdate, isBulkMode, isSelected, onToggleSelect
+}: {
+    deal: any, onClick: () => void, onEdit: () => void, onDuplicate: () => void, onDelete: () => void,
+    onQuickUpdate?: (id: string, updates: any) => void,
+    isBulkMode?: boolean,
+    isSelected?: boolean,
+    onToggleSelect?: () => void
+}) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: deal.id,
         data: deal
@@ -144,17 +153,36 @@ function DraggableDeal({ deal, onClick, onEdit, onDuplicate, onDelete }: { deal:
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="touch-none cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform duration-200">
+        <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="touch-none cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform duration-200 relative">
             <DealContextMenu
                 deal={deal}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onDuplicate={onDuplicate}
             >
-                <div onClick={onClick} className="group">
-                    <DealCard deal={deal} />
+                <div onClick={(e) => {
+                    if (isBulkMode && onToggleSelect) {
+                        e.stopPropagation();
+                        onToggleSelect();
+                    } else {
+                        onClick();
+                    }
+                }} className="group">
+                    {isBulkMode && (
+                        <div className="absolute top-2 left-2 z-20">
+                            <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => { e.stopPropagation(); onToggleSelect && onToggleSelect(); }}
+                                className="w-5 h-5 rounded-[6px] border-gray-300 text-blue-600 focus:ring-blue-500 bg-white/50 backdrop-blur shadow-sm cursor-pointer"
+                                onClick={(e) => e.stopPropagation()}
+                                onPointerDown={(e) => e.stopPropagation()}
+                            />
+                        </div>
+                    )}
+                    <DealCard deal={deal} onQuickUpdate={onQuickUpdate} />
                     {/* Visual Hover Feedback Ring */}
-                    <div className="absolute inset-0 rounded-xl ring-2 ring-transparent group-hover:ring-blue-200 transition-colors pointer-events-none" />
+                    <div className={`absolute inset-0 rounded-xl transition-colors pointer-events-none ${isSelected ? 'ring-2 ring-blue-500 bg-blue-50/10' : 'ring-2 ring-transparent group-hover:ring-blue-200'}`} />
                 </div>
             </DealContextMenu>
         </div>
@@ -170,6 +198,10 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
     const [priorityFilter, setPriorityFilter] = useState<string>("ALL");
     const [sortBy, setSortBy] = useState<"date" | "value">("date");
     const [compactMode, setCompactMode] = useState(false);
+
+    // Bulk Mode State
+    const [isBulkMode, setIsBulkMode] = useState(false);
+    const [selectedDealIds, setSelectedDealIds] = useState<string[]>([]);
 
     useEffect(() => {
         const timer = setTimeout(() => setMounted(true), 0);
@@ -213,6 +245,15 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
         const currentDeal = deals.find(d => d.id === dealId);
 
         if (currentDeal && currentDeal.stage !== newStage) {
+            // Fase 2 - Validation Rule upon dropping
+            if (newStage === 'LOST') {
+                const reason = window.prompt("⚠️ Regla de validación: Por favor ingresa el motivo de pérdida del deal.");
+                if (reason === null || reason.trim() === '') {
+                    toast.error("Movimiento cancelado: Motivo requerido para deals perdidos.");
+                    return;
+                }
+            }
+
             // Confetti v2: Enhanced for WON deals, extra for big deals > $10k
             if (newStage === 'WON') {
                 const isBigDeal = currentDeal.value >= 10000;
@@ -248,6 +289,45 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
             } catch (e) {
                 console.error(e);
             }
+        }
+    }
+
+    // --- Fase 2: Mutaciones de Productividad Senior ---
+    const handleQuickUpdate = async (dealId: string, updates: any) => {
+        setDeals(deals.map(d => d.id === dealId ? { ...d, ...updates } : d));
+        try {
+            await updateDeal(dealId, updates);
+            toast.success("Valor actualizado");
+        } catch (e) {
+            toast.error("Error al actualizar rápidamente");
+        }
+    }
+
+    const toggleSelection = (dealId: string) => {
+        setSelectedDealIds(prev => prev.includes(dealId) ? prev.filter(id => id !== dealId) : [...prev, dealId]);
+    }
+
+    const toggleBulkMode = () => {
+        setIsBulkMode(!isBulkMode);
+        setSelectedDealIds([]);
+    }
+
+    const handleBulkMove = async (newStage: string) => {
+        if (selectedDealIds.length === 0) return;
+
+        // Optimistic UI update
+        const count = selectedDealIds.length;
+        setDeals(deals.map(d => selectedDealIds.includes(d.id) ? { ...d, stage: newStage, lastActivity: new Date() } : d));
+
+        const idsToUpdate = [...selectedDealIds];
+        setSelectedDealIds([]);
+        setIsBulkMode(false);
+
+        try {
+            await Promise.all(idsToUpdate.map(id => updateDealStage(id, newStage)));
+            toast.success(`Movidos ${count} deals a ${STAGES.find(s => s.id === newStage)?.label}`);
+        } catch (e) {
+            toast.error("Error moviendo en lote");
         }
     }
 
@@ -423,6 +503,33 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
                     >
                         <Rows className="w-4 h-4" />
                     </button>
+
+                    {/* Fase 2: Bulk Actions Mode Toggle */}
+                    <button
+                        onClick={toggleBulkMode}
+                        className={`p-2.5 rounded-xl border border-transparent transition-all shadow-sm ${isBulkMode ? 'bg-blue-600 border-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-white/80 border-slate-200/60 text-slate-500 hover:bg-white hover:text-slate-800'}`}
+                        title="Selección Múltiple"
+                    >
+                        <CheckSquare className="w-4 h-4" />
+                    </button>
+
+                    {/* Fase 2: Bulk Actions Controls */}
+                    {isBulkMode && selectedDealIds.length > 0 && (
+                        <div className="flex items-center gap-2 bg-blue-50/90 border border-blue-200/60 rounded-xl shadow-sm p-1 animate-in slide-in-from-right-2">
+                            <span className="text-xs font-bold text-blue-700 px-2">{selectedDealIds.length} seleccionados</span>
+                            <select
+                                className="text-xs bg-white border border-blue-200 rounded-lg focus:ring-blue-500 text-slate-700 font-medium cursor-pointer px-2 py-1.5 outline-none"
+                                onChange={(e) => {
+                                    if (e.target.value) handleBulkMove(e.target.value);
+                                    e.target.value = ''; // reset
+                                }}
+                                defaultValue=""
+                            >
+                                <option value="" disabled>Mover a...</option>
+                                {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+                            </select>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -467,6 +574,10 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
                                         onEdit={() => setSelectedDeal(deal)}
                                         onDuplicate={() => executeDuplicate(deal)}
                                         onDelete={() => executeDelete(deal.id)}
+                                        onQuickUpdate={handleQuickUpdate}
+                                        isBulkMode={isBulkMode}
+                                        isSelected={selectedDealIds.includes(deal.id)}
+                                        onToggleSelect={() => toggleSelection(deal.id)}
                                     />
                                 ))}
                             </DroppableStage>
