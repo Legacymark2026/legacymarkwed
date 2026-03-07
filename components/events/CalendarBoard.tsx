@@ -81,22 +81,31 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
         const { event, timeText } = eventInfo;
         const type = event.extendedProps.type;
 
-        let pointColor = "bg-white/90";
-        // The background color is passed via event.backgroundColor 
-        // We apply it directly to the container to ensure it's always solid.
-        const bgColor = event.backgroundColor || '#0f172a';
+        let pointColor = "bg-slate-300";
+        let bgColorClass = "bg-slate-100";
+        if (type === 'ONLINE') {
+            pointColor = 'bg-blue-500';
+            bgColorClass = 'bg-blue-100/80';
+        }
+        if (type === 'PHYSICAL') {
+            pointColor = 'bg-orange-500';
+            bgColorClass = 'bg-orange-100/80';
+        }
+        if (type === 'HYBRID') {
+            pointColor = 'bg-purple-500';
+            bgColorClass = 'bg-purple-100/80';
+        }
 
         return (
             <div
-                className="flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors"
-                style={{ backgroundColor: bgColor }}
+                className={`flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors ${bgColorClass} hover:brightness-95`}
                 title={`${event.title}${timeText ? ` (${timeText})` : ''}`}
             >
                 <div className="flex items-center gap-1.5 w-full mb-0.5">
                     <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${pointColor} shadow-sm`} />
-                    <span className="text-[10px] font-black truncate tracking-wide text-white drop-shadow-md">{timeText}</span>
+                    <span className="text-[10px] font-black truncate tracking-wide text-slate-700">{timeText}</span>
                 </div>
-                <div className="text-[11px] font-bold leading-tight truncate w-full text-white drop-shadow-md whitespace-normal line-clamp-2">
+                <div className="text-[11px] font-bold leading-tight truncate w-full text-slate-900 whitespace-normal line-clamp-2">
                     {event.title}
                 </div>
             </div>
