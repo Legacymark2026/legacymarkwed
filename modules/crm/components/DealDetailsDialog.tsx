@@ -32,6 +32,7 @@ import { updateDeal, deleteDeal } from "@/actions/crm";
 import { toast } from "sonner";
 import { Trash2, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
 
 // Fix Zod schema to be less strict for hook-form
 const formSchema = z.object({
@@ -57,6 +58,7 @@ interface DealDetailsDialogProps {
 }
 
 export function DealDetailsDialog({ deal, open, onOpenChange }: DealDetailsDialogProps) {
+    const router = useRouter();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema) as any,
         defaultValues: {
@@ -93,6 +95,7 @@ export function DealDetailsDialog({ deal, open, onOpenChange }: DealDetailsDialo
             if (res.success) {
                 toast.success("Deal updated");
                 onOpenChange(false);
+                router.refresh();
             } else {
                 toast.error("Error: " + res.error);
             }
@@ -110,6 +113,7 @@ export function DealDetailsDialog({ deal, open, onOpenChange }: DealDetailsDialo
             if (res.success) {
                 toast.success("Deal deleted");
                 onOpenChange(false);
+                router.refresh();
             } else {
                 toast.error("Error: " + res.error);
             }

@@ -1,0 +1,17 @@
+actions/crm.ts(477,17): error TS2353: Object literal may only specify known properties, and 'contactPhone' does not exist in type 'Without<DealCreateInput, DealUncheckedCreateInput> & DealUncheckedCreateInput'.
+actions/projects.ts(49,13): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+actions/projects.ts(65,13): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+actions/projects.ts(96,13): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+actions/projects.ts(135,17): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'Without<ProjectCreateInput, ProjectUncheckedCreateInput> & ProjectUncheckedCreateInput'.
+actions/projects.ts(181,17): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'Without<ProjectUpdateInput, ProjectUncheckedUpdateInput> & ProjectUncheckedUpdateInput'.
+actions/projects.ts(202,24): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+actions/projects.ts(225,17): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'Without<ProjectCreateInput, ProjectUncheckedCreateInput> & ProjectUncheckedCreateInput'.
+actions/projects.ts(226,38): error TS2339: Property 'tags' does not exist on type '{ id: string; title: string; slug: string; description: string; content: string | null; client: string | null; coverImage: string | null; imageAlt: string | null; gallery: JsonValue; ... 22 more ...; videoUrl: string | null; }'.
+actions/projects.ts(226,47): error TS7006: Parameter 't' implicitly has an 'any' type.
+app/(dashboard)/dashboard/projects/page.tsx(141,26): error TS2322: Type '{ id: string; title: string; slug: string; description: string; content: string | null; client: string | null; coverImage: string | null; imageAlt: string | null; gallery: JsonValue; ... 22 more ...; videoUrl: string | null; }[]' is not assignable to type 'Project[]'.
+  Type '{ id: string; title: string; slug: string; description: string; content: string | null; client: string | null; coverImage: string | null; imageAlt: string | null; gallery: JsonValue; ... 22 more ...; videoUrl: string | null; }' is missing the following properties from type 'Project': category, _count
+modules/portfolio/actions/projects.ts(49,13): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+modules/portfolio/actions/projects.ts(65,13): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+modules/portfolio/actions/projects.ts(93,13): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'ProjectInclude<DefaultArgs>'.
+modules/portfolio/actions/projects.ts(126,17): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'Without<ProjectCreateInput, ProjectUncheckedCreateInput> & ProjectUncheckedCreateInput'.
+modules/portfolio/actions/projects.ts(166,17): error TS2353: Object literal may only specify known properties, and 'tags' does not exist in type 'Without<ProjectUpdateInput, ProjectUncheckedUpdateInput> & ProjectUncheckedUpdateInput'.

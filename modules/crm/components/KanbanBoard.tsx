@@ -170,6 +170,11 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
         return () => clearTimeout(timer);
     }, []);
 
+    // Sincronizar estado local cuando llegan nuevos props del servidor (por ejemplo al borrar o editar)
+    useEffect(() => {
+        setDeals(initialDeals);
+    }, [initialDeals]);
+
     // Filter deals
     const filteredDeals = deals.filter(deal => {
         const matchesSearch = deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

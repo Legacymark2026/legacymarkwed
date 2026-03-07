@@ -464,7 +464,23 @@ export async function createLead(data: {
                 status: "NEW", score: 0,
             },
         });
+
+        // Automatización: Sincronizar Inmediatamente con el Dashboard de Leads (Canal de Ventas / Pipeline Deals)
+        await prisma.deal.create({
+            data: {
+                title: data.name ? `Lead: ${data.name}` : `Lead: ${data.email}`,
+                value: 0,
+                stage: "NEW",
+                priority: "MEDIUM",
+                contactName: data.name || "",
+                contactEmail: data.email,
+                source: data.source || "Unknown",
+                companyId: data.companyId,
+            }
+        });
+
         revalidatePath("/dashboard/admin/crm/leads");
+        revalidatePath("/dashboard/admin/crm/pipeline");
         return { success: true, id: lead.id };
     } catch (error) {
         console.error(error);
