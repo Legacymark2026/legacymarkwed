@@ -30,14 +30,20 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
 
     // Format events for FullCalendar
     const calendarEvents = useMemo(() => {
+        const query = filters.query?.toLowerCase() || '';
+
         return events
-            .filter(e => filters.type === 'ALL' || e.type === filters.type)
+            .filter(e => {
+                const matchType = filters.type === 'ALL' || e.type === filters.type;
+                const matchQuery = !query || e.title.toLowerCase().includes(query);
+                return matchType && matchQuery;
+            })
             .map(e => {
-                // Determine color based on type
+                // Determine color based on type, making it slightly more vibrant
                 const backgroundColor =
-                    e.type === 'ONLINE' ? '#3b82f6' :
-                        e.type === 'PHYSICAL' ? '#f97316' :
-                            '#a855f7'; // HYBRID
+                    e.type === 'ONLINE' ? '#2563eb' : // blue-600
+                        e.type === 'PHYSICAL' ? '#ea580c' : // orange-600
+                            '#9333ea'; // purple-600
 
                 return {
                     id: e.id,
@@ -60,7 +66,6 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
     };
 
     const handleEventDrop = async (dropInfo: any) => {
-        // Optimistic UI updates / Drag and drop logic will be wired to server action here
         const { event } = dropInfo;
         onEventDropped(event.id, event.start, event.end);
     };
@@ -69,16 +74,36 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
         if (onDateSelect) {
             onDateSelect(selectInfo.start, selectInfo.end, selectInfo.allDay);
         }
-        // Unselect after callback
         selectInfo.view.calendar.unselect();
     };
 
+    const renderEventContent = (eventInfo: any) => {
+        const { event, timeText } = eventInfo;
+        const type = event.extendedProps.type;
+
+        let pointColor = "bg-white";
+        if (type === 'ONLINE') pointColor = 'bg-blue-100';
+        if (type === 'PHYSICAL') pointColor = 'bg-orange-100';
+        if (type === 'HYBRID') pointColor = 'bg-purple-100';
+
+        return (
+            <div
+                className="flex flex-col h-full w-full justify-start items-start p-1 sm:p-1.5 overflow-hidden group"
+                title={`${event.title}${timeText ? ` (${timeText})` : ''}`}
+            >
+                <div className="flex items-center gap-1.5 mb-0.5 w-full">
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${pointColor} shadow-sm opacity-90`} />
+                    <span className="text-[10px] font-extrabold truncate tracking-tight text-white/90 group-hover:text-white drop-shadow-sm">{timeText}</span>
+                </div>
+                <div className="text-[10px] sm:text-[11px] font-bold leading-tight truncate w-full text-white/95 group-hover:text-white drop-shadow-md whitespace-normal line-clamp-2">
+                    {event.title}
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div className="p-6 h-full w-full bg-white relative fc-theme-standard">
-            {/* 
-                We use inline overarching styles here as an override 
-                to make FullCalendar look highly professional and fit our theme 
-            */}
+        <div className="p-4 sm:p-6 h-full w-full bg-white relative fc-theme-standard">
             <style jsx global>{`
                 .fc { 
                     --fc-border-color: #f1f5f9; 
@@ -89,36 +114,46 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                     --fc-button-hover-border-color: #cbd5e1;
                     --fc-button-active-bg-color: #f1f5f9;
                     --fc-button-active-border-color: #cbd5e1;
-                    --fc-today-bg-color: #f0fdfa;
+                    --fc-today-bg-color: #f0fdfa; /* A light teal for today */
                     --fc-event-border-color: transparent;
+                    --fc-page-bg-color: #ffffff;
                     font-family: inherit;
                 }
                 .fc .fc-toolbar-title {
                     font-size: 1.25rem;
-                    font-weight: 900;
-                    color: #1e293b;
+                    font-weight: 800;
+                    color: #0f172a;
                     text-transform: capitalize;
+                    letter-spacing: -0.025em;
                 }
                 .fc .fc-button {
                     font-weight: 600;
+                    font-size: 0.875rem;
                     text-transform: capitalize;
                     border-radius: 0.5rem;
                     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-                    transition: all 0.2s;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    padding: 0.5rem 1rem;
                 }
                 .fc .fc-button-primary:not(:disabled):active, 
                 .fc .fc-button-primary:not(:disabled).fc-button-active {
                     background-color: #f1f5f9;
                     color: #0f172a;
                     border-color: #cbd5e1;
+                    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
                 }
                 .fc-theme-standard td, .fc-theme-standard th {
                     border-color: var(--fc-border-color);
                 }
+                .fc-scrollgrid {
+                    border-radius: 0.75rem;
+                    overflow: hidden;
+                    border: 1px solid #e2e8f0 !important;
+                }
                 .fc-col-header-cell-cushion {
                     padding: 12px 0 !important;
                     font-size: 0.75rem;
-                    font-weight: 800;
+                    font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
                     color: #64748b;
@@ -126,29 +161,62 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                 .fc-daygrid-day-number {
                     font-weight: 600;
                     color: #334155;
-                    padding: 8px !important;
+                    padding: 8px 12px !important;
+                    font-size: 0.875rem;
+                }
+                .fc-day-today .fc-daygrid-day-number {
+                    background-color: #0f172a;
+                    color: white;
+                    border-radius: 50%;
+                    width: 28px;
+                    height: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 4px;
+                    padding: 0 !important;
                 }
                 .fc-event {
                     border-radius: 6px;
-                    padding: 2px 4px;
-                    font-size: 0.75rem;
-                    font-weight: 600;
+                    border: none;
                     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-                    transition: transform 0.1s;
+                    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
                     cursor: pointer;
+                    overflow: hidden;
                 }
                 .fc-event:hover {
-                    transform: scale(1.02);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    transform: translateY(-1px) scale(1.01);
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
                     z-index: 5 !important;
+                    filter: brightness(1.05);
                 }
-                .fc-timegrid-event .fc-event-time {
+                .fc-timegrid-slot-label-cushion {
+                    font-size: 0.75rem;
+                    color: #94a3b8;
+                    font-weight: 500;
+                }
+                .fc-timegrid-axis-cushion {
                     font-size: 0.7rem;
-                    opacity: 0.9;
+                    text-transform: uppercase;
+                    color: #cbd5e1;
                 }
-                .fc-timegrid-event .fc-event-title {
-                    font-size: 0.8rem;
-                    font-weight: 700;
+                .fc-timegrid-col.fc-day-today {
+                    background-color: rgba(240, 253, 250, 0.4);
+                }
+                /* Hide empty scrollbars */
+                ::-webkit-scrollbar {
+                  width: 8px;
+                  height: 8px;
+                }
+                ::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                ::-webkit-scrollbar-thumb {
+                  background: #cbd5e1;
+                  border-radius: 4px;
+                }
+                ::-webkit-scrollbar-thumb:hover {
+                  background: #94a3b8;
                 }
             `}</style>
 
@@ -165,32 +233,38 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                 headerToolbar={{
                     left: "prev,next today",
                     center: "title",
-                    right: "dayGridMonth,timeGridWeek,timeGridDay,resourceTimelineDay,listWeek"
+                    right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
                 }}
                 locales={[esLocale]}
                 locale="es"
                 timeZone="local"
                 events={calendarEvents}
                 resources={resources}
-                editable={true} // Enables Drag & Drop
+                editable={true}
                 selectable={true}
                 selectMirror={true}
                 dayMaxEvents={true}
                 height="100%"
+                eventContent={renderEventContent}
                 eventClick={handleEventClick}
                 eventDrop={handleEventDrop}
                 select={handleDateSelect}
                 nowIndicator={true}
                 slotMinTime="06:00:00"
                 slotMaxTime="23:00:00"
-                allDayText="Todo el día"
+                allDayText="Día entero"
+                slotLabelFormat={{
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    omitZeroMinute: false,
+                    meridiem: 'short'
+                }}
                 buttonText={{
                     today: 'Hoy',
                     month: 'Mes',
                     week: 'Semana',
                     day: 'Día',
-                    list: 'Agenda',
-                    resourceTimelineDay: 'Equipo (Hoy)',
+                    list: 'Agenda'
                 }}
             />
         </div>
