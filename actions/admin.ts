@@ -112,21 +112,6 @@ export async function revokeAllSessions(userId: string) {
     }
 }
 
-export async function deleteUser(userId: string) {
-    const authCheck = await checkAdmin();
-    if (authCheck) return authCheck;
-
-    try {
-        await prisma.user.delete({
-            where: { id: userId },
-        });
-        revalidatePath("/dashboard/users");
-        return { success: "User deleted" };
-    } catch (error) {
-        console.error("Failed to delete user:", error);
-        return { error: "Failed to delete user" };
-    }
-}
 
 export async function toggleUserStatus(userId: string) {
     const session = await auth();
@@ -168,40 +153,22 @@ export async function deleteUser(userId: string) {
     }
 
     try {
-        // Cascada manual en una sola transacción:
-        // Orden — de dependientes → independientes, respetando las FK del schema.
         await prisma.$transaction([
-            // 1. Logs de actividad
             prisma.userActivityLog.deleteMany({ where: { userId } }),
-            // 2. Reading list
             prisma.readingListItem.deleteMany({ where: { userId } }),
-            // 3. Anotaciones
-            prisma.annotation.deleteMany({ where: { userId } }),
-            // 4. Participaciones en eventos
             prisma.eventParticipant.deleteMany({ where: { userId } }),
-            // 5. Actividades CRM
             prisma.cRMActivity.deleteMany({ where: { userId } }),
-            // 6. Tareas (como asignado y como creador)
-            prisma.task.deleteMany({ where: { assigneeId: userId } }),
-            prisma.task.deleteMany({ where: { creatorId: userId } }),
-            // 7. Negocios asignados
-            prisma.deal.deleteMany({ where: { assignedToId: userId } }),
-            // 8. Marketing events
+            prisma.task.deleteMany({ where: { assignedTo: userId } }),
+            prisma.task.deleteMany({ where: { createdBy: userId } }),
+            prisma.deal.deleteMany({ where: { assignedTo: userId } }),
             prisma.marketingEvent.deleteMany({ where: { userId } }),
-            // 9. Posts del usuario
             prisma.post.deleteMany({ where: { authorId: userId } }),
-            // 10. Conversaciones asignadas
             prisma.conversation.deleteMany({ where: { assignedTo: userId } }),
-            // 11. API Keys
             prisma.apiKey.deleteMany({ where: { userId } }),
-            // 12. CompanyUser (membresías)
             prisma.companyUser.deleteMany({ where: { userId } }),
-            // Cascada automática (onDelete: Cascade en el schema) pero
-            // incluimos para garantizar el orden en la transacción:
             prisma.account.deleteMany({ where: { userId } }),
             prisma.session.deleteMany({ where: { userId } }),
             prisma.userProfile.deleteMany({ where: { userId } }),
-            // 13. Finalmente, el usuario
             prisma.user.delete({ where: { id: userId } }),
         ]);
 
@@ -226,16 +193,14 @@ export async function bulkDeleteUsers(userIds: string[]) {
     }
 
     try {
-        // Cascada manual para bulk — mismo orden que deleteUser()
         await prisma.$transaction([
             prisma.userActivityLog.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.readingListItem.deleteMany({ where: { userId: { in: userIds } } }),
-            prisma.annotation.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.eventParticipant.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.cRMActivity.deleteMany({ where: { userId: { in: userIds } } }),
-            prisma.task.deleteMany({ where: { assigneeId: { in: userIds } } }),
-            prisma.task.deleteMany({ where: { creatorId: { in: userIds } } }),
-            prisma.deal.deleteMany({ where: { assignedToId: { in: userIds } } }),
+            prisma.task.deleteMany({ where: { assignedTo: { in: userIds } } }),
+            prisma.task.deleteMany({ where: { createdBy: { in: userIds } } }),
+            prisma.deal.deleteMany({ where: { assignedTo: { in: userIds } } }),
             prisma.marketingEvent.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.post.deleteMany({ where: { authorId: { in: userIds } } }),
             prisma.conversation.deleteMany({ where: { assignedTo: { in: userIds } } }),
