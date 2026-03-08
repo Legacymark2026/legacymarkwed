@@ -118,12 +118,25 @@ export function isPublicRoute(pathname: string): boolean {
  * Dado un pathname y un rol, verifica si el rol tiene acceso.
  * Estrategia: busca la ruta más específica que haga match.
  */
-export function canAccessRoute(pathname: string, role: UserRole): boolean {
+export function canAccessRoute(pathname: string, role: UserRole | string, permissions: string[] = []): boolean {
     if (role === UserRole.SUPER_ADMIN) return true; // SuperAdmin accede a todo
+
+    // Los custom roles (que no son del enum estándar) NO están en ROUTE_PERMISSIONS.
+    // Su acceso se controla por el PERMISSION_ROUTE_MAP en DashboardSidebar.
+    // Si tiene algún permiso asignado → puede navegar el dashboard (el sidebar
+    // filtra qué secciones ve). Si no tiene permisos → bloquear.
+    const isStandardRole = Object.values(UserRole).includes(role as UserRole);
+    if (!isStandardRole) {
+        // Custom role: solo bloqueamos /dashboard si es GUEST o no tiene permisos
+        if (pathname.startsWith("/dashboard")) {
+            return permissions.length > 0;
+        }
+        return true;
+    }
 
     // Buscar match exacto primero
     if (ROUTE_PERMISSIONS[pathname]) {
-        return ROUTE_PERMISSIONS[pathname].includes(role);
+        return ROUTE_PERMISSIONS[pathname].includes(role as UserRole);
     }
 
     // Buscar el prefijo más largo que haga match
@@ -132,7 +145,7 @@ export function canAccessRoute(pathname: string, role: UserRole): boolean {
         .sort((a, b) => b.length - a.length); // más específico primero
 
     if (matchingPrefixes.length > 0) {
-        return ROUTE_PERMISSIONS[matchingPrefixes[0]].includes(role);
+        return ROUTE_PERMISSIONS[matchingPrefixes[0]].includes(role as UserRole);
     }
 
     // Si la ruta empieza con /dashboard y no está en la matriz,

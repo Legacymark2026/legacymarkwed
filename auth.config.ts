@@ -59,9 +59,6 @@ export const authConfig: NextAuthConfig = {
             if (!isLoggedIn) return false;
 
             // ── Usuario eliminado ─────────────────────────────────────────
-            // El JWT callback marca el token con isDeleted=true cuando el
-            // usuario ya no existe en la base de datos (fue eliminado).
-            // Redirigimos al login con ?deleted=1 para que la cookie se limpie.
             const isDeleted = (auth?.user as any)?.isDeleted;
             if (isDeleted) {
                 const loginUrl = new URL('/auth/login?deleted=1', nextUrl.origin);
@@ -70,7 +67,9 @@ export const authConfig: NextAuthConfig = {
 
             // Protección de rutas del dashboard
             if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
-                const role = (auth?.user?.role as UserRole) || 'guest';
+                const role = (auth?.user?.role as string) || 'guest';
+                // Permisos del token (para custom roles)
+                const permissions = ((auth?.user as any)?.permissions as string[]) || [];
 
                 // GUEST → redirige a pending-approval (NO al login, para UX clara)
                 if (role === 'guest') {
@@ -78,7 +77,8 @@ export const authConfig: NextAuthConfig = {
                     return NextResponse.redirect(pendingUrl);
                 }
 
-                return canAccessRoute(pathname, role);
+                // Pasar permisos a canAccessRoute para que custom roles funcionen
+                return canAccessRoute(pathname, role as UserRole, permissions);
             }
 
             return true;

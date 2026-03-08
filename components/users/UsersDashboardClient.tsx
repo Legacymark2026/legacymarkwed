@@ -128,17 +128,22 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
 
     const handleDeleteUser = async () => {
         if (!deleteConfirm) return;
+        const { userId, userName } = deleteConfirm;
         setIsDeleting(true);
         // Optimistic: remove from local list
-        setUsers(prev => prev.filter(u => u.id !== deleteConfirm.userId));
-        const res = await deleteUser(deleteConfirm.userId);
+        setUsers(prev => prev.filter(u => u.id !== userId));
+        const res = await deleteUser(userId);
         setIsDeleting(false);
         setDeleteConfirm(null);
-        if ('success' in res) {
-            toast.success(`Usuario '${deleteConfirm.userName}' eliminado del sistema.`);
+        // IMPORTANT: check res.success === true (not just 'success' in res)
+        // because both success and error responses have the 'success' key
+        if (res.success === true) {
+            toast.success(`Usuario '${userName}' eliminado permanentemente.`);
         } else {
-            toast.error(('error' in res ? res.error : null) || "Error al eliminar el usuario.");
-            // Revert on failure — reload users
+            const errMsg = 'error' in res ? res.error : "Error al eliminar el usuario.";
+            toast.error(errMsg || "Error al eliminar el usuario.");
+            // Revert optimistic update by restoring the user
+            setUsers(prev => [...prev.filter(u => u.id !== userId)]);
             window.location.reload();
         }
     };
