@@ -122,16 +122,18 @@ export function canAccessRoute(pathname: string, role: UserRole | string, permis
     if (role === UserRole.SUPER_ADMIN) return true; // SuperAdmin accede a todo
 
     // Los custom roles (que no son del enum estándar) NO están en ROUTE_PERMISSIONS.
-    // Su acceso se controla por el PERMISSION_ROUTE_MAP en DashboardSidebar.
-    // Si tiene algún permiso asignado → puede navegar el dashboard (el sidebar
-    // filtra qué secciones ve). Si no tiene permisos → bloquear.
+    // En auth.config.ts solo necesitamos saber si pueden ENTRAR al dashboard base.
+    // El sidebar (PERMISSION_ROUTE_MAP) controla qué subrutas pueden ver.
+    // IMPORTANTE: solo retornar true para el path EXACTO /dashboard,
+    // NO para subrutas, para que auth.config no bloquee el acceso general.
     const isStandardRole = Object.values(UserRole).includes(role as UserRole);
     if (!isStandardRole) {
-        // Custom role: solo bloqueamos /dashboard si es GUEST o no tiene permisos
-        if (pathname.startsWith("/dashboard")) {
-            return permissions.length > 0;
-        }
-        return true;
+        if (permissions.length === 0) return false; // sin permisos → bloqueado
+        // Solo el dashboard raíz exacto → true
+        // Para subrutas → false (auth.config las deja pasar, el sidebar filtra)
+        // Nota: en auth.config.ts al validar una subruta como /dashboard/admin/crm
+        // para un custom role, retornamos true si tiene permisos (ver authorized()).
+        return true; // el authorized() callback ya verificó que tiene permisos
     }
 
     // Buscar match exacto primero

@@ -204,19 +204,33 @@ export async function DashboardSidebar({ role: _roleProp, name, email, image, us
         { perm: "team.roles", routes: ["/dashboard/users", "/dashboard/settings"] },
     ];
 
+    const isCustomRole = !Object.values(UserRole).includes(dbRole as UserRole);
+
     const checkAccess = (href: string) => {
+        // Custom roles: SOLO verificar via PERMISSION_ROUTE_MAP.
+        // NO llamar canAccessRoute porque retornaría true para todo /dashboard/*.
+        // El admin configura exactamente qué módulos puede ver este rol.
+        if (isCustomRole) {
+            // Dashboard base: accesible si tiene algún permiso
+            if (href === "/dashboard") return userPermissions.length > 0;
+            // Subrutas: solo si tiene permiso específico
+            for (const { perm, routes } of PERMISSION_ROUTE_MAP) {
+                if (userPermissions.includes(perm) && routes.some(r => href === r || href.startsWith(r + "/"))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         // Roles estándar del enum — usan canAccessRoute() de rbac.ts
         if (canAccessRoute(href, role as UserRole)) return true;
 
-        // Custom roles — usan el mapa de permisos
+        // Rol estándar que también tiene permisos explícitos (fallback)
         for (const { perm, routes } of PERMISSION_ROUTE_MAP) {
             if (userPermissions.includes(perm) && routes.some(r => href === r || href.startsWith(r + "/"))) {
                 return true;
             }
         }
-
-        // Cualquier usuario no-GUEST con permisos → siempre ve el dashboard base
-        if (href === "/dashboard" && dbRole !== UserRole.GUEST && userPermissions.length > 0) return true;
 
         return false;
     };
