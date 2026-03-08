@@ -3,7 +3,7 @@ import {
     LayoutDashboard, Users, Settings, FileText, LogOut,
     Shield, BookOpen, Briefcase, BarChart2, Workflow,
     MessageSquare, Target, TrendingUp, Link2, Building2,
-    Lock, UserCog, DollarSign, CheckSquare, Zap, Mail, Calendar
+    Lock, UserCog, DollarSign, CheckSquare, Zap, Mail, Calendar, Wand2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth";
@@ -60,6 +60,7 @@ const NAV_GROUPS: NavGroup[] = [
             { href: "/dashboard/admin/marketing/spend", label: "Ad Spend (ROI)", icon: <DollarSign size={18} className="text-green-500" /> },
             { href: "/dashboard/admin/marketing/links", label: "Link Tracker", icon: <Link2 size={18} className="text-blue-500" /> },
             { href: "/dashboard/admin/marketing/campaigns", label: "Campañas (Live)", icon: <Target size={18} className="text-pink-500" /> },
+            { href: "/dashboard/admin/marketing/creative-studio", label: "Creative Studio", icon: <Wand2 size={18} className="text-violet-500" /> },
             { href: "/dashboard/admin/marketing/settings", label: "APIs & Config", icon: <Settings size={18} className="text-slate-400" /> },
             { href: "/dashboard/admin/architecture", label: "Organización", icon: <Building2 size={18} className="text-slate-400" /> },
             { href: "/dashboard/admin/automation", label: "Automatización", icon: <Workflow size={18} className="text-purple-500" /> },
