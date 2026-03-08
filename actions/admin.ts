@@ -154,6 +154,14 @@ export async function deleteUser(userId: string) {
 
     try {
         await prisma.$transaction([
+            // SET NULL en campos opcionales que referencian al usuario
+            prisma.campaign.updateMany({ where: { approvedById: userId }, data: { approvedById: null } }),
+            prisma.companyUser.updateMany({ where: { invitedBy: userId }, data: { invitedBy: null } }),
+            prisma.conversation.updateMany({ where: { assignedTo: userId }, data: { assignedTo: null } }),
+            // DELETE en registros cuya FK al usuario es NOT NULL (sin onDelete:Cascade)
+            prisma.annotation.deleteMany({ where: { authorId: userId } }),
+            prisma.event.deleteMany({ where: { organizerId: userId } }),
+            // DELETE en registros propios del usuario
             prisma.userActivityLog.deleteMany({ where: { userId } }),
             prisma.readingListItem.deleteMany({ where: { userId } }),
             prisma.eventParticipant.deleteMany({ where: { userId } }),
@@ -163,12 +171,13 @@ export async function deleteUser(userId: string) {
             prisma.deal.deleteMany({ where: { assignedTo: userId } }),
             prisma.marketingEvent.deleteMany({ where: { userId } }),
             prisma.post.deleteMany({ where: { authorId: userId } }),
-            prisma.conversation.deleteMany({ where: { assignedTo: userId } }),
             prisma.apiKey.deleteMany({ where: { userId } }),
             prisma.companyUser.deleteMany({ where: { userId } }),
+            // Cascade automático (onDelete:Cascade en schema) pero incluimos para orden
             prisma.account.deleteMany({ where: { userId } }),
             prisma.session.deleteMany({ where: { userId } }),
             prisma.userProfile.deleteMany({ where: { userId } }),
+            // Último: el registro del usuario
             prisma.user.delete({ where: { id: userId } }),
         ]);
 
@@ -194,6 +203,14 @@ export async function bulkDeleteUsers(userIds: string[]) {
 
     try {
         await prisma.$transaction([
+            // SET NULL en campos opcionales que apuntan al usuario
+            prisma.campaign.updateMany({ where: { approvedById: { in: userIds } }, data: { approvedById: null } }),
+            prisma.companyUser.updateMany({ where: { invitedBy: { in: userIds } }, data: { invitedBy: null } }),
+            prisma.conversation.updateMany({ where: { assignedTo: { in: userIds } }, data: { assignedTo: null } }),
+            // DELETE registros con FK NOT NULL al usuario
+            prisma.annotation.deleteMany({ where: { authorId: { in: userIds } } }),
+            prisma.event.deleteMany({ where: { organizerId: { in: userIds } } }),
+            // DELETE registros propios del usuario
             prisma.userActivityLog.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.readingListItem.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.eventParticipant.deleteMany({ where: { userId: { in: userIds } } }),
@@ -203,7 +220,6 @@ export async function bulkDeleteUsers(userIds: string[]) {
             prisma.deal.deleteMany({ where: { assignedTo: { in: userIds } } }),
             prisma.marketingEvent.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.post.deleteMany({ where: { authorId: { in: userIds } } }),
-            prisma.conversation.deleteMany({ where: { assignedTo: { in: userIds } } }),
             prisma.apiKey.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.companyUser.deleteMany({ where: { userId: { in: userIds } } }),
             prisma.account.deleteMany({ where: { userId: { in: userIds } } }),
