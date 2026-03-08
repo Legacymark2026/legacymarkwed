@@ -49,26 +49,39 @@ export default async function CRMDashboardPage() {
     const isTotalEmpty = stats.activeDeals === 0 && topDeals.length === 0 && advancedStats.wonValue === 0;
 
     return (
-        <div className="ds-page space-y-6">
+        <div className="ds-page space-y-8">
+            {/* Grid overlay */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.025] pointer-events-none mix-blend-screen" />
+
             {/* ── Header ── */}
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6"
-                style={{ borderBottom: '1px solid var(--ds-border)' }}>
+            <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
                 <div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.2)' }}>
-                            <TrendingUp className="w-5 h-5 text-amber-400" />
+                    {/* HUD badge */}
+                    <div className="mb-4">
+                        <span className="ds-badge ds-badge-amber">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
+                            </span>
+                            CRM CORE · LIVE
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="ds-icon-box w-12 h-12">
+                            <TrendingUp className="w-5 h-5 text-teal-400" />
                         </div>
                         <div>
                             <h1 className="ds-heading-page">CRM Command Center</h1>
-                            <p className="ds-subtext mt-0.5">Pipeline de ventas · Leads · Deals · Actividad</p>
+                            <p className="ds-subtext mt-2">Pipeline · Leads · Deals · Actividad</p>
                         </div>
                     </div>
-                    <div className="mt-3 ml-13">
+                    <div className="mt-4 ml-16">
                         <QuickActions companyId={companyId} />
                     </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-3 shrink-0">
+                    <span className="font-mono text-[9px] text-slate-700 uppercase tracking-widest hidden md:block">[CRM_CORE]</span>
                     <CalendarDateRangePicker />
                     <CRMExportButton stats={stats} advancedStats={advancedStats} />
                 </div>

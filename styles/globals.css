@@ -5,63 +5,86 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-/* ─── DASHBOARD DESIGN TOKENS ────────────────────────────────────────────────
-   Single source of truth for all dashboard modules.
-   Every module uses: ds-bg, ds-surface, ds-border, ds-text-*, ds-accent-*
-   ────────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEGACYMARK DASHBOARD — DESIGN SYSTEM
+   Inspired by the home page aesthetic: slate-950, teal accents, mono type,
+   futuristic HUD elements, flashlight hover effects, quantum grid.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  /* Shadcn-ui variables (light mode baseline) */
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 263 70% 58%;
+  /* Shadcn-ui (dark) */
+  --background: 222 47% 4%;
+  --foreground: 210 40% 95%;
+  --card: 223 47% 6%;
+  --card-foreground: 210 40% 95%;
+  --popover: 223 47% 5%;
+  --popover-foreground: 210 40% 95%;
+  --primary: 173 84% 32%;
+  /* teal-600 */
   --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 263 70% 58%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 84.2% 60.2%;
+  --secondary: 217 33% 13%;
+  --secondary-foreground: 210 40% 90%;
+  --muted: 217 33% 15%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 173 84% 20%;
+  --accent-foreground: 168 84% 80%;
+  --destructive: 0 63% 40%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 263 70% 58%;
-  --radius: 0.75rem;
+  --border: 217 33% 14%;
+  --input: 217 33% 14%;
+  --ring: 173 84% 32%;
+  --radius: 0.15rem;
+  /* rounded-sm to match home */
 
-  /* ─── Dashboard Semantic Tokens (always dark in dashboard) ─── */
-  --ds-bg: #08080f;
-  --ds-bg-secondary: #0d0d1a;
-  --ds-surface: rgba(255, 255, 255, 0.03);
-  --ds-surface-hover: rgba(255, 255, 255, 0.055);
-  --ds-border: rgba(255, 255, 255, 0.08);
-  --ds-border-accent: rgba(255, 255, 255, 0.14);
+  /* ── Home-page Design Tokens ─────────────────────────────────────────── */
 
-  --ds-text-primary: #f1f5f9;
+  /* Backgrounds */
+  --ds-bg: #020617;
+  /* slate-950 — exactly home page */
+  --ds-bg-deep: #010409;
+  /* even deeper for sidebar */
+  --ds-surface: rgba(15, 23, 42, 0.5);
+  /* slate-900/50 */
+  --ds-surface-2: rgba(15, 23, 42, 0.7);
+
+  /* Borders */
+  --ds-border: rgba(30, 41, 59, 0.8);
+  /* slate-800 */
+  --ds-border-glow: rgba(13, 148, 136, 0.3);
+  /* teal-600/30 */
+
+  /* Text */
+  --ds-text-primary: #f8fafc;
+  /* slate-50 */
   --ds-text-secondary: #94a3b8;
+  /* slate-400 */
   --ds-text-muted: #475569;
-  --ds-text-disabled: #334155;
+  /* slate-600 */
+  --ds-text-dim: #334155;
+  /* slate-700 */
 
-  --ds-accent: #7c3aed;
-  --ds-accent-light: #8b5cf6;
-  --ds-accent-glow: rgba(124, 58, 237, 0.25);
+  /* Teal accent system */
+  --ds-teal: #0d9488;
+  /* teal-600 */
+  --ds-teal-md: #14b8a6;
+  /* teal-500 */
+  --ds-teal-bright: #2dd4bf;
+  /* teal-400 */
+  --ds-teal-dim: rgba(13, 148, 136, 0.15);
 
+  /* Semantic */
   --ds-success: #10b981;
   --ds-warning: #f59e0b;
   --ds-danger: #ef4444;
   --ds-info: #0ea5e9;
 
-  /* Sidebar specific */
-  --ds-sidebar-bg: #07070d;
-  --ds-sidebar-border: rgba(255, 255, 255, 0.06);
-  --ds-sidebar-item: rgba(255, 255, 255, 0.04);
-  --ds-sidebar-active: rgba(124, 58, 237, 0.18);
+  /* Shadows */
+  --ds-shadow-card: 0 20px 50px -12px rgba(0, 0, 0, 0.6);
+  --ds-shadow-teal: 0 20px 50px -12px rgba(13, 148, 136, 0.15);
+  --ds-glow-teal: 0 0 60px -15px rgba(13, 148, 136, 0.4);
 }
 
-/* ─── GLOBAL BASE ─────────────────────────────────────────────────────────── */
+/* ── GLOBAL ──────────────────────────────────────────────────────────────── */
 html,
 body {
   background-color: var(--ds-bg);
@@ -72,230 +95,317 @@ body {
   scroll-behavior: smooth;
 }
 
-/* ─── SHADCN DARK OVERRIDES (force dark everywhere in dashboard) ───────────── */
-.dark,
-[data-theme='dark'],
-.dashboard-dark {
-  --background: 240 10% 4%;
-  --foreground: 210 40% 98%;
-  --card: 240 10% 6%;
-  --card-foreground: 210 40% 98%;
-  --popover: 240 10% 6%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 263 70% 58%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 240 8% 12%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 240 8% 14%;
-  --muted-foreground: 215 20% 55%;
-  --accent: 263 70% 30%;
-  --accent-foreground: 263 70% 95%;
-  --destructive: 0 62.8% 40%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 240 8% 14%;
-  --input: 240 8% 14%;
-  --ring: 263 70% 58%;
-}
-
-/* ─── DASHBOARD LAYOUT UTILITIES ─────────────────────────────────────────── */
+/* ── LAYOUT UTILITIES ────────────────────────────────────────────────────── */
 @layer utilities {
 
-  /* Page container */
+  /* Page root */
   .ds-page {
     min-height: 100%;
     background-color: var(--ds-bg);
     color: var(--ds-text-primary);
-    padding: 1.5rem 2rem 3rem;
+    padding: 2rem 2.5rem 4rem;
+    position: relative;
   }
 
-  /* Module sections */
-  .ds-section {
-    background-color: var(--ds-surface);
-    border: 1px solid var(--ds-border);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    transition: border-color 0.2s;
+  /* Quantum grid overlay (home's quantum grid) */
+  .ds-grid-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/grid.svg');
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    z-index: 0;
   }
 
-  .ds-section:hover {
-    border-color: var(--ds-border-accent);
-  }
-
-  /* Cards */
+  /* ── Cards / Sections ── */
   .ds-card {
-    background-color: var(--ds-surface);
-    border: 1px solid var(--ds-border);
-    border-radius: 0.875rem;
-    padding: 1.25rem;
-    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.15rem;
+    /* rounded-sm */
+    background: rgba(15, 23, 42, 0.5);
+    /* slate-900/50 */
+    border: 1px solid rgba(30, 41, 59, 0.8);
+    /* slate-800 */
+    padding: 2rem;
+    transition: all 0.5s ease;
+  }
+
+  .ds-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #14b8a6, #10b981);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s ease;
   }
 
   .ds-card:hover {
-    background-color: var(--ds-surface-hover);
-    border-color: var(--ds-border-accent);
+    border-color: rgba(13, 148, 136, 0.3);
+    box-shadow: var(--ds-shadow-teal);
+    transform: translateY(-2px);
   }
 
-  /* KPI cards */
+  .ds-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Smaller card variant */
+  .ds-card-sm {
+    padding: 1.25rem;
+    border-radius: 0.15rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(30, 41, 59, 0.8);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ds-card-sm:hover {
+    border-color: rgba(13, 148, 136, 0.25);
+    box-shadow: 0 4px 20px -8px rgba(13, 148, 136, 0.2);
+  }
+
+  /* KPI card */
   .ds-kpi {
-    background-color: var(--ds-surface);
-    border: 1px solid var(--ds-border);
-    border-radius: 1rem;
-    padding: 1.25rem 1.5rem;
-    transition: all 0.2s;
+    padding: 1.5rem;
+    border-radius: 0.15rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(30, 41, 59, 0.8);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ds-kpi::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, #14b8a6, transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
   }
 
   .ds-kpi:hover {
-    background-color: var(--ds-surface-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-color: rgba(13, 148, 136, 0.3);
+    box-shadow: var(--ds-shadow-teal);
+    transform: translateY(-2px);
   }
 
-  /* Headings */
-  .ds-heading-page {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--ds-text-primary);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+  .ds-kpi:hover::after {
+    transform: scaleX(1);
   }
 
-  .ds-heading-section {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--ds-text-primary);
-    letter-spacing: -0.01em;
+  /* ── Section wrapper ── */
+  .ds-section {
+    border-radius: 0.15rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(30, 41, 59, 0.8);
+    padding: 1.5rem;
   }
 
-  .ds-subtext {
-    font-size: 0.8125rem;
-    color: var(--ds-text-secondary);
-  }
-
-  .ds-label {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ds-text-muted);
-  }
-
-  /* Divider */
-  .ds-divider {
-    border: none;
-    border-top: 1px solid var(--ds-border);
-  }
-
-  /* Accent badge */
+  /* ── Badges — HUD style (home: border-teal-900/50 bg-slate-900/60) ── */
   .ds-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.125rem 0.625rem;
-    border-radius: 999px;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    border: 1px solid transparent;
+    gap: 0.375rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border: 1px solid;
   }
 
-  .ds-badge-purple {
-    background: rgba(124, 58, 237, 0.15);
-    color: #a78bfa;
-    border-color: rgba(124, 58, 237, 0.25);
+  .ds-badge-teal {
+    border-color: rgba(13, 148, 136, 0.5);
+    background: rgba(15, 23, 42, 0.6);
+    color: #14b8a6;
   }
 
   .ds-badge-green {
-    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.1);
     color: #34d399;
-    border-color: rgba(16, 185, 129, 0.25);
   }
 
   .ds-badge-amber {
-    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.1);
     color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.25);
   }
 
   .ds-badge-red {
-    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.1);
     color: #f87171;
-    border-color: rgba(239, 68, 68, 0.25);
   }
 
   .ds-badge-blue {
-    background: rgba(14, 165, 233, 0.12);
+    border-color: rgba(14, 165, 233, 0.4);
+    background: rgba(14, 165, 233, 0.1);
     color: #38bdf8;
-    border-color: rgba(14, 165, 233, 0.25);
   }
 
-  .ds-badge-pink {
-    background: rgba(236, 72, 153, 0.12);
-    color: #f472b6;
-    border-color: rgba(236, 72, 153, 0.25);
+  .ds-badge-slate {
+    border-color: rgba(71, 85, 105, 0.5);
+    background: rgba(15, 23, 42, 0.6);
+    color: #94a3b8;
   }
 
-  /* Stat value */
-  .ds-stat-value {
-    font-size: 1.75rem;
-    font-weight: 800;
+  .ds-badge-purple {
+    border-color: rgba(124, 58, 237, 0.4);
+    background: rgba(124, 58, 237, 0.1);
+    color: #a78bfa;
+  }
+
+  /* HUD dot (live indicator matching home) */
+  .ds-dot-live {
+    display: inline-block;
+    position: relative;
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  .ds-dot-live::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #14b8a6;
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .ds-dot-live::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #0d9488;
+  }
+
+  /* ── Typography ── */
+  .ds-heading-page {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
     color: var(--ds-text-primary);
     line-height: 1;
+  }
+
+  .ds-heading-section {
+    font-size: 1.25rem;
+    font-weight: 900;
     letter-spacing: -0.03em;
+    color: var(--ds-text-primary);
+  }
+
+  .ds-heading-card {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--ds-text-primary);
+    transition: color 0.3s;
+  }
+
+  .ds-mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ds-text-muted);
+  }
+
+  .ds-subtext {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ds-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 400;
+  }
+
+  /* ── Stats ── */
+  .ds-stat-value {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: var(--ds-text-primary);
+    line-height: 1;
   }
 
   .ds-stat-label {
-    font-size: 0.75rem;
-    color: var(--ds-text-secondary);
-    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ds-text-muted);
+    margin-top: 0.375rem;
   }
 
   .ds-stat-delta-up {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--ds-success);
   }
 
   .ds-stat-delta-down {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--ds-danger);
   }
 
-  /* Progress bar */
+  /* ── Progress bar (teal gradient) ── */
   .ds-progress-track {
-    height: 0.375rem;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 9999px;
+    height: 0.25rem;
+    border-radius: 0;
+    /* square edges like home */
+    background: rgba(30, 41, 59, 0.8);
     overflow: hidden;
   }
 
   .ds-progress-fill {
     height: 100%;
-    border-radius: 9999px;
-    background: linear-gradient(90deg, var(--ds-accent), var(--ds-accent-light));
-    transition: width 0.5s ease;
+    background: linear-gradient(90deg, #0d9488, #2dd4bf);
+    transition: width 0.6s ease;
   }
 
-  /* Table */
+  /* ── Table ── */
   .ds-table {
     width: 100%;
     border-collapse: collapse;
   }
 
   .ds-table th {
-    font-size: 0.6875rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.12em;
     color: var(--ds-text-muted);
-    padding: 0.625rem 1rem;
-    border-bottom: 1px solid var(--ds-border);
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid rgba(30, 41, 59, 0.8);
     text-align: left;
+    background: transparent;
   }
 
   .ds-table td {
     font-size: 0.8125rem;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--ds-border);
+    border-bottom: 1px solid rgba(30, 41, 59, 0.5);
     color: var(--ds-text-primary);
   }
 
@@ -304,19 +414,98 @@ body {
   }
 
   .ds-table tbody tr:hover td {
-    background: var(--ds-surface-hover);
+    background: rgba(15, 23, 42, 0.7);
   }
 
-  /* Text utilities */
+  /* ── Divider ── */
+  .ds-divider {
+    border: none;
+    border-top: 1px solid rgba(30, 41, 59, 0.8);
+  }
+
+  /* ── Tech code tag (home style) ── */
+  .ds-code-tag {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--ds-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: color 0.3s;
+  }
+
+  /* ── Icon box (home style) ── */
+  .ds-icon-box {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.15rem;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(30, 41, 59, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+
+  .ds-icon-box:hover,
+  .ds-card:hover .ds-icon-box,
+  .ds-kpi:hover .ds-icon-box {
+    border-color: rgba(13, 148, 136, 0.5);
+    background: rgba(13, 148, 136, 0.15);
+  }
+
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Sidebar token */
+  --ds-sidebar-bg: #010409;
+  --ds-sidebar-border: rgba(30, 41, 59, 0.6);
 }
 
-/* ─── SCROLLBAR ──────────────────────────────────────────────────────────── */
+/* ── KEYFRAMES ─────────────────────────────────────────────────────────── */
+@keyframes ping {
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes shine {
+  from {
+    background-position: 200% center;
+  }
+
+  to {
+    background-position: -200% center;
+  }
+}
+
+@keyframes grid-flow {
+  0% {
+    transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(2) translateX(0);
+  }
+
+  100% {
+    transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(2) translateX(-4rem);
+  }
+}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -324,31 +513,15 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(13, 148, 136, 0.4);
 }
 
-/* ─── NOISE OVERLAY ──────────────────────────────────────────────────────── */
-@layer utilities {
-  .bg-noise {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 50;
-    opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    mix-blend-mode: overlay;
-  }
-}
-
-/* ─── CLOUDINARY ──────────────────────────────────────────────────────────── */
+/* ── CLOUDINARY ──────────────────────────────────────────────────────── */
 iframe[src*="cloudinary"] {
   z-index: 100000 !important;
   pointer-events: auto !important;
