@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, MousePointerClick, TrendingUp, Users } from "lucide-react";
+import { DollarSign, MousePointerClick, TrendingUp, Users, Eye } from "lucide-react";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 
 interface MetricsProps {
     totalSpend: number;
@@ -9,62 +9,65 @@ interface MetricsProps {
     cpa: number;
 }
 
-export default function CampaignMetricsCards({ metrics }: { metrics: MetricsProps }) {
+const CARDS = [
+    { key: 'spend', label: 'Total Ad Spend', icon: DollarSign, code: 'AD_SPN', accent: 'teal' },
+    { key: 'impressions', label: 'Total Impressions', icon: Eye, code: 'IMP_TOT', accent: 'slate' },
+    { key: 'clicks', label: 'Total Clicks', icon: MousePointerClick, code: 'CLK_TOT', accent: 'amber' },
+    { key: 'cpa', label: 'Avg. CPA', icon: TrendingUp, code: 'CPA_AVG', accent: 'teal' },
+] as const;
 
-    // Formatting helpers
-    const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
-    const formatNumber = (val: number) => new Intl.NumberFormat('en-US').format(val);
+function MetricCard({ label, value, subtext, icon: Icon, code, delay, isFeatured }: {
+    label: string; value: string; subtext: string;
+    icon: any; code: string; delay: number; isFeatured?: boolean;
+}) {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    function onMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    }
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between space-y-0 pb-2">
-                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Ad Spend</p>
-                        <DollarSign className="h-4 w-4 text-emerald-600" />
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            onMouseMove={onMove}
+            className="ds-kpi group relative"
+        >
+            <motion.div
+                className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
+                style={{ background: useMotionTemplate`radial-gradient(280px circle at ${mouseX}px ${mouseY}px, rgba(45,212,191,0.05), transparent 80%)` }}
+            />
+
+            <span className="absolute top-3 right-3 font-mono text-[8px] text-slate-700 uppercase tracking-widest group-hover:text-slate-500 transition-colors">[{code}]</span>
+
+            <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                    <p className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-[0.14em]">{label}</p>
+                    <div className="ds-icon-box w-8 h-8">
+                        <Icon size={13} strokeWidth={1.5} className={`${isFeatured ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400'} transition-colors`} />
                     </div>
-                    <div className="text-3xl font-bold tracking-tighter">{formatCurrency(metrics.totalSpend)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Live synced from Meta & Google
-                    </p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between space-y-0 pb-2">
-                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Impressions</p>
-                        <Users className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div className="text-3xl font-bold tracking-tighter">{formatNumber(metrics.totalImpressions)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Across all active networks
-                    </p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between space-y-0 pb-2">
-                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Clicks</p>
-                        <MousePointerClick className="h-4 w-4 text-amber-600" />
-                    </div>
-                    <div className="text-3xl font-bold tracking-tighter">{formatNumber(metrics.totalClicks)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Aggregated from live endpoints
-                    </p>
-                </CardContent>
-            </Card>
-            <Card className="bg-indigo-50/50 border-indigo-100">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between space-y-0 pb-2">
-                        <p className="text-sm font-bold text-indigo-700 uppercase tracking-wider">Avg. CPA (Conversions)</p>
-                        <TrendingUp className="h-4 w-4 text-indigo-600" />
-                    </div>
-                    <div className="flex items-end gap-2">
-                        <div className="text-3xl font-bold tracking-tighter text-indigo-900">{formatCurrency(metrics.cpa)}</div>
-                        <div className="text-sm font-medium text-indigo-600 mb-1">({formatNumber(metrics.totalConversions)} leads)</div>
-                    </div>
-                </CardContent>
-            </Card>
+                </div>
+                <p className="ds-stat-value">{value}</p>
+                <p className="ds-mono-label mt-2">{subtext}</p>
+            </div>
+        </motion.div>
+    );
+}
+
+export default function CampaignMetricsCards({ metrics }: { metrics: MetricsProps }) {
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v);
+    const num = (v: number) => new Intl.NumberFormat('en-US').format(v);
+
+    return (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <MetricCard label="Total Ad Spend" value={fmt(metrics.totalSpend)} subtext="Live · Meta & Google" icon={DollarSign} code="AD_SPN" delay={0} isFeatured />
+            <MetricCard label="Total Impressions" value={num(metrics.totalImpressions)} subtext="Across all networks" icon={Eye} code="IMP_TOT" delay={0.08} />
+            <MetricCard label="Total Clicks" value={num(metrics.totalClicks)} subtext="Aggregated live" icon={MousePointerClick} code="CLK_TOT" delay={0.16} />
+            <MetricCard label={`Avg. CPA (${num(metrics.totalConversions)} leads)`}
+                value={fmt(metrics.cpa)} subtext="Cost per acquisition" icon={TrendingUp} code="CPA_AVG" delay={0.24} isFeatured />
         </div>
     );
 }

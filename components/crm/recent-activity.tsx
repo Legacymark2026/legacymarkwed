@@ -1,93 +1,92 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { Activity as ActivityIcon, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { Activity as ActivityIcon, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface Activity {
-    id: string;
-    type: string;
-    title: string;
-    desc: string;
-    date: Date;
-}
-
-interface ActivityProps {
-    activities: Activity[];
-}
+interface Activity { id: string; type: string; title: string; desc: string; date: Date; }
+interface ActivityProps { activities: Activity[]; }
 
 export function RecentActivity({ activities }: ActivityProps) {
-    if (!activities || activities.length === 0) {
-        return (
-            <Card className="col-span-4 lg:col-span-3 h-full bg-white/70 backdrop-blur-xl border border-slate-200/50 shadow-sm">
-                <CardHeader>
-                    <CardTitle className="text-slate-500 uppercase tracking-widest text-sm font-bold">Actividad Reciente</CardTitle>
-                    <CardDescription>Sin actividad registrada.</CardDescription>
-                </CardHeader>
-            </Card>
-        );
-    }
-
     return (
-        <Card className="col-span-4 lg:col-span-3 h-full bg-white/70 backdrop-blur-xl border border-slate-200/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+        <div className="ds-section h-full flex flex-col relative overflow-hidden">
+            {/* Ambient glow */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
 
-            <CardHeader className="flex flex-row items-center justify-between pb-4 relative z-10 border-b border-slate-100/50 mb-2">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 mb-2 relative z-10"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-slate-400 to-slate-600 p-1.5 rounded-lg shadow-sm">
-                        <ActivityIcon className="w-4 h-4 text-white" />
+                    <div className="ds-icon-box w-8 h-8">
+                        <ActivityIcon size={14} strokeWidth={1.5} className="text-teal-400" />
                     </div>
                     <div>
-                        <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500">
-                            Actividad Reciente
-                        </CardTitle>
-                        <CardDescription className="text-xs font-medium text-slate-400 mt-0.5">
-                            Historial automático de eventos
-                        </CardDescription>
+                        <p className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-[0.14em]">Registro de Actividad Reciente</p>
+                        <p className="font-mono text-[8px] text-slate-700 uppercase tracking-widest mt-0.5">Historial automático de eventos</p>
                     </div>
                 </div>
-            </CardHeader>
-            <CardContent className="px-5 relative z-10 max-h-[400px] overflow-y-auto custom-scrollbar">
-                <div className="relative border-l-2 border-slate-200/50 ml-6 space-y-6 pt-2 pb-4 mt-2">
-                    {activities.map((activity, index) => {
+                {/* Live badge */}
+                <span className="ds-badge ds-badge-teal">
+                    <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                    </span>
+                    Live
+                </span>
+            </div>
+
+            {/* Activities */}
+            {!activities || activities.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center">
+                    <p className="font-mono text-[10px] text-slate-600 uppercase tracking-widest">&gt; Sin actividad registrada_</p>
+                </div>
+            ) : (
+                <div className="flex-1 overflow-y-auto pr-1 relative z-10 space-y-0"
+                    style={{ borderLeft: '1px solid rgba(30,41,59,0.8)', marginLeft: '1.5rem', paddingLeft: '1.25rem', paddingTop: '0.5rem' }}>
+                    {activities.map((activity, i) => {
                         const isDeal = activity.type === 'DEAL';
                         return (
                             <motion.div
-                                key={`${activity.type}-${activity.id}-${index}`}
+                                key={`${activity.type}-${activity.id}-${i}`}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.05, duration: 0.3 }}
-                                className="relative pl-6 group/item"
+                                transition={{ delay: i * 0.04, duration: 0.3 }}
+                                className="relative group/item pb-4"
                             >
-                                {/* Puntero del timeline */}
-                                <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 h-10 w-10 ring-4 ring-white rounded-full bg-white flex items-center justify-center shadow-sm">
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarFallback className={`text-[10px] font-bold ${isDeal ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                            {isDeal ? <ArrowUpCircle className="w-3.5 h-3.5" /> : <ArrowDownCircle className="w-3.5 h-3.5" />}
+                                {/* Timeline dot */}
+                                <div className="absolute -left-[calc(1.25rem+0.75rem)] top-3 h-6 w-6 rounded-sm flex items-center justify-center"
+                                    style={{ background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(30,41,59,0.8)' }}>
+                                    <Avatar className="h-5 w-5">
+                                        <AvatarFallback className="text-[8px] rounded-sm bg-transparent">
+                                            {isDeal
+                                                ? <ArrowUpCircle className="w-3 h-3 text-teal-500" />
+                                                : <ArrowDownCircle className="w-3 h-3 text-slate-500" />}
                                         </AvatarFallback>
                                     </Avatar>
                                 </div>
 
-                                <div className="bg-slate-50/50 border border-slate-200/40 rounded-xl p-3 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300">
+                                {/* Content card */}
+                                <div className="ds-card-sm group/item-card">
                                     <div className="flex justify-between items-start gap-4">
-                                        <div className="space-y-1 flex-1">
-                                            <p className="text-sm font-bold text-slate-700 leading-snug">{activity.title}</p>
-                                            <p className="text-xs text-slate-400 font-medium leading-relaxed">{activity.desc}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[12px] font-bold text-slate-200 leading-snug truncate">{activity.title}</p>
+                                            <p className="text-[11px] text-slate-500 font-light mt-0.5 leading-relaxed">{activity.desc}</p>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                        <span className={`w-1.5 h-1.5 rounded-full ${isDeal ? 'bg-indigo-400' : 'bg-emerald-400'}`} />
-                                        {formatDistanceToNow(new Date(activity.date), { addSuffix: true, locale: es })}
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className={`w-1 h-1 rounded-full ${isDeal ? 'bg-teal-500' : 'bg-slate-600'}`} />
+                                        <span className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">
+                                            {formatDistanceToNow(new Date(activity.date), { addSuffix: true, locale: es })}
+                                        </span>
                                     </div>
                                 </div>
                             </motion.div>
                         );
                     })}
                 </div>
-            </CardContent>
-        </Card>
+            )}
+        </div>
     );
 }

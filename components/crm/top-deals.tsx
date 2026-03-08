@@ -1,151 +1,158 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CRM_CURRENCY_FORMATTER } from "@/lib/crm-charts-config";
 import { ArrowUpRight, Maximize2, X, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
-interface Deal {
-    id: string;
-    title: string;
-    value: number;
-    stage: string;
-    probability: number;
-}
+interface Deal { id: string; title: string; value: number; stage: string; probability: number; }
+interface TopDealsProps { deals: Deal[]; }
 
-interface TopDealsProps {
-    deals: Deal[];
-}
+const STAGE_BADGE: Record<string, string> = {
+    'LEAD': 'ds-badge-slate',
+    'QUALIFIED': 'ds-badge-blue',
+    'PROPOSAL': 'ds-badge-teal',
+    'NEGOTIATION': 'ds-badge-amber',
+    'CLOSED_WON': 'ds-badge-green',
+    'CLOSED_LOST': 'ds-badge-red',
+};
 
 export function TopDeals({ deals }: TopDealsProps) {
-    const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
+    const [selected, setSelected] = useState<Deal | null>(null);
 
     return (
         <>
-            <Card className="col-span-4 h-full bg-white/70 backdrop-blur-xl border border-slate-200/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 overflow-hidden relative group">
-                <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -ml-16 -mt-16 pointer-events-none" />
+            <div className="ds-section h-full flex flex-col relative overflow-hidden group">
+                {/* Ambient */}
+                <div className="absolute top-0 left-0 w-48 h-48 bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
 
-                <CardHeader className="flex flex-row items-center justify-between pb-4 relative z-10 border-b border-slate-100/50 mb-2">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-4 mb-2 relative z-10"
+                    style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
                     <div className="flex items-center gap-3">
-                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-1.5 rounded-lg shadow-sm">
-                            <Flame className="w-4 h-4 text-white" />
+                        <div className="ds-icon-box w-8 h-8">
+                            <Flame size={14} strokeWidth={1.5} className="text-teal-400" />
                         </div>
                         <div>
-                            <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500">
-                                Top Deals Priority
-                            </CardTitle>
-                            <CardDescription className="text-xs font-medium text-slate-400">
-                                Tratos calientes próximos al cierre
-                            </CardDescription>
+                            <p className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-[0.14em]">Top Deals Priority</p>
+                            <p className="font-mono text-[8px] text-slate-700 uppercase tracking-widest mt-0.5">Tratos calientes · próximos al cierre</p>
                         </div>
                     </div>
-                    <Link href="/dashboard/admin/crm/pipeline" className="text-slate-400 hover:text-emerald-600 transition-colors bg-slate-50 hover:bg-emerald-50 p-2 rounded-full shadow-sm">
-                        <ArrowUpRight className="h-4 w-4" />
+                    <Link href="/dashboard/admin/crm/pipeline"
+                        className="ds-icon-box w-8 h-8 hover:border-teal-800 transition-all">
+                        <ArrowUpRight size={14} strokeWidth={1.5} className="text-slate-500 hover:text-teal-400 transition-colors" />
                     </Link>
-                </CardHeader>
-                <CardContent className="px-5 relative z-10">
-                    <div className="space-y-3">
-                        {deals.length === 0 ? (
-                            <div className="py-8 bg-slate-50/50 rounded-xl border border-slate-200/50 border-dashed flex flex-col items-center justify-center">
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No hay pipeline crítico</p>
-                            </div>
-                        ) : (
-                            deals.map((deal, index) => {
-                                const isSuperHot = deal.value > 10000 && deal.probability > 70;
+                </div>
 
-                                return (
-                                    <motion.div
-                                        key={deal.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        className={`group/item flex items-center justify-between p-3 rounded-xl transition-all duration-300 border ${isSuperHot ? 'bg-orange-50/50 border-orange-200/50 shadow-sm' : 'bg-transparent border-transparent hover:bg-slate-50 hover:border-slate-200/60'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex flex-col gap-1">
-                                                <p className="font-bold text-sm text-slate-700">{deal.title}</p>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded flex items-center gap-1 ${isSuperHot ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'}`}>
-                                                        {isSuperHot && <Flame className="w-2.5 h-2.5" />}
-                                                        Prob. {deal.probability}%
-                                                    </span>
-                                                    <Badge variant="outline" className="text-[9px] uppercase tracking-wider border-slate-200/60 text-slate-400 font-bold bg-white/50">{deal.stage}</Badge>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <p className="font-black font-mono text-base text-slate-800 tracking-tighter">
-                                                {CRM_CURRENCY_FORMATTER.format(deal.value)}
-                                            </p>
-                                            <button
-                                                onClick={() => setSelectedDeal(deal)}
-                                                className="opacity-0 group-hover/item:opacity-100 transition-opacity p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg shadow-sm bg-white"
-                                                title="Vista Previa Rápida"
-                                            >
-                                                <Maximize2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                {/* Deals list */}
+                <div className="flex-1 space-y-2 relative z-10 overflow-y-auto">
+                    {deals.length === 0 ? (
+                        <div className="py-10 flex flex-col items-center justify-center">
+                            <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">&gt; No hay pipeline crítico_</p>
+                        </div>
+                    ) : (
+                        deals.map((deal, i) => {
+                            const hot = deal.value > 10000 && deal.probability > 70;
+                            return (
+                                <motion.div
+                                    key={deal.id}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.08 }}
+                                    className={`group/item flex items-center justify-between p-3 transition-all duration-300 relative ${hot
+                                            ? 'bg-teal-950/30 border border-teal-900/40'
+                                            : 'bg-slate-900/30 border border-slate-800/50 hover:border-slate-700/50'
+                                        } rounded-sm`}
+                                >
+                                    {/* Hot indicator */}
+                                    {hot && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-teal-400 to-emerald-500 rounded-l-sm" />}
 
-            {/* Modular Peek View Modal */}
+                                    <div className="flex-1 min-w-0 pl-2">
+                                        <p className="font-bold text-[12px] text-slate-200 truncate">{deal.title}</p>
+                                        <div className="flex items-center gap-2 mt-1.5">
+                                            <span className={`ds-badge ${hot ? 'ds-badge-teal' : 'ds-badge-slate'}`}>
+                                                {hot && <Flame className="w-2 h-2" />}
+                                                Prob. {deal.probability}%
+                                            </span>
+                                            <span className={`ds-badge ${STAGE_BADGE[deal.stage] ?? 'ds-badge-slate'}`}>
+                                                {deal.stage}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3 shrink-0 ml-3">
+                                        <p className="font-black font-mono text-sm text-slate-100">
+                                            {CRM_CURRENCY_FORMATTER.format(deal.value)}
+                                        </p>
+                                        <button
+                                            onClick={() => setSelected(deal)}
+                                            className="opacity-0 group-hover/item:opacity-100 transition-opacity ds-icon-box w-7 h-7 hover:border-teal-800"
+                                        >
+                                            <Maximize2 className="w-3 h-3 text-slate-500 hover:text-teal-400 transition-colors" />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+
+            {/* Modal peek */}
             <AnimatePresence>
-                {selectedDeal && (
+                {selected && (
                     <>
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setSelectedDeal(null)}
-                            className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm"
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setSelected(null)}
+                            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm"
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-white/90 backdrop-blur-xl border border-white p-6 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)]"
+                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md p-6 rounded-sm"
+                            style={{ background: 'rgba(2,6,23,0.97)', border: '1px solid rgba(30,41,59,0.8)', boxShadow: '0 40px 80px -20px rgba(0,0,0,0.7)' }}
                         >
                             <button
-                                onClick={() => setSelectedDeal(null)}
-                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
+                                onClick={() => setSelected(null)}
+                                className="absolute top-4 right-4 ds-icon-box w-7 h-7 hover:border-red-900/50"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-3.5 h-3.5 text-slate-500 hover:text-red-400 transition-colors" />
                             </button>
 
+                            {/* Teal accent top line */}
+                            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/50 to-transparent" />
+
                             <div className="mb-6">
-                                <div className="bg-indigo-50 text-indigo-600 p-2 rounded-xl inline-flex shadow-sm mb-4 border border-indigo-100">
-                                    <Flame className="w-6 h-6" />
-                                </div>
-                                <h2 className="text-2xl font-black text-slate-800 leading-tight mb-2">{selectedDeal.title}</h2>
-                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{selectedDeal.stage}</p>
+                                <span className="ds-badge ds-badge-teal mb-4 inline-flex">
+                                    <span className="relative flex h-1.5 w-1.5">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                                    </span>
+                                    {selected.stage} · DEAL_PREVIEW
+                                </span>
+                                <h2 className="text-2xl font-black text-slate-100 tracking-[-0.04em] leading-tight mt-3">{selected.title}</h2>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Valor Potencial</p>
-                                    <p className="text-xl font-black font-mono text-emerald-600">{CRM_CURRENCY_FORMATTER.format(selectedDeal.value)}</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="ds-card-sm">
+                                    <p className="ds-mono-label mb-2">Valor Potencial</p>
+                                    <p className="text-xl font-black font-mono text-teal-400">{CRM_CURRENCY_FORMATTER.format(selected.value)}</p>
                                 </div>
-                                <div className="bg-orange-50/50 p-4 rounded-2xl border border-orange-100/50">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Probabilidad</p>
-                                    <p className="text-xl font-black font-mono text-orange-600">{selectedDeal.probability}%</p>
+                                <div className="ds-card-sm">
+                                    <p className="ds-mono-label mb-2">Probabilidad</p>
+                                    <p className="text-xl font-black font-mono text-amber-400">{selected.probability}%</p>
                                 </div>
                             </div>
 
-                            <div className="mt-6 flex justify-end">
+                            <div className="mt-5">
                                 <Link
                                     href="/dashboard/admin/crm/pipeline"
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md transition-all ease-out hover:-translate-y-0.5"
+                                    className="flex items-center justify-center gap-2 w-full py-2.5 font-mono text-xs uppercase tracking-widest text-white rounded-sm transition-all"
+                                    style={{ background: 'rgba(13,148,136,0.2)', border: '1px solid rgba(13,148,136,0.4)' }}
                                 >
-                                    Ir al Pipeline
+                                    <ArrowUpRight className="w-3.5 h-3.5" /> Ir al Pipeline
                                 </Link>
                             </div>
                         </motion.div>

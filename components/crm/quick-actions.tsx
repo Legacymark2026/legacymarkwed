@@ -1,82 +1,67 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Plus, UserPlus, Phone, MessageSquare } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
 import { CreateDealDialog } from "@/components/crm/create-deal-dialog";
 import { CreateLeadDialog } from "@/components/crm/create-lead-dialog";
 import { LogCallDialog } from "@/components/crm/log-call-dialog";
 import { QuickNoteDialog } from "@/components/crm/quick-note-dialog";
 
-interface QuickActionsProps {
-    companyId: string;
+interface QuickActionsProps { companyId: string; }
+
+// Home-style button — rounded-sm, mono font, teal border/hover
+function ActionBtn({ label, code, className }: { label: string; code: string; className?: string }) {
+    return (
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest rounded-sm transition-all duration-200 cursor-pointer ${className}`}>
+            {code === 'DEAL' && <Plus className="h-3 w-3" />}
+            {code === 'LEAD' && <UserPlus className="h-3 w-3" />}
+            {code === 'CALL' && <Phone className="h-3 w-3" />}
+            {code === 'NOTE' && <MessageSquare className="h-3 w-3" />}
+            {label}
+        </span>
+    );
 }
 
 export function QuickActions({ companyId }: QuickActionsProps) {
     return (
-        <div className="flex flex-wrap items-center gap-2 mt-2">
-            {/* Nuevo Deal → abre diálogo real */}
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+            {/* New Deal — primary teal */}
             <CreateDealDialog
                 companyId={companyId}
                 trigger={
-                    <Button
-                        size="sm"
-                        className="h-9 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 ease-out border-none rounded-xl px-4"
-                    >
-                        <Plus className="h-4 w-4" />
-                        <span className="font-semibold tracking-wide text-xs">Nuevo Deal</span>
-                    </Button>
+                    <button className="flex items-center gap-1.5 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-white rounded-sm transition-all hover:shadow-[0_0_20px_-8px_rgba(13,148,136,0.6)] hover:-translate-y-0.5"
+                        style={{ background: 'rgba(13,148,136,0.2)', border: '1px solid rgba(13,148,136,0.4)' }}>
+                        <Plus className="h-3 w-3" /> Nuevo Deal
+                    </button>
                 }
             />
 
-            <div className="flex items-center space-x-1.5 bg-white/60 backdrop-blur-xl p-1 border border-slate-200/60 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                {/* Lead → abre diálogo real */}
+            {/* Secondary actions bar */}
+            <div className="flex items-center gap-0"
+                style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(30,41,59,0.8)', borderRadius: '0.15rem' }}>
                 <CreateLeadDialog
                     companyId={companyId}
                     trigger={
-                        <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 gap-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-lg px-3 transition-colors"
-                        >
-                            <UserPlus className="h-3.5 w-3.5" />
-                            <span className="text-xs font-semibold">Lead</span>
-                        </Button>
+                        <button className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-teal-400 hover:bg-teal-950/30 transition-all">
+                            <UserPlus className="h-3 w-3" /> Lead
+                        </button>
                     }
                 />
-
-                <div className="w-[1px] h-4 bg-slate-200/80" />
-
-                {/* Llamada → abre diálogo de registro de llamada */}
+                <div className="w-px h-5" style={{ background: 'rgba(30,41,59,0.8)' }} />
                 <LogCallDialog
                     companyId={companyId}
                     trigger={
-                        <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 gap-1.5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50/80 rounded-lg px-3 transition-colors"
-                        >
-                            <Phone className="h-3.5 w-3.5" />
-                            <span className="text-xs font-semibold">Llamada</span>
-                        </Button>
+                        <button className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-teal-400 hover:bg-teal-950/30 transition-all">
+                            <Phone className="h-3 w-3" /> Llamada
+                        </button>
                     }
                 />
-
-                <div className="w-[1px] h-4 bg-slate-200/80" />
-
-                {/* Nota → abre diálogo de nota rápida */}
+                <div className="w-px h-5" style={{ background: 'rgba(30,41,59,0.8)' }} />
                 <QuickNoteDialog
                     companyId={companyId}
                     trigger={
-                        <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 gap-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50/80 rounded-lg px-3 transition-colors"
-                        >
-                            <MessageSquare className="h-3.5 w-3.5" />
-                            <span className="text-xs font-semibold">Nota</span>
-                        </Button>
+                        <button className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-amber-400 hover:bg-amber-950/20 transition-all">
+                            <MessageSquare className="h-3 w-3" /> Nota
+                        </button>
                     }
                 />
             </div>

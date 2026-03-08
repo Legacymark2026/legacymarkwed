@@ -1,119 +1,107 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Medal, PartyPopper } from "lucide-react";
+import { Trophy, Medal, PartyPopper, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
-interface LeaderboardEntry {
-    name: string;
-    wonValue: number;
-}
+interface LeaderboardEntry { name: string; wonValue: number; }
+interface SalesLeaderboardProps { data: LeaderboardEntry[]; }
 
-interface SalesLeaderboardProps {
-    data: LeaderboardEntry[];
-}
+const RANK_CONFIG = [
+    { icon: Trophy, color: 'text-amber-400', bg: 'bg-amber-950/30 border-amber-900/40', ring: 'ring-amber-500/30' },
+    { icon: Medal, color: 'text-slate-300', bg: 'bg-slate-800/40 border-slate-700/40', ring: 'ring-slate-500/20' },
+    { icon: Medal, color: 'text-orange-400', bg: 'bg-orange-950/20 border-orange-900/30', ring: 'ring-orange-500/20' },
+];
 
 export function SalesLeaderboard({ data }: SalesLeaderboardProps) {
-    const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 0
-    });
+    const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
     const fireKudos = (name: string, e: React.MouseEvent) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        const x = (rect.left + rect.width / 2) / window.innerWidth;
-        const y = (rect.top + rect.height / 2) / window.innerHeight;
-
         confetti({
-            particleCount: 80,
-            spread: 60,
-            origin: { x, y },
-            colors: ['#3b82f6', '#10b981', '#f59e0b'],
-            zIndex: 9999
+            particleCount: 80, spread: 60,
+            origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight },
+            colors: ['#14b8a6', '#10b981', '#f59e0b'], zIndex: 9999
         });
         toast.success(`¡Kudos enviados a ${name}! 🚀`);
     };
 
     return (
-        <Card className="col-span-4 lg:col-span-3 h-full bg-white/70 backdrop-blur-xl border border-slate-200/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl -mr-12 -mt-12 pointer-events-none" />
+        <div className="ds-section h-full flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
-            <CardHeader className="flex flex-row items-center justify-between pb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 rounded-lg shadow-sm">
-                        <Trophy className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                        <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500">
-                            Leaderboard
-                        </CardTitle>
-                        <CardDescription className="text-xs font-medium text-slate-400">
-                            Top Performers (Por Monto)
-                        </CardDescription>
-                    </div>
+            {/* Header */}
+            <div className="flex items-center gap-3 pb-4 mb-4 relative z-10"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
+                <div className="ds-icon-box w-8 h-8">
+                    <Trophy size={14} strokeWidth={1.5} className="text-teal-400" />
                 </div>
-            </CardHeader>
-            <CardContent className="relative z-10">
-                <div className="space-y-4 pt-2">
-                    {data.length === 0 ? (
-                        <p className="text-sm text-center font-medium text-slate-400 py-8 bg-slate-50 rounded-xl border border-slate-100 border-dashed">No hay datos de rendimiento registrados aún.</p>
-                    ) : (
-                        data.map((user, index) => {
-                            const isTop1 = index === 0;
-                            const isTop2 = index === 1;
-                            const isTop3 = index === 2;
+                <div>
+                    <p className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-[0.14em]">Leaderboard</p>
+                    <p className="font-mono text-[8px] text-slate-700 uppercase tracking-widest mt-0.5">Top Performers · By Revenue</p>
+                </div>
+                <span className="ml-auto ds-badge ds-badge-amber">RANKINGS</span>
+            </div>
 
-                            return (
-                                <motion.div
-                                    key={user.name}
-                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1, duration: 0.4, ease: "easeOut" }}
-                                    className={`flex items-center p-3 rounded-2xl transition-all duration-300 border ${isTop1 ? 'bg-gradient-to-r from-amber-50 to-white/50 border-amber-200/50 shadow-sm' :
-                                            isTop2 ? 'bg-gradient-to-r from-slate-100 to-white/50 border-slate-200/60' :
-                                                isTop3 ? 'bg-gradient-to-r from-orange-50/50 to-white/50 border-orange-200/50' :
-                                                    'bg-transparent border-transparent hover:bg-slate-50'
-                                        }`}
-                                >
-                                    <div className="mr-3 flex-shrink-0 w-6 flex justify-center">
-                                        {isTop1 ? <Trophy className="w-5 h-5 text-amber-500 drop-shadow-md" /> :
-                                            isTop2 ? <Medal className="w-5 h-5 text-slate-400" /> :
-                                                isTop3 ? <Medal className="w-5 h-5 text-orange-400" /> :
-                                                    <span className="text-sm font-bold text-slate-400">{index + 1}</span>}
-                                    </div>
-                                    <Avatar className={`h-10 w-10 ring-2 ${isTop1 ? 'ring-amber-400 ring-offset-2' : isTop2 ? 'ring-slate-300 ring-offset-1' : isTop3 ? 'ring-orange-300 ring-offset-1' : 'ring-transparent'}`}>
-                                        <AvatarFallback className="bg-slate-800 text-white font-bold text-xs tracking-wider">
-                                            {user.name.substring(0, 2).toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="ml-4 space-y-0.5 flex-1 min-w-0">
-                                        <p className="text-sm font-bold text-slate-700 truncate">{user.name}</p>
-                                        <p className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 truncate">
-                                            {isTop1 ? 'MVB (Most Valuable Biller)' : 'Sales Representative'}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col items-end gap-1">
-                                        <span className="font-mono font-bold text-slate-800 tracking-tighter bg-white px-2 py-0.5 rounded-md border border-slate-100 shadow-sm">
-                                            {formatter.format(user.wonValue)}
-                                        </span>
-                                        <button
-                                            onClick={(e) => fireKudos(user.name, e)}
-                                            className="opacity-0 group-hover:opacity-100 md:opacity-100 flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-indigo-500 hover:text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-sm transition-all"
-                                            title="Repartir Kudos"
-                                        >
-                                            <PartyPopper className="w-2.5 h-2.5" /> Kudos
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            );
-                        })
-                    )}
-                </div>
-            </CardContent>
-        </Card>
+            {/* List */}
+            <div className="flex-1 space-y-2 relative z-10">
+                {data.length === 0 ? (
+                    <div className="py-10 flex items-center justify-center">
+                        <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">&gt; Sin datos de rendimiento_</p>
+                    </div>
+                ) : (
+                    data.map((user, i) => {
+                        const rank = RANK_CONFIG[i] ?? null;
+                        const RankIcon = rank?.icon;
+                        return (
+                            <motion.div
+                                key={user.name}
+                                initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ delay: i * 0.08, duration: 0.4, ease: "easeOut" }}
+                                className={`group flex items-center p-3 transition-all duration-300 border rounded-sm ${rank
+                                        ? `${rank.bg}`
+                                        : 'bg-slate-900/30 border-slate-800/40 hover:border-slate-700/40'
+                                    }`}
+                            >
+                                {/* Rank indicator */}
+                                <div className="mr-3 w-5 flex justify-center shrink-0">
+                                    {RankIcon
+                                        ? <RankIcon className={`w-4 h-4 ${rank.color}`} strokeWidth={1.5} />
+                                        : <span className="font-mono text-[10px] font-bold text-slate-600">{i + 1}</span>}
+                                </div>
+
+                                {/* Avatar */}
+                                <div className={`w-8 h-8 rounded-sm flex items-center justify-center font-mono text-[10px] font-black shrink-0 ${rank ? `ring-1 ${rank.ring}` : ''}`}
+                                    style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.8)' }}>
+                                    {user.name.substring(0, 2).toUpperCase()}
+                                </div>
+
+                                {/* Info */}
+                                <div className="ml-3 flex-1 min-w-0">
+                                    <p className="text-[12px] font-bold text-slate-200 truncate">{user.name}</p>
+                                    <p className="font-mono text-[8px] text-slate-600 uppercase tracking-widest">
+                                        {i === 0 ? 'MVB · Most Valuable Biller' : 'Sales Representative'}
+                                    </p>
+                                </div>
+
+                                {/* Value + Kudos */}
+                                <div className="flex flex-col items-end gap-1.5 shrink-0 ml-2">
+                                    <span className="font-mono font-black text-sm text-slate-100">{fmt.format(user.wonValue)}</span>
+                                    <button
+                                        onClick={(e) => fireKudos(user.name, e)}
+                                        className="opacity-0 group-hover:opacity-100 flex items-center gap-1 font-mono text-[8px] uppercase tracking-widest text-teal-400 hover:text-teal-300 transition-all"
+                                    >
+                                        <Zap className="w-2.5 h-2.5" /> Kudos
+                                    </button>
+                                </div>
+                            </motion.div>
+                        );
+                    })
+                )}
+            </div>
+        </div>
     );
 }
