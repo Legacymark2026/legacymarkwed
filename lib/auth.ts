@@ -264,6 +264,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             token.permissions = ((freshUser.companies[0]?.permissions ?? []) as string[]) as Permission[];
                             token.roleCheckedAt = Date.now();
                             logger.auth(`JWT: Role refreshed from DB → ${token.role}`);
+                        } else {
+                            // Usuario eliminado de la DB — marcar token como inválido
+                            // El callback authorized() detectará esto y redirigirá al login
+                            logger.auth(`JWT: User ${tokenId} not found in DB — marking as deleted`);
+                            token.isDeleted = true;
+                            token.role = undefined;
                         }
                     } catch (e) {
                         // Silently fail — keep existing token data

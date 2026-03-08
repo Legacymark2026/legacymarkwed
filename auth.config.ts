@@ -58,6 +58,16 @@ export const authConfig: NextAuthConfig = {
             // No autenticado → redirect a login
             if (!isLoggedIn) return false;
 
+            // ── Usuario eliminado ─────────────────────────────────────────
+            // El JWT callback marca el token con isDeleted=true cuando el
+            // usuario ya no existe en la base de datos (fue eliminado).
+            // Redirigimos al login con ?deleted=1 para que la cookie se limpie.
+            const isDeleted = (auth?.user as any)?.isDeleted;
+            if (isDeleted) {
+                const loginUrl = new URL('/auth/login?deleted=1', nextUrl.origin);
+                return NextResponse.redirect(loginUrl);
+            }
+
             // Protección de rutas del dashboard
             if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
                 const role = (auth?.user?.role as UserRole) || 'guest';
