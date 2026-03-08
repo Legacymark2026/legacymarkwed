@@ -20,7 +20,7 @@ import { QuickActions } from "@/components/crm/quick-actions";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
-import { Download } from "lucide-react";
+import { Download, TrendingUp } from "lucide-react";
 import { CRMExportButton } from "@/components/crm/export-button";
 import { CRMEmptyState } from "@/components/crm/empty-state";
 import { getRecentExecutions } from "@/actions/automation";
@@ -49,15 +49,26 @@ export default async function CRMDashboardPage() {
     const isTotalEmpty = stats.activeDeals === 0 && topDeals.length === 0 && advancedStats.wonValue === 0;
 
     return (
-        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 relative z-20 pb-2">
+        <div className="ds-page space-y-6">
+            {/* ── Header ── */}
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6"
+                style={{ borderBottom: '1px solid var(--ds-border)' }}>
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">CRM Command Center</h2>
-                    <div className="mt-1">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                            <TrendingUp className="w-5 h-5 text-amber-400" />
+                        </div>
+                        <div>
+                            <h1 className="ds-heading-page">CRM Command Center</h1>
+                            <p className="ds-subtext mt-0.5">Pipeline de ventas · Leads · Deals · Actividad</p>
+                        </div>
+                    </div>
+                    <div className="mt-3 ml-13">
                         <QuickActions companyId={companyId} />
                     </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2 shrink-0">
                     <CalendarDateRangePicker />
                     <CRMExportButton stats={stats} advancedStats={advancedStats} />
                 </div>

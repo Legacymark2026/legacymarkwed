@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { getCampaignsList, getAggregatedSpend } from "@/actions/marketing";
 import CampaignsDashboardClient from "@/components/marketing/CampaignsDashboardClient";
 import CampaignMetricsCards from "@/components/marketing/CampaignMetricsCards";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 
@@ -26,25 +26,31 @@ export default async function CampaignsPage() {
     }));
 
     return (
-        <div className="flex-1 space-y-6 flex flex-col pt-6 pb-8 px-8">
-            <div className="flex items-center justify-between space-y-2">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Campaigns & Ad Spend</h2>
-                    <p className="text-muted-foreground">
-                        Centralized CMO view of all live marketing initiatives across Meta and Google.
-                    </p>
+        <div className="ds-page space-y-6">
+            {/* ── Header ── */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6"
+                style={{ borderBottom: '1px solid var(--ds-border)' }}>
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ background: 'rgba(236,72,153,0.15)', border: '1px solid rgba(236,72,153,0.2)' }}>
+                        <Target className="w-5 h-5 text-pink-400" />
+                    </div>
+                    <div>
+                        <h1 className="ds-heading-page">Campañas & Ad Spend</h1>
+                        <p className="ds-subtext mt-0.5">Vista CMO centralizada · Meta · Google · TikTok · LinkedIn</p>
+                    </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2 shrink-0">
                     <Link href="/dashboard/admin/marketing/settings">
-                        <Button variant="outline" className="h-9">
-                            <Settings className="mr-2 h-4 w-4" />
-                            API Connections
+                        <Button id="campaigns-api-btn" variant="outline" className="h-9 border-white/10 bg-white/5 text-gray-300 hover:bg-white/10 gap-1.5 text-sm">
+                            <Settings className="h-3.5 w-3.5" />
+                            Conexiones API
                         </Button>
                     </Link>
                     <Link href="/dashboard/admin/marketing/campaigns/new">
-                        <Button className="h-9">
-                            <Plus className="mr-2 h-4 w-4" />
-                            New Campaign
+                        <Button id="campaigns-new-btn" className="h-9 bg-violet-600 hover:bg-violet-500 text-white gap-1.5 text-sm">
+                            <Plus className="h-3.5 w-3.5" />
+                            Nueva Campaña
                         </Button>
                     </Link>
                 </div>
@@ -52,7 +58,7 @@ export default async function CampaignsPage() {
 
             <CampaignMetricsCards metrics={metricsResult} />
 
-            <div className="pt-4">
+            <div>
                 <CampaignsDashboardClient initialCampaigns={formattedCampaigns} />
             </div>
         </div>

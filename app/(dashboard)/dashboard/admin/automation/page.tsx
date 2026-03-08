@@ -24,7 +24,7 @@ export default async function AutomationPage() {
     }));
 
     return (
-        <div className="h-full flex-1 flex-col space-y-8 p-8 flex">
+        <div className="ds-page">
             <WorkflowListClient
                 initialWorkflows={serializedWorkflows as any}
                 analytics={analytics as any}

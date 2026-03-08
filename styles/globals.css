@@ -1,28 +1,339 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
-  /* Cyberpunk Colors (Updated to Teal Theme - Light Mode Compatible) */
-  --color-neon-purple: #10b981;
-  /* Emerald-500 */
-  --color-neon-blue: #0ea5e9;
-  /* Sky-500 */
-  --color-neon-cyan: #0d9488;
-  /* Teal-600 (Darker for light bg) */
-  --color-dark-bg: #ffffff;
-  /* White */
-
-  --color-black: #000000;
-  --color-white: #FFFFFF;
 }
 
+/* ─── DASHBOARD DESIGN TOKENS ────────────────────────────────────────────────
+   Single source of truth for all dashboard modules.
+   Every module uses: ds-bg, ds-surface, ds-border, ds-text-*, ds-accent-*
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Shadcn-ui variables (light mode baseline) */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 263 70% 58%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 263 70% 58%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 263 70% 58%;
+  --radius: 0.75rem;
+
+  /* ─── Dashboard Semantic Tokens (always dark in dashboard) ─── */
+  --ds-bg: #08080f;
+  --ds-bg-secondary: #0d0d1a;
+  --ds-surface: rgba(255, 255, 255, 0.03);
+  --ds-surface-hover: rgba(255, 255, 255, 0.055);
+  --ds-border: rgba(255, 255, 255, 0.08);
+  --ds-border-accent: rgba(255, 255, 255, 0.14);
+
+  --ds-text-primary: #f1f5f9;
+  --ds-text-secondary: #94a3b8;
+  --ds-text-muted: #475569;
+  --ds-text-disabled: #334155;
+
+  --ds-accent: #7c3aed;
+  --ds-accent-light: #8b5cf6;
+  --ds-accent-glow: rgba(124, 58, 237, 0.25);
+
+  --ds-success: #10b981;
+  --ds-warning: #f59e0b;
+  --ds-danger: #ef4444;
+  --ds-info: #0ea5e9;
+
+  /* Sidebar specific */
+  --ds-sidebar-bg: #07070d;
+  --ds-sidebar-border: rgba(255, 255, 255, 0.06);
+  --ds-sidebar-item: rgba(255, 255, 255, 0.04);
+  --ds-sidebar-active: rgba(124, 58, 237, 0.18);
+}
+
+/* ─── GLOBAL BASE ─────────────────────────────────────────────────────────── */
+html,
+body {
+  background-color: var(--ds-bg);
+  color: var(--ds-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* ─── SHADCN DARK OVERRIDES (force dark everywhere in dashboard) ───────────── */
+.dark,
+[data-theme='dark'],
+.dashboard-dark {
+  --background: 240 10% 4%;
+  --foreground: 210 40% 98%;
+  --card: 240 10% 6%;
+  --card-foreground: 210 40% 98%;
+  --popover: 240 10% 6%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 263 70% 58%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 240 8% 12%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 240 8% 14%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 263 70% 30%;
+  --accent-foreground: 263 70% 95%;
+  --destructive: 0 62.8% 40%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 240 8% 14%;
+  --input: 240 8% 14%;
+  --ring: 263 70% 58%;
+}
+
+/* ─── DASHBOARD LAYOUT UTILITIES ─────────────────────────────────────────── */
 @layer utilities {
+
+  /* Page container */
+  .ds-page {
+    min-height: 100%;
+    background-color: var(--ds-bg);
+    color: var(--ds-text-primary);
+    padding: 1.5rem 2rem 3rem;
+  }
+
+  /* Module sections */
+  .ds-section {
+    background-color: var(--ds-surface);
+    border: 1px solid var(--ds-border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+  }
+
+  .ds-section:hover {
+    border-color: var(--ds-border-accent);
+  }
+
+  /* Cards */
+  .ds-card {
+    background-color: var(--ds-surface);
+    border: 1px solid var(--ds-border);
+    border-radius: 0.875rem;
+    padding: 1.25rem;
+    transition: all 0.2s;
+  }
+
+  .ds-card:hover {
+    background-color: var(--ds-surface-hover);
+    border-color: var(--ds-border-accent);
+  }
+
+  /* KPI cards */
+  .ds-kpi {
+    background-color: var(--ds-surface);
+    border: 1px solid var(--ds-border);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    transition: all 0.2s;
+  }
+
+  .ds-kpi:hover {
+    background-color: var(--ds-surface-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Headings */
+  .ds-heading-page {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ds-text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .ds-heading-section {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ds-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .ds-subtext {
+    font-size: 0.8125rem;
+    color: var(--ds-text-secondary);
+  }
+
+  .ds-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ds-text-muted);
+  }
+
+  /* Divider */
+  .ds-divider {
+    border: none;
+    border-top: 1px solid var(--ds-border);
+  }
+
+  /* Accent badge */
+  .ds-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+  }
+
+  .ds-badge-purple {
+    background: rgba(124, 58, 237, 0.15);
+    color: #a78bfa;
+    border-color: rgba(124, 58, 237, 0.25);
+  }
+
+  .ds-badge-green {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+
+  .ds-badge-amber {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.25);
+  }
+
+  .ds-badge-red {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.25);
+  }
+
+  .ds-badge-blue {
+    background: rgba(14, 165, 233, 0.12);
+    color: #38bdf8;
+    border-color: rgba(14, 165, 233, 0.25);
+  }
+
+  .ds-badge-pink {
+    background: rgba(236, 72, 153, 0.12);
+    color: #f472b6;
+    border-color: rgba(236, 72, 153, 0.25);
+  }
+
+  /* Stat value */
+  .ds-stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--ds-text-primary);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .ds-stat-label {
+    font-size: 0.75rem;
+    color: var(--ds-text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  .ds-stat-delta-up {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ds-success);
+  }
+
+  .ds-stat-delta-down {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ds-danger);
+  }
+
+  /* Progress bar */
+  .ds-progress-track {
+    height: 0.375rem;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .ds-progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--ds-accent), var(--ds-accent-light));
+    transition: width 0.5s ease;
+  }
+
+  /* Table */
+  .ds-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ds-table th {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ds-text-muted);
+    padding: 0.625rem 1rem;
+    border-bottom: 1px solid var(--ds-border);
+    text-align: left;
+  }
+
+  .ds-table td {
+    font-size: 0.8125rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--ds-border);
+    color: var(--ds-text-primary);
+  }
+
+  .ds-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ds-table tbody tr:hover td {
+    background: var(--ds-surface-hover);
+  }
+
+  /* Text utilities */
   .text-balance {
     text-wrap: balance;
   }
+}
 
+/* ─── SCROLLBAR ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ds-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── NOISE OVERLAY ──────────────────────────────────────────────────────── */
+@layer utilities {
   .bg-noise {
     position: fixed;
     top: 0;
@@ -31,127 +342,13 @@
     height: 100vh;
     pointer-events: none;
     z-index: 50;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
-    mix-blend-mode: multiply;
-    /* Better for light mode */
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
   }
 }
 
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-
-  --primary: 175 84% 32%;
-  --primary-foreground: 210 40% 98%;
-
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-
-  --accent: 166 76% 97%;
-  --accent-foreground: 175 84% 32%;
-
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 175 84% 32%;
-
-  --radius: 0.75rem;
-}
-
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-
-  --primary: 160 84% 39%;
-  --primary-foreground: 210 40% 98%;
-
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-
-  --accent: 164 86% 16%;
-  --accent-foreground: 160 84% 39%;
-
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 160 84% 39%;
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom Scrollbar - Light Version */
-html.light ::-webkit-scrollbar {
-  width: 8px;
-}
-
-html.light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-html.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-html.light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Custom Scrollbar - Dark Version */
-html.dark ::-webkit-scrollbar {
-  width: 8px;
-}
-
-html.dark ::-webkit-scrollbar-track {
-  background: #0f172a;
-  /* background or Slate-900 */
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-  /* Slate-700 */
-  border-radius: 4px;
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-  /* Slate-600 */
-}
-
-/* Cloudinary Widget Fix */
+/* ─── CLOUDINARY ──────────────────────────────────────────────────────────── */
 iframe[src*="cloudinary"] {
   z-index: 100000 !important;
   pointer-events: auto !important;

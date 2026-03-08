@@ -20,7 +20,6 @@ export default async function DashboardLayout({
 
     let role = (session.user.role as UserRole) || UserRole.GUEST;
 
-    // Fetch freshest role from DB to avoid staleness when roles are updated
     const dbUser = await prisma.user.findUnique({
         where: { id: session.user.id },
         select: { role: true }
@@ -30,14 +29,15 @@ export default async function DashboardLayout({
         role = dbUser.role as UserRole;
     }
 
-    // Invitados sin rol asignado → redirigir a página de acceso denegado
     if (role === UserRole.GUEST) {
         redirect("/dashboard/unauthorized");
     }
 
     return (
-        <div className="h-screen flex flex-col md:flex-row font-sans selection:bg-teal-500 selection:text-white overflow-hidden bg-slate-50/50">
-            {/* Sidebar dinámico envuelto para responsiveness */}
+        <div className="h-screen flex flex-col md:flex-row font-sans overflow-hidden"
+            style={{ background: 'var(--ds-bg)', color: 'var(--ds-text-primary)' }}>
+
+            {/* Sidebar */}
             <MobileSidebarWrapper
                 sidebar={
                     <DashboardSidebar
@@ -50,9 +50,10 @@ export default async function DashboardLayout({
                 }
             />
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-auto p-4 md:p-8 relative w-full h-full">
-                <div className="max-w-[1400px] mx-auto">
+            {/* Main Content — scrollable */}
+            <main className="flex-1 overflow-auto relative w-full h-full"
+                style={{ background: 'var(--ds-bg)' }}>
+                <div className="max-w-[1440px] mx-auto px-6 py-6 md:px-10 md:py-8">
                     {children}
                 </div>
             </main>
