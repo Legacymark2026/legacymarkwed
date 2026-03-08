@@ -867,66 +867,80 @@ export const getRevenueStats = unstable_cache(async (): Promise<RevenueData> => 
     }
 
     try {
-        // Check for Deal model
         if (!('deal' in prisma)) {
             return { revenue: [], metrics: [] };
         }
 
         const today = new Date();
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const startOfPrevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const endOfPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59);
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - 7);
-        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        // Fetch won deals in last week
-        const weeklyDeals = await (prisma as any).deal.findMany({
-            where: {
-                stage: 'WON',
-                updatedAt: { gte: startOfWeek }
-            },
-            select: { value: true, updatedAt: true }
-        });
-
-        // Fetch month deals
-        const monthDeals = await (prisma as any).deal.findMany({
-            where: {
-                stage: 'WON',
-                updatedAt: { gte: startOfMonth }
-            },
-            select: { value: true }
-        });
+        // Fetch current month + previous month + last week — all in parallel
+        const [weeklyDeals, monthDeals, prevMonthDeals] = await Promise.all([
+            (prisma as any).deal.findMany({
+                where: { stage: 'WON', updatedAt: { gte: startOfWeek } },
+                select: { value: true, updatedAt: true },
+            }),
+            (prisma as any).deal.findMany({
+                where: { stage: 'WON', updatedAt: { gte: startOfMonth } },
+                select: { value: true },
+            }),
+            (prisma as any).deal.findMany({
+                where: { stage: 'WON', updatedAt: { gte: startOfPrevMonth, lte: endOfPrevMonth } },
+                select: { value: true },
+            }),
+        ]);
 
         const totalMonthRevenue = monthDeals.reduce((sum: number, d: any) => sum + (d.value || 0), 0);
         const totalOrders = monthDeals.length;
         const avgTicket = totalOrders > 0 ? totalMonthRevenue / totalOrders : 0;
 
-        // Group weekly deals by day
+        const prevMonthRevenue = prevMonthDeals.reduce((sum: number, d: any) => sum + (d.value || 0), 0);
+        const prevMonthOrders = prevMonthDeals.length;
+        const prevAvgTicket = prevMonthOrders > 0 ? prevMonthRevenue / prevMonthOrders : 0;
+
+        // Calculate real month-over-month % changes
+        const calcChange = (curr: number, prev: number): number | null => {
+            if (prev === 0 && curr === 0) return null;
+            if (prev === 0) return 100;
+            return Math.round(((curr - prev) / prev) * 100 * 10) / 10;
+        };
+
+        const revenueChange = calcChange(totalMonthRevenue, prevMonthRevenue);
+        const ordersChange = calcChange(totalOrders, prevMonthOrders);
+        const ticketChange = calcChange(avgTicket, prevAvgTicket);
+
+        // Weekly revenue chart
         const daysMap = new Map<string, number>();
         const days = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-
-        // Initialize
         for (let i = 0; i < 7; i++) {
             const d = new Date();
             d.setDate(d.getDate() - (6 - i));
             daysMap.set(days[d.getDay()], 0);
         }
-
         weeklyDeals.forEach((d: any) => {
             const dayName = days[new Date(d.updatedAt).getDay()];
             if (daysMap.has(dayName)) {
                 daysMap.set(dayName, daysMap.get(dayName)! + (d.value || 0));
             }
         });
-
         const revenueChart = Array.from(daysMap.entries()).map(([day, value]) => ({ day, value }));
+
+        // Meta mensual: use previous month revenue as target (or a fixed goal if no prev data)
+        const monthTarget = prevMonthRevenue > 0 ? prevMonthRevenue * 1.1 : totalMonthRevenue > 0 ? totalMonthRevenue * 1.2 : 0;
+        const metaProgress = monthTarget > 0 ? Math.min(100, Math.round((totalMonthRevenue / monthTarget) * 100 * 10) / 10) : 0;
 
         return {
             revenue: revenueChart,
             metrics: [
-                { label: 'Ingresos del Mes', value: totalMonthRevenue, change: 12.5, prefix: '$', color: 'emerald' },
-                { label: 'Pedidos (Deals)', value: totalOrders, change: 5.2, prefix: '', color: 'blue' },
-                { label: 'Ticket Promedio', value: Math.round(avgTicket), change: 2.1, prefix: '$', color: 'violet' },
-                { label: 'Meta Mensual', value: 78.5, change: null, prefix: '', suffix: '%', color: 'amber' }
-            ]
+                { label: 'Ingresos del Mes', value: totalMonthRevenue, change: revenueChange, prefix: '$', color: 'emerald' },
+                { label: 'Pedidos (Deals)', value: totalOrders, change: ordersChange, prefix: '', color: 'blue' },
+                { label: 'Ticket Promedio', value: Math.round(avgTicket), change: ticketChange, prefix: '$', color: 'violet' },
+                { label: 'Meta Mensual', value: metaProgress, change: null, prefix: '', suffix: '%', color: 'amber' },
+            ],
         };
 
     } catch (error) {
@@ -946,25 +960,68 @@ export const getChannelAttribution = unstable_cache(async (): Promise<Attributio
     if (!(await tablesExist())) return [];
 
     try {
-        // This is a complex query joining Sessions -> Deals/Conversions
-        // For now, we'll approximate using Traffic Sources and allocating a mock revenue per source 
-        // OR if we had a real relation, we'd use it.
-        // Let's use TrafficSources count and simulate proportional revenue if no real link exists.
+        const colors = ['#10b981', '#8b5cf6', '#f59e0b', '#06b6d4', '#ec4899', '#ef4444'];
 
+        // ── Real data: group leads by source ─────────────────────────────
+        const hasLeads = 'lead' in prisma;
+        const hasDeals = 'deal' in prisma;
+
+        if (hasLeads) {
+            // Count leads by source
+            const allLeads = await (prisma as any).lead.findMany({
+                select: { id: true, source: true },
+            });
+
+            // Count won deals per lead source (approximation via lead -> deals if relation exists)
+            // If a direct relation doesn't exist we aggregate won deals total and distribute proportionally
+            let wonDealsTotal = 0;
+            let wonDealsRevenue = 0;
+            if (hasDeals) {
+                const wonDeals = await (prisma as any).deal.aggregate({
+                    where: { stage: 'WON' },
+                    _count: { id: true },
+                    _sum: { value: true },
+                });
+                wonDealsTotal = wonDeals._count?.id ?? 0;
+                wonDealsRevenue = wonDeals._sum?.value ?? 0;
+            }
+
+            // Group leads by source
+            const bySource = new Map<string, number>();
+            allLeads.forEach((l: any) => {
+                const src = l.source || 'Direct';
+                bySource.set(src, (bySource.get(src) ?? 0) + 1);
+            });
+
+            const totalLeads = allLeads.length || 1;
+            const sortedSources = Array.from(bySource.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+
+            return sortedSources.map(([channel, leads], index) => {
+                const share = leads / totalLeads;
+                return {
+                    channel,
+                    conversions: Math.round(wonDealsTotal * share),
+                    revenue: Math.round(wonDealsRevenue * share),
+                    color: colors[index % colors.length],
+                };
+            });
+        }
+
+        // ── Fallback: use UTM sources from analytics sessions ─────────────
         const sources = await (prisma as any).analyticsSession.groupBy({
             by: ['utmSource'],
             _count: { id: true },
             take: 6,
-            orderBy: { _count: { id: 'desc' } }
+            orderBy: { _count: { id: 'desc' } },
         });
-
-        const colors = ['#10b981', '#8b5cf6', '#f59e0b', '#06b6d4', '#ec4899', '#ef4444'];
 
         return sources.map((s: any, index: number) => ({
             channel: s.utmSource || 'Direct',
-            conversions: Math.round(s._count.id * 0.05), // Assume 5% conversion rate
-            revenue: Math.round(s._count.id * 0.05 * 150), // Assume $150 avg ticket
-            color: colors[index % colors.length]
+            conversions: 0,
+            revenue: 0,
+            color: colors[index % colors.length],
         }));
 
     } catch (error) {

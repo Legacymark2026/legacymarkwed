@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AnalyticsOverview } from "@/modules/analytics/components/overview";
 import { TrafficChart } from "@/modules/analytics/components/traffic-chart";
 import { SeoMetrics } from "@/modules/analytics/components/seo-metrics";
@@ -11,7 +12,6 @@ import { PeriodComparison } from "@/modules/analytics/components/period-comparis
 import { ActivityHeatmap } from "@/modules/analytics/components/activity-heatmap";
 import { FunnelChartComponent } from "@/modules/analytics/components/funnel-chart";
 import { ExportButton } from "@/modules/analytics/components/export-button";
-import { ScheduleDialog } from "@/modules/analytics/components/schedule-dialog";
 import { GeoMap } from "@/modules/analytics/components/geo-map";
 import { GoalsWidget } from "@/modules/analytics/components/goals-widget";
 import { PerformanceScore } from "@/modules/analytics/components/performance-score";
@@ -20,8 +20,6 @@ import { QuickInsights } from "@/modules/analytics/components/quick-insights";
 import { SessionHistogram } from "@/modules/analytics/components/session-histogram";
 import { BounceTrend } from "@/modules/analytics/components/bounce-trend";
 import { UserFlow } from "@/modules/analytics/components/user-flow";
-import { ThemeToggle } from "@/modules/analytics/components/theme-toggle";
-import { FullscreenButton } from "@/modules/analytics/components/fullscreen-button";
 import { RefreshSelector } from "@/modules/analytics/components/refresh-selector";
 import { LiveVisitorsMap } from "@/modules/analytics/components/live-visitors-map";
 import { PageSpeedMetrics } from "@/modules/analytics/components/page-speed-metrics";
@@ -33,10 +31,12 @@ import { SearchTermsCloud } from "@/modules/analytics/components/search-terms-cl
 import { BrowserOsStats } from "@/modules/analytics/components/browser-os-stats";
 import { SocialMediaMetrics } from "@/modules/analytics/components/social-media-metrics";
 import { EngagementRadar } from "@/modules/analytics/components/engagement-radar";
+import Link from "next/link";
 import {
     TrendingUp, Globe, Monitor, BarChart3, Target, Gauge,
-    Calendar, MapPin, Sparkles, Activity, Filter, ArrowRight,
-    DollarSign, FlaskConical, Search, Share2, MessageSquare, Zap
+    Calendar, MapPin, Activity, Filter, ArrowRight,
+    DollarSign, FlaskConical, Search, Share2, Zap,
+    LayoutDashboard, MousePointerClick, Eye
 } from "lucide-react";
 import {
     getTrafficData, getTrafficSources, getConversionFunnel, getChannelPerformance,
@@ -47,22 +47,20 @@ import {
 } from "@/modules/analytics/actions/analytics";
 
 export const metadata = {
-    title: "Analítica Web | Dashboard Ultra-Profesional",
+    title: "Analítica Web | LegacyMark Command Center",
     description: "Métricas de rendimiento, tráfico y conversión en tiempo real.",
 };
 
-// Dark card wrapper — identical pattern to the home TechCard
+// ─── Shared HUD Card ──────────────────────────────────────────────────────────
 function DarkCard({ children, className = "", code }: { children: React.ReactNode; className?: string; code?: string }) {
     return (
         <div className={`ds-card group relative ${className}`}>
             {code && <span className="absolute top-3 right-3 font-mono text-[8px] text-slate-700 uppercase tracking-widest">[{code}]</span>}
-            {/* Teal bottom line on hover — same as home TechCard */}
             {children}
         </div>
     );
 }
 
-// Section header (mono HUD style)
 function SectionHeader({ icon: Icon, label, sub }: { icon: any; label: string; sub?: string }) {
     return (
         <div className="flex items-center gap-2.5 mb-5">
@@ -77,205 +75,293 @@ function SectionHeader({ icon: Icon, label, sub }: { icon: any; label: string; s
     );
 }
 
-export default async function AnalyticsPage() {
-    const trafficData = await getTrafficData(7);
-    const trafficSources = await getTrafficSources(30);
-    const funnelData = await getConversionFunnel();
-    const seoData = await getChannelPerformance(6);
-    const deviceData = await getDeviceStats(30);
-    const geoData = await getGeoStats(30);
-    const topPagesData = await getTopPages(10, 30);
-    const browserOsData = await getBrowserOsStats(30);
-    const activeUsers = await getRealtimeUsers();
-    const revenueData = await getRevenueStats();
-    const attributionData = await getChannelAttribution();
-    const pageSpeedData = await getPageSpeedMetrics();
-    const heatmapData = await getActivityHeatmap();
-    const sessionDurationData = await getSessionDurationDistribution();
-    const goalsData = await getGoalsProgress();
-    const insightsData = await getQuickInsights();
-    const searchTermsData = await getSearchTerms();
-    const socialMetricsData = await getSocialMetrics();
-    const engagementData = await getEngagementMetrics();
+// ─── Tab Nav (server-compatible via searchParams) ────────────────────────────
+const TABS = [
+    { id: "resumen", label: "Resumen", icon: LayoutDashboard },
+    { id: "trafico", label: "Tráfico", icon: Globe },
+    { id: "conversiones", label: "Conversiones", icon: Target },
+    { id: "rendimiento", label: "Rendimiento", icon: Gauge },
+] as const;
+
+function TabNav({ active }: { active: string }) {
+    return (
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm w-fit">
+            {TABS.map(({ id, label, icon: Icon }) => (
+                <Link
+                    key={id}
+                    href={`?tab=${id}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ${active === id
+                            ? "bg-teal-500/20 text-teal-400 border border-teal-500/30 shadow-sm shadow-teal-500/10"
+                            : "text-slate-500 hover:text-slate-300 hover:bg-slate-800/50"
+                        }`}
+                >
+                    <Icon size={12} />
+                    {label}
+                </Link>
+            ))}
+        </div>
+    );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+export default async function AnalyticsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ tab?: string }>;
+}) {
+    const { tab = "resumen" } = await searchParams;
+    const activeTab = TABS.find(t => t.id === tab)?.id ?? "resumen";
+
+    // Fetch all data in parallel
+    const [
+        trafficData, trafficSources, funnelData, seoData,
+        deviceData, geoData, topPagesData, browserOsData,
+        activeUsers, revenueData, attributionData, pageSpeedData,
+        heatmapData, sessionDurationData, goalsData, insightsData,
+        searchTermsData, socialMetricsData, engagementData,
+    ] = await Promise.all([
+        getTrafficData(7),
+        getTrafficSources(30),
+        getConversionFunnel(),
+        getChannelPerformance(6),
+        getDeviceStats(30),
+        getGeoStats(30),
+        getTopPages(10, 30),
+        getBrowserOsStats(30),
+        getRealtimeUsers(),
+        getRevenueStats(),
+        getChannelAttribution(),
+        getPageSpeedMetrics(),
+        getActivityHeatmap(),
+        getSessionDurationDistribution(),
+        getGoalsProgress(),
+        getQuickInsights(),
+        getSearchTerms(),
+        getSocialMetrics(),
+        getEngagementMetrics(),
+    ]);
 
     return (
         <div className="ds-page space-y-6">
             <TrackPageEvent eventName="ViewAnalytics" isCustom={true} />
-
-            {/* Grid overlay */}
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.025] pointer-events-none mix-blend-screen" />
 
             {/* ── Header ── */}
-            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-8"
-                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
-                <div>
-                    <div className="mb-4">
-                        <span className="ds-badge ds-badge-teal">
-                            <span className="relative flex h-1.5 w-1.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
-                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+            <div
+                className="relative z-10 flex flex-col gap-4 pb-6"
+                style={{ borderBottom: "1px solid rgba(30,41,59,0.8)" }}
+            >
+                {/* Top row: title + controls */}
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                    <div>
+                        <div className="mb-3">
+                            <span className="ds-badge ds-badge-teal">
+                                <span className="relative flex h-1.5 w-1.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                                </span>
+                                ANL_SYS · LIVE DATA
                             </span>
-                            ANL_SYS · LIVE DATA
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="ds-icon-box w-12 h-12">
-                            <BarChart3 className="w-5 h-5 text-teal-400" />
                         </div>
-                        <div>
-                            <h1 className="ds-heading-page">Analítica Avanzada</h1>
-                            <p className="ds-subtext mt-2">Métricas de rendimiento · Tráfico · Conversión en tiempo real</p>
+                        <div className="flex items-center gap-4">
+                            <div className="ds-icon-box w-12 h-12">
+                                <BarChart3 className="w-5 h-5 text-teal-400" />
+                            </div>
+                            <div>
+                                <h1 className="ds-heading-page">Analítica Avanzada</h1>
+                                <p className="ds-subtext mt-1">Métricas de rendimiento · Tráfico · Conversión en tiempo real</p>
+                            </div>
                         </div>
                     </div>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        <RealtimeIndicator count={activeUsers} />
+                        <RefreshSelector />
+                        <DateRangeSelector />
+                        <ExportButton />
+                    </div>
                 </div>
-                <div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
-                    <RealtimeIndicator count={activeUsers} />
-                    <RefreshSelector />
-                    <DateRangeSelector />
-                    <ExportButton />
-                    <ScheduleDialog />
-                    <FullscreenButton />
+
+                {/* Tab navigation */}
+                <TabNav active={activeTab} />
+            </div>
+
+            {/* ══════════════════════════════════════════════════════════════
+                TAB: RESUMEN
+            ══════════════════════════════════════════════════════════════ */}
+            {activeTab === "resumen" && (
+                <div className="relative z-10 space-y-5">
+                    {/* Quick Insights */}
+                    <QuickInsights data={insightsData} />
+
+                    {/* KPI Overview */}
+                    <AnalyticsOverview />
+
+                    {/* Period Comparison */}
+                    <PeriodComparison />
+
+                    {/* Main Charts */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="TRF_WK">
+                            <SectionHeader icon={TrendingUp} label="Tráfico Semanal" sub="Últimos 7 días" />
+                            <TrafficChart data={trafficData} />
+                        </DarkCard>
+                        <DarkCard code="SEO_PAG">
+                            <SectionHeader icon={BarChart3} label="SEO vs Pago" sub="Rendimiento por canal" />
+                            <SeoMetrics data={seoData} />
+                        </DarkCard>
+                    </div>
+
+                    {/* Funnel + User Flow */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="FNN_CNV">
+                            <SectionHeader icon={Filter} label="Embudo de Conversión" />
+                            <FunnelChartComponent data={funnelData} />
+                        </DarkCard>
+                        <DarkCard code="USR_FLW">
+                            <SectionHeader icon={ArrowRight} label="User Flow" sub="Rutas de navegación" />
+                            <UserFlow data={funnelData} />
+                        </DarkCard>
+                    </div>
+
+                    {/* Social Media */}
+                    <DarkCard code="SOC_MET">
+                        <SectionHeader icon={Share2} label="Redes Sociales" sub="Últimos 30 días" />
+                        <SocialMediaMetrics data={socialMetricsData} />
+                    </DarkCard>
                 </div>
-            </div>
+            )}
 
-            {/* Quick Insights */}
-            <div className="relative z-10"><QuickInsights data={insightsData} /></div>
+            {/* ══════════════════════════════════════════════════════════════
+                TAB: TRÁFICO
+            ══════════════════════════════════════════════════════════════ */}
+            {activeTab === "trafico" && (
+                <div className="relative z-10 space-y-5">
+                    {/* Devices + Sources */}
+                    <div className="grid gap-5 lg:grid-cols-3">
+                        <DarkCard code="DEV_STS">
+                            <SectionHeader icon={Monitor} label="Dispositivos" />
+                            <DeviceChart data={deviceData} />
+                        </DarkCard>
+                        <DarkCard className="lg:col-span-2" code="TRF_SRC">
+                            <SectionHeader icon={Globe} label="Fuentes de Tráfico" />
+                            <TrafficSources data={trafficSources} />
+                        </DarkCard>
+                    </div>
 
-            {/* Overview */}
-            <div className="relative z-10"><AnalyticsOverview /></div>
+                    {/* Geo Map */}
+                    <DarkCard code="GEO_MAP">
+                        <SectionHeader icon={MapPin} label="Distribución Geográfica" sub="Por país y región" />
+                        <GeoMap data={geoData} />
+                    </DarkCard>
 
-            {/* Period Comparison */}
-            <div className="relative z-10"><PeriodComparison /></div>
+                    {/* Top Pages */}
+                    <DarkCard code="TOP_PGS">
+                        <SectionHeader icon={Eye} label="Top Páginas Visitadas" sub="Últimos 30 días" />
+                        <TopPages data={topPagesData} />
+                    </DarkCard>
 
-            {/* Performance Score */}
-            <DarkCard code="PERF_SCR">
-                <SectionHeader icon={Gauge} label="Puntuación de Rendimiento" />
-                <PerformanceScore />
-            </DarkCard>
+                    {/* Session + Bounce + Browser/OS + Search */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="SESS_HG">
+                            <SectionHeader icon={Activity} label="Duración de Sesiones" />
+                            <SessionHistogram data={sessionDurationData} />
+                        </DarkCard>
+                        <DarkCard code="BNC_TRD">
+                            <SectionHeader icon={MousePointerClick} label="Tendencia de Rebote" />
+                            <BounceTrend />
+                        </DarkCard>
+                    </div>
 
-            {/* Main Charts */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="TRF_WK">
-                    <SectionHeader icon={TrendingUp} label="Tráfico Semanal" sub="Últimos 7 días" />
-                    <TrafficChart data={trafficData} />
-                </DarkCard>
-                <DarkCard code="SEO_PAG">
-                    <SectionHeader icon={BarChart3} label="SEO vs Pago" sub="Rendimiento por canal" />
-                    <SeoMetrics data={seoData} />
-                </DarkCard>
-            </div>
-
-            {/* Funnel & User Flow */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="FNN_CNV">
-                    <SectionHeader icon={Filter} label="Embudo de Conversión" />
-                    <FunnelChartComponent data={funnelData} />
-                </DarkCard>
-                <DarkCard code="USR_FLW">
-                    <SectionHeader icon={ArrowRight} label="User Flow" sub="Rutas de navegación" />
-                    <UserFlow data={funnelData} />
-                </DarkCard>
-            </div>
-
-            {/* Goals & Alerts */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="GOALS">
-                    <GoalsWidget data={goalsData as any} />
-                </DarkCard>
-                <DarkCard code="KPI_ALT">
-                    <KpiAlerts />
-                </DarkCard>
-            </div>
-
-            {/* Devices, Sources */}
-            <div className="grid gap-5 lg:grid-cols-3 relative z-10">
-                <DarkCard code="DEV_STS">
-                    <SectionHeader icon={Monitor} label="Dispositivos" />
-                    <DeviceChart data={deviceData} />
-                </DarkCard>
-                <DarkCard className="lg:col-span-2" code="TRF_SRC">
-                    <SectionHeader icon={Globe} label="Fuentes de Tráfico" />
-                    <TrafficSources data={trafficSources} />
-                </DarkCard>
-            </div>
-
-            {/* Session & Bounce */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="SESS_HG">
-                    <SessionHistogram data={sessionDurationData} />
-                </DarkCard>
-                <DarkCard code="BNC_TRD">
-                    <BounceTrend />
-                </DarkCard>
-            </div>
-
-            {/* Geo Map */}
-            <DarkCard code="GEO_MAP">
-                <SectionHeader icon={MapPin} label="Distribución Geográfica" sub="Por país y región" />
-                <GeoMap data={geoData} />
-            </DarkCard>
-
-            {/* Activity Heatmap */}
-            <DarkCard code="ACT_HMP">
-                <SectionHeader icon={Calendar} label="Actividad Anual" sub="Estilo GitHub" />
-                <ActivityHeatmap data={heatmapData} />
-            </DarkCard>
-
-            {/* Top Pages */}
-            <DarkCard code="TOP_PGS">
-                <div className="flex items-center justify-between mb-4">
-                    <SectionHeader icon={BarChart3} label="Top Páginas Visitadas" sub="Últimos 7 días" />
+                    <div className="grid gap-5 lg:grid-cols-3">
+                        <DarkCard code="SRCH_TM">
+                            <SectionHeader icon={Search} label="Términos de Búsqueda" />
+                            <SearchTermsCloud data={searchTermsData} />
+                        </DarkCard>
+                        <DarkCard code="BROW_OS">
+                            <SectionHeader icon={Monitor} label="Navegador / SO" />
+                            <BrowserOsStats data={browserOsData} />
+                        </DarkCard>
+                        <DarkCard code="ENG_RDR">
+                            <SectionHeader icon={Activity} label="Radar de Engagement" />
+                            <EngagementRadar data={engagementData} />
+                        </DarkCard>
+                    </div>
                 </div>
-                <TopPages data={topPagesData} />
-            </DarkCard>
+            )}
 
-            {/* Live Visitors & Page Speed */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="LIV_VIS">
-                    <LiveVisitorsMap initialCount={activeUsers} />
-                </DarkCard>
-                <DarkCard code="PG_SPDS">
-                    <PageSpeedMetrics data={pageSpeedData} />
-                </DarkCard>
-            </div>
+            {/* ══════════════════════════════════════════════════════════════
+                TAB: CONVERSIONES
+            ══════════════════════════════════════════════════════════════ */}
+            {activeTab === "conversiones" && (
+                <div className="relative z-10 space-y-5">
+                    {/* Goals + KPI Alerts */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="GOALS">
+                            <SectionHeader icon={Target} label="Objetivos y Metas" />
+                            <GoalsWidget data={goalsData as any} />
+                        </DarkCard>
+                        <DarkCard code="KPI_ALT">
+                            <SectionHeader icon={Zap} label="Alertas KPI" />
+                            <KpiAlerts />
+                        </DarkCard>
+                    </div>
 
-            {/* Revenue & Attribution */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="REV_TRK">
-                    <RevenueTracker data={revenueData} />
-                </DarkCard>
-                <DarkCard code="CHN_ATR">
-                    <ChannelAttribution data={attributionData} />
-                </DarkCard>
-            </div>
+                    {/* Revenue + Attribution */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="REV_TRK">
+                            <SectionHeader icon={DollarSign} label="Ingresos del CRM" sub="Deals ganados" />
+                            <RevenueTracker data={revenueData} />
+                        </DarkCard>
+                        <DarkCard code="CHN_ATR">
+                            <SectionHeader icon={Globe} label="Atribución por Canal" sub="Basado en Lead.source" />
+                            <ChannelAttribution data={attributionData} />
+                        </DarkCard>
+                    </div>
 
-            {/* A/B & Annotations */}
-            <div className="grid gap-5 lg:grid-cols-2 relative z-10">
-                <DarkCard code="AB_TEST">
-                    <ABTestResults />
-                </DarkCard>
-                <DarkCard code="ANNOT">
-                    <AnnotationsTimeline />
-                </DarkCard>
-            </div>
+                    {/* A/B Tests + Annotations */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="AB_TEST">
+                            <SectionHeader icon={FlaskConical} label="Pruebas A/B" />
+                            <ABTestResults />
+                        </DarkCard>
+                        <DarkCard code="ANNOT">
+                            <SectionHeader icon={Calendar} label="Anotaciones" />
+                            <AnnotationsTimeline />
+                        </DarkCard>
+                    </div>
+                </div>
+            )}
 
-            {/* Social */}
-            <DarkCard code="SOC_MET">
-                <SocialMediaMetrics data={socialMetricsData} />
-            </DarkCard>
+            {/* ══════════════════════════════════════════════════════════════
+                TAB: RENDIMIENTO
+            ══════════════════════════════════════════════════════════════ */}
+            {activeTab === "rendimiento" && (
+                <div className="relative z-10 space-y-5">
+                    {/* Performance score */}
+                    <DarkCard code="PERF_SCR">
+                        <SectionHeader icon={Gauge} label="Puntuación de Rendimiento" />
+                        <PerformanceScore />
+                    </DarkCard>
 
-            {/* Search, Browser, Engagement */}
-            <div className="grid gap-5 lg:grid-cols-3 relative z-10">
-                <DarkCard code="SRCH_TM">
-                    <SearchTermsCloud data={searchTermsData} />
-                </DarkCard>
-                <DarkCard code="BROW_OS">
-                    <BrowserOsStats data={browserOsData} />
-                </DarkCard>
-                <DarkCard code="ENG_RDR">
-                    <EngagementRadar data={engagementData} />
-                </DarkCard>
-            </div>
+                    {/* Live Visitors + Page Speed */}
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        <DarkCard code="LIV_VIS">
+                            <SectionHeader icon={Activity} label="Visitantes en Vivo" sub="Últimos 5 minutos" />
+                            <LiveVisitorsMap initialCount={activeUsers} />
+                        </DarkCard>
+                        <DarkCard code="PG_SPDS">
+                            <SectionHeader icon={Gauge} label="Velocidad de Página" sub="Core Web Vitals" />
+                            <PageSpeedMetrics data={pageSpeedData} />
+                        </DarkCard>
+                    </div>
+
+                    {/* Activity Heatmap */}
+                    <DarkCard code="ACT_HMP">
+                        <SectionHeader icon={Calendar} label="Actividad Anual" sub="Estilo GitHub — Últimos 365 días" />
+                        <ActivityHeatmap data={heatmapData} />
+                    </DarkCard>
+                </div>
+            )}
         </div>
     );
 }
