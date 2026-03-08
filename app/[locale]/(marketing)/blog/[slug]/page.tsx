@@ -141,38 +141,30 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 ]}
             />
 
-            <article className="relative min-h-screen bg-slate-950 text-white overflow-hidden">
-
-                {/* Dense Editorial Noise */}
-                <div className="bg-noise fixed inset-0 z-[49] pointer-events-none mix-blend-multiply opacity-[0.015]" />
-
-                {/* Global Spotlight Glow */}
-                <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[120%] h-[800px] bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.07)_0%,transparent_60%)] pointer-events-none -z-10" />
-                <div className="absolute top-[40%] right-[-5%] w-[500px] h-[500px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.05)_0%,transparent_70%)] pointer-events-none -z-10" />
-
+            <article className="min-h-screen bg-white dark:bg-gray-950">
                 {/* Reading Progress Bar - Fixed at top */}
-                <div className="fixed top-0 left-0 right-0 h-0.5 z-[51]">
+                <div className="fixed top-0 left-0 right-0 h-1 bg-gray-100 dark:bg-gray-800 z-50">
                     <div
                         id="reading-progress"
-                        className="h-full bg-gradient-to-r from-teal-400 via-sky-400 to-violet-500 transition-all duration-150"
+                        className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-150"
                         style={{ width: '0%' }}
                     />
                 </div>
 
                 {/* Hero Section */}
-                <div className="relative pt-24 pb-16">
+                <div className="relative pt-24 pb-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                         {/* Breadcrumb */}
-                        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-                            <Link href="/" className="hover:text-teal-400 transition-colors">Inicio</Link>
-                            <span className="text-slate-700">/</span>
-                            <Link href="/blog" className="hover:text-teal-400 transition-colors">Blog</Link>
+                        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                            <Link href="/" className="hover:text-gray-900 dark:hover:text-white transition-colors">Inicio</Link>
+                            <span>/</span>
+                            <Link href="/blog" className="hover:text-gray-900 dark:hover:text-white transition-colors">Blog</Link>
                             {post.categories?.[0] && (
                                 <>
-                                    <span className="text-slate-700">/</span>
+                                    <span>/</span>
                                     <Link
                                         href={`/blog?category=${post.categories[0].id}`}
-                                        className="hover:text-teal-400 transition-colors"
+                                        className="hover:text-gray-900 dark:hover:text-white transition-colors"
                                     >
                                         {post.categories[0].name}
                                     </Link>
@@ -181,7 +173,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         </nav>
 
                         <Link href="/blog">
-                            <Button variant="ghost" className="mb-8 -ml-4 pl-2 text-slate-400 hover:text-teal-400 hover:bg-slate-800/50 transition-colors">
+                            <Button variant="ghost" className="mb-8 -ml-4 pl-2 text-gray-500 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                 <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Blog
                             </Button>
                         </Link>
@@ -235,7 +227,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         {/* Article Content */}
                         <div className="order-2 lg:order-1">
                             {/* Share Buttons - Top */}
-                            <div className="mb-8 pb-6 border-b border-slate-800/60">
+                            <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
                                 <ShareButtons title={post.title} url={postUrl} />
                             </div>
 
@@ -244,14 +236,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                             {/* Tags */}
                             {post.tags && post.tags.length > 0 && (
-                                <div className="mt-12 pt-8 border-t border-slate-800/60">
+                                <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
                                     <div className="flex flex-wrap items-center gap-3">
-                                        <Tag className="h-4 w-4 text-slate-500" />
+                                        <Tag className="h-4 w-4 text-gray-500" />
                                         {post.tags.map((tag) => (
                                             <Link
                                                 key={tag.name}
                                                 href={`/blog?tag=${encodeURIComponent(tag.name)}`}
-                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm border border-slate-700 bg-slate-800/50 text-slate-300 hover:border-teal-500/40 hover:text-teal-400 transition-colors"
+                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                                             >
                                                 #{tag.name}
                                             </Link>
@@ -261,7 +253,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             )}
 
                             {/* Engagement Bar - Desktop */}
-                            <div className="hidden lg:block mt-8 pt-8 border-t border-slate-800/60">
+                            <div className="hidden lg:block mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
                                 <EngagementBar
                                     postId={post.id}
                                     postSlug={slug}
@@ -271,7 +263,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             </div>
 
                             {/* Share Buttons - Bottom */}
-                            <div className="mt-8 pt-8 border-t border-slate-800/60">
+                            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
                                 <ShareButtons title={post.title} url={postUrl} />
                             </div>
 
@@ -285,7 +277,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             </div>
 
                             {/* Comments Section */}
-                            <div className="mt-16 pt-12 border-t border-slate-800/60" id="comentarios">
+                            <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800" id="comentarios">
                                 <CommentSection
                                     postId={post.id}
                                     initialComments={comments.map((c: any) => ({
@@ -311,22 +303,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             <TableOfContents content={post.content} />
 
                             {/* Quick Stats */}
-                            <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/80 backdrop-blur-sm">
-                                {/* Teal top accent */}
-                                <div className="h-0.5 -mx-5 -mt-5 mb-5 rounded-t-xl bg-gradient-to-r from-teal-500 to-sky-500" />
-                                <h3 className="text-xs font-black uppercase tracking-widest mb-4 text-teal-400">
+                            <div className="p-5 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl text-white">
+                                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-300">
                                     Información
                                 </h3>
                                 <div className="space-y-3 text-sm">
                                     <div className="flex items-center gap-3">
-                                        <Clock className="h-4 w-4 text-slate-500" />
-                                        <span className="text-slate-400">Lectura</span>
-                                        <span className="ml-auto font-bold text-white font-mono">{readingTime} min</span>
+                                        <Clock className="h-4 w-4 text-gray-400" />
+                                        <span className="text-gray-300">Tiempo de lectura</span>
+                                        <span className="ml-auto font-medium">{readingTime} min</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="h-4 w-4 text-slate-500" />
-                                        <span className="text-slate-400">Publicado</span>
-                                        <span className="ml-auto font-bold text-white text-right">
+                                        <Calendar className="h-4 w-4 text-gray-400" />
+                                        <span className="text-gray-300">Publicado</span>
+                                        <span className="ml-auto font-medium">
                                             {new Date(post.createdAt).toLocaleDateString('es-ES', {
                                                 day: '2-digit',
                                                 month: 'short',
@@ -343,7 +333,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             {/* RSS Feed Link */}
                             <Link
                                 href="/rss"
-                                className="flex items-center gap-2 p-4 rounded-xl border border-teal-500/20 bg-teal-500/5 text-teal-400 hover:bg-teal-500/10 hover:border-teal-500/40 transition-colors"
+                                className="flex items-center gap-2 p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-950/50 transition-colors"
                                 target="_blank"
                             >
                                 <Rss className="h-5 w-5" />
@@ -355,7 +345,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                 {/* Related Posts Section */}
                 {relatedPosts.length > 0 && (
-                    <section className="py-16 border-t border-slate-800/60 bg-slate-900/30">
+                    <section className="bg-gray-50 dark:bg-gray-900 py-16 border-t border-gray-200 dark:border-gray-800">
                         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                             <RelatedPosts posts={relatedPosts} />
                         </div>
