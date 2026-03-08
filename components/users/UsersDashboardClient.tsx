@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { UserRole } from "@/types/auth";
 import { RoleSelector } from "@/components/dashboard/RoleSelector";
-import { toggleUserStatus, bulkDeleteUsers, bulkToggleUsersStatus } from "@/actions/admin";
+import { toggleUserStatus, bulkDeleteUsers, bulkToggleUsersStatus, deleteUser } from "@/actions/admin";
 import { toast } from "sonner";
 import {
     Crown, Shield, Megaphone, ShoppingBag, Palette, Users, UserPlus,
@@ -58,6 +58,8 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
     const [showMetrics, setShowMetrics] = useState(true);
     const [selectedUserForDrawer, setSelectedUserForDrawer] = useState<UserRecord | null>(null);
     const [contextMenu, setContextMenu] = useState<{ x: number; y: number; userId: string } | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ userId: string; userName: string } | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const dynamicRoleInfo = useMemo(() => {
         const map: Record<string, typeof ROLE_INFO[string]> = { ...ROLE_INFO };
@@ -122,6 +124,30 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
             toast.error(res.error || "Algo falló.");
             setUsers(prev => prev.map(u => u.id === userId ? { ...u, deactivatedAt: originalStatus ?? null } : u));
         }
+    };
+
+    const handleDeleteUser = async () => {
+        if (!deleteConfirm) return;
+        setIsDeleting(true);
+        // Optimistic: remove from local list
+        setUsers(prev => prev.filter(u => u.id !== deleteConfirm.userId));
+        const res = await deleteUser(deleteConfirm.userId);
+        setIsDeleting(false);
+        setDeleteConfirm(null);
+        if ('success' in res) {
+            toast.success(`Usuario '${deleteConfirm.userName}' eliminado del sistema.`);
+        } else {
+            toast.error(('error' in res ? res.error : null) || "Error al eliminar el usuario.");
+            // Revert on failure — reload users
+            window.location.reload();
+        }
+    };
+
+    const confirmDelete = (userId: string, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        const user = users.find(u => u.id === userId);
+        if (!user) return;
+        setDeleteConfirm({ userId, userName: user.name || user.email || userId });
     };
 
     const handleDrawerUpdate = (userId: string, data: Partial<UserRecord>) => {
@@ -337,16 +363,28 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
 
                                             {/* Actions */}
                                             <td className="py-4 px-5 text-right" onClick={(e) => e.stopPropagation()}>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id); }}
-                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] font-bold tracking-widest uppercase rounded-sm transition-all ${isDeactivated ? 'text-red-400' : 'text-slate-500 hover:text-amber-400'}`}
-                                                    style={isDeactivated
-                                                        ? { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }
-                                                        : { background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}
-                                                    disabled={isSelf}
-                                                >
-                                                    {isDeactivated ? <><EyeOff size={10} /> Suspendido</> : 'Suspender'}
-                                                </button>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id); }}
+                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] font-bold tracking-widest uppercase rounded-sm transition-all ${isDeactivated ? 'text-red-400' : 'text-slate-500 hover:text-amber-400'}`}
+                                                        style={isDeactivated
+                                                            ? { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }
+                                                            : { background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}
+                                                        disabled={isSelf}
+                                                    >
+                                                        {isDeactivated ? <><EyeOff size={10} /> Suspendido</> : 'Suspender'}
+                                                    </button>
+                                                    {/* Delete button — solo visible en hover, protege cuenta propia */}
+                                                    {!isSelf && (
+                                                        <button
+                                                            onClick={(e) => confirmDelete(user.id, e)}
+                                                            className="opacity-0 group-hover:opacity-100 flex items-center justify-center w-8 h-8 rounded-sm text-slate-700 hover:text-red-400 transition-all"
+                                                            style={{ border: '1px solid rgba(30,41,59,0.6)' }}
+                                                            title="Eliminar usuario">
+                                                            <Trash size={12} />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -425,9 +463,73 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
                         className="w-full text-left px-3 py-2 font-mono text-[10px] text-amber-400/70 hover:text-amber-400 rounded-sm transition-colors hover:bg-amber-950/20">
                         Alterar Estado
                     </button>
-                    <button className="w-full text-left px-3 py-2 font-mono text-[10px] text-red-400/70 hover:text-red-400 rounded-sm transition-colors hover:bg-red-950/20">
+                    <button
+                        onClick={() => { confirmDelete(contextMenu.userId); setContextMenu(null); }}
+                        className="w-full text-left px-3 py-2 font-mono text-[10px] text-red-400/70 hover:text-red-400 rounded-sm transition-colors hover:bg-red-950/20">
                         Eliminar del Hub
                     </button>
+                </div>
+            )}
+
+            {/* ── DELETE CONFIRMATION MODAL ───────────────────────── */}
+            {deleteConfirm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+                    style={{ background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(4px)' }}
+                    onClick={() => !isDeleting && setDeleteConfirm(null)}>
+                    <div className="relative w-full max-w-sm p-6 overflow-hidden"
+                        style={{ background: 'rgba(15,23,42,0.97)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.15rem' }}
+                        onClick={e => e.stopPropagation()}>
+                        {/* Red top line */}
+                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+
+                        <div className="flex items-start gap-4 mb-6">
+                            <div className="w-11 h-11 shrink-0 flex items-center justify-center rounded-sm"
+                                style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                                <UserX className="w-5 h-5 text-red-400" />
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="font-black text-[15px] text-slate-100">Eliminar Usuario</h3>
+                                    <span className="font-mono text-[8px] font-bold uppercase tracking-widest text-red-400 px-1.5 py-0.5"
+                                        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.15rem' }}>
+                                        IRREVERSIBLE
+                                    </span>
+                                </div>
+                                <p className="font-mono text-[9px] text-slate-500 uppercase tracking-widest">Acción permanente · Sin recuperación</p>
+                            </div>
+                        </div>
+
+                        <div className="mb-6 p-3 rounded-sm"
+                            style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                            <p className="text-[12px] text-slate-300 mb-1">
+                                ¿Estás seguro de eliminar a <span className="font-black text-slate-100">{deleteConfirm.userName}</span>?
+                            </p>
+                            <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">
+                                Se eliminarán todos sus datos, sesiones y registros de actividad.
+                            </p>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteConfirm(null)}
+                                disabled={isDeleting}
+                                className="flex-1 py-2.5 font-mono text-[9px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors rounded-sm disabled:opacity-40"
+                                style={{ border: '1px solid rgba(30,41,59,0.8)' }}>
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleDeleteUser}
+                                disabled={isDeleting}
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 font-mono text-[9px] font-bold uppercase tracking-widest text-red-400 hover:text-red-300 transition-all rounded-sm disabled:opacity-40"
+                                style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)' }}>
+                                {isDeleting ? (
+                                    <><span className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin" /> Eliminando...</>
+                                ) : (
+                                    <><Trash size={11} /> Eliminar definitivamente</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
