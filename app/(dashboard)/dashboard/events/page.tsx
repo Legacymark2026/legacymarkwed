@@ -22,7 +22,7 @@ export default async function EventsPage() {
     const initialEvents = eventsRes.success ? eventsRes.events : [];
 
     return (
-        <div className="flex-1 h-[calc(100vh-64px)] overflow-hidden flex flex-col bg-slate-50/50">
+        <div className="flex-1 h-[calc(100vh-64px)] overflow-hidden flex flex-col" style={{ background: '#0B0F19' }}>
             <Suspense fallback={
                 <div className="flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-teal-500" />

@@ -35,7 +35,6 @@ export function EventsClient({ initialEvents }: { initialEvents: any[] }) {
         setIsDrawerOpen(false);
     };
 
-    // Derived Statistics
     const stats = useMemo(() => {
         const upcoming = events.filter(e => new Date(e.startDate) >= new Date()).length;
         const online = events.filter(e => e.type === 'ONLINE').length;
@@ -44,34 +43,74 @@ export function EventsClient({ initialEvents }: { initialEvents: any[] }) {
     }, [events]);
 
     return (
-        <div className="flex-1 flex flex-col h-full relative bg-slate-50/50">
-            {/* Header & Actions */}
-            <div className="flex-none bg-white border-b border-slate-200 px-8 py-5 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex-1 flex flex-col h-full relative" style={{ background: '#0B0F19' }}>
+            {/* Ambient glow */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-0 left-1/4 w-96 h-64 bg-teal-500/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 right-1/4 w-80 h-48 bg-blue-500/5 rounded-full blur-3xl" />
+            </div>
+
+            {/* ── Header ── */}
+            <div
+                className="flex-none px-8 py-5 flex items-center justify-between sticky top-0 z-20"
+                style={{
+                    background: 'rgba(11,15,25,0.95)',
+                    backdropFilter: 'blur(20px)',
+                    borderBottom: '1px solid rgba(30,41,59,0.7)',
+                }}
+            >
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                        <CalendarIcon className="w-6 h-6 text-white" />
+                    {/* Teal icon box */}
+                    <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'rgba(13,148,136,0.15)', border: '1px solid rgba(13,148,136,0.35)' }}
+                    >
+                        <CalendarIcon className="w-5 h-5 text-teal-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Calendario de Eventos</h1>
-                        <p className="text-sm text-slate-500 font-medium">Gestión integral de citas, ferias y reuniones híbridas</p>
+                        <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-mono text-[9px] text-teal-500/70 uppercase tracking-widest">CAL_MOD · EVENTOS</span>
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-60" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                            </span>
+                        </div>
+                        <h1 className="text-xl font-black text-slate-100 tracking-tight">Calendario de Eventos</h1>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">Gestión integral de citas, ferias y reuniones híbridas</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     <EventFilters filters={filters} onChange={setFilters} />
 
-                    <div className="w-px h-8 bg-slate-200 mx-2" />
+                    <div className="w-px h-7 mx-1" style={{ background: 'rgba(30,41,59,0.8)' }} />
 
-                    <button className="p-2.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors tooltip-trigger" title="Exportar a ICS">
+                    <button
+                        className="p-2.5 rounded-xl transition-all"
+                        style={{ color: 'rgba(148,163,184,0.6)' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,41,59,0.6)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        title="Exportar a ICS"
+                    >
                         <Download className="w-4 h-4" />
                     </button>
-                    <button className="p-2.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors tooltip-trigger" title="Imprimir Visualización">
+                    <button
+                        className="p-2.5 rounded-xl transition-all"
+                        style={{ color: 'rgba(148,163,184,0.6)' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,41,59,0.6)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        title="Imprimir"
+                    >
                         <Printer className="w-4 h-4" />
                     </button>
 
                     <button
                         onClick={() => handleOpenDrawer()}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-all hover:-translate-y-0.5 ml-2"
+                        className="flex items-center gap-2 px-5 py-2.5 font-bold text-sm text-white rounded-xl shadow-lg transition-all hover:-translate-y-0.5 ml-1"
+                        style={{
+                            background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                            boxShadow: '0 4px 20px rgba(13,148,136,0.3)',
+                        }}
                     >
                         <Plus className="w-4 h-4" />
                         Nuevo Evento
@@ -79,57 +118,83 @@ export function EventsClient({ initialEvents }: { initialEvents: any[] }) {
                 </div>
             </div>
 
-            {/* Quick Stats Row */}
-            <div className="flex-none px-8 py-4 border-b border-slate-200 bg-white/40 flex items-center gap-4 overflow-x-auto">
-                <StatCard icon={CalendarIcon} label="Total Eventos" value={stats.total} color="bg-slate-100 text-slate-700" ring="ring-slate-200" />
-                <StatCard icon={Users} label="Próximos" value={stats.upcoming} color="bg-emerald-100 text-emerald-700" ring="ring-emerald-200" />
-                <StatCard icon={Video} label="Eventos Online" value={stats.online} color="bg-blue-100 text-blue-700" ring="ring-blue-200" />
-                <StatCard icon={MapPin} label="Presenciales" value={stats.physical} color="bg-orange-100 text-orange-700" ring="ring-orange-200" />
+            {/* ── KPI Stats Bar ── */}
+            <div
+                className="flex-none px-8 py-3 flex items-center gap-3 overflow-x-auto"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.6)', background: 'rgba(15,20,35,0.6)' }}
+            >
+                <StatCard icon={CalendarIcon} label="Total Eventos" value={stats.total} accent="teal" />
+                <StatCard icon={Users} label="Próximos" value={stats.upcoming} accent="emerald" />
+                <StatCard icon={Video} label="Online" value={stats.online} accent="blue" />
+                <StatCard icon={MapPin} label="Presenciales" value={stats.physical} accent="amber" />
             </div>
 
-            {/* Main Content Area */}
+            {/* ── Main Content ── */}
             <div className="flex-1 overflow-hidden flex relative">
 
                 {/* Mini Calendar Sidebar */}
-                <div className="hidden lg:flex w-80 border-r border-slate-200 bg-white/60 flex-col overflow-hidden">
-                    <div className="p-5 border-b border-slate-100">
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-3 flex justify-center">
+                <div
+                    className="hidden lg:flex w-72 flex-col overflow-hidden"
+                    style={{ borderRight: '1px solid rgba(30,41,59,0.6)', background: 'rgba(11,15,25,0.8)' }}
+                >
+                    {/* Mini calendar */}
+                    <div className="p-4" style={{ borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
+                        <div
+                            className="rounded-xl overflow-hidden p-2"
+                            style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(30,41,59,0.8)' }}
+                        >
                             <Calendar
                                 mode="single"
                                 selected={selectedDate}
-                                onSelect={(date) => {
-                                    if (date) setSelectedDate(date);
-                                }}
-                                className="w-full max-w-[260px]"
+                                onSelect={(date) => { if (date) setSelectedDate(date); }}
+                                className="w-full"
                             />
                         </div>
                     </div>
 
-                    <div className="p-5 flex-1 overflow-y-auto">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Próximos (Esta Semana)</h3>
-                            <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">{stats.upcoming}</span>
+                    {/* Upcoming events list */}
+                    <div className="p-4 flex-1 overflow-y-auto">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-mono text-[9px] text-slate-500 uppercase tracking-widest">Próximos (Esta Semana)</h3>
+                            <span
+                                className="font-mono text-[9px] text-teal-400 px-2 py-0.5 rounded-full"
+                                style={{ background: 'rgba(13,148,136,0.15)', border: '1px solid rgba(13,148,136,0.3)' }}
+                            >
+                                {stats.upcoming}
+                            </span>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             {events
                                 .filter(e => new Date(e.startDate) >= new Date() && new Date(e.startDate) <= new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))
                                 .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
                                 .slice(0, 5)
                                 .map(e => (
-                                    <div key={e.id} onClick={() => handleOpenDrawer(e.id)} className="group p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all">
-                                        <div className="flex items-center gap-2 mb-1.5">
-                                            <span className={`w-2 h-2 rounded-full ${e.type === 'ONLINE' ? 'bg-blue-500' : e.type === 'PHYSICAL' ? 'bg-orange-500' : 'bg-purple-500'}`} />
-                                            <span className="text-[10px] font-bold text-slate-400 capitalize">{new Date(e.startDate).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                                    <div
+                                        key={e.id}
+                                        onClick={() => handleOpenDrawer(e.id)}
+                                        className="group p-3 rounded-xl cursor-pointer transition-all"
+                                        style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(30,41,59,0.7)' }}
+                                        onMouseEnter={ev => { ev.currentTarget.style.borderColor = 'rgba(13,148,136,0.4)'; ev.currentTarget.style.background = 'rgba(13,148,136,0.06)'; }}
+                                        onMouseLeave={ev => { ev.currentTarget.style.borderColor = 'rgba(30,41,59,0.7)'; ev.currentTarget.style.background = 'rgba(15,23,42,0.5)'; }}
+                                    >
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${e.type === 'ONLINE' ? 'bg-blue-400' : e.type === 'PHYSICAL' ? 'bg-amber-400' : 'bg-purple-400'}`} />
+                                            <span className="font-mono text-[9px] text-slate-500 uppercase">
+                                                {new Date(e.startDate).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                            </span>
                                         </div>
-                                        <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-2">{e.title}</p>
+                                        <p className="text-xs font-bold text-slate-300 group-hover:text-teal-400 transition-colors line-clamp-2">{e.title}</p>
                                     </div>
                                 ))
                             }
                             {stats.upcoming === 0 && (
-                                <div className="text-center p-6 border-2 border-dashed border-slate-200 rounded-2xl">
-                                    <CalendarIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                                    <p className="text-sm text-slate-500 font-medium">No hay eventos próximos esta semana.</p>
+                                <div
+                                    className="text-center p-6 rounded-xl"
+                                    style={{ border: '1px dashed rgba(30,41,59,0.7)' }}
+                                >
+                                    <CalendarIcon className="w-7 h-7 text-slate-700 mx-auto mb-2" />
+                                    <p className="font-mono text-[9px] text-slate-600 uppercase tracking-wide">No hay eventos próximos esta semana.</p>
                                 </div>
                             )}
                         </div>
@@ -188,15 +253,27 @@ export function EventsClient({ initialEvents }: { initialEvents: any[] }) {
     );
 }
 
-function StatCard({ icon: Icon, label, value, color, ring }: { icon: any, label: string, value: number, color: string, ring: string }) {
+// ── KPI Stat Card ──────────────────────────────────────────────────────────
+const ACCENT_MAP: Record<string, { bg: string; border: string; text: string; icon: string }> = {
+    teal: { bg: 'rgba(13,148,136,0.12)', border: 'rgba(13,148,136,0.3)', text: '#99f6e4', icon: 'rgba(13,148,136,0.25)' },
+    emerald: { bg: 'rgba(16,185,129,0.10)', border: 'rgba(16,185,129,0.25)', text: '#6ee7b7', icon: 'rgba(16,185,129,0.2)' },
+    blue: { bg: 'rgba(59,130,246,0.10)', border: 'rgba(59,130,246,0.25)', text: '#93c5fd', icon: 'rgba(59,130,246,0.2)' },
+    amber: { bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.25)', text: '#fcd34d', icon: 'rgba(245,158,11,0.2)' },
+};
+
+function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: string; value: number; accent: string }) {
+    const a = ACCENT_MAP[accent] || ACCENT_MAP.teal;
     return (
-        <div className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white border border-slate-100 shadow-sm ring-1 ring-inset ${ring} min-w-[160px]`}>
-            <div className={`p-2 rounded-xl scale-90 ${color}`}>
-                <Icon className="w-4 h-4" />
+        <div
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl min-w-[155px]"
+            style={{ background: a.bg, border: `1px solid ${a.border}` }}
+        >
+            <div className="p-2 rounded-lg flex-shrink-0" style={{ background: a.icon }}>
+                <Icon className="w-4 h-4" style={{ color: a.text }} />
             </div>
             <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">{label}</p>
-                <p className="text-lg font-black text-slate-800 leading-none mt-0.5">{value}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest" style={{ color: 'rgba(148,163,184,0.6)' }}>{label}</p>
+                <p className="text-lg font-black mt-0.5" style={{ color: a.text }}>{value}</p>
             </div>
         </div>
     );
