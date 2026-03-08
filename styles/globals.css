@@ -82,6 +82,10 @@
   --ds-shadow-card: 0 20px 50px -12px rgba(0, 0, 0, 0.6);
   --ds-shadow-teal: 0 20px 50px -12px rgba(13, 148, 136, 0.15);
   --ds-glow-teal: 0 0 60px -15px rgba(13, 148, 136, 0.4);
+
+  /* Sidebar tokens */
+  --ds-sidebar-bg: #010409;
+  --ds-sidebar-border: rgba(30, 41, 59, 0.6);
 }
 
 /* ── GLOBAL ──────────────────────────────────────────────────────────────── */
@@ -456,10 +460,6 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-
-  /* Sidebar token */
-  --ds-sidebar-bg: #010409;
-  --ds-sidebar-border: rgba(30, 41, 59, 0.6);
 }
 
 /* ── KEYFRAMES ─────────────────────────────────────────────────────────── */
