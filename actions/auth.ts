@@ -46,15 +46,17 @@ export async function registerUser(formData: z.infer<typeof registerSchema>) {
                 firstName,
                 lastName,
                 name: `${firstName} ${lastName}`,
-                role: UserRole.CLIENT_USER, // Default role
+                // GUEST = sin acceso — el SuperAdmin debe asignar un rol para activar
+                role: UserRole.GUEST,
             },
         });
 
-        return { success: "Usuario creado exitosamente" };
+        return { success: "Cuenta creada. El administrador te otorgará acceso pronto." };
     } catch (error) {
         console.error("Registration error:", error);
         return { error: "Error al crear el usuario" };
     }
+
 }
 
 export async function loginUser(prevState: string | undefined, formData: FormData) {

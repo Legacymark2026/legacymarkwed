@@ -1,11 +1,16 @@
 import type { NextAuthConfig } from "next-auth";
 import type { UserRole } from '@/types/auth';
 import { canAccessRoute, isPublicRoute } from "@/lib/rbac";
+import { NextResponse } from "next/server";
 
 /**
  * Auth configuration for NextAuth.js
- * El callback `authorized` actúa como segunda capa de RBAC (después del middleware),
- * ambas usan la misma matriz de rbac.ts para consistencia.
+ * El callback `authorized` actúa como segunda capa de RBAC (después del middleware).
+ * RBAC rules:
+ *   - Rutas públicas → always OK
+ *   - No autenticado → redirige a login
+ *   - GUEST (usuario nuevo sin rol asignado) → redirige a /auth/pending-approval
+ *   - Cualquier otro rol → verifica canAccessRoute() contra rbac.ts
  */
 export const authConfig: NextAuthConfig = {
     pages: {
@@ -47,12 +52,22 @@ export const authConfig: NextAuthConfig = {
             // Rutas públicas → siempre OK
             if (isPublicRoute(pathname)) return true;
 
+            // Página de espera → accesible si está logueado (GUEST puede verla)
+            if (pathname.startsWith('/auth/pending-approval')) return isLoggedIn;
+
             // No autenticado → redirect a login
             if (!isLoggedIn) return false;
 
-            // Verificar rol para rutas de dashboard/admin
+            // Protección de rutas del dashboard
             if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
                 const role = (auth?.user?.role as UserRole) || 'guest';
+
+                // GUEST → redirige a pending-approval (NO al login, para UX clara)
+                if (role === 'guest') {
+                    const pendingUrl = new URL('/auth/pending-approval', nextUrl.origin);
+                    return NextResponse.redirect(pendingUrl);
+                }
+
                 return canAccessRoute(pathname, role);
             }
 
