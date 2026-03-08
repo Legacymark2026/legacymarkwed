@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
     Crown, Shield, Megaphone, ShoppingBag, Palette, Users, UserPlus,
     Search, Download, Trash, UserX, Inbox, LayoutGrid, List, SlidersHorizontal,
-    MoreVertical, Star, EyeOff, Briefcase
+    MoreVertical, Star, EyeOff, Briefcase, Lock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,13 +36,14 @@ interface UsersClientProps {
     customRoles?: any[];
 }
 
-const ROLE_INFO: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-    super_admin: { icon: <Crown size={12} />, label: "SuperAdmin", color: "bg-red-50 text-red-700 border-red-200" },
-    admin: { icon: <Shield size={12} />, label: "ProjectManager", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-    content_manager: { icon: <Megaphone size={12} />, label: "Marketing / SEO", color: "bg-teal-50 text-teal-700 border-teal-200" },
-    client_admin: { icon: <ShoppingBag size={12} />, label: "Ventas", color: "bg-amber-50 text-amber-700 border-amber-200" },
-    client_user: { icon: <Palette size={12} />, label: "Creativo", color: "bg-purple-50 text-purple-700 border-purple-200" },
-    guest: { icon: <Users size={12} />, label: "Invitado", color: "bg-gray-50 text-gray-500 border-gray-200" },
+// Dark-themed role colors — all using opacity-based tinting for consistency
+const ROLE_INFO: Record<string, { icon: React.ReactNode; label: string; colorClass: string; dotColor: string }> = {
+    super_admin: { icon: <Crown size={11} />, label: "SuperAdmin", colorClass: "text-red-400 border-red-900/50 bg-red-950/30", dotColor: "bg-red-500" },
+    admin: { icon: <Shield size={11} />, label: "ProjectManager", colorClass: "text-indigo-400 border-indigo-900/50 bg-indigo-950/30", dotColor: "bg-indigo-500" },
+    content_manager: { icon: <Megaphone size={11} />, label: "Marketing / SEO", colorClass: "text-teal-400 border-teal-900/50 bg-teal-950/30", dotColor: "bg-teal-500" },
+    client_admin: { icon: <ShoppingBag size={11} />, label: "Ventas", colorClass: "text-amber-400 border-amber-900/50 bg-amber-950/30", dotColor: "bg-amber-500" },
+    client_user: { icon: <Palette size={11} />, label: "Creativo", colorClass: "text-purple-400 border-purple-900/50 bg-purple-950/30", dotColor: "bg-purple-500" },
+    guest: { icon: <Users size={11} />, label: "Sin Rol", colorClass: "text-slate-500 border-slate-800 bg-slate-900/50", dotColor: "bg-slate-600" },
 };
 
 export function UsersDashboardClient({ initialUsers, currentUserId, customRoles = [] }: UsersClientProps) {
@@ -53,22 +54,20 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [starredIds, setStarredIds] = useState<Set<string>>(new Set());
     const [isClient, setIsClient] = useState(false);
-
-    // View States
     const [viewMode, setViewMode] = useState<"table" | "grid">("table");
     const [showMetrics, setShowMetrics] = useState(true);
     const [selectedUserForDrawer, setSelectedUserForDrawer] = useState<UserRecord | null>(null);
-    const [contextMenu, setContextMenu] = useState<{ x: number, y: number, userId: string } | null>(null);
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number; userId: string } | null>(null);
 
     const dynamicRoleInfo = useMemo(() => {
-        const map: Record<string, { icon: React.ReactNode; label: string; color: string }> = { ...ROLE_INFO };
+        const map: Record<string, typeof ROLE_INFO[string]> = { ...ROLE_INFO };
         if (customRoles.length > 0) {
             customRoles.forEach(role => {
-                const c = role.color || "slate";
                 map[role.id] = {
-                    icon: <Briefcase size={12} />,
+                    icon: <Briefcase size={11} />,
                     label: role.name,
-                    color: `bg-${c}-50 text-${c}-700 border-${c}-200`,
+                    colorClass: "text-sky-400 border-sky-900/50 bg-sky-950/30",
+                    dotColor: "bg-sky-500",
                 };
             });
         }
@@ -99,14 +98,11 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
             const matchesRole = roleFilter === "all" || user.role === roleFilter;
             return matchesSearch && matchesRole;
         });
-
-        // Sort starred first
         result.sort((a, b) => {
             if (starredIds.has(a.id) && !starredIds.has(b.id)) return -1;
             if (!starredIds.has(a.id) && starredIds.has(b.id)) return 1;
             return 0;
         });
-
         return result;
     }, [users, searchQuery, roleFilter, starredIds]);
 
@@ -145,18 +141,7 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
         setStarredIds(next);
     };
 
-    const generateAvatarColor = (name: string | null) => {
-        if (!name) return "from-gray-100 to-gray-200 border-gray-300 text-gray-500";
-        const charCode = name.charCodeAt(0);
-        const palettes = [
-            "from-indigo-100 to-purple-100 border-indigo-200 text-indigo-700",
-            "from-emerald-100 to-teal-100 border-emerald-200 text-emerald-700",
-            "from-amber-100 to-orange-100 border-amber-200 text-amber-700",
-            "from-rose-100 to-pink-100 border-rose-200 text-rose-700",
-            "from-blue-100 to-cyan-100 border-blue-200 text-blue-700"
-        ];
-        return palettes[charCode % palettes.length];
-    };
+    const getInitials = (name: string | null) => name?.[0]?.toUpperCase() ?? "U";
 
     const getRelativeDate = (date: Date) => {
         const rtf = new Intl.RelativeTimeFormat('es-CO', { numeric: 'auto' });
@@ -168,151 +153,199 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
     };
 
     return (
-        <div className={`space-y-6 transition-opacity duration-500 pb-20 ${!isClient ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 animate-in fade-in zoom-in-95'}`}>
-            {!isClient && <Skeleton className="w-full h-[600px] rounded-2xl mb-8" />}
-            {/* HERO HEADER */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 rounded-2xl p-8 text-white shadow-xl">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 text-indigo-500/10">
-                    <Users size={300} />
+        <div className={`ds-page space-y-6 transition-opacity duration-500 pb-20 ${!isClient ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 animate-in fade-in zoom-in-95'}`}>
+            {/* Grid overlay */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.025] pointer-events-none mix-blend-screen" />
+
+            {!isClient && <Skeleton className="w-full h-[600px] rounded-sm mb-8" style={{ background: 'rgba(15,23,42,0.5)' }} />}
+
+            {/* ── HEADER ───────────────────────────────────────────── */}
+            <div className="relative z-10 flex items-start justify-between gap-4 pb-8"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
+                <div>
+                    <div className="mb-4">
+                        <span className="ds-badge ds-badge-teal">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                            </span>
+                            IAM_CTRL · DIRECTORIO
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="ds-icon-box w-12 h-12">
+                            <Users className="w-5 h-5 text-teal-400" />
+                        </div>
+                        <div>
+                            <h1 className="ds-heading-page">Directorio IAM</h1>
+                            <p className="ds-subtext mt-2">Control de identidades · Accesos · Métricas operativas</p>
+                        </div>
+                    </div>
                 </div>
-                <div className="relative z-10 flex justify-between items-start">
-                    <div>
-                        <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
-                            <span className="text-indigo-400">♦</span> Directorio IAM
-                        </h1>
-                        <p className="mt-2 text-indigo-100/80 max-w-xl text-sm leading-relaxed">
-                            Control de identidades, accesos y métricas operativas de la organización.
-                        </p>
-                    </div>
-                    <div className="flex gap-3">
-                        <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center gap-2 backdrop-blur-md">
-                            <Download size={16} /> Exportar IAM
-                        </button>
-                        <button className="bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all flex items-center gap-2">
-                            <UserPlus size={16} /> Invitar Miembro
-                        </button>
-                    </div>
+                <div className="flex gap-3 shrink-0">
+                    <button className="flex items-center gap-2 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-teal-400 rounded-sm transition-all"
+                        style={{ background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}>
+                        <Download size={12} /> Exportar IAM
+                    </button>
+                    <button className="flex items-center gap-2 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-white rounded-sm transition-all hover:-translate-y-0.5"
+                        style={{ background: 'rgba(13,148,136,0.2)', border: '1px solid rgba(13,148,136,0.5)' }}>
+                        <UserPlus size={12} /> Invitar Miembro
+                    </button>
                 </div>
             </div>
 
-            {/* TOOLBAR AVANZADO */}
-            <div className="bg-white rounded-2xl border border-slate-200 outline outline-4 outline-slate-50/50 shadow-sm p-4 flex flex-col xl:flex-row gap-4 justify-between items-center sticky top-4 z-30">
+            {/* ── TOOLBAR ──────────────────────────────────────────── */}
+            <div className="relative z-30 ds-section flex flex-col xl:flex-row gap-4 justify-between items-center sticky top-4">
+                {/* Search */}
                 <div className="flex w-full xl:w-auto items-center gap-2 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 w-3.5 h-3.5" />
                     <input
                         id="user-search-input"
                         type="text"
                         placeholder="Buscar identidad (Cmd+K)..."
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        className="bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-14 py-2 text-sm w-full xl:w-80 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                        className="pl-9 pr-14 py-2 font-mono text-[11px] text-slate-200 placeholder:text-slate-700 rounded-sm transition-all focus:outline-none w-full xl:w-80"
+                        style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}
                     />
                     <AnimatePresence>
                         {isTyping && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute right-12 top-1/2 -translate-y-1/2 flex gap-1">
-                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
-                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-                                <span className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="absolute right-12 top-1/2 -translate-y-1/2 flex gap-1">
+                                <span className="w-1 h-1 bg-teal-500 rounded-full animate-bounce" />
+                                <span className="w-1 h-1 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                                <span className="w-1 h-1 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
-                <div className="flex w-full xl:w-auto items-center gap-3 overflow-x-auto pb-1 xl:pb-0 hide-scrollbar">
-                    <div className="flex gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
-                        <button onClick={() => setRoleFilter('all')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${roleFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Todos</button>
+                {/* Role filter pills */}
+                <div className="flex w-full xl:w-auto items-center gap-3 overflow-x-auto pb-1 xl:pb-0">
+                    <div className="flex gap-1 p-1 rounded-sm" style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}>
+                        <button onClick={() => setRoleFilter('all')}
+                            className={`px-3 py-1.5 font-mono text-[9px] font-bold uppercase tracking-wider rounded-sm transition-all ${roleFilter === 'all' ? 'text-teal-400' : 'text-slate-600 hover:text-slate-400'}`}
+                            style={roleFilter === 'all' ? { background: 'rgba(13,148,136,0.15)', border: '1px solid rgba(13,148,136,0.3)' } : {}}>
+                            Todos
+                        </button>
                         {Object.entries(dynamicRoleInfo).filter(([k]) => k !== 'guest').map(([k, info]) => (
-                            <button key={k} onClick={() => setRoleFilter(k)} className={`px-3 py-1.5 flex items-center gap-1.5 text-xs font-bold rounded-lg transition-all ${roleFilter === k ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
+                            <button key={k} onClick={() => setRoleFilter(k)}
+                                className={`px-3 py-1.5 flex items-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-wider rounded-sm transition-all ${roleFilter === k ? 'text-teal-400' : 'text-slate-600 hover:text-slate-400'}`}
+                                style={roleFilter === k ? { background: 'rgba(13,148,136,0.15)', border: '1px solid rgba(13,148,136,0.3)' } : {}}>
                                 {info.icon} <span className="hidden sm:inline">{info.label}</span>
                             </button>
                         ))}
                     </div>
 
-                    <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+                    <div className="h-5 w-px hidden sm:block" style={{ background: 'rgba(30,41,59,0.8)' }} />
 
-                    <div className="flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
-                        <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><List size={16} /></button>
-                        <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid size={16} /></button>
+                    {/* View mode toggle */}
+                    <div className="flex gap-1 p-1 rounded-sm" style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}>
+                        <button onClick={() => setViewMode('table')}
+                            className={`p-1.5 rounded-sm transition-colors ${viewMode === 'table' ? 'text-teal-400' : 'text-slate-600 hover:text-slate-400'}`}
+                            style={viewMode === 'table' ? { background: 'rgba(13,148,136,0.15)' } : {}}>
+                            <List size={14} />
+                        </button>
+                        <button onClick={() => setViewMode('grid')}
+                            className={`p-1.5 rounded-sm transition-colors ${viewMode === 'grid' ? 'text-teal-400' : 'text-slate-600 hover:text-slate-400'}`}
+                            style={viewMode === 'grid' ? { background: 'rgba(13,148,136,0.15)' } : {}}>
+                            <LayoutGrid size={14} />
+                        </button>
                     </div>
 
-                    <button onClick={() => setShowMetrics(!showMetrics)} className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 bg-slate-50 border border-slate-200 transition-colors" title="Alternar Columnas">
-                        <SlidersHorizontal size={16} />
+                    <button onClick={() => setShowMetrics(!showMetrics)}
+                        className="p-1.5 rounded-sm text-slate-600 hover:text-teal-400 transition-colors"
+                        style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}
+                        title="Alternar Columnas">
+                        <SlidersHorizontal size={14} />
                     </button>
                 </div>
             </div>
 
-            {/* VIEW RENDERER */}
+            {/* ── TABLE VIEW ───────────────────────────────────────── */}
             {viewMode === "table" ? (
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="relative z-10 ds-section overflow-hidden p-0">
                     <div className="overflow-x-auto min-h-[400px]">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50/50">
-                                    <th className="py-4 px-6 w-12"><Star size={14} className="text-slate-300" /></th>
-                                    <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase">Identidad Registrada</th>
-                                    <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase">Asignación de Rol</th>
-                                    {showMetrics && <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase">Actividad</th>}
-                                    <th className="py-4 px-6 text-[10px] font-black tracking-widest text-slate-400 uppercase text-right">Controles</th>
+                                <tr style={{ borderBottom: '1px solid rgba(30,41,59,0.8)', background: 'rgba(15,23,42,0.4)' }}>
+                                    <th className="py-3.5 px-5 w-10"><Star size={12} className="text-slate-700" /></th>
+                                    <th className="py-3.5 px-5 font-mono text-[9px] font-bold tracking-[0.14em] text-slate-600 uppercase">Identidad Registrada</th>
+                                    <th className="py-3.5 px-5 font-mono text-[9px] font-bold tracking-[0.14em] text-slate-600 uppercase">Asignación de Rol</th>
+                                    {showMetrics && <th className="py-3.5 px-5 font-mono text-[9px] font-bold tracking-[0.14em] text-slate-600 uppercase">Actividad</th>}
+                                    <th className="py-3.5 px-5 font-mono text-[9px] font-bold tracking-[0.14em] text-slate-600 uppercase text-right">Controles</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody>
                                 {filteredUsers.map((user) => {
                                     const isSelf = user.id === currentUserId;
                                     const isDeactivated = !!user.deactivatedAt;
-                                    const avatarGradient = generateAvatarColor(user.name);
                                     const isStarred = starredIds.has(user.id);
+                                    const initial = getInitials(user.name);
 
                                     return (
                                         <tr
                                             key={user.id}
                                             onContextMenu={(e) => handleRightClick(e, user.id)}
                                             onClick={() => setSelectedUserForDrawer(user)}
-                                            className={`group transition-colors hover:bg-slate-50 cursor-pointer ${isDeactivated ? 'opacity-60 grayscale' : ''} ${isStarred ? 'bg-amber-50/10' : ''}`}
+                                            className={`group cursor-pointer transition-all ${isDeactivated ? 'opacity-50' : ''} ${isStarred ? '' : ''}`}
+                                            style={{ borderBottom: '1px solid rgba(30,41,59,0.5)' }}
+                                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(15,23,42,0.6)')}
+                                            onMouseLeave={e => (e.currentTarget.style.background = '')}
                                         >
-                                            <td className="py-4 px-6" onClick={(e) => toggleStar(user.id, e)}>
-                                                <Star size={16} className={`transition-colors hover:text-amber-500 ${isStarred ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`} />
+                                            {/* Star */}
+                                            <td className="py-4 px-5" onClick={(e) => toggleStar(user.id, e)}>
+                                                <Star size={14} className={`transition-colors cursor-pointer ${isStarred ? 'text-amber-400 fill-amber-400' : 'text-slate-700 hover:text-amber-500'}`} />
                                             </td>
 
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`h-10 w-10 shrink-0 rounded-full bg-gradient-to-br border flex items-center justify-center font-bold text-sm ${avatarGradient} shadow-sm group-hover:scale-105 transition-transform`}>
-                                                        {user.name?.[0]?.toUpperCase() ?? "U"}
+                                            {/* Identity */}
+                                            <td className="py-4 px-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-9 w-9 shrink-0 rounded-sm flex items-center justify-center font-black text-sm transition-transform group-hover:scale-105"
+                                                        style={{ background: 'rgba(13,148,136,0.1)', border: '1px solid rgba(13,148,136,0.2)', color: '#14b8a6' }}>
+                                                        {initial}
                                                     </div>
                                                     <div>
                                                         <div className="flex items-center gap-2">
-                                                            <p className="text-sm font-bold text-slate-900">{user.name || "Sin Nombre"}</p>
-                                                            {isSelf && <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Tú</span>}
-                                                            {user.mfaEnabled && <span title="MFA Activado"><Shield size={12} className="text-emerald-500" /></span>}
+                                                            <p className="text-[13px] font-black text-slate-100">{user.name || "Sin Nombre"}</p>
+                                                            {isSelf && <span className="font-mono text-[8px] font-black px-1.5 py-0.5 rounded-sm" style={{ background: 'rgba(13,148,136,0.15)', border: '1px solid rgba(13,148,136,0.3)', color: '#14b8a6' }}>TÚ</span>}
+                                                            {user.mfaEnabled && <span title="MFA Activado"><Lock size={10} className="text-teal-500" /></span>}
                                                         </div>
-                                                        <p className="text-xs text-slate-500 font-medium font-mono mt-0.5">{user.email}</p>
+                                                        <p className="font-mono text-[9px] text-slate-600 mt-0.5">{user.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
+                                            {/* Role */}
+                                            <td className="py-4 px-5" onClick={(e) => e.stopPropagation()}>
                                                 <RoleSelector userId={user.id} currentRole={user.role} isSelf={isSelf} customRoles={customRoles} />
-                                                {user.jobTitle && <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1"><Briefcase size={10} /> {user.jobTitle}</p>}
+                                                {user.jobTitle && <p className="font-mono text-[9px] text-slate-700 mt-1.5 flex items-center gap-1"><Briefcase size={9} /> {user.jobTitle}</p>}
                                             </td>
 
+                                            {/* Activity */}
                                             {showMetrics && (
-                                                <td className="py-4 px-6">
-                                                    <div className="flex flex-col gap-1">
-                                                        <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                                                <td className="py-4 px-5">
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <p className="text-[12px] font-bold text-slate-300 flex items-center gap-1.5">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
                                                             {user._count?.sessions ?? 0} Inicios de sesión
                                                         </p>
-                                                        <p className="text-[10px] text-slate-400">Ingreso: {getRelativeDate(new Date(user.createdAt))}</p>
+                                                        <p className="font-mono text-[9px] text-slate-600">Ingreso: {getRelativeDate(new Date(user.createdAt))}</p>
                                                     </div>
                                                 </td>
                                             )}
 
-                                            <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                                            {/* Actions */}
+                                            <td className="py-4 px-5 text-right" onClick={(e) => e.stopPropagation()}>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleToggleStatus(user.id); }}
-                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border transition-all hover:shadow-sm ${isDeactivated ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] font-bold tracking-widest uppercase rounded-sm transition-all ${isDeactivated ? 'text-red-400' : 'text-slate-500 hover:text-amber-400'}`}
+                                                    style={isDeactivated
+                                                        ? { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }
+                                                        : { background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(30,41,59,0.8)' }}
                                                     disabled={isSelf}
                                                 >
-                                                    {isDeactivated ? <><EyeOff size={12} /> Suspendido</> : 'Suspender'}
+                                                    {isDeactivated ? <><EyeOff size={10} /> Suspendido</> : 'Suspender'}
                                                 </button>
                                             </td>
                                         </tr>
@@ -323,73 +356,87 @@ export function UsersDashboardClient({ initialUsers, currentUserId, customRoles 
                     </div>
                 </div>
             ) : (
-                /* GRID VIEW */
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {filteredUsers.map(user => {
-                        const avatarGradient = generateAvatarColor(user.name);
-                        return (
-                            <div key={user.id} onClick={() => setSelectedUserForDrawer(user)} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group relative overflow-hidden">
-                                {user.deactivatedAt && <div className="absolute inset-0 bg-slate-100/50 backdrop-blur-[1px] z-10 flex items-center justify-center"><span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">Cuenta Suspendida</span></div>}
-
+                /* ── GRID VIEW ─────────────────────────────────────── */
+                <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredUsers.map(user => (
+                        <div key={user.id} onClick={() => setSelectedUserForDrawer(user)}
+                            className="ds-card group cursor-pointer relative overflow-hidden">
+                            {user.deactivatedAt && (
+                                <div className="absolute inset-0 z-10 flex items-center justify-center"
+                                    style={{ background: 'rgba(2,6,23,0.7)', backdropFilter: 'blur(2px)' }}>
+                                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-red-400 px-3 py-1.5"
+                                        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.15rem' }}>
+                                        Cuenta Suspendida
+                                    </span>
+                                </div>
+                            )}
+                            <div className="relative z-10">
                                 <div className="flex justify-between items-start mb-4">
-                                    <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br border flex items-center justify-center font-black text-lg ${avatarGradient} shadow-sm group-hover:-translate-y-1 transition-transform`}>
-                                        {user.name?.[0]?.toUpperCase() ?? "U"}
+                                    <div className="h-11 w-11 rounded-sm flex items-center justify-center font-black text-lg transition-transform group-hover:-translate-y-0.5"
+                                        style={{ background: 'rgba(13,148,136,0.1)', border: '1px solid rgba(13,148,136,0.2)', color: '#14b8a6' }}>
+                                        {getInitials(user.name)}
                                     </div>
-                                    <button onClick={(e) => toggleStar(user.id, e)} className="p-1 z-20 hover:bg-slate-50 rounded-full">
-                                        <Star size={16} className={starredIds.has(user.id) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'} />
+                                    <button onClick={(e) => toggleStar(user.id, e)} className="p-1 z-20">
+                                        <Star size={14} className={starredIds.has(user.id) ? 'text-amber-400 fill-amber-400' : 'text-slate-700 hover:text-amber-500'} />
                                     </button>
                                 </div>
-                                <h3 className="font-bold text-slate-900 truncate">{user.name || "Usuario Sin Nombre"}</h3>
-                                <p className="text-xs text-slate-500 font-mono truncate mb-4">{user.email}</p>
-
+                                <h3 className="font-black text-[13px] text-slate-100 truncate">{user.name || "Usuario Sin Nombre"}</h3>
+                                <p className="font-mono text-[9px] text-slate-600 truncate mb-4 mt-0.5">{user.email}</p>
                                 <div className="flex items-center gap-2 mb-4" onClick={(e) => e.stopPropagation()}>
                                     <RoleSelector userId={user.id} currentRole={user.role} isSelf={user.id === currentUserId} customRoles={customRoles} />
                                 </div>
-
-                                <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <div className="pt-4 flex justify-between items-center font-mono text-[9px] text-slate-700 uppercase tracking-widest"
+                                    style={{ borderTop: '1px solid rgba(30,41,59,0.8)' }}>
                                     <span>{user._count.sessions} Logins</span>
                                     <span>{getRelativeDate(new Date(user.createdAt))}</span>
                                 </div>
                             </div>
-                        )
-                    })}
+                        </div>
+                    ))}
                 </div>
             )}
 
+            {/* Empty state */}
             {filteredUsers.length === 0 && (
-                <div className="py-20 flex flex-col items-center justify-center text-slate-400 bg-white border border-slate-200 rounded-2xl border-dashed">
-                    <Inbox className="w-16 h-16 mb-4 opacity-20" />
-                    <p className="text-lg font-bold text-slate-600">No hay creativos a la vista</p>
-                    <p className="text-sm mt-1">Intenta con otro filtro o término de búsqueda.</p>
+                <div className="relative z-10 ds-section flex flex-col items-center justify-center py-20 text-center">
+                    <div className="ds-icon-box w-14 h-14 mx-auto mb-5">
+                        <Inbox className="w-6 h-6 text-slate-700" />
+                    </div>
+                    <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">&gt; Sin identidades que coincidan_</p>
+                    <p className="font-mono text-[9px] text-slate-700 uppercase tracking-widest">Intenta con otro filtro o término de búsqueda</p>
                 </div>
             )}
 
-            {/* CONTEXT MENU COMPONENT */}
+            {/* ── CONTEXT MENU ────────────────────────────────────── */}
             {contextMenu && (
                 <div
-                    style={{ top: contextMenu.y, left: contextMenu.x }}
-                    className="fixed z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-1.5 min-w-[180px]"
+                    style={{ top: contextMenu.y, left: contextMenu.x, background: 'rgba(10,17,35,0.97)', border: '1px solid rgba(30,41,59,0.9)', borderRadius: '0.15rem' }}
+                    className="fixed z-50 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] p-1.5 min-w-[180px]"
                 >
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-2 pb-1 border-b border-slate-100 mb-1">Opciones Rápidas</p>
-                    <button onClick={() => { setSelectedUserForDrawer(users.find(u => u.id === contextMenu.userId) || null); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 rounded-lg transition-colors">
+                    {/* Teal top line */}
+                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/40 to-transparent" />
+                    <p className="font-mono text-[8px] font-bold text-slate-600 uppercase tracking-widest px-3 pt-2 pb-1.5 mb-1"
+                        style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>Opciones Rápidas</p>
+                    <button onClick={() => { setSelectedUserForDrawer(users.find(u => u.id === contextMenu.userId) || null); setContextMenu(null); }}
+                        className="w-full text-left px-3 py-2 font-mono text-[10px] text-slate-400 hover:text-teal-400 rounded-sm transition-colors hover:bg-teal-950/20">
                         Abrir Ficha Técnica
                     </button>
-                    <button onClick={() => { handleToggleStatus(contextMenu.userId); setContextMenu(null); }} className="w-full text-left px-3 py-2 text-sm font-semibold text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                    <button onClick={() => { handleToggleStatus(contextMenu.userId); setContextMenu(null); }}
+                        className="w-full text-left px-3 py-2 font-mono text-[10px] text-amber-400/70 hover:text-amber-400 rounded-sm transition-colors hover:bg-amber-950/20">
                         Alterar Estado
                     </button>
-                    <button className="w-full text-left px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <button className="w-full text-left px-3 py-2 font-mono text-[10px] text-red-400/70 hover:text-red-400 rounded-sm transition-colors hover:bg-red-950/20">
                         Eliminar del Hub
                     </button>
                 </div>
             )}
 
-            {/* USER DRAWER (SIDE PANEL) */}
+            {/* USER DRAWER */}
             <UserDrawer
                 user={selectedUserForDrawer}
                 onClose={() => setSelectedUserForDrawer(null)}
                 onUpdate={handleDrawerUpdate}
             />
-
         </div>
     );
 }
