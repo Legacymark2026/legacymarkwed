@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Sparkles, Copy, RefreshCw, Check } from 'lucide-react';
+import { CopyScorer } from './copy-scorer';
 import { cn } from '@/lib/utils';
 
 const PLATFORMS = [

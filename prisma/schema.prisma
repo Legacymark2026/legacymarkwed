@@ -136,6 +136,7 @@ model Company {
   defaultCompanySettings  Json?                    @map("default_settings")
   passwordPolicy          Json?                    @map("password_policy")
   whiteLabeling           Json?                    @map("white_labeling")
+  brandKit                BrandKit?
   customObjectDefinitions CustomObjectDefinition[]
   adSpends                AdSpend[]
   apiKeys                 ApiKey[]
@@ -158,6 +159,26 @@ model Company {
   workflows               Workflow[]
 
   @@map("companies")
+}
+
+model BrandKit {
+  id              String   @id @default(uuid())
+  companyId       String   @unique @map("company_id")
+  name            String   @default("Brand Kit")
+  primaryColor    String   @default("#6D28D9") @map("primary_color")
+  secondaryColor  String   @default("#FFFFFF") @map("secondary_color")
+  accentColor     String   @default("#10B981") @map("accent_color")
+  logoUrl         String?  @map("logo_url")
+  fontFamily      String   @default("Inter") @map("font_family")
+  toneOfVoice     String   @default("professional") @map("tone_of_voice")
+  brandValues     String[] @map("brand_values")
+  targetAudience  String?  @map("target_audience")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("brand_kits")
 }
 
 model CompanyUser {
