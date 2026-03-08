@@ -16,13 +16,21 @@ export default async function SettingsMembersPage() {
     const userRole = (session?.user as any)?.role;
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-300 pb-10">
-            <div>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-4">
-                    Equipo, Roles y Formularios
-                </h2>
-                <p className="text-sm text-slate-500 mt-2">
-                    Gestiona los accesos de tu equipo (RBAC) y estructura la información requerida en tus proesos comerciales.
+        <div className="ds-page space-y-8 pb-10">
+            {/* Header */}
+            <div className="pb-6" style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
+                <div className="mb-3">
+                    <span className="ds-badge ds-badge-teal">
+                        <span className="relative flex h-1.5 w-1.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                        </span>
+                        IAM &amp; RBAC SETTINGS
+                    </span>
+                </div>
+                <h2 className="ds-heading-page">Equipo, Roles y Formularios</h2>
+                <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mt-2">
+                    Gestiona accesos RBAC &middot; Configura permisos granulares &middot; Estructura campos comerciales
                 </p>
             </div>
 
@@ -33,11 +41,11 @@ export default async function SettingsMembersPage() {
                 />
             </section>
 
-            <section className="space-y-4 pt-4">
+            <section className="space-y-4">
                 <RolesPermissionsEditor customRoles={customRoles} currentUserRole={userRole} />
             </section>
 
-            <section className="space-y-4 pt-4">
+            <section className="space-y-4">
                 <CustomFieldsBuilder initialData={fields} />
             </section>
         </div>

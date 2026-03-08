@@ -139,16 +139,88 @@ export async function DashboardSidebar({ role: _roleProp, name, email, image, us
     const role = dbRole as UserRole;
     const badge = resolveBadge(dbRole, customRoleName);
 
+    // ── Mapa de permisos → rutas del sidebar ──────────────────────────────
+    // Cada permiso del editor de roles controla la visibilidad de las rutas.
+    // Los permisos están en formato 'scope.action' (ej. crm.view_all, mkt.view)
+    const PERMISSION_ROUTE_MAP: { perm: string; routes: string[] }[] = [
+        // Dashboard base
+        { perm: "dashboard.view", routes: ["/dashboard"] },
+        // IAM / Admin
+        { perm: "iam.view_users", routes: ["/dashboard/users"] },
+        { perm: "iam.manage_users", routes: ["/dashboard/users", "/dashboard/experts"] },
+        { perm: "iam.manage_roles", routes: ["/dashboard/users"] },
+        { perm: "iam.view_security", routes: ["/dashboard/security"] },
+        { perm: "manage_settings", routes: ["/dashboard/settings"] },
+        // Calendario
+        { perm: "calendar.view", routes: ["/dashboard/events"] },
+        { perm: "calendar.create", routes: ["/dashboard/events"] },
+        { perm: "calendar.delete", routes: ["/dashboard/events"] },
+        // CRM
+        { perm: "crm.view_own", routes: ["/dashboard/admin/crm", "/dashboard/admin/crm/leads"] },
+        { perm: "crm.view_all", routes: ["/dashboard/admin/crm", "/dashboard/admin/crm/leads"] },
+        { perm: "crm.edit", routes: ["/dashboard/admin/crm", "/dashboard/admin/crm/leads"] },
+        { perm: "crm.delete", routes: ["/dashboard/admin/crm/leads"] },
+        { perm: "crm.export", routes: ["/dashboard/admin/crm"] },
+        { perm: "crm.pipeline", routes: ["/dashboard/admin/crm/pipeline"] },
+        { perm: "crm.tasks", routes: ["/dashboard/admin/crm/tasks"] },
+        { perm: "crm.reports", routes: ["/dashboard/admin/crm/reports"] },
+        { perm: "crm.templates", routes: ["/dashboard/admin/crm/templates"] },
+        { perm: "crm.scoring", routes: ["/dashboard/admin/crm/scoring"] },
+        // Marketing
+        { perm: "mkt.view", routes: ["/dashboard/admin/marketing"] },
+        { perm: "mkt.campaigns", routes: ["/dashboard/admin/marketing/campaigns"] },
+        { perm: "mkt.spend", routes: ["/dashboard/admin/marketing/spend"] },
+        { perm: "mkt.links", routes: ["/dashboard/admin/marketing/links"] },
+        { perm: "mkt.edit", routes: ["/dashboard/admin/marketing"] },
+        { perm: "mkt.send", routes: ["/dashboard/admin/marketing/campaigns"] },
+        { perm: "mkt.integrations", routes: ["/dashboard/admin/marketing/settings"] },
+        { perm: "mkt.creative", routes: ["/dashboard/admin/marketing/creative-studio"] },
+        // Automatización
+        { perm: "automation.view", routes: ["/dashboard/admin/automation", "/dashboard/admin/architecture"] },
+        { perm: "automation.manage", routes: ["/dashboard/admin/automation"] },
+        // Inbox
+        { perm: "inbox.view", routes: ["/dashboard/inbox"] },
+        { perm: "inbox.send", routes: ["/dashboard/inbox"] },
+        { perm: "inbox.manage", routes: ["/dashboard/inbox"] },
+        // Contenido
+        { perm: "content.view", routes: ["/dashboard/posts", "/dashboard/posts/categories"] },
+        { perm: "content.create", routes: ["/dashboard/posts", "/dashboard/posts/create"] },
+        { perm: "content.publish", routes: ["/dashboard/posts"] },
+        { perm: "content.delete", routes: ["/dashboard/posts"] },
+        // Proyectos
+        { perm: "projects.view", routes: ["/dashboard/projects"] },
+        { perm: "projects.create", routes: ["/dashboard/projects"] },
+        { perm: "projects.manage", routes: ["/dashboard/projects"] },
+        // Analítica
+        { perm: "analytics.view", routes: ["/dashboard/analytics"] },
+        { perm: "analytics.reports", routes: ["/dashboard/analytics"] },
+        { perm: "analytics.export", routes: ["/dashboard/analytics"] },
+        // Assets
+        { perm: "assets.upload", routes: ["/dashboard/posts"] },
+        { perm: "assets.delete", routes: ["/dashboard/posts"] },
+        // Equipo
+        { perm: "team.view", routes: ["/dashboard/experts"] },
+        { perm: "team.invite", routes: ["/dashboard/users", "/dashboard/experts"] },
+        { perm: "team.roles", routes: ["/dashboard/users", "/dashboard/settings"] },
+    ];
+
     const checkAccess = (href: string) => {
+        // Roles estándar del enum — usan canAccessRoute() de rbac.ts
         if (canAccessRoute(href, role as UserRole)) return true;
-        if (href === "/dashboard" && userPermissions.length > 0) return true;
-        if (href.startsWith("/dashboard/admin/crm")) return userPermissions.some(p => p.startsWith("crm."));
-        if (href.startsWith("/dashboard/admin/marketing")) return userPermissions.some(p => p.startsWith("mkt."));
-        if (href.startsWith("/dashboard/admin/automation")) return userPermissions.some(p => p.startsWith("automation."));
-        // Custom roles con permisos → dar acceso al dashboard base
-        if (href === "/dashboard" && dbRole !== UserRole.GUEST) return true;
+
+        // Custom roles — usan el mapa de permisos
+        for (const { perm, routes } of PERMISSION_ROUTE_MAP) {
+            if (userPermissions.includes(perm) && routes.some(r => href === r || href.startsWith(r + "/"))) {
+                return true;
+            }
+        }
+
+        // Cualquier usuario no-GUEST con permisos → siempre ve el dashboard base
+        if (href === "/dashboard" && dbRole !== UserRole.GUEST && userPermissions.length > 0) return true;
+
         return false;
     };
+
 
     return (
         // Sidebar — slate-950+ dark, border-right slate-800 style
