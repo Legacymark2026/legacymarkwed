@@ -279,6 +279,11 @@ export async function updateUserRole(
             data: { role: newRole },
         });
 
+        // ── Revocar sesiones activas del usuario ──────────────────────────────
+        // Esto garantiza que el próximo request del usuario haga un nuevo sign-in
+        // y el JWT callback DB-First lea el rol correcto desde la DB.
+        await prisma.session.deleteMany({ where: { userId } });
+
         await prisma.userActivityLog.create({
             data: {
                 userId: userId, // The user whose role was updated

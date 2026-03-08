@@ -84,8 +84,17 @@ const ROLE_BADGES: Record<UserRole, { label: string; color: string }> = {
     [UserRole.CONTENT_MANAGER]: { label: "Marketing / SEO", color: "border-teal-900/50 text-teal-400 bg-slate-900/60" },
     [UserRole.CLIENT_ADMIN]: { label: "Ventas", color: "border-amber-900/50 text-amber-400 bg-slate-900/60" },
     [UserRole.CLIENT_USER]: { label: "Creativo", color: "border-teal-900/50 text-teal-400 bg-slate-900/60" },
-    [UserRole.GUEST]: { label: "Invitado", color: "border-slate-700/50 text-slate-400 bg-slate-900/60" },
+    [UserRole.GUEST]: { label: "En Revisión", color: "border-slate-700/50 text-slate-500 bg-slate-900/60" },
 };
+
+/** Resuelve el badge para cualquier rol — incluye custom roles (ej. 'gerente') */
+function resolveBadge(role: string, customRoleName?: string): { label: string; color: string } {
+    // Primero buscar en los roles estándar
+    if (ROLE_BADGES[role as UserRole]) return ROLE_BADGES[role as UserRole];
+    // Para custom roles: mostrar el nombre del rol (capitalizado) con teal badge
+    const label = customRoleName || (role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, ' '));
+    return { label, color: "border-teal-900/50 text-teal-400 bg-slate-900/60" };
+}
 
 interface DashboardSidebarProps {
     role: UserRole;
@@ -95,19 +104,40 @@ interface DashboardSidebarProps {
     userId?: string;
 }
 
-export async function DashboardSidebar({ role, name, email, image, userId }: DashboardSidebarProps) {
-    let badge = ROLE_BADGES[role];
+export async function DashboardSidebar({ role: _roleProp, name, email, image, userId }: DashboardSidebarProps) {
     let userPermissions: string[] = [];
+    let customRoleName: string | undefined;
+
+    // ── DB-First: siempre leer el rol real desde la DB para evitar sesión stale ──
+    // Esto garantiza que el sidebar refleje el rol actual aunque el JWT sea viejo.
+    let dbRole: string = _roleProp; // fallback al prop si DB falla
 
     if (userId) {
-        const companyUser = await prisma.companyUser.findFirst({
-            where: { userId },
-            select: { permissions: true, companyId: true },
-        });
-        if (companyUser) userPermissions = (companyUser.permissions as string[]) ?? [];
+        const [dbUser, companyUser] = await Promise.all([
+            prisma.user.findUnique({
+                where: { id: userId },
+                select: { role: true },
+            }),
+            prisma.companyUser.findFirst({
+                where: { userId },
+                select: { permissions: true, companyId: true, company: { select: { defaultCompanySettings: true } } },
+            }),
+        ]);
+
+        if (dbUser) dbRole = dbUser.role;
+
+        if (companyUser) {
+            userPermissions = (companyUser.permissions as string[]) ?? [];
+            // Resolver el nombre del custom role
+            const settings = (companyUser.company?.defaultCompanySettings as any) || {};
+            const customRoles = settings.customRoles || [];
+            const matched = customRoles.find((r: any) => r.id === dbRole);
+            if (matched) customRoleName = matched.name;
+        }
     }
 
-    badge = badge ?? ROLE_BADGES[UserRole.GUEST];
+    const role = dbRole as UserRole;
+    const badge = resolveBadge(dbRole, customRoleName);
 
     const checkAccess = (href: string) => {
         if (canAccessRoute(href, role as UserRole)) return true;
@@ -115,6 +145,8 @@ export async function DashboardSidebar({ role, name, email, image, userId }: Das
         if (href.startsWith("/dashboard/admin/crm")) return userPermissions.some(p => p.startsWith("crm."));
         if (href.startsWith("/dashboard/admin/marketing")) return userPermissions.some(p => p.startsWith("mkt."));
         if (href.startsWith("/dashboard/admin/automation")) return userPermissions.some(p => p.startsWith("automation."));
+        // Custom roles con permisos → dar acceso al dashboard base
+        if (href === "/dashboard" && dbRole !== UserRole.GUEST) return true;
         return false;
     };
 

@@ -188,6 +188,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             token.role = dbAccount.user.role;
                             token.companyId = userWithMeta?.companies[0]?.companyId ?? null;
                             token.permissions = ((userWithMeta?.companies[0]?.permissions ?? []) as string[]) as Permission[];
+                            token.roleCheckedAt = Date.now();
                             return token;
                         }
                     }
@@ -224,6 +225,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         token.role = dbUser.role;
                         token.companyId = userWithMeta?.companies[0]?.companyId ?? null;
                         token.permissions = ((userWithMeta?.companies[0]?.permissions ?? []) as string[]) as Permission[];
+                        token.roleCheckedAt = Date.now();
                     } else {
                         logger.auth("JWT: User not found in DB, using OAuth ID as fallback.");
                         token.id = user.id;
@@ -234,6 +236,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 } catch (error) {
                     logger.error("JWT callback error:", error);
                     token.id = user.id;
+                }
+            } else {
+                // ── DB-First role refresh ────────────────────────────────────────
+                // En requests subsiguientes: refrescar el rol desde DB cada 60s.
+                // Esto garantiza que los cambios de rol del admin se apliquen
+                // sin que el usuario necesite hacer logout.
+                const tokenId = token.id as string | undefined;
+                const lastCheck = (token.roleCheckedAt as number | undefined) ?? 0;
+                const REFRESH_INTERVAL_MS = 60 * 1000; // 60 segundos
+
+                if (tokenId && (Date.now() - lastCheck > REFRESH_INTERVAL_MS)) {
+                    try {
+                        const freshUser = await prisma.user.findUnique({
+                            where: { id: tokenId },
+                            select: {
+                                role: true,
+                                companies: {
+                                    select: { companyId: true, permissions: true },
+                                    take: 1
+                                }
+                            }
+                        });
+                        if (freshUser) {
+                            token.role = freshUser.role as UserRole;
+                            token.companyId = freshUser.companies[0]?.companyId ?? token.companyId;
+                            token.permissions = ((freshUser.companies[0]?.permissions ?? []) as string[]) as Permission[];
+                            token.roleCheckedAt = Date.now();
+                            logger.auth(`JWT: Role refreshed from DB → ${token.role}`);
+                        }
+                    } catch (e) {
+                        // Silently fail — keep existing token data
+                        logger.error("JWT role refresh error:", e);
+                    }
                 }
             }
 
