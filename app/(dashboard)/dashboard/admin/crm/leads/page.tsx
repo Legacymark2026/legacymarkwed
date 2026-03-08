@@ -3,15 +3,17 @@ import { getLeads } from "@/actions/crm";
 import { prisma } from "@/lib/prisma";
 import { LeadsTable } from "@/components/crm/leads-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, TrendingUp, Target, Star } from "lucide-react";
+import { Users, TrendingUp, Target, Star, UserCheck } from "lucide-react";
 
 export default async function LeadsPage() {
     const company = await prisma.company.findFirst();
 
     if (!company) {
         return (
-            <div className="p-8 text-center">
-                <p className="text-slate-500">No se encontró la empresa. Configura tu empresa primero.</p>
+            <div className="ds-page flex items-center justify-center min-h-screen">
+                <div className="ds-section text-center max-w-sm">
+                    <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">&gt; Empresa no configurada_</p>
+                </div>
             </div>
         );
     }
@@ -25,35 +27,61 @@ export default async function LeadsPage() {
     const total = "error" in result ? 0 : result.total;
 
     const stats = [
-        { label: "Total Leads", value: total, icon: <Users className="w-5 h-5" />, color: "text-sky-600", bg: "bg-sky-50" },
-        { label: "Nuevos", value: statusStats.find((s) => s.status === "NEW")?._count.status ?? 0, icon: <Star className="w-5 h-5" />, color: "text-violet-600", bg: "bg-violet-50" },
-        { label: "Calificados", value: statusStats.find((s) => s.status === "QUALIFIED")?._count.status ?? 0, icon: <Target className="w-5 h-5" />, color: "text-teal-600", bg: "bg-teal-50" },
-        { label: "Convertidos", value: statusStats.find((s) => s.status === "CONVERTED")?._count.status ?? 0, icon: <TrendingUp className="w-5 h-5" />, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: "Total Leads", value: total, icon: Users, code: "TOT" },
+        { label: "Nuevos", value: statusStats.find(s => s.status === "NEW")?._count.status ?? 0, icon: Star, code: "NEW" },
+        { label: "Calificados", value: statusStats.find(s => s.status === "QUALIFIED")?._count.status ?? 0, icon: Target, code: "QUA" },
+        { label: "Convertidos", value: statusStats.find(s => s.status === "CONVERTED")?._count.status ?? 0, icon: TrendingUp, code: "CNV" },
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-3xl font-black text-slate-900">Gestión de Leads</h1>
-                <p className="text-slate-500 mt-1">Rastrea, califica y convierte cada lead en oportunidades de negocio.</p>
+        <div className="ds-page space-y-8">
+            {/* Grid overlay */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.025] pointer-events-none mix-blend-screen" />
+
+            {/* ── Header ── */}
+            <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
+                <div>
+                    <div className="mb-4">
+                        <span className="ds-badge ds-badge-teal">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                            </span>
+                            CRM_CORE · LEADS
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="ds-icon-box w-12 h-12">
+                            <UserCheck className="w-5 h-5 text-teal-400" />
+                        </div>
+                        <div>
+                            <h1 className="ds-heading-page">Gestión de Leads</h1>
+                            <p className="ds-subtext mt-2">Rastrea · Califica · Convierte cada oportunidad</p>
+                        </div>
+                    </div>
+                </div>
+                <span className="font-mono text-[9px] text-slate-700 uppercase tracking-widest hidden md:block">[LDS_CORE]</span>
             </div>
 
             {/* KPI Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {stats.map((s) => (
-                    <div key={s.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
-                        <div className={`w-11 h-11 rounded-2xl ${s.bg} ${s.color} flex items-center justify-center flex-shrink-0`}>{s.icon}</div>
-                        <div>
-                            <p className="text-2xl font-black text-slate-900">{s.value}</p>
-                            <p className="text-xs text-slate-400 font-medium">{s.label}</p>
+            <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {stats.map((s, i) => (
+                    <div key={s.label} className="ds-kpi group">
+                        <span className="absolute top-3 right-3 font-mono text-[8px] text-slate-700 uppercase tracking-widest">[{s.code}]</span>
+                        <div className="relative z-10">
+                            <div className="ds-icon-box w-9 h-9 mb-3">
+                                <s.icon size={14} strokeWidth={1.5} className="text-slate-500 group-hover:text-teal-400 transition-colors" />
+                            </div>
+                            <p className="ds-stat-value">{s.value}</p>
+                            <p className="ds-stat-label">{s.label}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <div className="relative z-10 ds-section">
                 <Suspense fallback={<LeadTableSkeleton />}>
                     <LeadsTable leads={leads as any} total={total} companyId={company.id} />
                 </Suspense>
@@ -65,8 +93,10 @@ export default async function LeadsPage() {
 function LeadTableSkeleton() {
     return (
         <div className="space-y-3">
-            <Skeleton className="h-10 w-full" />
-            {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
+            <div className="h-10 w-full rounded-sm" style={{ background: 'rgba(30,41,59,0.4)' }} />
+            {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-14 w-full rounded-sm" style={{ background: 'rgba(30,41,59,0.3)' }} />
+            ))}
         </div>
     );
 }

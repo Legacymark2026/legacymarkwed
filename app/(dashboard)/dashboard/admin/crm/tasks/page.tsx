@@ -5,40 +5,75 @@ import { CheckSquare, Clock, AlertTriangle, ListTodo } from "lucide-react";
 
 export default async function TasksPage() {
     const company = await prisma.company.findFirst();
-    if (!company) return <div className="p-8 text-slate-500 text-center">Configura tu empresa primero.</div>;
+    if (!company) return (
+        <div className="ds-page flex items-center justify-center">
+            <p className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">&gt; Empresa no configurada_</p>
+        </div>
+    );
 
     const tasks = await getTasks(company.id);
-    const overdue = tasks.filter((t) => !t.completed && t.dueDate && new Date(t.dueDate) < new Date());
-    const pending = tasks.filter((t) => !t.completed);
-    const completed = tasks.filter((t) => t.completed);
+    const overdue = tasks.filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < new Date());
+    const pending = tasks.filter(t => !t.completed);
+    const completed = tasks.filter(t => t.completed);
 
     const kpis = [
-        { label: "Total", value: tasks.length, icon: <ListTodo className="w-5 h-5" />, color: "text-slate-600", bg: "bg-slate-50" },
-        { label: "Pendientes", value: pending.length, icon: <Clock className="w-5 h-5" />, color: "text-sky-600", bg: "bg-sky-50" },
-        { label: "Vencidas", value: overdue.length, icon: <AlertTriangle className="w-5 h-5" />, color: "text-red-600", bg: "bg-red-50" },
-        { label: "Completadas", value: completed.length, icon: <CheckSquare className="w-5 h-5" />, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: "Total", value: tasks.length, icon: ListTodo, code: "TOT" },
+        { label: "Pendientes", value: pending.length, icon: Clock, code: "PND" },
+        { label: "Vencidas", value: overdue.length, icon: AlertTriangle, code: "VNC" },
+        { label: "Completadas", value: completed.length, icon: CheckSquare, code: "CMP" },
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 space-y-6">
-            <div>
-                <h1 className="text-3xl font-black text-slate-900">Tareas & Recordatorios</h1>
-                <p className="text-slate-500 mt-1">Gestiona el seguimiento de leads y deals con tareas asignadas.</p>
+        <div className="ds-page space-y-8">
+            {/* Grid overlay */}
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.025] pointer-events-none mix-blend-screen" />
+
+            {/* Header */}
+            <div className="relative z-10 pb-8 flex flex-col md:flex-row md:items-start justify-between gap-4"
+                style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
+                <div>
+                    <div className="mb-4">
+                        <span className="ds-badge ds-badge-teal">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" />
+                            </span>
+                            CRM_CORE · TASKS
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="ds-icon-box w-12 h-12">
+                            <CheckSquare className="w-5 h-5 text-teal-400" />
+                        </div>
+                        <div>
+                            <h1 className="ds-heading-page">Tareas & Recordatorios</h1>
+                            <p className="ds-subtext mt-2">Seguimiento de leads y deals · Tareas asignadas</p>
+                        </div>
+                    </div>
+                </div>
+                <span className="font-mono text-[9px] text-slate-700 uppercase tracking-widest hidden md:block">[TSK_BOARD]</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {kpis.map((k) => (
-                    <div key={k.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
-                        <div className={`w-11 h-11 rounded-2xl ${k.bg} ${k.color} flex items-center justify-center flex-shrink-0`}>{k.icon}</div>
-                        <div>
-                            <p className="text-2xl font-black text-slate-900">{k.value}</p>
-                            <p className="text-xs text-slate-400 font-medium">{k.label}</p>
+            {/* KPI Strip */}
+            <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {kpis.map(k => (
+                    <div key={k.label} className="ds-kpi group">
+                        <span className="absolute top-3 right-3 font-mono text-[8px] text-slate-700 uppercase tracking-widest">[{k.code}]</span>
+                        <div className="relative z-10">
+                            <div className="ds-icon-box w-9 h-9 mb-3">
+                                <k.icon size={14} strokeWidth={1.5} className={`transition-colors ${k.code === 'VNC' ? 'text-red-500' : 'text-slate-500 group-hover:text-teal-400'}`} />
+                            </div>
+                            <p className="ds-stat-value">{k.value}</p>
+                            <p className="ds-stat-label">{k.label}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <TasksBoard tasks={tasks as any} companyId={company.id} />
+            {/* Board */}
+            <div className="relative z-10">
+                <TasksBoard tasks={tasks as any} companyId={company.id} />
+            </div>
         </div>
     );
 }
