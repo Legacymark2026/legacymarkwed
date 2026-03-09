@@ -11,13 +11,25 @@ import esLocale from "@fullcalendar/core/locales/es";
 
 interface CalendarBoardProps {
     events: any[];
-    resources?: any[]; // optional for now
+    resources?: any[];
     filters: any;
     selectedDate?: Date;
     onEventClick: (id: string) => void;
     onEventDropped: (id: string, start: Date, end: Date | null) => void;
     onDateSelect?: (start: Date, end: Date, allDay: boolean) => void;
 }
+
+// ── Color map (inline, PurgeCSS-safe) ────────────────────────────────────────
+const TYPE_COLORS: Record<string, { point: string; bg: string; text: string; fc: string }> = {
+    ONLINE: { point: '#60a5fa', bg: 'rgba(59,130,246,0.20)', text: '#bfdbfe', fc: '#2563eb' },
+    PHYSICAL: { point: '#fb923c', bg: 'rgba(234,88,12,0.20)', text: '#fed7aa', fc: '#ea580c' },
+    HYBRID: { point: '#c084fc', bg: 'rgba(147,51,234,0.20)', text: '#e9d5ff', fc: '#9333ea' },
+    NETWORKING: { point: '#2dd4bf', bg: 'rgba(13,148,136,0.25)', text: '#99f6e4', fc: '#0d9488' },
+    MEETING: { point: '#22d3ee', bg: 'rgba(8,145,178,0.22)', text: '#a5f3fc', fc: '#0891b2' },
+    TASK: { point: '#fbbf24', bg: 'rgba(217,119,6,0.22)', text: '#fde68a', fc: '#d97706' },
+    OTHER: { point: '#a78bfa', bg: 'rgba(124,58,237,0.22)', text: '#ddd6fe', fc: '#7c3aed' },
+};
+const FALLBACK_COLOR = { point: '#94a3b8', bg: 'rgba(100,116,139,0.18)', text: '#cbd5e1', fc: '#64748b' };
 
 export function CalendarBoard({ events, resources = [], filters, selectedDate, onEventClick, onEventDropped, onDateSelect }: CalendarBoardProps) {
     const calendarRef = useRef<FullCalendar>(null);
@@ -28,7 +40,6 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
         }
     }, [selectedDate]);
 
-    // Format events for FullCalendar
     const calendarEvents = useMemo(() => {
         const query = filters.query?.toLowerCase() || '';
 
@@ -39,77 +50,57 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                 return matchType && matchQuery;
             })
             .map(e => {
-                // Determine color based on type
-                const colorByType: Record<string, string> = {
-                    ONLINE: '#2563eb', // blue
-                    PHYSICAL: '#ea580c', // orange
-                    HYBRID: '#9333ea', // purple
-                    NETWORKING: '#0d9488', // teal
-                    MEETING: '#0891b2', // cyan
-                    TASK: '#d97706', // amber
-                    OTHER: '#7c3aed', // violet
-                };
-                const backgroundColor = colorByType[e.type] ?? '#64748b'; // slate fallback
-
+                const c = TYPE_COLORS[e.type] ?? FALLBACK_COLOR;
                 return {
                     id: e.id,
                     title: e.title,
                     start: e.startDate,
                     end: e.endDate,
                     allDay: e.isAllDay,
-                    backgroundColor,
-                    borderColor: backgroundColor,
-                    extendedProps: {
-                        type: e.type,
-                        status: e.status
-                    }
+                    backgroundColor: c.fc,
+                    borderColor: 'transparent',
+                    extendedProps: { type: e.type, status: e.status }
                 };
             });
     }, [events, filters]);
 
-    const handleEventClick = (clickInfo: any) => {
-        onEventClick(clickInfo.event.id);
-    };
-
-    const handleEventDrop = async (dropInfo: any) => {
-        const { event } = dropInfo;
-        onEventDropped(event.id, event.start, event.end);
-    };
-
-    const handleDateSelect = (selectInfo: any) => {
-        if (onDateSelect) {
-            onDateSelect(selectInfo.start, selectInfo.end, selectInfo.allDay);
-        }
-        selectInfo.view.calendar.unselect();
-    };
-
     const renderEventContent = (eventInfo: any) => {
         const { event, timeText } = eventInfo;
-        const type = event.extendedProps.type;
-
-        // Map type → color token
-        const colorByType: Record<string, { point: string; bg: string; text: string }> = {
-            ONLINE: { point: '#60a5fa', bg: 'rgba(59,130,246,0.18)', text: '#bfdbfe' },
-            PHYSICAL: { point: '#fb923c', bg: 'rgba(234,88,12,0.18)', text: '#fed7aa' },
-            HYBRID: { point: '#c084fc', bg: 'rgba(147,51,234,0.18)', text: '#e9d5ff' },
-            NETWORKING: { point: '#2dd4bf', bg: 'rgba(13,148,136,0.22)', text: '#99f6e4' },
-            MEETING: { point: '#22d3ee', bg: 'rgba(8,145,178,0.20)', text: '#a5f3fc' },
-            TASK: { point: '#fbbf24', bg: 'rgba(217,119,6,0.22)', text: '#fde68a' },
-            OTHER: { point: '#a78bfa', bg: 'rgba(124,58,237,0.20)', text: '#ddd6fe' },
-        };
-        const colors = colorByType[type] ?? { point: '#94a3b8', bg: 'rgba(100,116,139,0.15)', text: '#cbd5e1' };
+        const c = TYPE_COLORS[event.extendedProps.type] ?? FALLBACK_COLOR;
 
         return (
             <div
-                className={`flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors hover:brightness-110`}
-                style={{ backgroundColor: colors.bg }}
+                style={{
+                    background: c.bg,
+                    border: `1px solid ${c.point}30`,
+                    borderLeft: `3px solid ${c.point}`,
+                    borderRadius: '6px',
+                    padding: '3px 6px',
+                    height: '100%',
+                    width: '100%',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(4px)',
+                }}
                 title={`${event.title}${timeText ? ` (${timeText})` : ''}`}
             >
-                <div className="flex items-center gap-1.5 w-full mb-0.5">
-                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${pointColor} shadow-sm`} />
-                    <span className="text-[10px] font-black truncate tracking-wide text-slate-200">{timeText}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span style={{
+                        width: '6px', height: '6px', borderRadius: '50%',
+                        background: c.point, flexShrink: 0, boxShadow: `0 0 4px ${c.point}80`
+                    }} />
+                    <span style={{ fontSize: '10px', fontWeight: 800, color: c.text, letterSpacing: '0.04em', fontFamily: 'monospace' }}>
+                        {timeText}
+                    </span>
                 </div>
-                <div className="text-[11px] font-bold leading-tight truncate w-full text-white whitespace-normal line-clamp-2">
+                <div style={{
+                    fontSize: '11px', fontWeight: 700, lineHeight: 1.3,
+                    color: '#f1f5f9', overflow: 'hidden',
+                    display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                }}>
                     {event.title}
                 </div>
             </div>
@@ -117,142 +108,190 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
     };
 
     return (
-        <div className="p-4 sm:p-6 h-full w-full bg-white relative fc-theme-standard">
+        <div style={{ padding: '20px', height: '100%', width: '100%', background: 'transparent', position: 'relative' }}>
             <style jsx global>{`
-                .fc { 
-                    --fc-border-color: #f1f5f9; 
-                    --fc-button-bg-color: #fff;
-                    --fc-button-border-color: #e2e8f0;
-                    --fc-button-text-color: #475569;
-                    --fc-button-hover-bg-color: #f8fafc;
-                    --fc-button-hover-border-color: #cbd5e1;
-                    --fc-button-active-bg-color: #f1f5f9;
-                    --fc-button-active-border-color: #cbd5e1;
-                    --fc-today-bg-color: #f0fdfa; /* A light teal for today */
+                /* ── Dark HUD FullCalendar Theme ───────────────────────────── */
+                .fc {
+                    --fc-border-color: rgba(30,41,59,0.8);
+                    --fc-button-bg-color: rgba(15,23,42,0.8);
+                    --fc-button-border-color: rgba(30,41,59,0.9);
+                    --fc-button-text-color: #94a3b8;
+                    --fc-button-hover-bg-color: rgba(13,148,136,0.15);
+                    --fc-button-hover-border-color: rgba(13,148,136,0.4);
+                    --fc-button-active-bg-color: rgba(13,148,136,0.25);
+                    --fc-button-active-border-color: rgba(13,148,136,0.6);
+                    --fc-today-bg-color: rgba(13,148,136,0.08);
                     --fc-event-border-color: transparent;
-                    --fc-page-bg-color: #ffffff;
+                    --fc-page-bg-color: transparent;
                     font-family: inherit;
                 }
+
+                /* Toolbar Title */
                 .fc .fc-toolbar-title {
-                    font-size: 1.25rem;
-                    font-weight: 800;
-                    color: #0f172a;
+                    font-size: 1.2rem;
+                    font-weight: 900;
+                    color: #f1f5f9;
                     text-transform: capitalize;
-                    letter-spacing: -0.025em;
+                    letter-spacing: -0.02em;
                 }
+
+                /* Toolbar buttons */
                 .fc .fc-button {
-                    font-weight: 600;
-                    font-size: 0.875rem;
-                    text-transform: capitalize;
-                    border-radius: 0.5rem;
-                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    padding: 0.5rem 1rem;
-                }
-                .fc .fc-button-primary:not(:disabled):active, 
-                .fc .fc-button-primary:not(:disabled).fc-button-active {
-                    background-color: #f1f5f9;
-                    color: #0f172a;
-                    border-color: #cbd5e1;
-                    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-                }
-                .fc-theme-standard td, .fc-theme-standard th {
-                    border-color: var(--fc-border-color);
-                }
-                .fc-scrollgrid {
-                    border-radius: 0.75rem;
-                    overflow: hidden;
-                    border: 1px solid #e2e8f0 !important;
-                }
-                .fc-col-header-cell-cushion {
-                    padding: 12px 0 !important;
-                    font-size: 0.75rem;
                     font-weight: 700;
+                    font-size: 0.75rem;
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
-                    color: #64748b;
+                    border-radius: 8px;
+                    padding: 6px 14px;
+                    transition: all 0.2s ease;
+                    backdrop-filter: blur(8px);
                 }
+                .fc .fc-button-primary:hover {
+                    color: #2dd4bf !important;
+                    border-color: rgba(13,148,136,0.5) !important;
+                }
+                .fc .fc-button-primary:not(:disabled):active,
+                .fc .fc-button-primary:not(:disabled).fc-button-active {
+                    background-color: rgba(13,148,136,0.25) !important;
+                    color: #2dd4bf !important;
+                    border-color: rgba(13,148,136,0.6) !important;
+                    box-shadow: 0 0 12px rgba(13,148,136,0.2);
+                }
+
+                /* Grid borders */
+                .fc-theme-standard td,
+                .fc-theme-standard th,
+                .fc-theme-standard .fc-scrollgrid {
+                    border-color: rgba(30,41,59,0.7) !important;
+                }
+                .fc-scrollgrid {
+                    border-radius: 12px;
+                    overflow: hidden;
+                    border: 1px solid rgba(30,41,59,0.8) !important;
+                }
+
+                /* Header cells (Mon, Tue, etc.) */
+                .fc-col-header-cell {
+                    background: rgba(15,23,42,0.8) !important;
+                }
+                .fc-col-header-cell-cushion {
+                    padding: 10px 0 !important;
+                    font-size: 0.7rem;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                    color: #475569;
+                    text-decoration: none !important;
+                }
+
+                /* Day cells */
+                .fc-daygrid-day {
+                    background: rgba(11,15,25,0.6) !important;
+                    transition: background 0.2s;
+                }
+                .fc-daygrid-day:hover {
+                    background: rgba(13,148,136,0.04) !important;
+                }
+                .fc-day-today {
+                    background: rgba(13,148,136,0.07) !important;
+                }
+
+                /* Day numbers */
                 .fc-daygrid-day-number {
-                    font-weight: 600;
-                    color: #334155;
-                    padding: 8px 12px !important;
-                    font-size: 0.875rem;
+                    font-weight: 700;
+                    color: #64748b;
+                    padding: 8px 10px !important;
+                    font-size: 0.8rem;
+                    text-decoration: none !important;
                 }
                 .fc-day-today .fc-daygrid-day-number {
-                    background-color: #0f172a;
+                    background: linear-gradient(135deg, #0d9488, #0f766e);
                     color: white;
                     border-radius: 50%;
-                    width: 28px;
-                    height: 28px;
+                    width: 26px;
+                    height: 26px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    margin: 4px;
                     padding: 0 !important;
+                    margin: 6px;
+                    font-size: 0.75rem;
+                    box-shadow: 0 0 12px rgba(13,148,136,0.4);
                 }
+                .fc-day-other .fc-daygrid-day-number {
+                    color: #334155;
+                }
+
+                /* Events */
                 .fc-event {
-                    border-radius: 6px;
-                    border: none;
-                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-                    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
+                    border: none !important;
+                    background: transparent !important;
+                    box-shadow: none;
                     cursor: pointer;
-                    overflow: hidden;
-                    background-color: transparent !important;
+                    overflow: visible;
+                }
+                .fc-event:hover {
+                    filter: brightness(1.15);
+                    transform: translateY(-1px);
+                    z-index: 10 !important;
                 }
                 .fc-daygrid-event {
                     margin-top: 2px !important;
+                    border-radius: 6px;
                 }
-                .fc-daygrid-event-dot {
-                    display: none; /* Hide default dot to use our custom one */
-                }
-                .fc-event-main {
-                    padding: 0 !important;
-                }
-                .fc-event:hover {
-                    transform: translateY(-1px) scale(1.01);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-                    z-index: 5 !important;
-                    filter: brightness(1.05);
-                }
+                .fc-daygrid-event-dot { display: none; }
+                .fc-event-main { padding: 0 !important; overflow: visible; }
+
+                /* Time grid */
                 .fc-timegrid-slot-label-cushion {
-                    font-size: 0.75rem;
-                    color: #94a3b8;
-                    font-weight: 500;
-                }
-                .fc-timegrid-axis-cushion {
                     font-size: 0.7rem;
-                    text-transform: uppercase;
-                    color: #cbd5e1;
+                    color: #334155;
+                    font-weight: 600;
+                    font-family: monospace;
                 }
                 .fc-timegrid-col.fc-day-today {
-                    background-color: rgba(240, 253, 250, 0.4);
+                    background: rgba(13,148,136,0.04) !important;
                 }
-                /* Hide empty scrollbars */
-                ::-webkit-scrollbar {
-                  width: 8px;
-                  height: 8px;
+                .fc-timegrid-now-indicator-line {
+                    border-color: #2dd4bf !important;
+                    box-shadow: 0 0 6px rgba(45,212,191,0.4);
                 }
-                ::-webkit-scrollbar-track {
-                  background: transparent;
+                .fc-timegrid-now-indicator-arrow {
+                    border-color: #2dd4bf transparent !important;
                 }
-                ::-webkit-scrollbar-thumb {
-                  background: #cbd5e1;
-                  border-radius: 4px;
+
+                /* "More" link */
+                .fc-daygrid-more-link {
+                    font-size: 10px;
+                    font-weight: 800;
+                    color: #2dd4bf !important;
+                    font-family: monospace;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
                 }
-                ::-webkit-scrollbar-thumb:hover {
-                  background: #94a3b8;
+
+                /* List view */
+                .fc-list-day-cushion {
+                    background: rgba(15,23,42,0.9) !important;
                 }
+                .fc-list-event:hover td {
+                    background: rgba(13,148,136,0.08) !important;
+                }
+                .fc-list-day-text, .fc-list-day-side-text {
+                    color: #2dd4bf !important;
+                    text-decoration: none !important;
+                }
+
+                /* Scrollbars */
+                ::-webkit-scrollbar { width: 6px; height: 6px; }
+                ::-webkit-scrollbar-track { background: transparent; }
+                ::-webkit-scrollbar-thumb { background: rgba(30,41,59,0.8); border-radius: 3px; }
+                ::-webkit-scrollbar-thumb:hover { background: rgba(13,148,136,0.4); }
             `}</style>
 
             <FullCalendar
                 ref={calendarRef}
-                plugins={[
-                    dayGridPlugin,
-                    timeGridPlugin,
-                    interactionPlugin,
-                    resourcePlugin,
-                    resourceTimelinePlugin
-                ]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, resourcePlugin, resourceTimelinePlugin]}
                 initialView="dayGridMonth"
                 headerToolbar={{
                     left: "prev,next today",
@@ -270,26 +309,18 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                 dayMaxEvents={true}
                 height="100%"
                 eventContent={renderEventContent}
-                eventClick={handleEventClick}
-                eventDrop={handleEventDrop}
-                select={handleDateSelect}
+                eventClick={(info) => onEventClick(info.event.id)}
+                eventDrop={(info) => onEventDropped(info.event.id, info.event.start!, info.event.end)}
+                select={(info) => {
+                    if (onDateSelect) onDateSelect(info.start, info.end, info.allDay);
+                    info.view.calendar.unselect();
+                }}
                 nowIndicator={true}
                 slotMinTime="06:00:00"
                 slotMaxTime="23:00:00"
                 allDayText="Día entero"
-                slotLabelFormat={{
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    omitZeroMinute: false,
-                    meridiem: 'short'
-                }}
-                buttonText={{
-                    today: 'Hoy',
-                    month: 'Mes',
-                    week: 'Semana',
-                    day: 'Día',
-                    list: 'Agenda'
-                }}
+                slotLabelFormat={{ hour: 'numeric', minute: '2-digit', omitZeroMinute: false, meridiem: 'short' }}
+                buttonText={{ today: 'Hoy', month: 'Mes', week: 'Semana', day: 'Día', list: 'Agenda' }}
             />
         </div>
     );
