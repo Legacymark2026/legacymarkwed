@@ -3,15 +3,6 @@ import type { UserRole } from '@/types/auth';
 import { canAccessRoute, isPublicRoute } from "@/lib/rbac";
 import { NextResponse } from "next/server";
 
-/**
- * Auth configuration for NextAuth.js
- * El callback `authorized` actúa como segunda capa de RBAC (después del middleware).
- * RBAC rules:
- *   - Rutas públicas → always OK
- *   - No autenticado → redirige a login
- *   - GUEST (usuario nuevo sin rol asignado) → redirige a /auth/pending-approval
- *   - Cualquier otro rol → verifica canAccessRoute() contra rbac.ts
- */
 export const authConfig: NextAuthConfig = {
     pages: {
         signIn: "/auth/login",
@@ -42,6 +33,8 @@ export const authConfig: NextAuthConfig = {
                     session.user.companyId = token.companyId as string;
                 }
                 session.user.permissions = token.permissions as import("@/types/auth").Permission[] | undefined;
+                // Propagar allowedRoutes al cliente para el sidebar
+                (session.user as any).allowedRoutes = (token.allowedRoutes as string[]) ?? [];
             }
             return session;
         },
@@ -52,13 +45,13 @@ export const authConfig: NextAuthConfig = {
             // Rutas públicas → siempre OK
             if (isPublicRoute(pathname)) return true;
 
-            // Página de espera → accesible si está logueado (GUEST puede verla)
+            // Página de espera → accesible si está logueado
             if (pathname.startsWith('/auth/pending-approval')) return isLoggedIn;
 
             // No autenticado → redirect a login
             if (!isLoggedIn) return false;
 
-            // ── Usuario eliminado ─────────────────────────────────────────
+            // ── Usuario eliminado ────────────────────────────────────────
             const isDeleted = (auth?.user as any)?.isDeleted;
             if (isDeleted) {
                 const loginUrl = new URL('/auth/login?deleted=1', nextUrl.origin);
@@ -68,21 +61,21 @@ export const authConfig: NextAuthConfig = {
             // Protección de rutas del dashboard
             if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
                 const role = (auth?.user?.role as string) || 'guest';
-                // Permisos del token (para custom roles)
-                const permissions = ((auth?.user as any)?.permissions as string[]) || [];
 
-                // GUEST → redirige a pending-approval (NO al login, para UX clara)
+                // GUEST → redirige a pending-approval
                 if (role === 'guest') {
                     const pendingUrl = new URL('/auth/pending-approval', nextUrl.origin);
                     return NextResponse.redirect(pendingUrl);
                 }
 
-                // Pasar permisos a canAccessRoute para que custom roles funcionen
-                return canAccessRoute(pathname, role as UserRole, permissions);
+                // Para roles custom: leer allowedRoutes del JWT (embebidas al hacer login)
+                const allowedRoutes = ((auth as any)?.token?.allowedRoutes as string[]) ?? [];
+
+                return canAccessRoute(pathname, role as UserRole, allowedRoutes);
             }
 
             return true;
         },
     },
-    providers: [], // Providers are configured in lib/auth.ts
+    providers: [],
 } satisfies NextAuthConfig;

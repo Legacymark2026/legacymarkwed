@@ -2,14 +2,14 @@
  * lib/rbac.ts
  * ─────────────────────────────────────────────────────
  * Matriz de Control de Acceso Basado en Roles (RBAC).
- * Define qué roles pueden acceder a cada ruta del dashboard.
+ * Define qué roles estándar pueden acceder a cada ruta del dashboard.
  *
- * Esta es la ÚNICA fuente de verdad para las reglas de acceso.
+ * Esta es la ÚNICA fuente de verdad para los roles ESTÁNDAR.
  * El middleware, el sidebar y los guards leen de aquí.
  *
- * Soporta dos tipos de roles:
- *   1. Roles estándar (UserRole enum)
- *   2. Roles custom (string libre) definidos en CUSTOM_ROLE_PERMISSIONS
+ * Para roles CUSTOM → los permisos se guardan en la tabla `role_configs`
+ * de la BD y se embeben en el JWT al hacer login.
+ * Ver: lib/role-config.ts para la lógica de BD.
  */
 import { UserRole } from "@/types/auth";
 
@@ -48,10 +48,10 @@ export const PUBLIC_PREFIXES = [
     "/api/webhooks/",
 ];
 
-// ── Matriz de permisos para roles ESTÁNDAR ─────────────────
-// Si una ruta no aparece aquí pero está bajo /dashboard → requiere autenticación
-// y cualquier rol autenticado puede acceder (salvo GUEST).
+// ── Roles estándar del sistema ────────────────────────────
+export const STANDARD_ROLES = Object.values(UserRole);
 
+// ── Matriz de permisos para roles ESTÁNDAR ─────────────────
 export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     // ── Acceso universal autenticado ──────────────────────
     "/dashboard": [
@@ -71,20 +71,11 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     "/dashboard/analytics": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_MANAGER],
 
     // ── Contenido / Blog ──────────────────────────────────
-    "/dashboard/posts": [
-        UserRole.SUPER_ADMIN, UserRole.ADMIN,
-        UserRole.CONTENT_MANAGER, UserRole.CLIENT_USER,
-    ],
-    "/dashboard/posts/create": [
-        UserRole.SUPER_ADMIN, UserRole.ADMIN,
-        UserRole.CONTENT_MANAGER, UserRole.CLIENT_USER,
-    ],
+    "/dashboard/posts": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.CLIENT_USER],
+    "/dashboard/posts/create": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.CLIENT_USER],
 
     // ── Proyectos / Portafolio ────────────────────────────
-    "/dashboard/projects": [
-        UserRole.SUPER_ADMIN, UserRole.ADMIN,
-        UserRole.CONTENT_MANAGER, UserRole.CLIENT_USER,
-    ],
+    "/dashboard/projects": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CONTENT_MANAGER, UserRole.CLIENT_USER],
 
     // ── Inbox Omnicanal ───────────────────────────────────
     "/dashboard/inbox": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CLIENT_ADMIN],
@@ -105,43 +96,9 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     "/dashboard/admin/crm/leads": [UserRole.SUPER_ADMIN, UserRole.CLIENT_ADMIN],
     "/dashboard/admin/crm/pipeline": [UserRole.SUPER_ADMIN, UserRole.CLIENT_ADMIN],
     "/dashboard/admin/crm/campaigns": [UserRole.SUPER_ADMIN, UserRole.CLIENT_ADMIN, UserRole.CONTENT_MANAGER],
-};
 
-// ── Matriz de permisos para roles CUSTOM ──────────────────
-// Añade aquí cualquier rol personalizado con las rutas que puede acceder.
-// La clave es el nombre del rol (en minúsculas, como se guarda en DB).
-// El valor es el array de rutas accesibles.
-//
-// Para añadir un nuevo rol custom:
-//   "nombre_rol": ["/dashboard", "/dashboard/ruta1", "/dashboard/ruta2"]
-//
-export const CUSTOM_ROLE_PERMISSIONS: Record<string, string[]> = {
-    // ── Gerente: acceso a Dashboard, Analytics, Inbox, CRM, Marketing ──
-    "gerente": [
-        "/dashboard",
-        "/dashboard/analytics",
-        "/dashboard/inbox",
-        "/dashboard/marketing",
-        "/dashboard/marketing/campaigns",
-        "/dashboard/marketing/links",
-        "/dashboard/admin/crm",
-        "/dashboard/admin/crm/leads",
-        "/dashboard/admin/crm/pipeline",
-        "/dashboard/admin/crm/campaigns",
-    ],
-
-    // ── Viewer: acceso de solo lectura a Dashboard, Posts y Proyectos ──
-    "viewer": [
-        "/dashboard",
-        "/dashboard/posts",
-        "/dashboard/projects",
-    ],
-
-    // ── Plantilla para agregar nuevos roles ──
-    // "nombre_rol": [
-    //     "/dashboard",
-    //     "/dashboard/ruta1",
-    // ],
+    // ── Calendario / Eventos ──────────────────────────────
+    "/dashboard/events": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CLIENT_ADMIN],
 };
 
 // ── Helpers ───────────────────────────────────────────────
@@ -155,55 +112,68 @@ export function isPublicRoute(pathname: string): boolean {
 }
 
 /**
- * Dado un pathname y un rol, verifica si el rol tiene acceso.
- * Soporta roles estándar (ROUTE_PERMISSIONS) y custom (CUSTOM_ROLE_PERMISSIONS).
+ * Verifica si un rol es estándar del sistema.
  */
-export function canAccessRoute(pathname: string, role: UserRole | string, permissions: string[] = []): boolean {
-    // SuperAdmin accede a todo sin restricción
-    if (role === UserRole.SUPER_ADMIN) return true;
+export function isStandardRole(role: string): boolean {
+    return STANDARD_ROLES.includes(role as UserRole);
+}
 
-    // ── Verificar roles CUSTOM primero ──────────────────────
-    const roleLower = role.toString().toLowerCase();
-    if (CUSTOM_ROLE_PERMISSIONS[roleLower]) {
-        const allowedRoutes = CUSTOM_ROLE_PERMISSIONS[roleLower];
-
-        for (const allowed of allowedRoutes) {
-            // Exact match siempre funciona
-            if (pathname === allowed) return true;
-            // Prefix match SOLO para rutas con sub-paths reales
-            // EXCLUIR /dashboard del prefix match porque /dashboard/ es prefijo
-            // de ABSOLUTAMENTE TODAS las rutas del dashboard
-            if (allowed !== '/dashboard' && pathname.startsWith(allowed + '/')) return true;
-        }
-        return false;
+/**
+ * Verifica si un rol CUSTOM puede acceder a una ruta.
+ * allowedRoutes viene del JWT (leído de la BD al hacer login).
+ *
+ * REGLA: exact match O prefix match con '/' separador,
+ *        EXCEPTO /dashboard que solo es exact match.
+ */
+export function canCustomRoleAccess(allowedRoutes: string[], pathname: string): boolean {
+    for (const allowed of allowedRoutes) {
+        if (pathname === allowed) return true;
+        // CRÍTICO: /dashboard no hace prefix match (sería prefix de TODAS las rutas)
+        if (allowed !== '/dashboard' && pathname.startsWith(allowed + '/')) return true;
     }
+    return false;
+}
 
-    // ── Verificar roles ESTÁNDAR ──────────────────────────
-    const isStandardRole = Object.values(UserRole).includes(role as UserRole);
-
-    if (!isStandardRole) {
-        // Rol desconocido sin permisos configurados → bloqueado
-        return false;
-    }
+/**
+ * Dado un pathname y un rol, verifica si tiene acceso.
+ *
+ * @param pathname   - La ruta a verificar
+ * @param role       - El rol del usuario (estándar o custom)
+ * @param allowedRoutes - Para roles custom: las rutas permitidas del JWT/BD
+ */
+export function canAccessRoute(
+    pathname: string,
+    role: UserRole | string,
+    allowedRoutes: string[] = []
+): boolean {
+    // SuperAdmin accede a todo
+    if (role === UserRole.SUPER_ADMIN || role === 'super_admin') return true;
 
     // GUEST siempre bloqueado
-    if (role === UserRole.GUEST) return false;
+    if (role === UserRole.GUEST || role === 'guest') return false;
 
-    // Buscar match exacto
+    // ── Roles CUSTOM → usar allowedRoutes del JWT ─────────
+    if (!isStandardRole(role)) {
+        if (allowedRoutes.length === 0) return false; // sin configuración → acceso denegado
+        return canCustomRoleAccess(allowedRoutes, pathname);
+    }
+
+    // ── Roles ESTÁNDAR → usar ROUTE_PERMISSIONS ───────────
+    // Buscar match exacto primero
     if (ROUTE_PERMISSIONS[pathname]) {
         return ROUTE_PERMISSIONS[pathname].includes(role as UserRole);
     }
 
-    // Buscar el prefijo más largo que haga match
+    // Buscar el prefijo más específico
     const matchingPrefixes = Object.keys(ROUTE_PERMISSIONS)
-        .filter((route) => pathname.startsWith(route + '/') || pathname === route)
+        .filter((route) => route !== '/dashboard' && pathname.startsWith(route + '/'))
         .sort((a, b) => b.length - a.length);
 
     if (matchingPrefixes.length > 0) {
         return ROUTE_PERMISSIONS[matchingPrefixes[0]].includes(role as UserRole);
     }
 
-    // Ruta bajo /dashboard no listada → cualquier rol autenticado (salvo GUEST)
+    // Ruta bajo /dashboard no listada → cualquier rol autenticado
     if (pathname.startsWith("/dashboard")) {
         return role !== UserRole.GUEST;
     }
@@ -212,20 +182,12 @@ export function canAccessRoute(pathname: string, role: UserRole | string, permis
 }
 
 /**
- * Devuelve la lista de rutas del dashboard accesibles por un rol.
- * Usada por el sidebar para filtrar la navegación.
+ * Devuelve la lista de rutas accesibles por un rol estándar.
+ * Para roles custom usar allowedRoutes del JWT directamente.
  */
-export function getAccessibleRoutes(role: UserRole | string): string[] {
+export function getAccessibleRoutes(role: UserRole): string[] {
     if (role === UserRole.SUPER_ADMIN) return Object.keys(ROUTE_PERMISSIONS);
-
-    // Roles custom
-    const roleLower = role.toString().toLowerCase();
-    if (CUSTOM_ROLE_PERMISSIONS[roleLower]) {
-        return CUSTOM_ROLE_PERMISSIONS[roleLower];
-    }
-
-    // Roles estándar
     return Object.entries(ROUTE_PERMISSIONS)
-        .filter(([, roles]) => roles.includes(role as UserRole))
+        .filter(([, roles]) => roles.includes(role))
         .map(([route]) => route);
 }

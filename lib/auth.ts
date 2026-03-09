@@ -11,6 +11,15 @@ import { authConfig } from "@/auth.config";
 import type { Permission } from "@/types/auth";
 import { UserRole } from "@/types/auth";
 import { logger } from "@/lib/logger";
+import { getRoleAllowedRoutes } from "@/lib/role-config";
+import { isStandardRole } from "@/lib/rbac";
+
+/** Carga las rutas permitidas para un rol custom desde la BD */
+async function loadAllowedRoutes(role: string): Promise<string[]> {
+    if (isStandardRole(role)) return []; // roles estándar no usan allowedRoutes
+    const routes = await getRoleAllowedRoutes(role);
+    return routes ?? [];
+}
 
 
 const signInSchema = z.object({
@@ -188,6 +197,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             token.role = dbAccount.user.role;
                             token.companyId = userWithMeta?.companies[0]?.companyId ?? null;
                             token.permissions = ((userWithMeta?.companies[0]?.permissions ?? []) as string[]) as Permission[];
+                            // ── RoleConfig: cargar rutas permitidas para roles custom
+                            token.allowedRoutes = await loadAllowedRoutes(dbAccount.user.role);
                             token.roleCheckedAt = Date.now();
                             return token;
                         }
@@ -225,6 +236,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         token.role = dbUser.role;
                         token.companyId = userWithMeta?.companies[0]?.companyId ?? null;
                         token.permissions = ((userWithMeta?.companies[0]?.permissions ?? []) as string[]) as Permission[];
+                        // ── RoleConfig: cargar rutas permitidas para roles custom
+                        token.allowedRoutes = await loadAllowedRoutes(dbUser.role);
                         token.roleCheckedAt = Date.now();
                     } else {
                         logger.auth("JWT: User not found in DB, using OAuth ID as fallback.");
@@ -262,6 +275,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             token.role = freshUser.role as UserRole;
                             token.companyId = freshUser.companies[0]?.companyId ?? token.companyId;
                             token.permissions = ((freshUser.companies[0]?.permissions ?? []) as string[]) as Permission[];
+                            // ── RoleConfig: refrescar rutas permitidas si el rol cambió
+                            token.allowedRoutes = await loadAllowedRoutes(freshUser.role);
                             token.roleCheckedAt = Date.now();
                             logger.auth(`JWT: Role refreshed from DB → ${token.role}`);
                         } else {
