@@ -296,22 +296,15 @@ export async function getEvents(filters?: { startDate?: string; endDate?: string
 
         const where: any = { companyId };
 
-        // Scope logic:
-        // Admin: Can see all company events.
-        // Others (PM / Exec): Just scoping to their own events for now, or events they are participants in. (V1 simple scope)
-        if (!isAdmin) {
-            where.OR = [
-                { organizerId: userId },
-                { participants: { some: { userId: userId } } }
-            ];
-        }
+        // Todos los usuarios autorizados (que pueden ver el calendario) pueden
+        // ver todos los eventos de la compañía, no solo los propios.
 
         if (filters?.startDate) where.startDate = { gte: new Date(filters.startDate) };
         if (filters?.endDate) where.endDate = { lte: new Date(filters.endDate) };
 
-        if (filters?.organizerId && isAdmin) {
+        // Todos pueden filtrar por el calendario específico de alguien si el frontend lo envía
+        if (filters?.organizerId) {
             where.organizerId = filters.organizerId;
-            delete where.OR; // Override simple scope if admin filters explicitly
         }
 
         const events = await prisma.event.findMany({

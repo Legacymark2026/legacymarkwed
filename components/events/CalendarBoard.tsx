@@ -59,7 +59,7 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                     allDay: e.isAllDay,
                     backgroundColor: c.fc,
                     borderColor: 'transparent',
-                    extendedProps: { type: e.type, status: e.status }
+                    extendedProps: { type: e.type, status: e.status, organizerName: e.organizer?.name }
                 };
             });
     }, [events, filters]);
@@ -103,6 +103,15 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                 }}>
                     {event.title}
                 </div>
+                {event.extendedProps.organizerName && (
+                    <div style={{
+                        fontSize: '9px', fontWeight: 600, color: 'rgba(148,163,184,0.8)',
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        marginTop: 'auto'
+                    }}>
+                        👤 {event.extendedProps.organizerName}
+                    </div>
+                )}
             </div>
         );
     };
