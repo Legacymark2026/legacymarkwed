@@ -49,125 +49,121 @@ export function CreateLeadDialog({ companyId, trigger }: Props) {
         }
     };
 
-    const inputCls = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all";
+    const inputCls = "w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all text-slate-200 placeholder-slate-600";
+    const inputStyle = { background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.9)', borderRadius: '10px', padding: '9px 14px', fontSize: '13px', color: '#cbd5e1', width: '100%', outline: 'none' } as React.CSSProperties;
 
     const dialogContent = open && (
         <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
             onClick={(e) => e.target === e.currentTarget && !loading && setOpen(false)}
         >
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                {/* Header */}
-                <div className="sticky top-0 bg-white rounded-t-3xl px-8 pt-8 pb-4 border-b border-slate-50 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-sky-500 flex items-center justify-center text-white flex-shrink-0">
-                            <UserPlus className="w-5 h-5" />
+            <div style={{ background: 'rgba(11,15,25,0.98)', border: '1px solid rgba(30,41,59,0.9)', borderRadius: '20px', boxShadow: '0 25px 80px rgba(0,0,0,0.6)', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto' }}>
+                <div style={{ position: 'sticky', top: 0, background: 'rgba(11,15,25,0.98)', borderRadius: '20px 20px 0 0', padding: '24px 28px 16px', borderBottom: '1px solid rgba(30,41,59,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg,#0d9488,#0891b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <UserPlus style={{ width: '18px', height: '18px', color: '#fff' }} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-black text-slate-900">Nuevo Lead</h2>
-                            <p className="text-xs text-slate-400">Registra un contacto manualmente</p>
+                            <h2 style={{ fontSize: '17px', fontWeight: 900, color: '#f1f5f9', margin: 0 }}>Nuevo Lead</h2>
+                            <p style={{ fontSize: '11px', color: '#475569', margin: 0, fontFamily: 'monospace' }}>Registra un contacto manualmente</p>
                         </div>
                     </div>
-                    <button onClick={() => setOpen(false)} disabled={loading} className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-                        <X className="w-5 h-5" />
+                    <button onClick={() => setOpen(false)} disabled={loading}
+                        style={{ padding: '6px', borderRadius: '8px', color: '#475569', background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.6)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'none'; (e.currentTarget as HTMLElement).style.color = '#475569'; }}>
+                        <X style={{ width: '18px', height: '18px' }} />
                     </button>
                 </div>
 
                 {success ? (
-                    <div className="px-8 py-16 text-center">
-                        <div className="text-5xl mb-4">🎉</div>
-                        <h3 className="text-lg font-black text-slate-900">¡Lead creado!</h3>
-                        <p className="text-sm text-slate-400 mt-2">El lead fue registrado correctamente.</p>
+                    <div style={{ padding: '48px 28px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '48px', marginBottom: '12px' }}>🎉</div>
+                        <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#f1f5f9', margin: '0 0 8px' }}>¡Lead creado!</h3>
+                        <p style={{ fontSize: '13px', color: '#475569', margin: 0 }}>El lead fue registrado correctamente.</p>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="px-8 pb-8 pt-5 space-y-5">
+                    <form onSubmit={handleSubmit} style={{ padding: '20px 28px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {/* Datos de contacto */}
                         <div>
-                            <p className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">📋 Datos de Contacto</p>
-                            <div className="space-y-3">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-semibold text-slate-600">Nombre</label>
-                                        <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ana García" className={inputCls} />
+                            <p style={{ fontSize: '10px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'monospace', marginBottom: '12px' }}>📋 Datos de Contacto</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                    <div>
+                                        <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '6px', fontFamily: 'monospace' }}>Nombre</label>
+                                        <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ana García" style={inputStyle} />
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-semibold text-slate-600">Empresa</label>
-                                        <input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="Mi Empresa S.A.S" className={inputCls} />
+                                    <div>
+                                        <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '6px', fontFamily: 'monospace' }}>Empresa</label>
+                                        <input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="Mi Empresa S.A.S" style={inputStyle} />
                                     </div>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-slate-600">Email <span className="text-red-400">*</span></label>
-                                    <input type="email" required value={form.email} onChange={(e) => set("email", e.target.value)} onBlur={handleEmailBlur} placeholder="ana@empresa.com" className={inputCls} />
+                                <div>
+                                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '6px', fontFamily: 'monospace' }}>Email <span style={{ color: '#f87171' }}>*</span></label>
+                                    <input type="email" required value={form.email} onChange={(e) => set("email", e.target.value)} onBlur={handleEmailBlur} placeholder="ana@empresa.com" style={inputStyle} />
                                     {duplicate && (
-                                        <div className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs">
-                                            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                                            <span className="text-amber-800">Ya existe: <strong>{duplicate.leadName ?? duplicate.leadId}</strong></span>
-                                            <Link href={`/dashboard/admin/crm/leads/${duplicate.leadId}`} onClick={() => setOpen(false)} className="ml-auto font-bold text-teal-600 hover:underline">Ver →</Link>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: '8px', marginTop: '6px', fontSize: '12px' }}>
+                                            <AlertTriangle style={{ width: '14px', height: '14px', color: '#fbbf24', flexShrink: 0 }} />
+                                            <span style={{ color: '#fcd34d' }}>Ya existe: <strong>{duplicate.leadName ?? duplicate.leadId}</strong></span>
+                                            <Link href={`/dashboard/admin/crm/leads/${duplicate.leadId}`} onClick={() => setOpen(false)} style={{ marginLeft: 'auto', color: '#2dd4bf', fontWeight: 700, fontSize: '11px' }}>Ver →</Link>
                                         </div>
                                     )}
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-slate-600">WhatsApp / Teléfono</label>
-                                    <input type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+57 300 000 0000" className={inputCls} />
+                                <div>
+                                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '6px', fontFamily: 'monospace' }}>WhatsApp / Teléfono</label>
+                                    <input type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+57 300 000 0000" style={inputStyle} />
                                 </div>
                             </div>
                         </div>
 
                         {/* Fuente */}
                         <div>
-                            <p className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">🌐 Fuente</p>
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-slate-600">¿De dónde viene este lead? <span className="text-red-400">*</span></label>
-                                <select required value={form.source} onChange={(e) => set("source", e.target.value)} className={inputCls}>
+                            <p style={{ fontSize: '10px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'monospace', marginBottom: '12px' }}>🌐 Fuente</p>
+                            <div>
+                                <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '6px', fontFamily: 'monospace' }}>¿De dónde viene este lead? <span style={{ color: '#f87171' }}>*</span></label>
+                                <select required value={form.source} onChange={(e) => set("source", e.target.value)} style={inputStyle}>
                                     {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
                                 </select>
                             </div>
                         </div>
-
-                        {/* Mensaje */}
                         <div>
-                            <p className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">💬 Mensaje / Notas</p>
-                            <textarea
-                                value={form.message} onChange={(e) => set("message", e.target.value)}
-                                rows={3} placeholder="¿En qué está interesado este lead? Contexto adicional..."
-                                className={`${inputCls} resize-none`}
-                            />
+                            <p style={{ fontSize: '10px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'monospace', marginBottom: '12px' }}>💬 Mensaje / Notas</p>
+                            <textarea value={form.message} onChange={(e) => set("message", e.target.value)} rows={3} placeholder="¿En qué está interesado este lead?" style={{ ...inputStyle, resize: 'none' }} />
                         </div>
 
-                        {/* UTMs (collapsible) */}
-                        <details className="group">
-                            <summary className="text-xs font-black text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700 select-none flex items-center gap-2">
-                                <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
+                        <details>
+                            <summary style={{ fontSize: '10px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'monospace', cursor: 'pointer', userSelect: 'none', listStyle: 'none', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                                 📊 UTM / Atribución (opcional)
                             </summary>
-                            <div className="mt-3 grid grid-cols-3 gap-3">
+                            <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                                 {[
-                                    { key: "utmSource", label: "UTM Source", placeholder: "google" },
-                                    { key: "utmMedium", label: "UTM Medium", placeholder: "cpc" },
-                                    { key: "utmCampaign", label: "UTM Campaign", placeholder: "brand-q1" },
+                                    { key: "utmSource", label: "Source", placeholder: "google" },
+                                    { key: "utmMedium", label: "Medium", placeholder: "cpc" },
+                                    { key: "utmCampaign", label: "Campaign", placeholder: "brand-q1" },
                                 ].map((f) => (
-                                    <div key={f.key} className="space-y-1.5">
-                                        <label className="text-xs font-semibold text-slate-600">{f.label}</label>
-                                        <input value={form[f.key as keyof typeof form]} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder} className={inputCls} />
+                                    <div key={f.key}>
+                                        <label style={{ fontSize: '10px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px', fontFamily: 'monospace' }}>{f.label}</label>
+                                        <input value={form[f.key as keyof typeof form]} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder} style={inputStyle} />
                                     </div>
                                 ))}
                             </div>
                         </details>
 
                         {error && (
-                            <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">{error}</div>
+                            <div style={{ padding: '10px 14px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: '10px', fontSize: '12px', color: '#f87171' }}>{error}</div>
                         )}
 
-                        <div className="flex gap-3 pt-2">
-                            <button
-                                type="button" onClick={() => setOpen(false)} disabled={loading}
-                                className="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors disabled:opacity-40"
+                        <div style={{ display: 'flex', gap: '10px', paddingTop: '4px' }}>
+                            <button type="button" onClick={() => setOpen(false)} disabled={loading}
+                                style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1px solid rgba(30,41,59,0.9)', background: 'transparent', color: '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer', transition: 'all 0.15s' }}
+                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(13,148,136,0.4)'; (e.currentTarget as HTMLElement).style.color = '#2dd4bf'; }}
+                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#64748b'; }}
                             >
                                 Cancelar
                             </button>
-                            <button
-                                type="submit" disabled={loading}
-                                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold text-sm hover:from-teal-600 hover:to-emerald-600 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-teal-200 disabled:opacity-50"
+                            <button type="submit" disabled={loading}
+                                style={{ flex: 1, padding: '11px', borderRadius: '10px', background: 'linear-gradient(135deg,#0d9488,#0f766e)', color: '#fff', fontWeight: 800, fontSize: '13px', border: 'none', cursor: 'pointer', opacity: loading ? 0.5 : 1, boxShadow: '0 4px 20px rgba(13,148,136,0.3)' }}
                             >
                                 {loading ? "Creando…" : "Crear Lead ✓"}
                             </button>
@@ -182,8 +178,12 @@ export function CreateLeadDialog({ companyId, trigger }: Props) {
         <>
             <div onClick={() => setOpen(true)}>
                 {trigger ?? (
-                    <button className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white text-sm font-bold rounded-xl hover:bg-teal-700 transition-colors shadow-lg shadow-teal-200">
-                        <UserPlus className="w-4 h-4" /> Nuevo Lead
+                    <button
+                        style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 18px', background: 'linear-gradient(135deg,#0d9488,#0f766e)', color: '#fff', fontSize: '13px', fontWeight: 800, borderRadius: '10px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(13,148,136,0.3)', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+                    >
+                        <UserPlus style={{ width: '14px', height: '14px' }} /> Nuevo Lead
                     </button>
                 )}
             </div>
