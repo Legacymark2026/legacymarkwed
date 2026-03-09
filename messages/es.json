@@ -29,10 +29,13 @@
       "design": "Diseño & Creatividad",
       "analytics": "Analytics & ROI",
       "flyering": "Marketing 360°",
+      "automation": "Automatización & IA",
+      "webdev": "Desarrollo Web",
       "methodology": "Metodología",
       "portfolio": "Portfolio",
       "blog": "Insights",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "about": "Nosotros"
     },
     "ctaBadge": "Disponibles para nuevos proyectos",
     "ctaTitleStart": "¿Listo para ",
