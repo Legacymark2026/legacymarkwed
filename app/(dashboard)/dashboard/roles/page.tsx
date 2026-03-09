@@ -50,7 +50,7 @@ export default function RolesPage() {
     useEffect(() => {
         async function load() {
             const [cfg, usr] = await Promise.all([getRoleConfigs(), getUsersWithRoles()]);
-            setRoles(cfg.map(r => ({ ...r, allowedRoutes: r.allowedRoutes as string[] })));
+            setRoles((cfg as RoleConfig[]).map(r => ({ ...r, allowedRoutes: r.allowedRoutes as string[] })));
             setUsers(usr);
         }
         load();
