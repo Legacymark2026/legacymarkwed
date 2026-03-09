@@ -14,14 +14,15 @@ const { auth } = NextAuth(authConfig);
 export default auth(function middleware(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
-    // Si es una ruta de API o Auth, dejamos que NextAuth se encargue 
+    // Si es una ruta de API o Auth, dejamos que NextAuth se encargue
     const isApiOrAuth = pathname.startsWith("/api") || pathname.startsWith("/auth") || pathname.startsWith("/_next");
     if (isApiOrAuth) {
         return NextResponse.next();
     }
 
-    // Para el dashboard, pasamos directo ya que NextAuth maneja la protección
-    // (A menos que también quieras traducir el dashboard, en cuyo caso lo quitamos de aquí)
+    // ── DASHBOARD: el authorized() callback de NextAuth YA verifica permisos.
+    // NO hacer NextResponse.next() aquí — eso bypasaría el RBAC.
+    // auth() wrapper aplica authorized() antes de llegar a este handler.
     if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) {
         return NextResponse.next();
     }

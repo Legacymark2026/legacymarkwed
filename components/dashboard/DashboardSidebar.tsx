@@ -6,12 +6,12 @@ import {
     Lock, UserCog, DollarSign, CheckSquare, Zap, Mail, Calendar, Wand2,
     Activity, Wifi
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth";
 import Image from "next/image";
-import { canAccessRoute } from "@/lib/rbac";
+import { canAccessRoute, isStandardRole } from "@/lib/rbac";
 import { UserRole } from "@/types/auth";
 import { prisma } from "@/lib/prisma";
+import { getRoleAllowedRoutes, canCustomRoleAccess } from "@/lib/role-config";
 
 interface NavItem { href: string; label: string; icon: React.ReactNode; code?: string; }
 interface NavGroup { title: string; code: string; accent?: string; items: NavItem[]; }
@@ -107,10 +107,11 @@ interface DashboardSidebarProps {
 export async function DashboardSidebar({ role: _roleProp, name, email, image, userId }: DashboardSidebarProps) {
     let userPermissions: string[] = [];
     let customRoleName: string | undefined;
+    // ── allowedRoutes del RoleConfig (fuente de verdad para roles custom) ──
+    let roleAllowedRoutes: string[] = [];
 
     // ── DB-First: siempre leer el rol real desde la DB para evitar sesión stale ──
-    // Esto garantiza que el sidebar refleje el rol actual aunque el JWT sea viejo.
-    let dbRole: string = _roleProp; // fallback al prop si DB falla
+    let dbRole: string = _roleProp;
 
     if (userId) {
         const [dbUser, companyUser] = await Promise.all([
@@ -128,11 +129,17 @@ export async function DashboardSidebar({ role: _roleProp, name, email, image, us
 
         if (companyUser) {
             userPermissions = (companyUser.permissions as string[]) ?? [];
-            // Resolver el nombre del custom role
             const settings = (companyUser.company?.defaultCompanySettings as any) || {};
             const customRoles = settings.customRoles || [];
             const matched = customRoles.find((r: any) => r.id === dbRole);
             if (matched) customRoleName = matched.name;
+        }
+
+        // ── Para roles custom: cargar allowedRoutes desde RoleConfig (BD) ──
+        // Esta es la fuente de verdad: las rutas configuradas en el editor de roles.
+        if (!isStandardRole(dbRole)) {
+            const routes = await getRoleAllowedRoutes(dbRole);
+            roleAllowedRoutes = routes ?? [];
         }
     }
 
@@ -204,16 +211,21 @@ export async function DashboardSidebar({ role: _roleProp, name, email, image, us
         { perm: "team.roles", routes: ["/dashboard/users", "/dashboard/settings"] },
     ];
 
-    const isCustomRole = !Object.values(UserRole).includes(dbRole as UserRole);
+    const isCustomRole = !isStandardRole(dbRole);
 
-    const checkAccess = (href: string) => {
-        // Custom roles: SOLO verificar via PERMISSION_ROUTE_MAP.
-        // NO llamar canAccessRoute porque retornaría true para todo /dashboard/*.
-        // El admin configura exactamente qué módulos puede ver este rol.
+    const checkAccess = (href: string): boolean => {
         if (isCustomRole) {
-            // Dashboard base: accesible si tiene algún permiso
+            // ── FUENTE DE VERDAD PARA ROLES CUSTOM ────────────────────────────
+            // 1. Primero: verificar contra allowedRoutes del RoleConfig (BD).
+            //    Esto es lo que configura el admin en el editor de roles.
+            if (roleAllowedRoutes.length > 0) {
+                if (href === "/dashboard") return true; // siempre accesible si tiene rutas
+                return canCustomRoleAccess(roleAllowedRoutes, href);
+            }
+
+            // 2. Fallback: verificar contra permisos IAM granulares (companyUser.permissions)
+            //    Útil si se usa el editor de permisos en lugar del editor de rutas.
             if (href === "/dashboard") return userPermissions.length > 0;
-            // Subrutas: solo si tiene permiso específico
             for (const { perm, routes } of PERMISSION_ROUTE_MAP) {
                 if (userPermissions.includes(perm) && routes.some(r => href === r || href.startsWith(r + "/"))) {
                     return true;
@@ -222,16 +234,15 @@ export async function DashboardSidebar({ role: _roleProp, name, email, image, us
             return false;
         }
 
-        // Roles estándar del enum — usan canAccessRoute() de rbac.ts
+        // Roles estándar — usan canAccessRoute() de rbac.ts
         if (canAccessRoute(href, role as UserRole)) return true;
 
-        // Rol estándar que también tiene permisos explícitos (fallback)
+        // Fallback: permisos IAM explícitos para roles estándar con permisos extra
         for (const { perm, routes } of PERMISSION_ROUTE_MAP) {
             if (userPermissions.includes(perm) && routes.some(r => href === r || href.startsWith(r + "/"))) {
                 return true;
             }
         }
-
         return false;
     };
 
