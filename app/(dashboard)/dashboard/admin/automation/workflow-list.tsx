@@ -168,232 +168,149 @@ export default function WorkflowListClient({ initialWorkflows, analytics, recent
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            {/* HEROS SECTION / HEADER */}
+            {/* HEADER */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">Automation Center</h1>
-                    <p className="text-gray-500 mt-1">Orquesta y monitorea todos tus flujos de trabajo automáticos a gran escala.</p>
+                    <h1 style={{ fontSize: "28px", fontWeight: 900, color: "#f1f5f9", letterSpacing: "-0.02em", margin: 0 }}>Automation Center</h1>
+                    <p style={{ color: "#475569", marginTop: "4px", fontSize: "13px", fontFamily: "monospace" }}>Orquesta y monitorea todos tus flujos de trabajo automáticos.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Link href={`/dashboard/admin/automation/builder?new=true`}>
-                        <Button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700">
-                            <Plus size={16} /> Crear Nuevo Flujo
-                        </Button>
+                        <button style={{ display: "flex", alignItems: "center", gap: "6px", padding: "9px 18px", background: "linear-gradient(135deg,#6366f1,#7c3aed)", color: "#fff", fontSize: "12px", fontWeight: 800, borderRadius: "10px", border: "none", cursor: "pointer", boxShadow: "0 4px 16px rgba(99,102,241,0.4)" }}>
+                            <Plus size={14} /> Crear Nuevo Flujo
+                        </button>
                     </Link>
                 </div>
             </div>
 
-            {/* KEY METRICS CARDS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Flujos Totales</CardTitle>
-                        <Activity className="h-4 w-4 text-gray-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{analytics.totalWorkflows}</div>
-                        <p className="text-xs text-gray-500 mt-1">
-                            <span className="text-green-600 font-medium">{analytics.activeWorkflows} activos</span> en este momento
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Ejecuciones Históricas</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-gray-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{(analytics.totalExecutions || 0).toLocaleString()}</div>
-                        <p className="text-xs text-gray-500 mt-1">Disparos registrados en total</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Tasa de Éxito</CardTitle>
-                        <CheckCircle2 className="h-4 w-4 text-gray-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{analytics.successRate}%</div>
-                        <Progress value={analytics.successRate} className={`mt-2 h-2 ${analytics.successRate > 90 ? "[&>div]:bg-green-500" : "[&>div]:bg-yellow-500"}`} />
-                    </CardContent>
-                </Card>
-                <Card className="bg-slate-50 border-slate-200">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-700">Alertas Recientes</CardTitle>
-                        <AlertCircle className="h-4 w-4 text-orange-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-orange-600">
-                            {recentExecutions.filter(e => e.status === 'FAILED').length}
+            {/* KEY METRICS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                    { label: "Flujos Totales", value: analytics.totalWorkflows, sub: `${analytics.activeWorkflows} activos`, icon: <Activity size={15} />, color: "#6366f1" },
+                    { label: "Ejecuciones", value: (analytics.totalExecutions || 0).toLocaleString(), sub: "disparos totales", icon: <TrendingUp size={15} />, color: "#2dd4bf" },
+                    { label: "Tasa de Éxito", value: `${analytics.successRate}%`, sub: analytics.successRate > 90 ? "Excelente" : "Revisar", icon: <CheckCircle2 size={15} />, color: analytics.successRate > 90 ? "#34d399" : "#fbbf24" },
+                    { label: "Fallos Recientes", value: recentExecutions.filter(e => e.status === 'FAILED').length, sub: "últimos 10 disparos", icon: <AlertCircle size={15} />, color: "#f87171" },
+                ].map((m, i) => (
+                    <div key={i} style={{ background: "rgba(15,20,35,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "14px", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", fontFamily: "monospace", textTransform: "uppercase" }}>{m.label}</span>
+                            <span style={{ color: m.color, opacity: 0.8 }}>{m.icon}</span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">Fallos en los últimos 10 disparos</p>
-                    </CardContent>
-                </Card>
+                        <div style={{ fontSize: "28px", fontWeight: 900, color: m.color, fontFamily: "monospace", lineHeight: 1 }}>{m.value}</div>
+                        <div style={{ fontSize: "11px", color: "#334155", fontFamily: "monospace" }}>{m.sub}</div>
+                    </div>
+                ))}
             </div>
 
             {/* OPERATIONS BAR */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-lg border shadow-sm">
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                        <Input
-                            placeholder="Buscar por nombre, ID o disparador..."
-                            className="pl-9 w-full"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px", background: "rgba(11,15,25,0.7)", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(30,41,59,0.8)" }}>
+                <div style={{ position: "relative", flex: 1, minWidth: "240px", maxWidth: "360px" }}>
+                    <Search style={{ position: "absolute", left: "10px", top: "9px", width: "14px", height: "14px", color: "#475569" }} />
+                    <input placeholder="Buscar por nombre, ID o disparador..."
+                        style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "9px", padding: "8px 12px 8px 32px", fontSize: "12px", color: "#cbd5e1", outline: "none" }}
+                        value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                    {/* BULK ACTIONS (Visible only if selection > 0) */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     {selectedIds.size > 0 && (
-                        <div className="flex items-center gap-2 mr-4 animate-in slide-in-from-right-4">
-                            <span className="text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-md">
-                                {selectedIds.size} seleccionados
-                            </span>
-                            <Button size="sm" variant="outline" className="border-green-200 text-green-700 hover:bg-green-50" onClick={() => handleBulkToggle(true)} disabled={isLoading === "bulk"}>
-                                <Play className="h-4 w-4 mr-1" /> Activar
-                            </Button>
-                            <Button size="sm" variant="outline" className="border-orange-200 text-orange-700 hover:bg-orange-50" onClick={() => handleBulkToggle(false)} disabled={isLoading === "bulk"}>
-                                <Pause className="h-4 w-4 mr-1" /> Pausar
-                            </Button>
-                            <Button size="sm" variant="outline" className="border-red-200 text-red-700 hover:bg-red-50" onClick={handleBulkDelete} disabled={isLoading === "bulk"}>
-                                <Trash2 className="h-4 w-4 mr-1" /> Eliminar
-                            </Button>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "11px", fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,0.12)", padding: "4px 10px", borderRadius: "6px", fontFamily: "monospace" }}>{selectedIds.size} sel.</span>
+                            {[{ label: "Activar", fn: () => handleBulkToggle(true), c: "#34d399" }, { label: "Pausar", fn: () => handleBulkToggle(false), c: "#fbbf24" }, { label: "Eliminar", fn: handleBulkDelete, c: "#f87171" }].map(b => (
+                                <button key={b.label} onClick={b.fn} disabled={isLoading === "bulk"}
+                                    style={{ padding: "5px 10px", borderRadius: "7px", border: `1px solid ${b.c}40`, background: `${b.c}12`, color: b.c, fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>{b.label}</button>
+                            ))}
                         </div>
                     )}
-
-                    <div className="flex p-1 bg-gray-100 rounded-md border">
-                        <button
-                            onClick={() => setViewMode("list")}
-                            className={`p-1.5 rounded-sm transition-colors ${viewMode === "list" ? "bg-white shadow-sm" : "text-gray-500 hover:text-gray-900"}`}
-                        >
-                            <ListIcon size={18} />
-                        </button>
-                        <button
-                            onClick={() => setViewMode("grid")}
-                            className={`p-1.5 rounded-sm transition-colors ${viewMode === "grid" ? "bg-white shadow-sm" : "text-gray-500 hover:text-gray-900"}`}
-                        >
-                            <LayoutGrid size={18} />
-                        </button>
+                    <div style={{ display: "flex", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "3px" }}>
+                        {(["list", "grid"] as const).map(m => (
+                            <button key={m} onClick={() => setViewMode(m)}
+                                style={{ padding: "5px", borderRadius: "5px", background: viewMode === m ? "rgba(30,41,59,0.9)" : "transparent", border: "none", color: viewMode === m ? "#2dd4bf" : "#475569", cursor: "pointer", display: "flex" }}>
+                                {m === "list" ? <ListIcon size={15} /> : <LayoutGrid size={15} />}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* WORKFLOWS DISPLAY (LIST OR GRID) */}
             {filteredWorkflows.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 bg-gray-50 border border-dashed border-gray-300 rounded-xl">
-                    <div className="bg-white p-4 rounded-full shadow-sm mb-4">
-                        <Activity className="h-10 w-10 text-indigo-500" />
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "64px 16px", background: "rgba(11,15,25,0.4)", border: "1px dashed rgba(30,41,59,0.8)", borderRadius: "14px" }}>
+                    <div style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: "50%", padding: "16px", marginBottom: "16px", color: "#6366f1" }}>
+                        <Activity style={{ width: "36px", height: "36px" }} />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">No hay flujos de trabajo</h3>
-                    <p className="text-gray-500 mt-1 max-w-sm text-center">
-                        {searchQuery ? "No se encontraron flujos que coincidan con tu búsqueda." : "Crea tu primera automatización para ahorrar tiempo y optimizar tus procesos."}
+                    <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#64748b", margin: "0 0 8px", fontFamily: "monospace" }}>Sin flujos de trabajo</h3>
+                    <p style={{ fontSize: "12px", color: "#334155", textAlign: "center", maxWidth: "320px" }}>
+                        {searchQuery ? "Sin resultados para tu búsqueda." : "Crea tu primera automatización."}
                     </p>
                     {!searchQuery && (
-                        <Link href={`/dashboard/admin/automation/builder?new=true`} className="mt-6">
-                            <Button>Crear mi primer flujo</Button>
+                        <Link href={`/dashboard/admin/automation/builder?new=true`} style={{ marginTop: "20px" }}>
+                            <button style={{ padding: "8px 18px", background: "linear-gradient(135deg,#6366f1,#7c3aed)", color: "#fff", fontSize: "12px", fontWeight: 800, borderRadius: "9px", border: "none", cursor: "pointer" }}>Crear mi primer flujo</button>
                         </Link>
                     )}
                 </div>
             ) : viewMode === "list" ? (
                 /* LIST VIEW */
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50/80">
-                            <tr>
-                                <th className="px-6 py-3 text-left w-12">
-                                    <Checkbox
-                                        checked={selectedIds.size === filteredWorkflows.length && filteredWorkflows.length > 0}
-                                        onCheckedChange={toggleSelectAll}
-                                    />
+                <div style={{ background: "rgba(11,15,25,0.7)", borderRadius: "12px", border: "1px solid rgba(30,41,59,0.8)", overflow: "hidden" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <thead>
+                            <tr style={{ background: "rgba(15,23,42,0.9)", borderBottom: "1px solid rgba(30,41,59,0.9)" }}>
+                                <th style={{ padding: "10px 20px", textAlign: "left", width: "40px" }}>
+                                    <Checkbox checked={selectedIds.size === filteredWorkflows.length && filteredWorkflows.length > 0} onCheckedChange={toggleSelectAll} />
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre del Flujo</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Disparador</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ejecuciones</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actualizado</th>
-                                <th className="relative px-6 py-3"><span className="sr-only">Acciones</span></th>
+                                {["Nombre del Flujo", "Disparador", "Estado", "Ejecuciones", "Actualizado", ""].map(h => (
+                                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: "10px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "monospace" }}>{h}</th>
+                                ))}
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-100">
-                            {filteredWorkflows.map((workflow) => {
+                        <tbody>
+                            {filteredWorkflows.map((workflow, i) => {
                                 const badge = getTriggerBadgeDetails(workflow.triggerType);
                                 const isSelected = selectedIds.has(workflow.id);
                                 return (
-                                    <tr key={workflow.id} className={`hover:bg-indigo-50/30 transition-colors ${isSelected ? 'bg-indigo-50/40' : ''}`}>
-                                        <td className="px-6 py-4">
-                                            <Checkbox checked={isSelected} onCheckedChange={() => toggleSelect(workflow.id)} />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`p-2 rounded-md ${workflow.isActive ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'}`}>
-                                                    <Activity size={18} />
+                                    <tr key={workflow.id}
+                                        style={{ background: isSelected ? "rgba(99,102,241,0.08)" : i % 2 === 0 ? "rgba(15,20,35,0.5)" : "rgba(11,15,25,0.3)", borderBottom: "1px solid rgba(30,41,59,0.5)", transition: "background 0.1s" }}>
+                                        <td style={{ padding: "12px 20px" }}><Checkbox checked={isSelected} onCheckedChange={() => toggleSelect(workflow.id)} /></td>
+                                        <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                                <div style={{ padding: "7px", borderRadius: "8px", background: workflow.isActive ? "rgba(99,102,241,0.15)" : "rgba(30,41,59,0.7)", color: workflow.isActive ? "#818cf8" : "#475569" }}>
+                                                    <Activity size={15} />
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-bold text-gray-900">{workflow.name}</div>
-                                                    <div className="text-xs text-gray-400 font-mono mt-0.5 cursor-pointer hover:text-indigo-600" onClick={() => copyToClipboard(workflow.id, "ID Copiado")}>
-                                                        {workflow.id.substring(0, 12)}...
-                                                    </div>
+                                                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#e2e8f0" }}>{workflow.name}</div>
+                                                    <div style={{ fontSize: "11px", color: "#334155", fontFamily: "monospace", cursor: "pointer" }} onClick={() => copyToClipboard(workflow.id, "ID Copiado")}>{workflow.id.substring(0, 12)}…</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2.5 py-1 inline-flex text-xs font-medium rounded-full ${badge.color}`}>
+                                        <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
+                                            <span style={{ padding: "3px 10px", fontSize: "10px", fontWeight: 800, fontFamily: "monospace", borderRadius: "99px", color: "#a78bfa", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.25)" }}>
                                                 {badge.label}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <button
-                                                onClick={() => handleToggle(workflow.id, workflow.isActive)}
-                                                disabled={isLoading === workflow.id}
-                                                className={`px-3 py-1 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full cursor-pointer transition-all border ${workflow.isActive
-                                                    ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100 shadow-sm'
-                                                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                                                    }`}
-                                            >
-                                                <div className={`w-1.5 h-1.5 rounded-full ${workflow.isActive ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`}></div>
-                                                {workflow.isActive ? 'On' : 'Off'}
+                                        <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
+                                            <button onClick={() => handleToggle(workflow.id, workflow.isActive)} disabled={isLoading === workflow.id}
+                                                style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 10px", fontSize: "10px", fontWeight: 800, fontFamily: "monospace", borderRadius: "99px", border: `1px solid ${workflow.isActive ? "rgba(52,211,153,0.35)" : "rgba(71,85,105,0.5)"}`, background: workflow.isActive ? "rgba(52,211,153,0.1)" : "rgba(71,85,105,0.1)", color: workflow.isActive ? "#34d399" : "#475569", cursor: "pointer" }}>
+                                                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: workflow.isActive ? "#34d399" : "#475569" }} />
+                                                {workflow.isActive ? "On" : "Off"}
                                             </button>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                                            {((workflow as any)._count?.executions || 0).toLocaleString()}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {format(new Date(workflow.updatedAt), 'dd MMM yyyy')}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td style={{ padding: "12px 16px", fontSize: "13px", color: "#64748b", fontFamily: "monospace" }}>{((workflow as any)._count?.executions || 0).toLocaleString()}</td>
+                                        <td style={{ padding: "12px 16px", fontSize: "12px", color: "#475569", fontFamily: "monospace" }}>{format(new Date(workflow.updatedAt), 'dd MMM yyyy')}</td>
+                                        <td style={{ padding: "12px 16px", textAlign: "right" }}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-200">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
+                                                    <button style={{ padding: "5px", borderRadius: "7px", background: "rgba(30,41,59,0.7)", border: "1px solid rgba(30,41,59,0.9)", color: "#475569", cursor: "pointer", display: "flex" }}>
+                                                        <MoreHorizontal style={{ width: "14px", height: "14px" }} />
+                                                    </button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuLabel>Acciones de Flujo</DropdownMenuLabel>
                                                     <DropdownMenuSeparator />
-                                                    <Link href={`/dashboard/admin/automation/builder?id=${workflow.id}`}>
-                                                        <DropdownMenuItem className="cursor-pointer">
-                                                            <Edit className="mr-2 h-4 w-4 text-blue-600" /> Editar flujograma
-                                                        </DropdownMenuItem>
-                                                    </Link>
-                                                    <DropdownMenuItem onClick={() => copyToClipboard(workflow.id, "ID Copiado")}>
-                                                        <Copy className="mr-2 h-4 w-4 text-gray-500" /> Copiar ID
-                                                    </DropdownMenuItem>
-                                                    {/* Duplicate placeholder (needs backend logic) */}
-                                                    <DropdownMenuItem className="cursor-not-allowed text-gray-400" disabled>
-                                                        <CopyPlus className="mr-2 h-4 w-4" /> Duplicar (Próximamente)
-                                                    </DropdownMenuItem>
+                                                    <Link href={`/dashboard/admin/automation/builder?id=${workflow.id}`}><DropdownMenuItem className="cursor-pointer"><Edit className="mr-2 h-4 w-4 text-blue-600" /> Editar</DropdownMenuItem></Link>
+                                                    <DropdownMenuItem onClick={() => copyToClipboard(workflow.id, "ID Copiado")}><Copy className="mr-2 h-4 w-4" /> Copiar ID</DropdownMenuItem>
+                                                    <DropdownMenuItem disabled><CopyPlus className="mr-2 h-4 w-4" /> Duplicar (Próx.)</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => handleToggle(workflow.id, workflow.isActive)}>
-                                                        {workflow.isActive ? <Pause className="mr-2 h-4 w-4 text-orange-600" /> : <Play className="mr-2 h-4 w-4 text-green-600" />}
-                                                        {workflow.isActive ? 'Pausar automatización' : 'Activar automatización'}
-                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleToggle(workflow.id, workflow.isActive)}>{workflow.isActive ? <Pause className="mr-2 h-4 w-4 text-orange-600" /> : <Play className="mr-2 h-4 w-4 text-green-600" />}{workflow.isActive ? 'Pausar' : 'Activar'}</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => handleDelete(workflow.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer">
-                                                        <Trash2 className="mr-2 h-4 w-4" /> Eliminar definitivamente
-                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleDelete(workflow.id)} className="text-red-600 cursor-pointer"><Trash2 className="mr-2 h-4 w-4" /> Eliminar</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </td>
