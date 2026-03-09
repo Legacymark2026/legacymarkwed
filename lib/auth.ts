@@ -299,6 +299,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         /**
          * C-3 Fix: Session callback sin query a BD por request.
          * B-2 Fix: companyId y permissions propagados desde JWT → sesión.
+         * RBAC Fix: allowedRoutes propagado para que authorized() lo lea
+         *           desde session.user en lugar de (auth as any)?.token (Edge Bug).
          */
         async session({ session, token }) {
             if (token && session.user) {
@@ -311,6 +313,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (token.permissions) {
                     session.user.permissions = token.permissions as Permission[];
                 }
+                // RBAC Fix: Propagar allowedRoutes para roles custom
+                // El authorized() en auth.config.ts lo lee desde session.user
+                (session.user as any).allowedRoutes = (token.allowedRoutes as string[]) ?? [];
             }
             return session;
         },

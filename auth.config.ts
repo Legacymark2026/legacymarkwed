@@ -68,8 +68,9 @@ export const authConfig: NextAuthConfig = {
                     return NextResponse.redirect(pendingUrl);
                 }
 
-                // Para roles custom: leer allowedRoutes del JWT (embebidas al hacer login)
-                const allowedRoutes = ((auth as any)?.token?.allowedRoutes as string[]) ?? [];
+                // Para roles custom: leer allowedRoutes desde session.user
+                // (NO desde token — no accesible en Edge Runtime de NextAuth v5)
+                const allowedRoutes = ((auth?.user as any)?.allowedRoutes as string[]) ?? [];
 
                 return canAccessRoute(pathname, role as UserRole, allowedRoutes);
             }
