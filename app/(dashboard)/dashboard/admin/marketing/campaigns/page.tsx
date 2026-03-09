@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 
 export default async function CampaignsPage() {
-    const campaigns = await getCampaignsList();
-    const metricsResult = await getAggregatedSpend();
+    const campaigns = await getCampaignsList().catch(() => []);
+    const metricsResult = await getAggregatedSpend().catch(() => null);
+
+    const safeMetrics = metricsResult ?? { totalSpend: 0, totalImpressions: 0, totalClicks: 0, totalConversions: 0, cpa: 0 };
 
     // Map DB object to what the client component expects
     const formattedCampaigns = campaigns.map(c => ({
@@ -69,7 +71,7 @@ export default async function CampaignsPage() {
             </div>
 
             <div className="relative z-10">
-                <CampaignMetricsCards metrics={metricsResult} />
+                <CampaignMetricsCards metrics={safeMetrics} />
             </div>
 
             <div className="relative z-10">

@@ -1,3 +1,5 @@
+'use client';
+
 import { DollarSign, MousePointerClick, TrendingUp, Users, Eye } from "lucide-react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 
