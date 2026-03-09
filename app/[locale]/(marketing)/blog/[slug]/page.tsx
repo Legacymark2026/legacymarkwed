@@ -239,14 +239,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                             <Link
                                                 key={tag.name}
                                                 href={`/blog?tag=${encodeURIComponent(tag.name)}`}
-                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold transition-all"
+                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold text-teal-300 transition-all hover:text-white"
                                                 style={{
                                                     background: 'rgba(13,148,136,0.1)',
-                                                    border: '1px solid rgba(13,148,136,0.25)',
-                                                    color: '#2dd4bf'
+                                                    border: '1px solid rgba(13,148,136,0.3)',
                                                 }}
-                                                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(13,148,136,0.2)')}
-                                                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(13,148,136,0.1)')}
                                             >
                                                 #{tag.name}
                                             </Link>
