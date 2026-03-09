@@ -825,10 +825,10 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             exit={{ opacity: 0 }}
                             className="flex justify-start w-full"
                         >
-                            <div className="bg-white border border-gray-100 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                            <div style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(30,41,59,0.9)", padding: "10px 14px", borderRadius: "16px 16px 16px 2px", display: "flex", alignItems: "center", gap: "5px" }}>
+                                <span style={{ width: "6px", height: "6px", background: "#334155", borderRadius: "50", display: "inline-block", animation: "bounce 1s infinite" }} />
+                                <span style={{ width: "6px", height: "6px", background: "#334155", borderRadius: "50%", display: "inline-block", animation: "bounce 1s 0.15s infinite" }} />
+                                <span style={{ width: "6px", height: "6px", background: "#334155", borderRadius: "50%", display: "inline-block", animation: "bounce 1s 0.3s infinite" }} />
                             </div>
                         </motion.div>
                     )}
@@ -836,7 +836,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-200 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.05)] z-20">
+            <div style={{ padding: "12px 16px", background: "rgba(8,12,20,0.98)", borderTop: "1px solid rgba(30,41,59,0.8)", zIndex: 20, flexShrink: 0 }}>
                 <div className="flex gap-2 items-end max-w-4xl mx-auto">
 
                     {/* Attachments */}
@@ -854,9 +854,9 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon" className="h-11 w-11 shrink-0 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 border-gray-200">
-                                <PlusIcon size={20} />
-                            </Button>
+                            <button style={{ height: "40px", width: "40px", flexShrink: 0, borderRadius: "10px", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#475569" }}>
+                                <PlusIcon size={18} />
+                            </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-48 p-2">
                             <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
@@ -870,21 +870,22 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
 
                     {/* Input Container */}
-                    <div className={cn(
-                        "flex-1 relative border rounded-xl transition-all flex flex-col p-1",
-                        isPrivateNote
-                            ? "bg-amber-50/50 border-amber-200 hover:border-amber-400 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20"
-                            : "bg-gray-50 border-gray-200 hover:border-blue-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10"
-                    )}>
+                    <div style={{
+                        flex: 1, position: "relative",
+                        border: isPrivateNote ? "1px solid rgba(234,179,8,0.3)" : "1px solid rgba(30,41,59,0.9)",
+                        borderRadius: "10px",
+                        background: isPrivateNote ? "rgba(234,179,8,0.06)" : "rgba(15,23,42,0.8)",
+                        display: "flex", flexDirection: "column", padding: "2px",
+                    }}>
 
                         {/* Pending Attachments UI */}
                         {pendingFiles.length > 0 && (
-                            <div className="flex flex-wrap gap-2 px-3 pt-2">
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", padding: "6px 10px 0" }}>
                                 {pendingFiles.map((file, idx) => (
-                                    <div key={idx} className="bg-white border top-2 border-gray-200 rounded-lg px-2 py-1 text-xs flex items-center gap-2 shadow-sm animate-in zoom-in-95">
-                                        {file.type.includes('image') ? <ImageIcon size={12} className="text-purple-500" /> : <Paperclip size={12} className="text-blue-500" />}
-                                        <span className="max-w-[100px] truncate font-medium text-gray-700">{file.name}</span>
-                                        <button className="text-gray-400 hover:text-red-500" onClick={() => setPendingFiles(prev => prev.filter((_, i) => i !== idx))}><X size={12} /></button>
+                                    <div key={idx} style={{ background: "rgba(30,41,59,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "3px 8px", fontSize: "11px", display: "flex", alignItems: "center", gap: "6px", fontFamily: "monospace" }}>
+                                        {file.type.includes('image') ? <ImageIcon size={11} style={{ color: "#a78bfa" }} /> : <Paperclip size={11} style={{ color: "#60a5fa" }} />}
+                                        <span style={{ maxWidth: "90px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#94a3b8" }}>{file.name}</span>
+                                        <button style={{ background: "none", border: "none", cursor: "pointer", color: "#475569" }} onClick={() => setPendingFiles(prev => prev.filter((_, i) => i !== idx))}><X size={11} /></button>
                                     </div>
                                 ))}
                             </div>
@@ -892,8 +893,8 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
                         {/* Private Note Toggle Label */}
                         {isPrivateNote && (
-                            <div className="absolute -top-3 left-4 bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 shadow-sm z-10 flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Internal Note
+                            <div style={{ position: "absolute", top: "-12px", left: "12px", background: "rgba(234,179,8,0.15)", color: "#fbbf24", fontSize: "10px", fontWeight: 800, padding: "2px 8px", borderRadius: "99px", border: "1px solid rgba(234,179,8,0.3)", zIndex: 10, display: "flex", alignItems: "center", gap: "4px", fontFamily: "monospace" }}>
+                                <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#fbbf24", display: "inline-block" }} /> Internal Note
                             </div>
                         )}
 
@@ -920,15 +921,13 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
                         {/* Audio Recording UI or Textarea */}
                         {isRecording ? (
-                            <div className="w-full bg-red-50/80 border border-red-100 rounded-xl py-2.5 px-4 min-h-[44px] flex items-center justify-between shadow-inner">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-3 h-3 rounded-full bg-red-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></span>
-                                    <span className="text-red-600 font-mono font-bold text-base">{formatDuration(recordDuration)}</span>
-                                    <span className="text-red-500/80 text-sm hidden sm:inline ml-2 font-medium">Grabando audio...</span>
+                            <div style={{ width: "100%", background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)", borderRadius: "10px", padding: "8px 14px", minHeight: "44px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ef4444", display: "inline-block", animation: "ping 1.5s infinite" }} />
+                                    <span style={{ color: "#ef4444", fontFamily: "monospace", fontWeight: 800, fontSize: "16px" }}>{formatDuration(recordDuration)}</span>
+                                    <span style={{ color: "rgba(239,68,68,0.8)", fontSize: "12px" }}>Grabando audio...</span>
                                 </div>
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-100/50 h-8 font-semibold" onClick={cancelRecording}>
-                                    Cancelar
-                                </Button>
+                                <button style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: "12px", fontWeight: 700, fontFamily: "monospace" }} onClick={cancelRecording}>Cancelar</button>
                             </div>
                         ) : (
                             <textarea
@@ -938,7 +937,7 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                     const val = e.target.value;
                                     setNewItem(val);
                                     if (val.endsWith('/')) setShowQuickReplies(true);
-                                    else if (!val.includes('/')) setShowQuickReplies(false); // simple check
+                                    else if (!val.includes('/')) setShowQuickReplies(false);
                                     adjustHeight();
                                 }}
                                 onKeyDown={(e) => {
@@ -948,123 +947,89 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                     }
                                 }}
                                 placeholder="Type your message..."
-                                className="w-full bg-transparent border-none focus:ring-0 text-sm resize-none py-3 px-3 min-h-[44px] max-h-32 text-gray-800 placeholder:text-gray-400"
+                                style={{ width: "100%", background: "transparent", border: "none", outline: "none", resize: "none", padding: "10px 12px", minHeight: "44px", maxHeight: "128px", fontSize: "13px", color: "#cbd5e1", fontFamily: "inherit" }}
                                 rows={1}
                             />
                         )}
 
-                        {/* Rich Text Toolbar (Phase 3) */}
-                        <div className="flex pb-2 pr-1 gap-1 items-center border-t border-gray-100 pt-1 mx-2">
-                            <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-800 rounded">
-                                <span className="font-bold text-xs">B</span>
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-800 rounded">
-                                <span className="italic text-xs font-serif">I</span>
-                            </Button>
-                            <div className="w-px h-3 bg-gray-200 mx-1"></div>
-
-                            {/* Private Note Toggle */}
-                            <Button
-                                variant="ghost"
-                                size="sm"
+                        {/* Rich Text Toolbar */}
+                        <div style={{ display: "flex", paddingBottom: "6px", paddingRight: "4px", gap: "2px", alignItems: "center", borderTop: "1px solid rgba(30,41,59,0.6)", paddingTop: "4px", margin: "0 6px" }}>
+                            <button style={{ height: "22px", width: "22px", background: "none", border: "none", cursor: "pointer", color: "#334155", fontSize: "11px", fontWeight: 800, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center" }}>B</button>
+                            <button style={{ height: "22px", width: "22px", background: "none", border: "none", cursor: "pointer", color: "#334155", fontSize: "11px", fontStyle: "italic", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center" }}>I</button>
+                            <div style={{ width: "1px", height: "10px", background: "rgba(30,41,59,0.8)", margin: "0 3px" }} />
+                            <button
+                                style={{ height: "22px", padding: "0 6px", background: isPrivateNote ? "rgba(234,179,8,0.15)" : "none", border: isPrivateNote ? "1px solid rgba(234,179,8,0.3)" : "none", cursor: "pointer", color: isPrivateNote ? "#fbbf24" : "#334155", fontSize: "10px", fontWeight: 800, borderRadius: "4px", fontFamily: "monospace" }}
                                 onClick={() => setIsPrivateNote(!isPrivateNote)}
-                                className={cn(
-                                    "h-6 px-2 text-[10px] font-bold rounded transiton-colors",
-                                    isPrivateNote ? "bg-amber-200 text-amber-900 hover:bg-amber-300" : "text-gray-400 hover:text-amber-600 hover:bg-amber-50"
-                                )}
-                            >
-                                /Note
-                            </Button>
-
-                            <div className="flex-1"></div>
-
-                            {/* Voice Note Toggle */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
+                            >/Note</button>
+                            <div style={{ flex: 1 }} />
+                            <button
+                                style={{ height: "28px", width: "28px", background: "none", border: "none", cursor: "pointer", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", color: isRecording ? "#ef4444" : "#334155" }}
                                 onClick={toggleRecording}
-                                className={cn(
-                                    "h-8 w-8 rounded-lg transition-all",
-                                    isRecording ? "text-red-500 bg-red-50 animate-pulse" : "text-gray-400 hover:text-red-500"
-                                )}
                             >
-                                <Mic size={isRecording ? 20 : 18} />
-                            </Button>
+                                <Mic size={isRecording ? 18 : 16} />
+                            </button>
                         </div>
                     </div>
 
-                    <div className="flex shadow-md rounded-xl">
-                        <Button
+                    <div style={{ display: "flex", borderRadius: "10px", overflow: "hidden" }}>
+                        <button
                             onClick={handleSend}
                             disabled={(!newItem.trim() && !isRecording && pendingFiles.length === 0) || isSending}
-                            className={cn(
-                                "h-11 px-4 shrink-0 rounded-l-xl rounded-r-none transition-all border-r border-white/20",
-                                (newItem.trim() || isRecording || pendingFiles.length > 0)
-                                    ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
-                                    : "bg-gray-100 text-gray-300 shadow-none"
-                            )}
+                            style={{
+                                height: "40px", padding: "0 16px", flexShrink: 0, borderRadius: "10px 0 0 10px", transition: "all 0.15s", borderRight: "1px solid rgba(0,0,0,0.2)", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 700, fontFamily: "monospace",
+                                background: (newItem.trim() || isRecording || pendingFiles.length > 0)
+                                    ? (isPrivateNote ? "rgba(234,179,8,0.2)" : "linear-gradient(135deg, #0d7a72, #0d9488)")
+                                    : "rgba(15,23,42,0.8)",
+                                color: (newItem.trim() || isRecording || pendingFiles.length > 0) ? (isPrivateNote ? "#fbbf24" : "#2dd4bf") : "#1e293b",
+                                border: (newItem.trim() || isRecording || pendingFiles.length > 0) ? (isPrivateNote ? "1px solid rgba(234,179,8,0.3)" : "1px solid rgba(13,148,136,0.4)") : "1px solid rgba(30,41,59,0.9)",
+                            }}
                         >
-                            <Send size={18} className={cn("transition-transform", (newItem.trim() || isRecording || pendingFiles.length > 0) ? "translate-x-0.5 mr-1" : "")} />
-                            <span className="font-semibold text-sm">{isPrivateNote ? 'Save' : 'Send'}</span>
-                        </Button>
+                            <Send size={15} />
+                            <span>{isPrivateNote ? 'Save' : 'Send'}</span>
+                        </button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button
+                                <button
                                     disabled={(!newItem.trim() && !isRecording && pendingFiles.length === 0) || isSending}
-                                    className={cn(
-                                        "h-11 w-8 px-0 shrink-0 rounded-l-none rounded-r-xl transition-all shadow-none",
-                                        (newItem.trim() || isRecording || pendingFiles.length > 0)
-                                            ? (isPrivateNote ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white")
-                                            : "bg-gray-100 text-gray-300 shadow-none border-l border-gray-200"
-                                    )}
+                                    style={{
+                                        height: "40px", width: "28px", flexShrink: 0, borderRadius: "0 10px 10px 0", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                        background: (newItem.trim() || isRecording || pendingFiles.length > 0)
+                                            ? (isPrivateNote ? "rgba(234,179,8,0.15)" : "rgba(13,148,136,0.15)")
+                                            : "rgba(15,23,42,0.8)",
+                                        color: (newItem.trim() || isRecording || pendingFiles.length > 0) ? (isPrivateNote ? "#fbbf24" : "#2dd4bf") : "#1e293b",
+                                        border: (newItem.trim() || isRecording || pendingFiles.length > 0) ? (isPrivateNote ? "1px solid rgba(234,179,8,0.3)" : "1px solid rgba(13,148,136,0.4)") : "1px solid rgba(30,41,59,0.9)",
+                                        borderLeft: "none",
+                                    }}
                                 >
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-                                </Button>
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                                </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem className="gap-2" onClick={() => setShowSendLaterModal(true)}><Clock size={14} className="text-blue-500" /> Send Later...</DropdownMenuItem>
-                                <DropdownMenuItem className="gap-2" onClick={() => {
-                                    handleSend();
-                                    handleCloseDeal();
-                                    updateConversationStatus(conversation.id, 'CLOSED');
-                                }}><CheckCheck size={14} className="text-green-500" /> Send & Mark Resolved</DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2" onClick={() => setShowSendLaterModal(true)}><Clock size={14} className="text-teal-500" /> Send Later...</DropdownMenuItem>
+                                <DropdownMenuItem className="gap-2" onClick={() => { handleSend(); handleCloseDeal(); updateConversationStatus(conversation.id, 'CLOSED'); }}><CheckCheck size={14} className="text-green-500" /> Send & Mark Resolved</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </div>
-                <div className="text-[10px] text-center text-gray-400 mt-2 font-medium">
-                    Powered by <span className="text-indigo-500">LegacyMark OmniChannel</span>
+                <div style={{ fontSize: "10px", textAlign: "center", color: "#1e293b", marginTop: "6px", fontFamily: "monospace" }}>
+                    Powered by <span style={{ color: "#2dd4bf" }}>LegacyMark OmniChannel</span>
                 </div>
             </div>
 
             {/* Send Later Modal Simulation */}
             {showSendLaterModal && (
-                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-xs overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-blue-50 text-blue-900">
-                            <h3 className="font-bold flex items-center gap-2"><Clock size={16} /> Schedule Message</h3>
-                            <button onClick={() => setShowSendLaterModal(false)} className="text-blue-400 hover:text-blue-600"><X size={16} /></button>
+                <div style={{ position: "absolute", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                    <div style={{ background: "rgba(11,15,25,0.98)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "16px", width: "100%", maxWidth: "320px", overflow: "hidden" }}>
+                        <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(30,41,59,0.8)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(8,12,20,0.9)" }}>
+                            <h3 style={{ fontWeight: 800, color: "#e2e8f0", fontSize: "14px", fontFamily: "monospace", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><Clock size={13} style={{ color: "#2dd4bf" }} /> Schedule Message</h3>
+                            <button onClick={() => setShowSendLaterModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#475569" }}><X size={14} /></button>
                         </div>
-                        <div className="p-5 space-y-4">
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">Select Date & Time</label>
-                                <input
-                                    type="datetime-local"
-                                    className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                                    value={sendLaterDate}
-                                    onChange={(e) => setSendLaterDate(e.target.value)}
-                                />
+                        <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "monospace", display: "block", marginBottom: "5px" }}>Select Date & Time</label>
+                                <input type="datetime-local" style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "8px 10px", fontSize: "12px", color: "#cbd5e1", outline: "none", fontFamily: "monospace", boxSizing: "border-box" }} value={sendLaterDate} onChange={e => setSendLaterDate(e.target.value)} />
                             </div>
-                            <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => {
-                                if (!sendLaterDate) {
-                                    toast.error('Please select a date');
-                                    return;
-                                }
-                                toast.success(`Message scheduled for ${new Date(sendLaterDate).toLocaleString()}`);
-                                setShowSendLaterModal(false);
-                                setNewItem('');
-                                setPendingFiles([]);
-                            }}>Schedule Send</Button>
+                            <button style={{ width: "100%", padding: "9px", borderRadius: "8px", border: "1px solid rgba(13,148,136,0.4)", background: "rgba(13,148,136,0.12)", color: "#2dd4bf", fontSize: "12px", fontWeight: 800, cursor: "pointer", fontFamily: "monospace" }} onClick={() => { if (!sendLaterDate) { toast.error('Please select a date'); return; } toast.success(`Scheduled for ${new Date(sendLaterDate).toLocaleString()}`); setShowSendLaterModal(false); setNewItem(''); setPendingFiles([]); }}>Schedule Send</button>
                         </div>
                     </div>
                 </div>
@@ -1072,32 +1037,18 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
 
             {/* Add Participant Modal Simulation */}
             {showAddParticipant && (
-                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-xs overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-indigo-50 text-indigo-900">
-                            <h3 className="font-bold flex items-center gap-2"><UserPlus size={16} /> Añadir Participante</h3>
-                            <button onClick={() => setShowAddParticipant(false)} className="text-indigo-400 hover:text-indigo-600"><X size={16} /></button>
+                <div style={{ position: "absolute", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                    <div style={{ background: "rgba(11,15,25,0.98)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "16px", width: "100%", maxWidth: "320px", overflow: "hidden" }}>
+                        <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(30,41,59,0.8)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(8,12,20,0.9)" }}>
+                            <h3 style={{ fontWeight: 800, color: "#e2e8f0", fontSize: "14px", fontFamily: "monospace", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><UserPlus size={13} style={{ color: "#2dd4bf" }} /> Añadir Participante</h3>
+                            <button onClick={() => setShowAddParticipant(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#475569" }}><X size={14} /></button>
                         </div>
-                        <div className="p-5 space-y-4">
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">Nombre o Correo del Agente</label>
-                                <input
-                                    type="text"
-                                    placeholder="Ej. Juan Pérez"
-                                    className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                    value={newParticipant}
-                                    onChange={(e) => setNewParticipant(e.target.value)}
-                                />
+                        <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "monospace", display: "block", marginBottom: "5px" }}>Nombre o Correo del Agente</label>
+                                <input type="text" placeholder="Ej. Juan Pérez" style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "8px 10px", fontSize: "12px", color: "#cbd5e1", outline: "none", fontFamily: "monospace", boxSizing: "border-box" }} value={newParticipant} onChange={e => setNewParticipant(e.target.value)} />
                             </div>
-                            <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={() => {
-                                if (!newParticipant) {
-                                    toast.error('Ingresa un nombre');
-                                    return;
-                                }
-                                toast.success(`${newParticipant} invocado a la llamada`);
-                                setShowAddParticipant(false);
-                                setNewParticipant('');
-                            }}>Invitar a la llamada</Button>
+                            <button style={{ width: "100%", padding: "9px", borderRadius: "8px", border: "1px solid rgba(13,148,136,0.4)", background: "rgba(13,148,136,0.12)", color: "#2dd4bf", fontSize: "12px", fontWeight: 800, cursor: "pointer", fontFamily: "monospace" }} onClick={() => { if (!newParticipant) { toast.error('Ingresa un nombre'); return; } toast.success(`${newParticipant} invocado a la llamada`); setShowAddParticipant(false); setNewParticipant(''); }}>Invitar a la llamada</button>
                         </div>
                     </div>
                 </div>
