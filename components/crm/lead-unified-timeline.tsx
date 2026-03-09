@@ -4,63 +4,37 @@ import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar, MessageSquare, MousePointerClick, UserPlus, Globe } from "lucide-react";
 
-interface Props {
-    leadId: string;
-    createdAt: Date;
-    formData: any;
-    source: string;
-}
+interface Props { leadId: string; createdAt: Date; formData: any; source: string; }
 
 export async function LeadUnifiedTimeline({ leadId, createdAt, formData, source }: Props) {
-    // Artificial delay to demonstrate Suspense streaming
-    // await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Fetch related data
     const [conversations, marketingEvents] = await Promise.all([
-        prisma.conversation.findMany({
-            where: { leadId },
-            orderBy: { updatedAt: "desc" },
-            take: 10,
-        }),
-        prisma.marketingEvent.findMany({
-            where: { leadId },
-            orderBy: { createdAt: "desc" },
-            take: 15,
-        }),
+        prisma.conversation.findMany({ where: { leadId }, orderBy: { updatedAt: "desc" }, take: 10 }),
+        prisma.marketingEvent.findMany({ where: { leadId }, orderBy: { createdAt: "desc" }, take: 15 }),
     ]);
 
-    // Normalize events into a single timeline array
     type TimelineItem = {
-        id: string;
-        date: Date;
-        type: "lead_created" | "conversation" | "marketing_event";
-        icon: React.ReactNode;
-        title: string;
-        description: string | React.ReactNode;
-        colorClass: string;
-        bgClass: string;
+        id: string; date: Date; type: string; icon: React.ReactNode;
+        title: string; description: string | React.ReactNode;
+        color: string; border: string; bg: string;
     };
 
     const timeline: TimelineItem[] = [];
 
-    // 1. Initial Creation Event
     timeline.push({
-        id: "created",
-        date: createdAt,
-        type: "lead_created",
-        icon: <UserPlus className="w-4 h-4" />,
+        id: "created", date: createdAt, type: "lead_created",
+        icon: <UserPlus style={{ width: "13px", height: "13px" }} />,
         title: "Lead capturado",
         description: (
-            <div className="space-y-2 mt-1">
-                <p className="text-sm text-slate-600">Entró mediante <span className="font-bold">{source}</span></p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "4px" }}>
+                <p style={{ fontSize: "12px", color: "#94a3b8" }}>Entró mediante <span style={{ fontWeight: 800, color: "#e2e8f0" }}>{source}</span></p>
                 {formData && Object.keys(formData).length > 0 && (
-                    <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Datos del formulario</p>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "10px", padding: "10px 12px" }}>
+                        <p style={{ fontSize: "9px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "monospace", marginBottom: "6px" }}>Datos del formulario</p>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px" }}>
                             {Object.entries(formData as Record<string, unknown>).map(([k, v]) => (
-                                <div key={k} className="flex gap-2">
-                                    <span className="text-slate-400 capitalize">{k}:</span>
-                                    <span className="font-medium text-slate-800 truncate" title={String(v)}>{String(v)}</span>
+                                <div key={k} style={{ display: "flex", gap: "4px" }}>
+                                    <span style={{ fontSize: "11px", color: "#475569" }}>{k}:</span>
+                                    <span style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={String(v)}>{String(v)}</span>
                                 </div>
                             ))}
                         </div>
@@ -68,110 +42,88 @@ export async function LeadUnifiedTimeline({ leadId, createdAt, formData, source 
                 )}
             </div>
         ),
-        colorClass: "text-blue-500",
-        bgClass: "bg-blue-50 border-blue-200",
+        color: "#60a5fa", border: "rgba(96,165,250,0.3)", bg: "rgba(96,165,250,0.1)",
     });
 
-    // 2. Conversations
     conversations.forEach((conv) => {
         timeline.push({
-            id: `conv-${conv.id}`,
-            date: conv.updatedAt,
-            type: "conversation",
-            icon: <MessageSquare className="w-4 h-4" />,
-            title: `Conversación en ${conv.channel}`,
+            id: `conv-${conv.id}`, date: conv.updatedAt, type: "conversation",
+            icon: <MessageSquare style={{ width: "13px", height: "13px" }} />,
+            title: `Conversación Por ${conv.channel}`,
             description: (
-                <div className="flex items-center gap-3 mt-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${conv.status === "OPEN" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                    <span style={{ fontSize: "9px", padding: "2px 8px", borderRadius: "99px", fontWeight: 800, fontFamily: "monospace", color: conv.status === "OPEN" ? "#34d399" : "#475569", background: conv.status === "OPEN" ? "rgba(52,211,153,0.12)" : "rgba(71,85,105,0.15)", border: `1px solid ${conv.status === "OPEN" ? "rgba(52,211,153,0.3)" : "rgba(71,85,105,0.3)"}` }}>
                         {conv.status}
                     </span>
-                    <Link href={`/dashboard/inbox/${conv.id}`} className="text-xs font-semibold text-teal-600 hover:text-teal-700 underline underline-offset-2">
-                        Ver hilo completo &rarr;
+                    <Link href={`/dashboard/inbox/${conv.id}`} style={{ fontSize: "11px", fontWeight: 700, color: "#2dd4bf", textDecoration: "underline" }}>
+                        Ver hilo completo →
                     </Link>
                 </div>
             ),
-            colorClass: "text-emerald-500",
-            bgClass: "bg-emerald-50 border-emerald-200",
+            color: "#34d399", border: "rgba(52,211,153,0.3)", bg: "rgba(52,211,153,0.1)",
         });
     });
 
-    // 3. Marketing Events
     marketingEvents.forEach((ev) => {
         const isClick = ev.eventType.includes("CLICK");
         timeline.push({
-            id: `ev-${ev.id}`,
-            date: ev.createdAt,
-            type: "marketing_event",
-            icon: isClick ? <MousePointerClick className="w-4 h-4" /> : <Globe className="w-4 h-4" />,
+            id: `ev-${ev.id}`, date: ev.createdAt, type: "marketing_event",
+            icon: isClick ? <MousePointerClick style={{ width: "13px", height: "13px" }} /> : <Globe style={{ width: "13px", height: "13px" }} />,
             title: ev.eventType.replace(/_/g, " "),
             description: (
-                <div className="mt-1">
-                    <p className="text-sm font-medium text-slate-700">{ev.eventName || "Actividad en el sitio"}</p>
-                    {ev.url && <a href={ev.url} target="_blank" rel="noreferrer" className="text-[10px] text-sky-500 hover:underline truncate block mt-1">{ev.url}</a>}
+                <div style={{ marginTop: "4px" }}>
+                    <p style={{ fontSize: "12px", color: "#94a3b8" }}>{ev.eventName || "Actividad en el sitio"}</p>
+                    {ev.url && <a href={ev.url} target="_blank" rel="noreferrer" style={{ fontSize: "10px", color: "#38bdf8", display: "block", marginTop: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ev.url}</a>}
                 </div>
             ),
-            colorClass: isClick ? "text-amber-500" : "text-purple-500",
-            bgClass: isClick ? "bg-amber-50 border-amber-200" : "bg-purple-50 border-purple-200",
+            color: isClick ? "#fbbf24" : "#a78bfa",
+            border: isClick ? "rgba(251,191,36,0.3)" : "rgba(167,139,250,0.3)",
+            bg: isClick ? "rgba(251,191,36,0.1)" : "rgba(167,139,250,0.1)",
         });
     });
 
-    // Sort by date descending
     timeline.sort((a, b) => b.date.getTime() - a.date.getTime());
 
     return (
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8">
-            <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-teal-500" /> Historial Unificado
+        <div style={{ background: "rgba(11,15,25,0.6)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "18px", padding: "22px" }}>
+            <h2 style={{ fontSize: "11px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.12em", display: "flex", alignItems: "center", gap: "6px", marginBottom: "22px", fontFamily: "monospace" }}>
+                <Calendar style={{ width: "14px", height: "14px", color: "#2dd4bf" }} /> Historial Unificado
             </h2>
 
-            <div className="relative border-l-2 border-slate-100 ml-4 space-y-8 pb-4">
-                {timeline.map((item, idx) => (
-                    <div key={item.id} className="relative pl-6 sm:pl-8">
-                        {/* Timeline dot */}
-                        <div className={`absolute -left-[17px] top-1 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-sm ${item.bgClass} ${item.colorClass}`}>
+            <div style={{ position: "relative", borderLeft: "2px solid rgba(30,41,59,0.9)", marginLeft: "16px", display: "flex", flexDirection: "column", gap: "22px", paddingBottom: "8px" }}>
+                {timeline.map((item) => (
+                    <div key={item.id} style={{ position: "relative", paddingLeft: "28px" }}>
+                        <div style={{ position: "absolute", left: "-19px", top: "2px", width: "34px", height: "34px", borderRadius: "50%", border: `1px solid ${item.border}`, background: item.bg, display: "flex", alignItems: "center", justifyContent: "center", color: item.color, flexShrink: 0 }}>
                             {item.icon}
                         </div>
-
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4 mb-1">
-                            <h3 className="text-sm font-bold text-slate-900 capitalize">{item.title}</h3>
-                            <span className="text-[11px] font-semibold text-slate-400 whitespace-nowrap" title={format(item.date, "PPpp", { locale: es })}>
+                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "4px", marginBottom: "3px" }}>
+                            <h3 style={{ fontSize: "13px", fontWeight: 800, color: "#e2e8f0", textTransform: "capitalize", margin: 0 }}>{item.title}</h3>
+                            <span style={{ fontSize: "10px", fontWeight: 600, color: "#334155", whiteSpace: "nowrap", fontFamily: "monospace" }} title={format(item.date, "PPpp", { locale: es })}>
                                 {formatDistanceToNow(item.date, { addSuffix: true, locale: es })}
                             </span>
                         </div>
-
-                        <div className="mt-1">
-                            {item.description}
-                        </div>
+                        <div>{item.description}</div>
                     </div>
                 ))}
-            </div>
 
-            {timeline.length === 0 && (
-                <div className="text-center py-10 text-slate-400">
-                    <p className="text-sm font-medium">No hay actividad registrada aún.</p>
-                </div>
-            )}
+                {timeline.length === 0 && (
+                    <p style={{ fontSize: "12px", color: "#334155", textAlign: "center", padding: "32px 0", fontFamily: "monospace" }}>— Sin actividad registrada —</p>
+                )}
+            </div>
         </div>
     );
 }
 
 export function LeadUnifiedTimelineSkeleton() {
     return (
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8 animate-pulse">
-            <div className="h-4 w-40 bg-slate-200 rounded-full mb-8" />
-
-            <div className="relative border-l-2 border-slate-100 ml-4 space-y-8">
+        <div style={{ background: "rgba(11,15,25,0.6)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "18px", padding: "22px" }}>
+            <div style={{ height: "14px", width: "160px", background: "rgba(30,41,59,0.9)", borderRadius: "99px", marginBottom: "22px" }} />
+            <div style={{ position: "relative", borderLeft: "2px solid rgba(30,41,59,0.9)", marginLeft: "16px", display: "flex", flexDirection: "column", gap: "22px" }}>
                 {[1, 2, 3].map((i) => (
-                    <div key={i} className="relative pl-8">
-                        <div className="absolute -left-[17px] top-1 w-8 h-8 rounded-full bg-slate-200 border-2 border-white" />
-                        <div className="flex justify-between items-start mb-2">
-                            <div className="h-4 w-32 bg-slate-200 rounded-full" />
-                            <div className="h-3 w-20 bg-slate-100 rounded-full" />
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-3 w-3/4 bg-slate-100 rounded-full" />
-                            <div className="h-3 w-1/2 bg-slate-100 rounded-full" />
-                        </div>
+                    <div key={i} style={{ position: "relative", paddingLeft: "28px" }}>
+                        <div style={{ position: "absolute", left: "-19px", top: "2px", width: "34px", height: "34px", borderRadius: "50%", background: "rgba(30,41,59,0.9)" }} />
+                        <div style={{ height: "13px", width: "140px", background: "rgba(30,41,59,0.9)", borderRadius: "99px", marginBottom: "8px" }} />
+                        <div style={{ height: "10px", width: "80px", background: "rgba(30,41,59,0.7)", borderRadius: "99px" }} />
                     </div>
                 ))}
             </div>

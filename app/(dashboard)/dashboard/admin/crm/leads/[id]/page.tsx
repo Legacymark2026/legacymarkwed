@@ -56,7 +56,7 @@ export default async function LeadDetailPage(props: PageProps) {
     const canManageLeads = Boolean(session?.user?.permissions?.includes(Permission.MANAGE_LEADS) || (role && ROLE_PERMISSIONS[role]?.includes(Permission.MANAGE_LEADS)));
 
     return (
-        <div className="min-h-screen bg-slate-50 relative">
+        <div className="min-h-screen relative" style={{ background: "transparent" }}>
             {/* Sticky Actions */}
             <LeadStickyActions
                 leadName={lead.name || "Sin nombre"}
@@ -70,16 +70,15 @@ export default async function LeadDetailPage(props: PageProps) {
             </LeadStickyActions>
 
             {/* Top Breadcrumbs */}
-            <div className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 px-6 py-4 sticky top-0 z-30">
+            <div style={{ background: "rgba(11,15,25,0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(30,41,59,0.8)", padding: "12px 24px", position: "sticky", top: 0, zIndex: 30 }}>
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Link href="/dashboard/admin/crm/leads" className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 transition-colors">
-                            <ArrowLeft className="w-4 h-4" />
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <Link href="/dashboard/admin/crm/leads" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "32px", height: "32px", borderRadius: "50%", background: "rgba(30,41,59,0.8)", border: "1px solid rgba(30,41,59,0.9)", color: "#475569" }}>
+                            <ArrowLeft style={{ width: "14px", height: "14px" }} />
                         </Link>
-                        <span className="text-sm font-bold text-slate-800 hidden sm:inline-block">Detalles del Lead</span>
+                        <span style={{ fontSize: "13px", fontWeight: 800, color: "#94a3b8", fontFamily: "monospace" }}>Detalles del plomo</span>
                     </div>
-                    {/* Header Action */}
-                    <div className="flex items-center gap-2">
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         {canManageLeads && <LeadDeleteButton leadId={lead.id} />}
                         <ConvertAction lead={lead} company={company} canManageLeads={canManageLeads} />
                     </div>
@@ -112,11 +111,11 @@ export default async function LeadDetailPage(props: PageProps) {
                 <div className="space-y-6">
                     {/* UTM Attribution */}
                     {(lead.utmSource || lead.utmCampaign || lead.utmMedium || lead.source) && (
-                        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8">
-                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                                <Globe className="w-4 h-4 text-teal-500" /> Atribución
+                        <div style={{ background: "rgba(11,15,25,0.6)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "18px", padding: "22px" }}>
+                            <h2 style={{ fontSize: "11px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.12em", display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px", fontFamily: "monospace" }}>
+                                <Globe style={{ width: "14px", height: "14px", color: "#2dd4bf" }} /> Atribución
                             </h2>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                                 {[
                                     { label: "Fuente", value: lead.source, icon: SOURCE_ICONS[lead.source] ?? "🌐" },
                                     { label: "UTM Source", value: lead.utmSource },
@@ -125,20 +124,20 @@ export default async function LeadDetailPage(props: PageProps) {
                                     { label: "UTM Term", value: lead.utmTerm },
                                     { label: "Landing Page", value: lead.landingPage },
                                 ].filter((i) => i.value).map((item) => (
-                                    <div key={item.label} className="p-3 bg-slate-50/50 rounded-2xl border border-slate-100">
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{item.label}</p>
-                                        <p className="text-sm font-bold text-slate-900 truncate" title={item.value as string}>
-                                            {item.icon && <span className="mr-1">{item.icon}</span>}{item.value}
+                                    <div key={item.label} style={{ padding: "10px 12px", background: "rgba(15,23,42,0.7)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "10px" }}>
+                                        <p style={{ fontSize: "9px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "monospace", marginBottom: "3px" }}>{item.label}</p>
+                                        <p style={{ fontSize: "13px", fontWeight: 800, color: "#e2e8f0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.value as string}>
+                                            {item.icon && <span style={{ marginRight: "4px" }}>{item.icon}</span>}{item.value}
                                         </p>
                                     </div>
                                 ))}
                             </div>
                             {(lead as any).campaign && (
-                                <div className="mt-5 flex items-center gap-3 p-4 bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-100 rounded-2xl">
-                                    <span className="text-2xl drop-shadow-sm">📈</span>
+                                <div style={{ marginTop: "14px", display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "rgba(167,139,250,0.08)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: "12px" }}>
+                                    <span style={{ fontSize: "22px" }}>📈</span>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase text-violet-500 tracking-wider">Campaña Vinculada</p>
-                                        <p className="text-sm font-black text-slate-900">{(lead as any).campaign.name} <span className="text-xs font-mono text-slate-400 font-medium">({(lead as any).campaign.platform})</span></p>
+                                        <p style={{ fontSize: "9px", fontWeight: 900, textTransform: "uppercase", color: "#a78bfa", letterSpacing: "0.1em", fontFamily: "monospace" }}>Campaña Vinculada</p>
+                                        <p style={{ fontSize: "13px", fontWeight: 800, color: "#e2e8f0" }}>{(lead as any).campaign.name} <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#475569" }}>({(lead as any).campaign.platform})</span></p>
                                     </div>
                                 </div>
                             )}
@@ -146,21 +145,21 @@ export default async function LeadDetailPage(props: PageProps) {
                     )}
 
                     {/* Metadata */}
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8 space-y-5">
-                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-2">Detalles Internos</h3>
+                    <div style={{ background: "rgba(11,15,25,0.6)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "18px", padding: "22px", display: "flex", flexDirection: "column", gap: "14px" }}>
+                        <h3 style={{ fontSize: "11px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0, fontFamily: "monospace" }}>Detalles Internos</h3>
                         {[
-                            { icon: <Calendar className="w-4 h-4" />, label: "Creado", value: format(new Date(lead.createdAt), "d MMM yyyy · HH:mm", { locale: es }) },
-                            { icon: <Calendar className="w-4 h-4" />, label: "Actualizado", value: formatDistanceToNow(new Date(lead.updatedAt), { addSuffix: true, locale: es }) },
-                            { icon: <MapPin className="w-4 h-4" />, label: "País", value: lead.country || "Desconocido" },
-                            { icon: <MapPin className="w-4 h-4" />, label: "Ciudad", value: lead.city || "Desconocida" },
+                            { icon: <Calendar style={{ width: "14px", height: "14px" }} />, label: "Creado", value: format(new Date(lead.createdAt), "d MMM yyyy · HH:mm", { locale: es }) },
+                            { icon: <Calendar style={{ width: "14px", height: "14px" }} />, label: "Actualizado", value: formatDistanceToNow(new Date(lead.updatedAt), { addSuffix: true, locale: es }) },
+                            { icon: <MapPin style={{ width: "14px", height: "14px" }} />, label: "País", value: lead.country || "Desconocido" },
+                            { icon: <MapPin style={{ width: "14px", height: "14px" }} />, label: "Ciudad", value: lead.city || "Desconocida" },
                         ].map((item) => (
-                            <div key={item.label} className="flex items-center gap-4 group">
-                                <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-teal-500 transition-colors">
+                            <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ width: "30px", height: "30px", borderRadius: "9px", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", display: "flex", alignItems: "center", justifyContent: "center", color: "#2dd4bf", flexShrink: 0 }}>
                                     {item.icon}
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">{item.label}</p>
-                                    <p className="text-sm font-semibold text-slate-700">{item.value}</p>
+                                    <p style={{ fontSize: "9px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "monospace", margin: 0 }}>{item.label}</p>
+                                    <p style={{ fontSize: "13px", fontWeight: 600, color: "#94a3b8", margin: 0 }}>{item.value}</p>
                                 </div>
                             </div>
                         ))}

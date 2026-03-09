@@ -6,10 +6,7 @@ import { es } from "date-fns/locale";
 import { Calendar, Video, MapPin, Plus, Clock } from "lucide-react";
 import { EventDrawer } from "@/components/events/EventDrawer";
 
-interface LeadEventsWidgetProps {
-    leadId: string;
-    initialEvents: any[];
-}
+interface LeadEventsWidgetProps { leadId: string; initialEvents: any[] }
 
 export function LeadEventsWidget({ leadId, initialEvents }: LeadEventsWidgetProps) {
     const [events, setEvents] = useState(initialEvents);
@@ -19,47 +16,43 @@ export function LeadEventsWidget({ leadId, initialEvents }: LeadEventsWidgetProp
         setEvents(prev => {
             const exists = prev.find(e => e.id === newEvent.id);
             if (exists) return prev.map(e => e.id === newEvent.id ? newEvent : e);
-            // Append and sort
-            const updated = [...prev, newEvent];
-            return updated.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+            return [...prev, newEvent].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
         });
     };
 
     return (
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8 mt-6">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-teal-500" /> Eventos
+        <div style={{ background: "rgba(11,15,25,0.6)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "18px", padding: "22px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "18px" }}>
+                <h2 style={{ fontSize: "11px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.12em", display: "flex", alignItems: "center", gap: "6px", margin: 0, fontFamily: "monospace" }}>
+                    <Calendar style={{ width: "14px", height: "14px", color: "#2dd4bf" }} /> Eventos
                 </h2>
-                <button
-                    onClick={() => setIsDrawerOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-teal-50 text-slate-600 hover:text-teal-600 border border-slate-200 hover:border-teal-200 transition-all rounded-lg text-xs font-bold"
-                >
-                    <Plus className="w-3.5 h-3.5" /> Nuevo
+                <button onClick={() => setIsDrawerOpen(true)}
+                    style={{ display: "flex", alignItems: "center", gap: "4px", padding: "5px 12px", background: "rgba(13,148,136,0.1)", border: "1px solid rgba(13,148,136,0.3)", borderRadius: "8px", color: "#2dd4bf", fontSize: "11px", fontWeight: 800, cursor: "pointer" }}>
+                    <Plus style={{ width: "11px", height: "11px" }} /> Nuevo
                 </button>
             </div>
 
             {events.length === 0 ? (
-                <div className="text-center py-8 bg-slate-50 border border-slate-100 border-dashed rounded-2xl">
-                    <p className="text-sm text-slate-500 font-medium">No hay eventos vinculados a este lead.</p>
+                <div style={{ textAlign: "center", padding: "32px 16px", background: "rgba(15,23,42,0.5)", border: "1px dashed rgba(30,41,59,0.8)", borderRadius: "12px" }}>
+                    <p style={{ fontSize: "12px", color: "#334155", fontFamily: "monospace" }}>No hay eventos vinculados a este lead.</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                     {events.map(event => (
-                        <div key={event.id} className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex items-start gap-4 hover:border-teal-200 transition-colors">
-                            <div className="flex-none w-12 text-center bg-white rounded-xl py-1 border border-slate-100 shadow-sm">
-                                <p className="text-[9px] font-black uppercase text-slate-400">{format(new Date(event.startDate), 'MMM', { locale: es })}</p>
-                                <p className="text-base font-black text-slate-700">{format(new Date(event.startDate), 'dd')}</p>
+                        <div key={event.id} style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "12px", background: "rgba(15,23,42,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "12px" }}>
+                            <div style={{ flexShrink: 0, width: "42px", textAlign: "center", background: "rgba(13,148,136,0.1)", border: "1px solid rgba(13,148,136,0.2)", borderRadius: "10px", padding: "4px 0" }}>
+                                <p style={{ fontSize: "8px", fontWeight: 900, textTransform: "uppercase", color: "#0d9488", fontFamily: "monospace" }}>{format(new Date(event.startDate), 'MMM', { locale: es })}</p>
+                                <p style={{ fontSize: "16px", fontWeight: 900, color: "#2dd4bf", fontFamily: "monospace" }}>{format(new Date(event.startDate), 'dd')}</p>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-sm font-bold text-slate-900 truncate">{event.title}</h3>
-                                <p className="text-xs text-slate-500 line-clamp-1">{event.description || "Sin descripción"}</p>
-                                <div className="mt-2 flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                    <span className="flex items-center gap-1 text-slate-500">
-                                        <Clock className="w-3 h-3" /> {format(new Date(event.startDate), 'HH:mm')}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <h3 style={{ fontSize: "13px", fontWeight: 700, color: "#e2e8f0", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{event.title}</h3>
+                                <p style={{ fontSize: "11px", color: "#475569", margin: "0 0 6px" }}>{event.description || "Sin descripción"}</p>
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "10px", fontWeight: 800, fontFamily: "monospace", textTransform: "uppercase", color: "#334155" }}>
+                                    <span style={{ display: "flex", alignItems: "center", gap: "3px", color: "#475569" }}>
+                                        <Clock style={{ width: "10px", height: "10px" }} /> {format(new Date(event.startDate), 'HH:mm')}
                                     </span>
-                                    {event.type === 'ONLINE' && <span className="flex items-center gap-1 text-blue-500"><Video className="w-3 h-3" /> Online</span>}
-                                    {event.type === 'PHYSICAL' && <span className="flex items-center gap-1 text-orange-500"><MapPin className="w-3 h-3" /> Presencial</span>}
+                                    {event.type === 'ONLINE' && <span style={{ display: "flex", alignItems: "center", gap: "3px", color: "#38bdf8" }}><Video style={{ width: "10px", height: "10px" }} /> Online</span>}
+                                    {event.type === 'PHYSICAL' && <span style={{ display: "flex", alignItems: "center", gap: "3px", color: "#fb923c" }}><MapPin style={{ width: "10px", height: "10px" }} /> Presencial</span>}
                                 </div>
                             </div>
                         </div>
@@ -67,13 +60,7 @@ export function LeadEventsWidget({ leadId, initialEvents }: LeadEventsWidgetProp
                 </div>
             )}
 
-            {/* Embedded drawer configured for this lead */}
-            <EventDrawer
-                isOpen={isDrawerOpen}
-                onClose={() => setIsDrawerOpen(false)}
-                eventId={null}
-                onEventSaved={handleEventSaved}
-            />
+            <EventDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} eventId={null} onEventSaved={handleEventSaved} />
         </div>
     );
 }
