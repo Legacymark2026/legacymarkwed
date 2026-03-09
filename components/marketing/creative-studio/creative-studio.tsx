@@ -64,26 +64,26 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
     ];
 
     return (
-        <div className="min-h-screen bg-[#0a0a12] text-white">
+        <div style={{ minHeight: "100vh", background: "transparent", color: "white" }}>
             {/* ── Header ── */}
-            <div className="border-b border-white/8 bg-[#0d0d1a]/80 backdrop-blur-xl sticky top-0 z-10">
+            <div style={{ borderBottom: "1px solid rgba(30,41,59,0.8)", background: "rgba(11,15,25,0.9)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10 }}>
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
-                            <Wand2 className="w-5 h-5 text-white" />
+                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #0d9488, #2dd4bf)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Wand2 style={{ width: "18px", height: "18px", color: "white" }} />
                         </div>
                         <div>
-                            <h1 className="font-bold text-lg tracking-tight">Creative Studio</h1>
-                            <p className="text-xs text-gray-500">Powered by Gemini Imagen 3 + Veo 2</p>
+                            <h1 style={{ fontWeight: 800, fontSize: "16px", color: "#e2e8f0", margin: 0 }}>Creative Studio</h1>
+                            <p style={{ fontSize: "11px", color: "#334155", fontFamily: "monospace", margin: 0 }}>Powered by Gemini Imagen 3 + Veo 2</p>
                         </div>
                     </div>
                     {campaignId && (
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#475569", fontFamily: "monospace" }}>
+                            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
                             Vinculado a campaña
                             {wizardAssets.length > 0 && (
-                                <span className="ml-2 px-2 py-0.5 bg-violet-500/20 text-violet-300 rounded-full">
-                                    {wizardAssets.length} assets añadidos
+                                <span style={{ marginLeft: "6px", padding: "1px 8px", background: "rgba(13,148,136,0.15)", color: "#2dd4bf", borderRadius: "99px", border: "1px solid rgba(13,148,136,0.3)" }}>
+                                    {wizardAssets.length} assets
                                 </span>
                             )}
                         </div>
@@ -95,12 +95,16 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
                     {MAIN_TABS.map((tab) => (
                         <button key={tab.key} id={`creative-tab-${tab.key.toLowerCase()}`} type="button"
                             onClick={() => setMainTab(tab.key)}
-                            className={cn(
-                                'flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-all shrink-0',
-                                mainTab === tab.key
-                                    ? 'border-violet-500 text-violet-300'
-                                    : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-white/20'
-                            )}>
+                            style={{
+                                display: "flex", alignItems: "center", gap: "6px",
+                                padding: "10px 16px", fontSize: "13px", fontWeight: 600,
+                                borderBottom: mainTab === tab.key ? "2px solid #2dd4bf" : "2px solid transparent",
+                                color: mainTab === tab.key ? "#2dd4bf" : "#475569",
+                                background: "transparent", border: "none",
+                                borderBottom: mainTab === tab.key ? "2px solid #2dd4bf" : "2px solid transparent",
+                                cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
+                                fontFamily: "monospace",
+                            }}>
                             {tab.icon} {tab.label}
                         </button>
                     ))}
@@ -113,26 +117,32 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
                 {/* ── AI Generation ── */}
                 {mainTab === 'AI' && (
                     <div className="space-y-6">
-                        <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1.5 gap-1 max-w-sm">
+                        <div style={{ display: "flex", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "12px", padding: "4px", gap: "4px", maxWidth: "320px" }}>
                             {AI_SUBTABS.map((sub) => (
                                 <button key={sub.key} id={`ai-subtab-${sub.key.toLowerCase()}`} type="button"
                                     onClick={() => setAISubTab(sub.key)}
-                                    className={cn(
-                                        'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all',
-                                        aiSubTab === sub.key ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/30' : 'text-gray-400 hover:text-gray-200'
-                                    )}>
+                                    style={{
+                                        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+                                        gap: "6px", padding: "8px", borderRadius: "8px", fontSize: "12px",
+                                        fontWeight: 700, cursor: "pointer", transition: "all 0.2s",
+                                        background: aiSubTab === sub.key ? "rgba(13,148,136,0.2)" : "transparent",
+                                        border: aiSubTab === sub.key ? "1px solid rgba(13,148,136,0.4)" : "1px solid transparent",
+                                        color: aiSubTab === sub.key ? "#2dd4bf" : "#475569",
+                                        boxShadow: aiSubTab === sub.key ? "0 0 12px rgba(13,148,136,0.2)" : undefined,
+                                        fontFamily: "monospace",
+                                    }}>
                                     {sub.icon} {sub.label}
                                 </button>
                             ))}
                         </div>
 
-                        <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                        <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                             {aiSubTab === 'IMAGE' && (
                                 <>
-                                    <div className="flex items-center gap-2 mb-6">
-                                        <ImageIcon className="w-5 h-5 text-violet-400" />
-                                        <h2 className="font-semibold text-white">Generación de Imagen</h2>
-                                        <span className="text-xs px-2 py-0.5 bg-violet-500/20 text-violet-300 rounded-full border border-violet-500/30">Gemini Imagen 3</span>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
+                                        <ImageIcon style={{ width: "18px", height: "18px", color: "#2dd4bf" }} />
+                                        <h2 style={{ fontWeight: 700, color: "#e2e8f0", fontSize: "15px", margin: 0 }}>Generación de Imagen</h2>
+                                        <span style={{ fontSize: "10px", padding: "2px 8px", background: "rgba(13,148,136,0.15)", color: "#2dd4bf", borderRadius: "99px", border: "1px solid rgba(13,148,136,0.3)", fontFamily: "monospace" }}>Gemini Imagen 3</span>
                                     </div>
                                     <ImageGenerator campaignId={campaignId} onAssetGenerated={handleImageGenerated} />
                                 </>
@@ -161,9 +171,9 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
 
                         {previewImageUrl && (
                             <button type="button" onClick={() => setMainTab('PREVIEW')}
-                                className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors group">
-                                <Eye className="w-4 h-4" /> Ver preview en plataforma
-                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#2dd4bf", background: "none", border: "none", cursor: "pointer", fontFamily: "monospace" }}>
+                                <Eye style={{ width: "14px", height: "14px" }} /> Ver preview en plataforma
+                                <ChevronRight style={{ width: "14px", height: "14px" }} />
                             </button>
                         )}
                     </div>
@@ -172,7 +182,7 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
                 {/* ── Gallery / Upload ── */}
                 {mainTab === 'MANUAL' && (
                     <div className="space-y-6">
-                        <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                        <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                             <div className="flex items-center gap-2 mb-6">
                                 <Upload className="w-5 h-5 text-blue-400" />
                                 <h2 className="font-semibold text-white">Galería de Assets</h2>
@@ -183,7 +193,7 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
                         </div>
 
                         {/* Google Drive importer */}
-                        <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                        <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                             <div className="flex items-center gap-2 mb-6">
                                 <FolderOpen className="w-5 h-5 text-yellow-400" />
                                 <h2 className="font-semibold text-white">Importar desde Google Drive / URL</h2>
@@ -195,7 +205,7 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
 
                 {/* ── Layer Editor ── */}
                 {mainTab === 'LAYER' && (
-                    <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                         <div className="flex items-center gap-2 mb-6">
                             <Layers className="w-5 h-5 text-orange-400" />
                             <h2 className="font-semibold text-white">Editor de Capas</h2>
@@ -212,7 +222,7 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
 
                 {/* ── Preview ── */}
                 {mainTab === 'PREVIEW' && (
-                    <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                         <div className="flex items-center gap-2 mb-6">
                             <Eye className="w-5 h-5 text-cyan-400" />
                             <h2 className="font-semibold text-white">Preview Interactivo en Plataforma</h2>
@@ -229,14 +239,14 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
 
                 {/* ── Brand Kit ── */}
                 {mainTab === 'BRAND' && (
-                    <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                         <BrandKitPanel onSaved={() => null} />
                     </div>
                 )}
 
                 {/* ── A/B Tests ── */}
                 {mainTab === 'ABTEST' && (
-                    <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                         <div className="flex items-center gap-2 mb-6">
                             <FlaskConical className="w-5 h-5 text-violet-400" />
                             <h2 className="font-semibold text-white">Dashboard A/B Tests</h2>
@@ -257,7 +267,7 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
 
                 {/* ── Insights ── */}
                 {mainTab === 'INSIGHTS' && (
-                    <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
+                    <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "24px" }}>
                         <CreativeInsights />
                     </div>
                 )}
