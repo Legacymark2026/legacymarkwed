@@ -106,61 +106,55 @@ export function ConversationList({ conversations, currentUser }: { conversations
     };
 
     return (
-        <div className="flex flex-col h-full bg-white w-full">
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "transparent", width: "100%" }}>
             {/* Header / Search */}
-            <div className="p-4 border-b border-gray-100 space-y-3">
-                <div className="flex items-center justify-between">
-                    <h2 className="font-bold text-xl text-gray-900 tracking-tight">Inbox</h2>
-                    <div className="flex items-center gap-1">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            <div style={{ padding: "14px 14px 10px", borderBottom: "1px solid rgba(30,41,59,0.8)", display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <h2 style={{ fontWeight: 800, fontSize: "16px", color: "#e2e8f0", fontFamily: "monospace", margin: 0 }}>Inbox</h2>
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <button
+                            style={{ background: "rgba(30,41,59,0.6)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "7px", padding: "5px", cursor: "pointer", color: isSyncing ? "#2dd4bf" : "#475569", display: "flex" }}
                             onClick={handleSync}
                             disabled={isSyncing}
-                            title="Sincronizar Meta (Facebook/Instagram)"
+                            title="Sincronizar Meta"
                         >
-                            <RefreshCw size={18} className={cn(isSyncing && "animate-spin")} />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-gray-900" onClick={() => setShowNewMessageModal(true)}>
-                            <Plus size={20} />
-                        </Button>
+                            <RefreshCw size={14} className={cn(isSyncing && "animate-spin")} />
+                        </button>
+                        <button
+                            style={{ background: "rgba(30,41,59,0.6)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "7px", padding: "5px", cursor: "pointer", color: "#475569", display: "flex" }}
+                            onClick={() => setShowNewMessageModal(true)}
+                        >
+                            <Plus size={14} />
+                        </button>
                     </div>
                 </div>
 
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
+                <div style={{ position: "relative" }}>
+                    <Search style={{ position: "absolute", left: "9px", top: "50%", transform: "translateY(-50%)", color: "#334155", width: "13px", height: "13px" }} />
+                    <input
                         placeholder="Search messages..."
-                        className="pl-9 bg-gray-50 border-gray-200 focus:bg-white transition-all h-9 text-sm rounded-xl"
+                        style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "7px 10px 7px 28px", fontSize: "12px", color: "#cbd5e1", outline: "none", boxSizing: "border-box" }}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
                 {/* Channel Filters (Mini Icons) */}
-                <div className="flex gap-1.5 justify-start overflow-x-auto py-1 scrollbar-hide">
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                <div style={{ display: "flex", gap: "6px", justifyContent: "flex-start", overflowX: "auto", paddingBottom: "2px" }}>
+                    <button
                         onClick={() => setActiveChannel('ALL')}
-                        className={cn("h-7 px-2 text-[10px] rounded-full border", activeChannel === 'ALL' ? "bg-gray-800 text-white border-gray-800" : "bg-white text-gray-600 border-gray-200")}
+                        style={{ height: "26px", padding: "0 10px", borderRadius: "99px", border: `1px solid ${activeChannel === 'ALL' ? "rgba(13,148,136,0.4)" : "rgba(30,41,59,0.9)"}`, background: activeChannel === 'ALL' ? "rgba(13,148,136,0.15)" : "rgba(15,23,42,0.8)", color: activeChannel === 'ALL' ? "#2dd4bf" : "#475569", fontSize: "10px", fontWeight: 800, cursor: "pointer", fontFamily: "monospace", whiteSpace: "nowrap" }}
                     >
                         All
-                    </Button>
+                    </button>
                     {(['WHATSAPP', 'MESSENGER', 'INSTAGRAM'] as ChannelType[]).map(ch => (
                         <button
                             key={ch}
                             onClick={() => setActiveChannel(ch)}
-                            className={cn(
-                                "h-7 w-7 rounded-full flex items-center justify-center border transition-all",
-                                activeChannel === ch
-                                    ? "bg-blue-50 border-blue-200 ring-1 ring-blue-200"
-                                    : "bg-white border-gray-200 hover:bg-gray-50"
-                            )}
+                            style={{ height: "26px", width: "26px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${activeChannel === ch ? "rgba(13,148,136,0.4)" : "rgba(30,41,59,0.9)"}`, background: activeChannel === ch ? "rgba(13,148,136,0.15)" : "rgba(15,23,42,0.8)", cursor: "pointer", opacity: activeChannel !== ch ? 0.6 : 1 }}
                             title={ch}
                         >
-                            <ChannelIcon channel={ch} className={cn("text-sm", activeChannel !== ch && "opacity-60 grayscale")} />
+                            <ChannelIcon channel={ch} className="text-sm" />
                         </button>
                     ))}
                 </div>
@@ -175,86 +169,43 @@ export function ConversationList({ conversations, currentUser }: { conversations
                 </Tabs>
 
                 {/* Status Tabs (Mini) */}
-                <div className="flex gap-1">
+                <div style={{ display: "flex", gap: "4px" }}>
                     {['OPEN', 'CLOSED'].map((status) => (
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status as any)}
-                            className={cn(
-                                "text-[10px] font-medium px-2 py-1 rounded-md transition-all border",
-                                statusFilter === status
-                                    ? "bg-gray-900 text-white border-gray-900"
-                                    : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
-                            )}
+                            style={{ fontSize: "10px", fontWeight: 800, padding: "4px 10px", borderRadius: "6px", cursor: "pointer", fontFamily: "monospace", transition: "all 0.15s", border: `1px solid ${statusFilter === status ? "rgba(13,148,136,0.4)" : "rgba(30,41,59,0.9)"}`, background: statusFilter === status ? "rgba(13,148,136,0.15)" : "rgba(15,23,42,0.8)", color: statusFilter === status ? "#2dd4bf" : "#334155" }}
                         >
                             {status === 'OPEN' ? 'ABIERTOS' : 'CERRADOS'}
                         </button>
                     ))}
-                    <div className="flex-1"></div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                            setSelectionMode(!selectionMode);
-                            setSelectedIds([]);
-                        }}
-                        className={cn("h-6 text-[10px] px-2", selectionMode ? "bg-blue-50 text-blue-600" : "text-gray-400")}
+                    <div style={{ flex: 1 }} />
+                    <button
+                        onClick={() => { setSelectionMode(!selectionMode); setSelectedIds([]); }}
+                        style={{ fontSize: "10px", fontWeight: 800, padding: "4px 8px", borderRadius: "6px", cursor: "pointer", fontFamily: "monospace", background: selectionMode ? "rgba(13,148,136,0.15)" : "transparent", border: "1px solid transparent", color: selectionMode ? "#2dd4bf" : "#334155" }}
                     >
-                        {selectionMode ? 'Cancel' : 'Select'}
-                    </Button>
+                        {selectionMode ? 'Cancelar' : 'Select'}
+                    </button>
                 </div>
 
                 {/* Bulk Actions Bar */}
                 {selectionMode && selectedIds.length > 0 && (
-                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-2 flex items-center justify-between animate-in slide-in-from-top-2">
-                        <span className="text-xs font-semibold text-blue-700 ml-1">{selectedIds.length} selected</span>
-                        <div className="flex gap-1 relative">
-                            <Button size="sm" variant="ghost" className={cn("h-6 w-6 p-0 rounded", showAdvancedFilters ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white" : "hover:bg-blue-100 text-blue-600")} onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                                <Filter size={14} />
-                            </Button>
-                            {/* Advanced Filters Popover */}
-                            {showAdvancedFilters && (
-                                <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-20 animate-in zoom-in-95">
-                                    <h4 className="font-semibold text-xs text-gray-900 mb-3">Advanced Bulk Filters</h4>
-                                    <div className="space-y-3">
-                                        <div>
-                                            <label className="text-[10px] uppercase font-bold text-gray-500 mb-1 block">Date Range</label>
-                                            <select className="w-full text-xs p-1.5 border border-gray-200 rounded">
-                                                <option>Last 7 Days</option>
-                                                <option>Last 30 Days</option>
-                                                <option>This Month</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] uppercase font-bold text-gray-500 mb-1 block">Lead Tags</label>
-                                            <select className="w-full text-xs p-1.5 border border-gray-200 rounded">
-                                                <option>VIP</option>
-                                                <option>Urgent</option>
-                                                <option>Sales</option>
-                                            </select>
-                                        </div>
-                                        <Button size="sm" className="w-full text-xs h-7 bg-blue-600" onClick={() => {
-                                            toast.success('Filters applied to selection');
-                                            setShowAdvancedFilters(false);
-                                        }}>Apply Filters</Button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    <div style={{ background: "rgba(13,148,136,0.1)", border: "1px solid rgba(13,148,136,0.3)", borderRadius: "8px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#2dd4bf", fontFamily: "monospace" }}>{selectedIds.length} seleccionados</span>
                     </div>
                 )}
             </div>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto">
+            <div style={{ flex: 1, overflowY: "auto" }}>
                 {filteredConversations.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-40 text-gray-400 p-8 text-center mt-10">
-                        <Filter size={32} className="mb-3 opacity-20" />
-                        <p className="text-sm font-medium">No results found</p>
-                        <p className="text-xs mt-1">Try adjusting filters or search</p>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "160px", padding: "32px", textAlign: "center" }}>
+                        <Filter size={28} style={{ marginBottom: "10px", opacity: 0.2, color: "#475569" }} />
+                        <p style={{ fontSize: "12px", fontWeight: 700, color: "#334155", fontFamily: "monospace", margin: 0 }}>No results found</p>
+                        <p style={{ fontSize: "11px", color: "#1e293b", marginTop: "4px", fontFamily: "monospace" }}>Try adjusting filters or search</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-50">
+                    <div>
                         {filteredConversations.map((convo) => {
                             const isActive = activeId === convo.id;
 
@@ -262,61 +213,48 @@ export function ConversationList({ conversations, currentUser }: { conversations
                                 <Link
                                     key={convo.id}
                                     href={`/dashboard/inbox/${convo.id}`}
-                                    className={cn(
-                                        "block p-4 hover:bg-gray-50 transition-all cursor-pointer relative group",
-                                        isActive && "bg-blue-50/60 hover:bg-blue-50/80"
-                                    )}
+                                    style={{ display: "block", padding: "12px 14px", borderBottom: "1px solid rgba(30,41,59,0.5)", cursor: "pointer", position: "relative", background: isActive ? "rgba(13,148,136,0.08)" : "transparent", transition: "background 0.15s" }}
                                 >
                                     {isActive && (
-                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-r-full" />
+                                        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "3px", background: "linear-gradient(to bottom, #0d9488, #2dd4bf)", borderRadius: "0 3px 3px 0" }} />
                                     )}
 
-                                    <div className="flex items-start gap-3">
-                                        {/* Selection Checkbox */}
+                                    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                                         {selectionMode && (
-                                            <div className="pt-3" onClick={(e) => { e.preventDefault(); toggleSelection(convo.id); }}>
+                                            <div style={{ paddingTop: "10px" }} onClick={(e) => { e.preventDefault(); toggleSelection(convo.id); }}>
                                                 <Checkbox checked={selectedIds.includes(convo.id)} />
                                             </div>
                                         )}
-                                        {/* Avatar & Icon */}
-                                        <div className="relative flex-shrink-0">
-                                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-100 to-white border border-gray-100 flex items-center justify-center text-indigo-700 font-bold text-sm shadow-sm">
+                                        {/* Avatar */}
+                                        <div style={{ position: "relative", flexShrink: 0 }}>
+                                            <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: isActive ? "rgba(13,148,136,0.2)" : "rgba(30,41,59,0.8)", border: `1px solid ${isActive ? "rgba(13,148,136,0.4)" : "rgba(30,41,59,0.9)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: isActive ? "#2dd4bf" : "#475569", fontWeight: 800, fontSize: "11px", fontFamily: "monospace" }}>
                                                 {convo.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md border border-gray-100 ring-2 ring-white">
+                                            <div style={{ position: "absolute", bottom: "-3px", right: "-3px", width: "18px", height: "18px", background: "rgba(8,12,20,0.95)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(30,41,59,0.9)" }}>
                                                 <ChannelIcon channel={convo.channel} className="text-[10px]" />
                                             </div>
                                         </div>
 
                                         {/* Content */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-baseline mb-0.5">
-                                                <h3 className={cn(
-                                                    "truncate text-sm text-gray-900",
-                                                    (convo.unreadCount > 0 || isActive) ? "font-semibold" : "font-medium"
-                                                )}>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "2px" }}>
+                                                <h3 style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "12px", color: isActive ? "#2dd4bf" : convo.unreadCount > 0 ? "#e2e8f0" : "#94a3b8", fontWeight: convo.unreadCount > 0 || isActive ? 800 : 500, fontFamily: "monospace", margin: 0 }}>
                                                     {convo.lead?.name || 'Unknown Lead'}
                                                 </h3>
-                                                <span className={cn(
-                                                    "text-[10px] whitespace-nowrap ml-2",
-                                                    convo.unreadCount > 0 ? "text-blue-600 font-medium" : "text-gray-400"
-                                                )}>
+                                                <span style={{ fontSize: "10px", whiteSpace: "nowrap", marginLeft: "8px", color: convo.unreadCount > 0 ? "#2dd4bf" : "#1e293b", fontFamily: "monospace" }}>
                                                     {formatDistanceToNow(new Date(convo.lastMessageAt), { addSuffix: false })}
                                                 </span>
                                             </div>
 
-                                            <div className="flex justify-between items-end">
-                                                <p className={cn(
-                                                    "text-xs truncate pr-2 max-w-[180px]",
-                                                    convo.unreadCount > 0 ? "text-gray-900 font-medium" : "text-gray-500"
-                                                )}>
-                                                    {convo.lastMessagePreview || 'Started a conversation'}
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                                                <p style={{ fontSize: "11px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: "8px", maxWidth: "170px", color: convo.unreadCount > 0 ? "#475569" : "#1e293b", fontWeight: convo.unreadCount > 0 ? 600 : 400, margin: 0 }}>
+                                                    {convo.lastMessagePreview || 'Inició una conversación'}
                                                 </p>
 
                                                 {convo.unreadCount > 0 && (
-                                                    <Badge variant="default" className="h-5 min-w-[20px] px-1.5 flex items-center justify-center bg-blue-600 hover:bg-blue-700">
+                                                    <span style={{ padding: "1px 6px", borderRadius: "99px", fontSize: "10px", fontWeight: 800, background: "rgba(13,148,136,0.2)", color: "#2dd4bf", border: "1px solid rgba(13,148,136,0.3)", fontFamily: "monospace", flexShrink: 0 }}>
                                                         {convo.unreadCount}
-                                                    </Badge>
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
@@ -330,38 +268,34 @@ export function ConversationList({ conversations, currentUser }: { conversations
 
             {/* New Message Composition Modal */}
             {showNewMessageModal && (
-                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2"><Send size={16} className="text-blue-600" /> New Message</h3>
-                            <button onClick={() => setShowNewMessageModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+                <div style={{ position: "absolute", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                    <div style={{ background: "rgba(11,15,25,0.98)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "16px", width: "100%", maxWidth: "400px", overflow: "hidden" }}>
+                        <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(30,41,59,0.8)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(8,12,20,0.9)" }}>
+                            <h3 style={{ fontWeight: 800, color: "#e2e8f0", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontFamily: "monospace", margin: 0 }}><Send size={14} style={{ color: "#2dd4bf" }} /> New Message</h3>
+                            <button onClick={() => setShowNewMessageModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", display: "flex" }}><X size={14} /></button>
                         </div>
-                        <div className="p-5 space-y-4">
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">Channel</label>
-                                <div className="flex gap-2">
+                        <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "14px" }}>
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "monospace", display: "block", marginBottom: "6px" }}>Channel</label>
+                                <div style={{ display: "flex", gap: "8px" }}>
                                     {['WHATSAPP', 'MESSENGER', 'INSTAGRAM'].map(ch => (
-                                        <button key={ch} className="p-2 border rounded-lg hover:bg-gray-50 flex-1 flex justify-center items-center">
+                                        <button key={ch} style={{ padding: "8px", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", background: "rgba(15,23,42,0.8)", flex: 1, display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer" }}>
                                             <ChannelIcon channel={ch as any} className="text-xl" />
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">Recipient (Lead Name or Phone)</label>
-                                <input type="text" className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Search contacts..." autoFocus />
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "monospace", display: "block", marginBottom: "6px" }}>Recipient</label>
+                                <input type="text" style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "8px 10px", fontSize: "12px", color: "#cbd5e1", outline: "none", boxSizing: "border-box" }} placeholder="Search contacts..." autoFocus />
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">First Message</label>
-                                <textarea className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500 min-h-[80px]" placeholder="Type your message here..." />
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "monospace", display: "block", marginBottom: "6px" }}>First Message</label>
+                                <textarea style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "8px 10px", fontSize: "12px", color: "#cbd5e1", outline: "none", minHeight: "80px", resize: "none", boxSizing: "border-box" }} placeholder="Type your message here..." />
                             </div>
-                            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
-                                <Button variant="ghost" onClick={() => setShowNewMessageModal(false)}>Cancel</Button>
-                                <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => {
-                                    toast.success('Message queued for sending');
-                                    setShowNewMessageModal(false);
-                                    router.refresh();
-                                }}>Send Message</Button>
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", paddingTop: "8px", borderTop: "1px solid rgba(30,41,59,0.8)" }}>
+                                <button onClick={() => setShowNewMessageModal(false)} style={{ padding: "7px 14px", borderRadius: "8px", border: "1px solid rgba(30,41,59,0.9)", background: "transparent", color: "#475569", fontSize: "12px", cursor: "pointer", fontFamily: "monospace" }}>Cancelar</button>
+                                <button style={{ padding: "7px 14px", borderRadius: "8px", border: "1px solid rgba(13,148,136,0.4)", background: "rgba(13,148,136,0.15)", color: "#2dd4bf", fontSize: "12px", cursor: "pointer", fontWeight: 800, fontFamily: "monospace" }} onClick={() => { toast.success('Message queued'); setShowNewMessageModal(false); router.refresh(); }}>Enviar</button>
                             </div>
                         </div>
                     </div>

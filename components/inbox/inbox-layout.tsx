@@ -18,7 +18,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 interface InboxLayoutProps {
     children: React.ReactNode;
     conversationList: React.ReactNode;
-    leadProfile?: React.ReactNode; // Optional 4th panel or right-side info
+    leadProfile?: React.ReactNode;
     currentUser?: any;
     metrics?: any;
 }
@@ -41,59 +41,77 @@ export function InboxLayout({ children, conversationList, leadProfile, currentUs
 
     return (
         <TooltipProvider>
-            <div className="flex h-[calc(100vh-65px)] overflow-hidden bg-white border-t border-slate-200">
+            <div style={{
+                display: "flex",
+                height: "calc(100vh - 65px)",
+                overflow: "hidden",
+                background: "rgba(11,15,25,0.95)",
+                borderTop: "1px solid rgba(30,41,59,0.8)",
+            }}>
 
                 {/* Panel 1: Folders & Filters (Left) */}
-                <div className={cn(
-                    "hidden md:flex flex-col border-r border-slate-200 bg-slate-50/50 transition-all duration-300",
-                    isFoldersOpen ? "w-64" : "w-16 items-center"
-                )}>
-                    <div className={cn("p-4 flex items-center border-b border-slate-200 h-16", isFoldersOpen ? "justify-between" : "justify-center")}>
-                        {isFoldersOpen && <h2 className="font-bold text-slate-800 tracking-tight">Bandeja</h2>}
-                        <Button variant="ghost" size="icon" onClick={() => setIsFoldersOpen(!isFoldersOpen)} className="text-slate-500 hover:bg-slate-200 rounded-xl">
-                            <Menu size={20} />
-                        </Button>
+                <div style={{
+                    display: "none",
+                    flexDirection: "column",
+                    borderRight: "1px solid rgba(30,41,59,0.8)",
+                    background: "rgba(8,12,20,0.98)",
+                    transition: "width 0.3s",
+                    width: isFoldersOpen ? "256px" : "64px",
+                    flexShrink: 0,
+                }} className="hidden md:flex">
+                    <div style={{
+                        padding: "0 16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: isFoldersOpen ? "space-between" : "center",
+                        borderBottom: "1px solid rgba(30,41,59,0.8)",
+                        height: "64px",
+                    }}>
+                        {isFoldersOpen && <h2 style={{ fontWeight: 800, color: "#e2e8f0", fontSize: "14px", fontFamily: "monospace", letterSpacing: "0.05em", margin: 0 }}>Bandeja</h2>}
+                        <button onClick={() => setIsFoldersOpen(!isFoldersOpen)} style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", borderRadius: "8px", color: "#475569", display: "flex", alignItems: "center" }}>
+                            <Menu size={18} />
+                        </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto py-4 space-y-6 scrollbar-hide">
+                    <div className="flex-1 overflow-y-auto scrollbar-hide" style={{ padding: "16px 0" }}>
                         {/* Status Folders */}
-                        <div className="space-y-1 px-3">
-                            {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Vistas</p>}
-                            <NavItem icon={Inbox} label="Sin Asignar" count={metrics?.unassigned || 0} active={currentFolder === 'unassigned'} isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => handleNavigation('folder', 'unassigned')} />
+                        <div style={{ marginBottom: "24px", padding: "0 12px" }}>
+                            {isFoldersOpen && <p style={{ fontSize: "9px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "#1e293b", fontFamily: "monospace", padding: "0 12px", marginBottom: "6px" }}>Vistas</p>}
+                            <NavItem icon={Inbox} label="Sin Asignar" count={metrics?.unassigned || 0} active={currentFolder === 'unassigned'} isOpen={isFoldersOpen} badgeColor="teal" onClick={() => handleNavigation('folder', 'unassigned')} />
                             <NavItem icon={MessageSquare} label="Mis Chats" count={metrics?.mine || 0} active={currentFolder === 'mine'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'mine')} />
-                            <NavItem icon={Clock} label="Pendientes" count={metrics?.pending || 0} active={currentFolder === 'pending'} isOpen={isFoldersOpen} badgeColor="bg-amber-100 text-amber-700" onClick={() => handleNavigation('folder', 'pending')} />
+                            <NavItem icon={Clock} label="Pendientes" count={metrics?.pending || 0} active={currentFolder === 'pending'} isOpen={isFoldersOpen} badgeColor="amber" onClick={() => handleNavigation('folder', 'pending')} />
                             <NavItem icon={CheckCircle2} label="Resueltos" count={metrics?.resolved || 0} active={currentFolder === 'resolved'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'resolved')} />
-                            <NavItem icon={MessageSquare} label="Todos" active={!currentFolder && !currentTag} isOpen={isFoldersOpen} badgeColor="bg-blue-100 text-blue-700" onClick={() => router.push('/dashboard/inbox')} />
+                            <NavItem icon={MessageSquare} label="Todos" active={!currentFolder && !currentTag} isOpen={isFoldersOpen} badgeColor="teal" onClick={() => router.push('/dashboard/inbox')} />
                         </div>
 
                         {/* Tags */}
-                        <div className="space-y-1 px-3">
-                            {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Etiquetas</p>}
-                            <NavItem icon={Hash} iconColor="text-rose-500" label="Soporte VIP" count={metrics?.vip || 0} active={currentTag === 'Soporte VIP'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Soporte VIP')} />
-                            <NavItem icon={Hash} iconColor="text-emerald-500" label="Ventas" count={metrics?.sales || 0} active={currentTag === 'Ventas'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Ventas')} />
-                            <NavItem icon={Hash} iconColor="text-violet-500" label="Dudas" count={metrics?.questions || 0} active={currentTag === 'Dudas'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Dudas')} />
+                        <div style={{ marginBottom: "24px", padding: "0 12px" }}>
+                            {isFoldersOpen && <p style={{ fontSize: "9px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "#1e293b", fontFamily: "monospace", padding: "0 12px", marginBottom: "6px" }}>Etiquetas</p>}
+                            <NavItem icon={Hash} iconColor="#f43f5e" label="Soporte VIP" count={metrics?.vip || 0} active={currentTag === 'Soporte VIP'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Soporte VIP')} />
+                            <NavItem icon={Hash} iconColor="#10b981" label="Ventas" count={metrics?.sales || 0} active={currentTag === 'Ventas'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Ventas')} />
+                            <NavItem icon={Hash} iconColor="#a78bfa" label="Dudas" count={metrics?.questions || 0} active={currentTag === 'Dudas'} isOpen={isFoldersOpen} onClick={() => handleNavigation('tag', 'Dudas')} />
                         </div>
 
                         {/* Other */}
-                        <div className="space-y-1 px-3">
-                            {isFoldersOpen && <p className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Otros</p>}
+                        <div style={{ padding: "0 12px" }}>
+                            {isFoldersOpen && <p style={{ fontSize: "9px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "#1e293b", fontFamily: "monospace", padding: "0 12px", marginBottom: "6px" }}>Otros</p>}
                             <NavItem icon={Star} label="Destacados" active={currentFolder === 'starred'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'starred')} />
                             <NavItem icon={Archive} label="Archivados" active={currentFolder === 'archived'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'archived')} />
                             <NavItem icon={AlertCircle} label="Spam" active={currentFolder === 'spam'} isOpen={isFoldersOpen} onClick={() => handleNavigation('folder', 'spam')} />
                         </div>
                     </div>
 
-                    {/* User Mini Profile / Settings at bottom */}
+                    {/* User Mini Profile */}
                     {isFoldersOpen && (
-                        <div className="p-4 border-t border-slate-200">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                        <div style={{ padding: "12px 16px", borderTop: "1px solid rgba(30,41,59,0.8)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg, #0d9488, #2dd4bf)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 800, fontSize: "11px", flexShrink: 0 }}>
                                     {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : 'AG'}
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-slate-900 truncate">{currentUser?.name || 'Agente Ventas'}</p>
-                                    <p className="text-xs text-emerald-500 flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <p style={{ fontSize: "12px", fontWeight: 700, color: "#cbd5e1", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{currentUser?.name || 'Administrador'}</p>
+                                    <p style={{ fontSize: "10px", color: "#10b981", display: "flex", alignItems: "center", gap: "4px", margin: 0 }}>
+                                        <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
                                         En línea
                                     </p>
                                 </div>
@@ -102,44 +120,58 @@ export function InboxLayout({ children, conversationList, leadProfile, currentUs
                     )}
                 </div>
 
-                {/* Panel 2: Conversation List (Center) */}
-                <div className="hidden md:flex w-80 lg:w-96 border-r border-slate-200 flex-col bg-white overflow-hidden">
+                {/* Panel 2: Conversation List */}
+                <div style={{
+                    display: "none",
+                    flexDirection: "column",
+                    width: "360px",
+                    flexShrink: 0,
+                    borderRight: "1px solid rgba(30,41,59,0.8)",
+                    background: "rgba(10,14,23,0.97)",
+                    overflow: "hidden",
+                }} className="hidden md:flex">
                     {conversationList}
                 </div>
 
                 {/* Panel 3: Main Chat Area */}
-                <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc] relative">
-                    {/* Mobile Flow (Drawer Header inside Main Area) */}
-                    <div className="md:hidden flex items-center p-3 border-b border-slate-200 bg-white sticky top-0 z-10">
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, background: "rgba(11,15,25,0.95)", position: "relative" }}>
+                    {/* Mobile Drawer */}
+                    <div className="md:hidden" style={{ display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid rgba(30,41,59,0.8)", background: "rgba(8,12,20,0.98)", position: "sticky", top: 0, zIndex: 10 }}>
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2">
+                                <button style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", marginRight: "8px", color: "#475569" }}>
                                     <Menu size={20} />
-                                </Button>
+                                </button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="p-0 w-[320px] sm:w-[360px]">
-                                <div className="h-full flex flex-col">
-                                    <div className="p-4 border-b border-slate-200">
-                                        <h2 className="font-bold text-lg">Inbox</h2>
+                            <SheetContent side="left" className="p-0 w-[320px] sm:w-[360px]" style={{ background: "rgba(8,12,20,0.99)", borderRight: "1px solid rgba(30,41,59,0.8)" }}>
+                                <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                                    <div style={{ padding: "16px", borderBottom: "1px solid rgba(30,41,59,0.8)" }}>
+                                        <h2 style={{ fontWeight: 800, fontSize: "16px", color: "#e2e8f0", margin: 0 }}>Inbox</h2>
                                     </div>
-                                    <div className="flex-1 overflow-y-auto">
+                                    <div style={{ flex: 1, overflowY: "auto" }}>
                                         {conversationList}
                                     </div>
                                 </div>
                             </SheetContent>
                         </Sheet>
-                        <span className="font-semibold text-slate-900">Inbox</span>
+                        <span style={{ fontWeight: 700, color: "#cbd5e1", fontSize: "14px" }}>Inbox</span>
                     </div>
 
                     {children}
                 </div>
 
-                {/* Optional Panel 4: Lead Profile (Right) */}
+                {/* Panel 4: Lead Profile (Right) */}
                 {leadProfile && (
-                    <div className={cn(
-                        "hidden xl:flex border-l border-slate-200 flex-col bg-white transition-all duration-300",
-                        isProfileOpen ? "w-80" : "w-0 opacity-0 overflow-hidden border-none"
-                    )}>
+                    <div style={{
+                        display: isProfileOpen ? "flex" : "none",
+                        flexDirection: "column",
+                        width: isProfileOpen ? "320px" : "0",
+                        flexShrink: 0,
+                        borderLeft: "1px solid rgba(30,41,59,0.8)",
+                        background: "rgba(8,12,20,0.98)",
+                        overflow: "hidden",
+                        transition: "width 0.3s",
+                    }} className="hidden xl:flex">
                         {leadProfile}
                     </div>
                 )}
@@ -161,42 +193,63 @@ interface NavItemProps {
 }
 
 function NavItem({ icon: Icon, label, count, active, isOpen, badgeColor, iconColor, onClick }: NavItemProps) {
+    const activeBg = "rgba(13,148,136,0.12)";
+    const activeBorder = "rgba(13,148,136,0.3)";
+    const activeText = "#2dd4bf";
+    const inactiveText = "#475569";
+    const hoverBg = "rgba(30,41,59,0.5)";
+
+    const badgeBg = badgeColor === 'teal'
+        ? "rgba(13,148,136,0.15)"
+        : badgeColor === 'amber'
+            ? "rgba(245,158,11,0.15)"
+            : "rgba(30,41,59,0.7)";
+    const badgeText = badgeColor === 'teal'
+        ? "#2dd4bf"
+        : badgeColor === 'amber'
+            ? "#f59e0b"
+            : "#475569";
+
     if (!isOpen) {
         return (
             <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={onClick} className={cn(
-                        "rounded-xl w-10 h-10 mb-2 relative",
-                        active ? "bg-blue-50 text-blue-600" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900",
-                        iconColor
-                    )}>
-                        <Icon size={20} />
-                        {count && (
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>
+                    <button onClick={onClick} style={{
+                        background: active ? activeBg : "transparent",
+                        border: active ? `1px solid ${activeBorder}` : "1px solid transparent",
+                        borderRadius: "8px", width: "40px", height: "40px", marginBottom: "6px", position: "relative",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer", color: active ? activeText : (iconColor || inactiveText),
+                    }}>
+                        <Icon size={18} />
+                        {!!count && (
+                            <span style={{ position: "absolute", top: "2px", right: "2px", width: "6px", height: "6px", background: "#f43f5e", borderRadius: "50%", border: "1px solid rgba(8,12,20,0.9)" }} />
                         )}
-                    </Button>
+                    </button>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="font-semibold">
-                    {label} {count && `(${count})`}
+                <TooltipContent side="right" style={{ background: "rgba(11,15,25,0.95)", border: "1px solid rgba(30,41,59,0.8)", color: "#cbd5e1", fontSize: "11px", fontFamily: "monospace" }}>
+                    {label} {count ? `(${count})` : ''}
                 </TooltipContent>
             </Tooltip>
         );
     }
 
     return (
-        <button onClick={onClick} className={cn(
-            "w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-colors group",
-            active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-        )}>
-            <div className="flex items-center gap-3">
-                <Icon size={18} className={cn(active ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600", iconColor)} />
-                <span className="truncate">{label}</span>
+        <button onClick={onClick} style={{
+            width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "7px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: 600,
+            background: active ? activeBg : "transparent",
+            border: active ? `1px solid ${activeBorder}` : "1px solid transparent",
+            color: active ? activeText : inactiveText,
+            cursor: "pointer", marginBottom: "2px", transition: "all 0.15s",
+            fontFamily: "monospace",
+        }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Icon size={15} style={{ color: active ? activeText : (iconColor || inactiveText), flexShrink: 0 }} />
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
             </div>
-            {count && (
-                <span className={cn(
-                    "px-2 py-0.5 rounded-full text-[10px] font-bold group-hover:bg-opacity-80 transition-opacity",
-                    badgeColor || (active ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700")
-                )}>
+            {!!count && (
+                <span style={{ padding: "1px 6px", borderRadius: "99px", fontSize: "10px", fontWeight: 800, background: badgeBg, color: badgeText, fontFamily: "monospace" }}>
                     {count}
                 </span>
             )}

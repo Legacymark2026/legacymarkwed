@@ -1,16 +1,14 @@
 
 import { MessageSquareDashed } from 'lucide-react';
 
-export function EmptyState({ title = "No conversation selected", description = "Choose a conversation from the sidebar to start chatting." }) {
+export function EmptyState({ title = "Select a conversation", description = "Choose a conversation from the list to start chatting or view details." }) {
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-gray-50/50">
-            <div className="w-24 h-24 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center mb-6 animate-in zoom-in duration-500">
-                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
-                    <MessageSquareDashed size={40} className="text-gray-300" />
-                </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center", padding: "32px", background: "transparent" }}>
+            <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "rgba(30,41,59,0.6)", border: "1px solid rgba(30,41,59,0.9)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <MessageSquareDashed size={32} style={{ color: "#1e293b" }} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-            <p className="text-gray-500 max-w-sm mx-auto mb-8 leading-relaxed">
+            <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#334155", marginBottom: "8px", fontFamily: "monospace" }}>{title}</h3>
+            <p style={{ fontSize: "12px", color: "#1e293b", maxWidth: "280px", lineHeight: "1.6", fontFamily: "monospace" }}>
                 {description}
             </p>
         </div>
