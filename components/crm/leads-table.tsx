@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { bulkUpdateLeads } from "@/actions/crm";
 import { CreateLeadDialog } from "@/components/crm/create-lead-dialog";
-import { Search, Download, ChevronUp, ChevronDown, X, Mail, Phone } from "lucide-react";
+import { Search, Download, ChevronUp, ChevronDown, X, Mail, Phone, ExternalLink } from "lucide-react";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -18,20 +18,16 @@ interface Lead {
     utmSource: string | null; utmCampaign: string | null; convertedAt: Date | null;
 }
 
-interface Props {
-    leads: Lead[];
-    total: number;
-    companyId: string;
-}
+interface Props { leads: Lead[]; total: number; companyId: string; }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-    NEW: { label: "Nuevo", color: "text-sky-700", bg: "bg-sky-50 border-sky-200" },
-    CONTACTED: { label: "Contactado", color: "text-violet-700", bg: "bg-violet-50 border-violet-200" },
-    QUALIFIED: { label: "Calificado", color: "text-teal-700", bg: "bg-teal-50 border-teal-200" },
-    CONVERTED: { label: "Convertido", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
-    LOST: { label: "Perdido", color: "text-red-700", bg: "bg-red-50 border-red-200" },
+const STATUS_CONFIG: Record<string, { label: string; color: string; border: string; bg: string }> = {
+    NEW: { label: "Nuevo", color: "#38bdf8", border: "rgba(56,189,248,0.4)", bg: "rgba(56,189,248,0.1)" },
+    CONTACTED: { label: "Contactado", color: "#a78bfa", border: "rgba(167,139,250,0.4)", bg: "rgba(167,139,250,0.1)" },
+    QUALIFIED: { label: "Calificado", color: "#2dd4bf", border: "rgba(45,212,191,0.4)", bg: "rgba(45,212,191,0.1)" },
+    CONVERTED: { label: "Convertido", color: "#34d399", border: "rgba(52,211,153,0.4)", bg: "rgba(52,211,153,0.1)" },
+    LOST: { label: "Perdido", color: "#f87171", border: "rgba(248,113,113,0.4)", bg: "rgba(248,113,113,0.1)" },
 };
 
 const SOURCE_ICONS: Record<string, string> = {
@@ -39,17 +35,32 @@ const SOURCE_ICONS: Record<string, string> = {
     REFERRAL: "🤝", DIRECT: "🌐", EMAIL: "✉️", TIKTOK: "🎵", ORGANIC: "🌱",
 };
 
+// ─── SCORE BAR ────────────────────────────────────────────────────────────────
+
 function ScoreBar({ score }: { score: number }) {
-    const color = score >= 70 ? "bg-emerald-500" : score >= 40 ? "bg-amber-500" : "bg-red-400";
+    const color = score >= 70 ? "#34d399" : score >= 40 ? "#fbbf24" : "#f87171";
     return (
-        <div className="flex items-center gap-2">
-            <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ width: "60px", height: "4px", background: "rgba(30,41,59,0.8)", borderRadius: "99px", overflow: "hidden" }}>
+                <div style={{ width: `${score}%`, height: "100%", background: color, borderRadius: "99px", boxShadow: `0 0 6px ${color}80` }} />
             </div>
-            <span className="text-xs font-bold text-slate-600 tabular-nums w-7">{score}</span>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#94a3b8", fontFamily: "monospace", minWidth: "24px" }}>{score}</span>
         </div>
     );
 }
+
+// ─── CONTROL STYLES ───────────────────────────────────────────────────────────
+
+const inputStyle: React.CSSProperties = {
+    background: "rgba(15,23,42,0.8)",
+    border: "1px solid rgba(30,41,59,0.9)",
+    color: "#cbd5e1",
+    borderRadius: "10px",
+    padding: "8px 14px",
+    fontSize: "13px",
+    outline: "none",
+    width: "100%",
+};
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
@@ -92,10 +103,7 @@ export function LeadsTable({ leads, total, companyId }: Props) {
     }, [bulkStatus, selected]);
 
     const exportCSV = useCallback(() => {
-        const rows = sorted.map((l) => ([
-            l.name ?? "", l.email, l.phone ?? "", l.company ?? "",
-            l.source, l.status, l.score, l.createdAt.toString(),
-        ]));
+        const rows = sorted.map((l) => ([l.name ?? "", l.email, l.phone ?? "", l.company ?? "", l.source, l.status, l.score, l.createdAt.toString()]));
         const header = ["Nombre", "Email", "Teléfono", "Empresa", "Fuente", "Estado", "Score", "Fecha"];
         const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -108,57 +116,84 @@ export function LeadsTable({ leads, total, companyId }: Props) {
         ? sortDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
         : <div className="w-3 h-3" />;
 
+    const TH_STYLE: React.CSSProperties = {
+        padding: "12px 16px", textAlign: "left", fontSize: "10px",
+        fontWeight: 800, color: "#475569", textTransform: "uppercase",
+        letterSpacing: "0.08em", fontFamily: "monospace", whiteSpace: "nowrap",
+        cursor: "pointer", userSelect: "none",
+    };
+
     return (
-        <div className="space-y-4">
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+
             {/* ── Filters bar ── */}
-            <div className="flex flex-wrap gap-3 items-center">
-                <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center" }}>
+                {/* Search */}
+                <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
+                    <Search style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "15px", height: "15px", color: "#475569" }} />
                     <input
-                        type="text" placeholder="Buscar por nombre, email, empresa..."
+                        type="text" placeholder="Buscar nombre, email, empresa..."
                         value={search} onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        style={{ ...inputStyle, paddingLeft: "38px" }}
+                        onFocus={e => (e.target.style.borderColor = "rgba(13,148,136,0.6)")}
+                        onBlur={e => (e.target.style.borderColor = "rgba(30,41,59,0.9)")}
                     />
                 </div>
-                <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400">
+                {/* Status filter */}
+                <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+                    style={{ ...inputStyle, width: "auto", minWidth: "150px" }}>
                     <option value="">Todos los estados</option>
                     {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
-                <select value={filterSource} onChange={(e) => setFilterSource(e.target.value)} className="px-3 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400">
+                {/* Source filter */}
+                <select value={filterSource} onChange={(e) => setFilterSource(e.target.value)}
+                    style={{ ...inputStyle, width: "auto", minWidth: "150px" }}>
                     <option value="">Todas las fuentes</option>
                     {Object.keys(SOURCE_ICONS).map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors">
-                    <Download className="w-4 h-4" /> Exportar CSV
+                {/* Export */}
+                <button onClick={exportCSV}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", fontSize: "13px", fontWeight: 600, color: "#94a3b8", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "10px", cursor: "pointer", whiteSpace: "nowrap" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(13,148,136,0.5)"; (e.currentTarget as HTMLElement).style.color = "#2dd4bf"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(30,41,59,0.9)"; (e.currentTarget as HTMLElement).style.color = "#94a3b8"; }}
+                >
+                    <Download style={{ width: "14px", height: "14px" }} /> Exportar CSV
                 </button>
                 <CreateLeadDialog companyId={companyId} />
-                <div className="ml-auto text-sm text-slate-400">{filtered.length} de {total} leads</div>
+                <span style={{ marginLeft: "auto", fontSize: "11px", color: "#475569", fontFamily: "monospace" }}>
+                    {filtered.length} de {total} leads
+                </span>
             </div>
 
-            {/* ── Bulk actions bar ── */}
+            {/* ── Bulk actions ── */}
             {selected.size > 0 && (
-                <div className="flex items-center gap-3 px-5 py-3 bg-teal-50 border border-teal-200 rounded-xl">
-                    <span className="text-sm font-bold text-teal-700">{selected.size} seleccionados</span>
-                    <div className="flex-1 flex items-center gap-2">
-                        <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)} className="text-sm px-3 py-1.5 rounded-lg border border-teal-300 bg-white focus:outline-none">
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 16px", background: "rgba(13,148,136,0.1)", border: "1px solid rgba(13,148,136,0.3)", borderRadius: "12px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: 800, color: "#2dd4bf", fontFamily: "monospace" }}>{selected.size} seleccionados</span>
+                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
+                        <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)}
+                            style={{ ...inputStyle, width: "auto" }}>
                             <option value="">Cambiar estado…</option>
                             {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                         </select>
-                        <button onClick={handleBulkAction} disabled={!bulkStatus || bulkLoading} className="px-3 py-1.5 text-sm font-bold bg-teal-600 text-white rounded-lg disabled:opacity-40 transition-opacity hover:bg-teal-700">
+                        <button onClick={handleBulkAction} disabled={!bulkStatus || bulkLoading}
+                            style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 800, background: "linear-gradient(135deg,#0d9488,#0f766e)", color: "#fff", borderRadius: "8px", border: "none", cursor: "pointer", opacity: (!bulkStatus || bulkLoading) ? 0.4 : 1 }}>
                             {bulkLoading ? "..." : "Aplicar"}
                         </button>
                     </div>
-                    <button onClick={() => setSelected(new Set())} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+                    <button onClick={() => setSelected(new Set())} style={{ color: "#475569", background: "none", border: "none", cursor: "pointer" }}>
+                        <X style={{ width: "16px", height: "16px" }} />
+                    </button>
                 </div>
             )}
 
             {/* ── Table ── */}
-            <div className="rounded-2xl border border-slate-100 overflow-hidden bg-white shadow-sm">
-                <table className="w-full text-sm">
-                    <thead className="bg-slate-50 border-b border-slate-100">
-                        <tr>
-                            <th className="w-10 px-4 py-3">
-                                <input type="checkbox" checked={selected.size === leads.length && leads.length > 0} onChange={toggleAll} className="rounded border-slate-300 text-teal-600 focus:ring-teal-400" />
+            <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(30,41,59,0.8)" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                    <thead>
+                        <tr style={{ background: "rgba(15,23,42,0.9)", borderBottom: "1px solid rgba(30,41,59,0.9)" }}>
+                            <th style={{ ...TH_STYLE, width: "40px" }}>
+                                <input type="checkbox" checked={selected.size === leads.length && leads.length > 0} onChange={toggleAll}
+                                    style={{ accentColor: "#0d9488", width: "14px", height: "14px" }} />
                             </th>
                             {[
                                 { key: "name", label: "Lead" },
@@ -168,58 +203,95 @@ export function LeadsTable({ leads, total, companyId }: Props) {
                                 { key: "company", label: "Empresa" },
                                 { key: "createdAt", label: "Fecha" },
                             ].map((col) => (
-                                <th key={col.key} className="px-4 py-3 text-left font-semibold text-slate-500 cursor-pointer hover:text-slate-900 transition-colors" onClick={() => sortBy(col.key)}>
-                                    <span className="flex items-center gap-1">{col.label} <SortIcon col={col.key} /></span>
+                                <th key={col.key} style={TH_STYLE} onClick={() => sortBy(col.key)}>
+                                    <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                        {col.label} <SortIcon col={col.key} />
+                                    </span>
                                 </th>
                             ))}
-                            <th className="px-4 py-3 text-left font-semibold text-slate-500">Acciones</th>
+                            <th style={TH_STYLE}>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {sorted.map((lead) => {
+                    <tbody>
+                        {sorted.map((lead, idx) => {
                             const cfg = STATUS_CONFIG[lead.status] ?? STATUS_CONFIG["NEW"];
+                            const isSelected = selected.has(lead.id);
+                            const rowBg = isSelected
+                                ? "rgba(13,148,136,0.08)"
+                                : idx % 2 === 0 ? "rgba(11,15,25,0.6)" : "rgba(15,20,35,0.5)";
                             return (
-                                <tr key={lead.id} className={`hover:bg-slate-50/50 transition-colors ${selected.has(lead.id) ? "bg-teal-50/30" : ""}`}>
-                                    <td className="px-4 py-3">
-                                        <input type="checkbox" checked={selected.has(lead.id)} onChange={() => toggle(lead.id)} className="rounded border-slate-300 text-teal-600 focus:ring-teal-400" />
+                                <tr key={lead.id}
+                                    style={{ background: rowBg, borderBottom: "1px solid rgba(30,41,59,0.5)", transition: "background 0.15s" }}
+                                    onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "rgba(13,148,136,0.04)"; }}
+                                    onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = rowBg; }}
+                                >
+                                    <td style={{ padding: "12px 16px" }}>
+                                        <input type="checkbox" checked={isSelected} onChange={() => toggle(lead.id)}
+                                            style={{ accentColor: "#0d9488", width: "14px", height: "14px" }} />
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <Link href={`/dashboard/admin/crm/leads/${lead.id}`} className="group flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-sky-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                                    <td style={{ padding: "12px 16px" }}>
+                                        <Link href={`/dashboard/admin/crm/leads/${lead.id}`}
+                                            style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg,#0d9488,#0891b2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "12px", flexShrink: 0 }}>
                                                 {(lead.name || lead.email)[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-slate-900 group-hover:text-teal-600 transition-colors">{lead.name || "Sin nombre"}</p>
-                                                <p className="text-xs text-slate-400">{lead.email}</p>
+                                                <p style={{ fontWeight: 700, color: "#e2e8f0", margin: 0, fontSize: "13px" }}>{lead.name || "Sin nombre"}</p>
+                                                <p style={{ fontSize: "11px", color: "#475569", margin: 0, fontFamily: "monospace" }}>{lead.email}</p>
                                             </div>
                                         </Link>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${cfg.bg} ${cfg.color}`}>{cfg.label}</span>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <span className="flex items-center gap-1.5 text-xs text-slate-500">
-                                            <span>{SOURCE_ICONS[lead.source] ?? "🌐"}</span>
-                                            {lead.source}
+                                    <td style={{ padding: "12px 16px" }}>
+                                        <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 800, color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
+                                            {cfg.label}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3"><ScoreBar score={lead.score} /></td>
-                                    <td className="px-4 py-3 text-slate-500">{lead.company || "—"}</td>
-                                    <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+                                    <td style={{ padding: "12px 16px" }}>
+                                        <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>
+                                            <span>{SOURCE_ICONS[lead.source] ?? "🌐"}</span>
+                                            <span style={{ fontFamily: "monospace" }}>{lead.source}</span>
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: "12px 16px" }}><ScoreBar score={lead.score} /></td>
+                                    <td style={{ padding: "12px 16px", color: "#64748b", fontSize: "13px" }}>{lead.company || "—"}</td>
+                                    <td style={{ padding: "12px 16px", fontSize: "11px", color: "#475569", whiteSpace: "nowrap", fontFamily: "monospace" }}>
                                         {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true, locale: es })}
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-1">
-                                            {lead.email && <a href={`mailto:${lead.email}`} className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all"><Mail className="w-3.5 h-3.5" /></a>}
-                                            {lead.phone && <a href={`tel:${lead.phone}`} className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"><Phone className="w-3.5 h-3.5" /></a>}
-                                            <Link href={`/dashboard/admin/crm/leads/${lead.id}`} className="px-2.5 py-1 text-xs font-bold text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors">Ver</Link>
+                                    <td style={{ padding: "12px 16px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                            {lead.email && (
+                                                <a href={`mailto:${lead.email}`}
+                                                    style={{ padding: "5px", borderRadius: "7px", color: "#475569", display: "flex", transition: "all 0.15s" }}
+                                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#38bdf8"; (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.1)"; }}
+                                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#475569"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}>
+                                                    <Mail style={{ width: "14px", height: "14px" }} />
+                                                </a>
+                                            )}
+                                            {lead.phone && (
+                                                <a href={`tel:${lead.phone}`}
+                                                    style={{ padding: "5px", borderRadius: "7px", color: "#475569", display: "flex", transition: "all 0.15s" }}
+                                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#34d399"; (e.currentTarget as HTMLElement).style.background = "rgba(52,211,153,0.1)"; }}
+                                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#475569"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}>
+                                                    <Phone style={{ width: "14px", height: "14px" }} />
+                                                </a>
+                                            )}
+                                            <Link href={`/dashboard/admin/crm/leads/${lead.id}`}
+                                                style={{ padding: "5px 10px", fontSize: "11px", fontWeight: 800, color: "#2dd4bf", background: "rgba(13,148,136,0.12)", borderRadius: "7px", textDecoration: "none", fontFamily: "monospace", border: "1px solid rgba(13,148,136,0.25)", transition: "all 0.15s" }}
+                                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(13,148,136,0.25)"; }}
+                                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(13,148,136,0.12)"; }}>
+                                                Ver
+                                            </Link>
                                         </div>
                                     </td>
                                 </tr>
                             );
                         })}
                         {sorted.length === 0 && (
-                            <tr><td colSpan={8} className="px-4 py-16 text-center text-slate-400">No hay leads con estos filtros.</td></tr>
+                            <tr>
+                                <td colSpan={8} style={{ padding: "64px 16px", textAlign: "center", color: "#334155", fontSize: "12px", fontFamily: "monospace" }}>
+                                    — No hay leads con estos filtros —
+                                </td>
+                            </tr>
                         )}
                     </tbody>
                 </table>
