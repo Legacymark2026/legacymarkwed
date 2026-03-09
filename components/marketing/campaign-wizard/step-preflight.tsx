@@ -68,7 +68,7 @@ export function StepPreflight() {
 
             {isValidating ? (
                 <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-teal-400 animate-spin" />
                 </div>
             ) : (
                 <>
@@ -173,7 +173,7 @@ export function StepPreflight() {
                         id="wizard-next-step-5"
                         onClick={nextStep}
                         disabled={!allValid || isValidating}
-                        className="bg-violet-600 hover:bg-violet-500 text-white px-8 h-11 disabled:opacity-40"
+                        className="bg-teal-700 hover:bg-teal-600 text-white px-8 h-11 disabled:opacity-40"
                     >
                         Revisar y Lanzar →
                     </Button>

@@ -160,7 +160,7 @@ export function StepLaunch() {
                     <Button
                         id="wizard-go-to-campaigns"
                         onClick={() => router.push('/dashboard/admin/marketing/campaigns')}
-                        className="bg-violet-600 hover:bg-violet-500 text-white"
+                        className="bg-teal-700 hover:bg-teal-600 text-white"
                     >
                         Ver Campañas →
                     </Button>

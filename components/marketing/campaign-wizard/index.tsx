@@ -23,7 +23,7 @@ export function CampaignWizard() {
     const { step } = useCampaignWizard();
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 p-6">
+        <div style={{ minHeight: "100vh", background: "transparent", padding: "24px" }}>
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
@@ -35,11 +35,10 @@ export function CampaignWizard() {
 
                 {/* Progress Steps */}
                 <div className="relative flex items-center justify-between mb-10">
-                    {/* Progress line */}
-                    <div className="absolute top-5 left-5 right-5 h-0.5 bg-white/10 z-0" />
+                    <div className="absolute top-5 left-5 right-5 h-0.5 z-0" style={{ background: "rgba(30,41,59,0.8)" }} />
                     <div
-                        className="absolute top-5 left-5 h-0.5 bg-gradient-to-r from-violet-600 to-indigo-500 z-0 transition-all duration-500"
-                        style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
+                        className="absolute top-5 left-5 h-0.5 z-0 transition-all duration-500"
+                        style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%`, background: "linear-gradient(to right, #0d9488, #2dd4bf)" }}
                     />
 
                     {STEPS.map(({ number, label }) => {
@@ -49,23 +48,22 @@ export function CampaignWizard() {
                         return (
                             <div key={number} className="relative z-10 flex flex-col items-center gap-2">
                                 <div
-                                    className={cn(
-                                        'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm border-2 transition-all duration-300',
-                                        done
-                                            ? 'bg-violet-600 border-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.5)]'
-                                            : current
-                                                ? 'bg-gray-800 border-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.4)]'
-                                                : 'bg-gray-900 border-white/10 text-gray-500'
-                                    )}
+                                    style={{
+                                        width: "36px", height: "36px", borderRadius: "50%",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        fontWeight: 700, fontSize: "13px", transition: "all 0.3s",
+                                        border: done ? "2px solid #0d9488" : current ? "2px solid #2dd4bf" : "2px solid rgba(30,41,59,0.9)",
+                                        background: done ? "#0d9488" : current ? "rgba(13,148,136,0.15)" : "rgba(11,15,25,0.8)",
+                                        color: done ? "#fff" : current ? "#2dd4bf" : "#334155",
+                                        boxShadow: current ? "0 0 16px rgba(45,212,191,0.3)" : done ? "0 0 10px rgba(13,148,136,0.3)" : undefined,
+                                    }}
                                 >
-                                    {done ? <Check className="w-4 h-4" /> : number}
+                                    {done ? <Check style={{ width: "12px", height: "12px" }} /> : number}
                                 </div>
-                                <span
-                                    className={cn(
-                                        'text-xs font-medium whitespace-nowrap',
-                                        current ? 'text-violet-300' : done ? 'text-gray-400' : 'text-gray-600'
-                                    )}
-                                >
+                                <span style={{
+                                    fontSize: "10px", fontWeight: 700, whiteSpace: "nowrap", fontFamily: "monospace",
+                                    color: current ? "#2dd4bf" : done ? "#475569" : "#1e293b",
+                                }}>
                                     {label}
                                 </span>
                             </div>
@@ -74,12 +72,12 @@ export function CampaignWizard() {
                 </div>
 
                 {/* Step Content */}
-                <div className="bg-gray-900/60 border border-white/8 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
-                    <div className="mb-6">
-                        <h2 className="text-lg font-bold text-white">
+                <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "16px", padding: "28px 32px", boxShadow: "0 20px 50px rgba(0,0,0,0.4)", backdropFilter: "blur(10px)" }}>
+                    <div style={{ marginBottom: "22px" }}>
+                        <h2 style={{ fontSize: "17px", fontWeight: 800, color: "#e2e8f0", margin: 0 }}>
                             Paso {step}: {STEPS[step - 1]?.label}
                         </h2>
-                        <div className="h-0.5 w-16 bg-violet-500 mt-2 rounded-full" />
+                        <div style={{ height: "2px", width: "40px", background: "linear-gradient(to right, #0d9488, #2dd4bf)", marginTop: "8px", borderRadius: "99px" }} />
                     </div>
 
                     {step === 1 && <StepPlatform />}

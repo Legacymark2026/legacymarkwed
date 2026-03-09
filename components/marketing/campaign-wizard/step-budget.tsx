@@ -41,7 +41,7 @@ export function StepBudget() {
                             type="button"
                             onClick={() => setBudget({ type })}
                             className={`p-4 rounded-xl border-2 text-left transition-all ${budget.type === type
-                                    ? 'border-violet-500 bg-violet-500/10'
+                                    ? 'border-teal-500 bg-teal-500/10'
                                     : 'border-white/10 bg-white/3 hover:border-white/20'
                                 }`}
                         >
@@ -175,7 +175,7 @@ export function StepBudget() {
                     id="wizard-next-step-2"
                     onClick={nextStep}
                     disabled={!canContinue}
-                    className="bg-violet-600 hover:bg-violet-500 text-white px-8 h-11 disabled:opacity-40"
+                    className="bg-teal-700 hover:bg-teal-600 text-white px-8 h-11 disabled:opacity-40"
                 >
                     Continuar →
                 </Button>

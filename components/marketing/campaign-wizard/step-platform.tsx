@@ -95,7 +95,7 @@ export function StepPlatform() {
                                 className={cn(
                                     'relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 text-left',
                                     selected
-                                        ? 'border-violet-500 bg-violet-500/10 shadow-[0_0_20px_rgba(139,92,246,0.2)]'
+                                        ? 'border-teal-500 bg-teal-500/10 shadow-[0_0_20px_rgba(13,148,136,0.2)]'
                                         : 'border-white/10 bg-white/3 hover:border-white/20 hover:bg-white/5'
                                 )}
                             >
@@ -103,14 +103,14 @@ export function StepPlatform() {
                                 <div>
                                     <p className="font-medium text-white text-sm">{label}</p>
                                     {selected && (
-                                        <Badge className="mt-1 bg-violet-500/30 text-violet-300 border-0 text-[10px]">
+                                        <Badge className="mt-1 bg-violet-500/30 text-teal-300 border-0 text-[10px]">
                                             Seleccionada
                                         </Badge>
                                     )}
                                 </div>
                                 <div className="absolute top-3 right-3">
                                     {selected ? (
-                                        <CheckCircle2 className="w-4 h-4 text-violet-400" />
+                                        <CheckCircle2 className="w-4 h-4 text-teal-400" />
                                     ) : (
                                         <Circle className="w-4 h-4 text-gray-600" />
                                     )}
@@ -146,7 +146,7 @@ export function StepPlatform() {
                     id="wizard-next-step-1"
                     onClick={nextStep}
                     disabled={!canContinue}
-                    className="bg-violet-600 hover:bg-violet-500 text-white px-8 h-11 disabled:opacity-40"
+                    className="bg-teal-700 hover:bg-teal-600 text-white px-8 h-11 disabled:opacity-40"
                 >
                     Continuar →
                 </Button>

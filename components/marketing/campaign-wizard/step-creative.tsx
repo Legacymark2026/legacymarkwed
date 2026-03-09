@@ -50,7 +50,7 @@ export function StepCreative() {
             {/* Asset Upload */}
             <div className="space-y-3">
                 <Label className="text-sm font-semibold text-gray-300">Creativos (Imágenes / Videos)</Label>
-                <div className="border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-violet-500/40 transition-colors">
+                <div className="border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-teal-500/40 transition-colors">
                     <Upload className="w-8 h-8 text-gray-500 mx-auto mb-3" />
                     <p className="text-sm text-gray-400">Arrastra archivos aquí, o ingresa una URL de asset</p>
                     <div className="flex gap-2 mt-4 max-w-md mx-auto">
@@ -158,7 +158,7 @@ export function StepCreative() {
                         variant="ghost"
                         size="sm"
                         onClick={generateUTMs}
-                        className="text-xs text-violet-400 hover:text-violet-300 h-auto py-1"
+                        className="text-xs text-teal-400 hover:text-teal-300 h-auto py-1"
                     >
                         ✨ Auto-generar UTMs
                     </Button>
@@ -201,7 +201,7 @@ export function StepCreative() {
                     id="wizard-next-step-4"
                     onClick={nextStep}
                     disabled={!canContinue}
-                    className="bg-violet-600 hover:bg-violet-500 text-white px-8 h-11 disabled:opacity-40"
+                    className="bg-teal-700 hover:bg-teal-600 text-white px-8 h-11 disabled:opacity-40"
                 >
                     Validar →
                 </Button>

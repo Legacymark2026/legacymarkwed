@@ -80,7 +80,7 @@ export function StepTargeting() {
                             type="button"
                             onClick={() => setTargeting({ genders: [g] })}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${targeting.genders.includes(g)
-                                    ? 'border-violet-500 bg-violet-500/20 text-violet-300'
+                                    ? 'border-teal-500 bg-violet-500/20 text-teal-300'
                                     : 'border-white/10 text-gray-400 hover:border-white/20'
                                 }`}
                         >
@@ -141,7 +141,7 @@ export function StepTargeting() {
                             key={interest}
                             type="button"
                             onClick={() => addInterest(interest)}
-                            className="px-2 py-1 rounded text-xs text-gray-400 border border-dashed border-white/10 hover:border-violet-500/50 hover:text-violet-400 transition-colors"
+                            className="px-2 py-1 rounded text-xs text-gray-400 border border-dashed border-white/10 hover:border-teal-500/50 hover:text-teal-400 transition-colors"
                         >
                             + {interest}
                         </button>
@@ -154,7 +154,7 @@ export function StepTargeting() {
                         {targeting.interests.map((interest) => (
                             <Badge
                                 key={interest}
-                                className="bg-violet-500/20 text-violet-300 border-violet-500/30 gap-1.5"
+                                className="bg-violet-500/20 text-teal-300 border-teal-500/30 gap-1.5"
                             >
                                 {interest}
                                 <button type="button" onClick={() => removeInterest(interest)}>
@@ -203,7 +203,7 @@ export function StepTargeting() {
                 <Button
                     id="wizard-next-step-3"
                     onClick={nextStep}
-                    className="bg-violet-600 hover:bg-violet-500 text-white px-8 h-11"
+                    className="bg-teal-700 hover:bg-teal-600 text-white px-8 h-11"
                 >
                     Continuar →
                 </Button>
