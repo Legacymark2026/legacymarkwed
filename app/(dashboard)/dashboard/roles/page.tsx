@@ -9,8 +9,9 @@
 import { useState, useEffect, useTransition } from "react";
 import { Shield, Plus, Trash2, Save, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { upsertRoleConfig, deleteRoleConfig, getRoleConfigs, getUsersWithRoles, updateUserRole } from "@/actions/role-config";
-import { ALL_DASHBOARD_ROUTES } from "@/lib/role-config";
+import { ALL_DASHBOARD_ROUTES } from "@/lib/rbac-routes";
 import { toast } from "sonner";
+
 
 interface RoleConfig {
     id: string;
