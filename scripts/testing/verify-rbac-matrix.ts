@@ -42,6 +42,27 @@ const ROUTE_PERMISSIONS: Record<string, string[]> = {
     "/dashboard/admin/crm/campaigns": ["SUPER_ADMIN", "CLIENT_ADMIN", "CONTENT_MANAGER"],
 };
 
+// ─── Permisos para roles CUSTOM (copia de lib/rbac.ts) ─────
+const CUSTOM_ROLE_PERMISSIONS: Record<string, string[]> = {
+    "gerente": [
+        "/dashboard",
+        "/dashboard/analytics",
+        "/dashboard/inbox",
+        "/dashboard/marketing",
+        "/dashboard/marketing/campaigns",
+        "/dashboard/marketing/links",
+        "/dashboard/admin/crm",
+        "/dashboard/admin/crm/leads",
+        "/dashboard/admin/crm/pipeline",
+        "/dashboard/admin/crm/campaigns",
+    ],
+    "viewer": [
+        "/dashboard",
+        "/dashboard/posts",
+        "/dashboard/projects",
+    ],
+};
+
 // Roles estándar conocidos por el sistema (en mayúsculas y minúsculas por si acaso)
 const STANDARD_ROLES = [
     "SUPER_ADMIN", "ADMIN", "CONTENT_MANAGER",
@@ -61,9 +82,22 @@ function isStandardRole(role: string): boolean {
 
 function canAccess(role: string, pathname: string): boolean {
     const r = normalizeRole(role);
+    const rLower = role.toLowerCase();
+
     if (r === 'SUPER_ADMIN') return true;
     if (r === 'GUEST') return false;
 
+    // Custom roles — verificar en CUSTOM_ROLE_PERMISSIONS primero
+    if (CUSTOM_ROLE_PERMISSIONS[rLower]) {
+        const allowed = CUSTOM_ROLE_PERMISSIONS[rLower];
+        if (allowed.includes(pathname)) return true;
+        const prefix = allowed
+            .filter(rt => pathname.startsWith(rt))
+            .sort((a, b) => b.length - a.length)[0];
+        return !!prefix;
+    }
+
+    // Roles estándar
     if (ROUTE_PERMISSIONS[pathname]) {
         return ROUTE_PERMISSIONS[pathname].includes(r);
     }

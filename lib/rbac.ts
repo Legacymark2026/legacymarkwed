@@ -6,6 +6,10 @@
  *
  * Esta es la ÚNICA fuente de verdad para las reglas de acceso.
  * El middleware, el sidebar y los guards leen de aquí.
+ *
+ * Soporta dos tipos de roles:
+ *   1. Roles estándar (UserRole enum)
+ *   2. Roles custom (string libre) definidos en CUSTOM_ROLE_PERMISSIONS
  */
 import { UserRole } from "@/types/auth";
 
@@ -44,10 +48,9 @@ export const PUBLIC_PREFIXES = [
     "/api/webhooks/",
 ];
 
-// ── Matriz de permisos por ruta del dashboard ─────────────
+// ── Matriz de permisos para roles ESTÁNDAR ─────────────────
 // Si una ruta no aparece aquí pero está bajo /dashboard → requiere autenticación
 // y cualquier rol autenticado puede acceder (salvo GUEST).
-// Para rutas más restrictivas, listarlas explícitamente.
 
 export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     // ── Acceso universal autenticado ──────────────────────
@@ -104,6 +107,43 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
     "/dashboard/admin/crm/campaigns": [UserRole.SUPER_ADMIN, UserRole.CLIENT_ADMIN, UserRole.CONTENT_MANAGER],
 };
 
+// ── Matriz de permisos para roles CUSTOM ──────────────────
+// Añade aquí cualquier rol personalizado con las rutas que puede acceder.
+// La clave es el nombre del rol (en minúsculas, como se guarda en DB).
+// El valor es el array de rutas accesibles.
+//
+// Para añadir un nuevo rol custom:
+//   "nombre_rol": ["/dashboard", "/dashboard/ruta1", "/dashboard/ruta2"]
+//
+export const CUSTOM_ROLE_PERMISSIONS: Record<string, string[]> = {
+    // ── Gerente: acceso a Dashboard, Analytics, Inbox, CRM, Marketing ──
+    "gerente": [
+        "/dashboard",
+        "/dashboard/analytics",
+        "/dashboard/inbox",
+        "/dashboard/marketing",
+        "/dashboard/marketing/campaigns",
+        "/dashboard/marketing/links",
+        "/dashboard/admin/crm",
+        "/dashboard/admin/crm/leads",
+        "/dashboard/admin/crm/pipeline",
+        "/dashboard/admin/crm/campaigns",
+    ],
+
+    // ── Viewer: acceso de solo lectura a Dashboard, Posts y Proyectos ──
+    "viewer": [
+        "/dashboard",
+        "/dashboard/posts",
+        "/dashboard/projects",
+    ],
+
+    // ── Plantilla para agregar nuevos roles ──
+    // "nombre_rol": [
+    //     "/dashboard",
+    //     "/dashboard/ruta1",
+    // ],
+};
+
 // ── Helpers ───────────────────────────────────────────────
 
 /**
@@ -116,27 +156,40 @@ export function isPublicRoute(pathname: string): boolean {
 
 /**
  * Dado un pathname y un rol, verifica si el rol tiene acceso.
- * Estrategia: busca la ruta más específica que haga match.
+ * Soporta roles estándar (ROUTE_PERMISSIONS) y custom (CUSTOM_ROLE_PERMISSIONS).
  */
 export function canAccessRoute(pathname: string, role: UserRole | string, permissions: string[] = []): boolean {
-    if (role === UserRole.SUPER_ADMIN) return true; // SuperAdmin accede a todo
+    // SuperAdmin accede a todo sin restricción
+    if (role === UserRole.SUPER_ADMIN) return true;
 
-    // Los custom roles (que no son del enum estándar) NO están en ROUTE_PERMISSIONS.
-    // En auth.config.ts solo necesitamos saber si pueden ENTRAR al dashboard base.
-    // El sidebar (PERMISSION_ROUTE_MAP) controla qué subrutas pueden ver.
-    // IMPORTANTE: solo retornar true para el path EXACTO /dashboard,
-    // NO para subrutas, para que auth.config no bloquee el acceso general.
-    const isStandardRole = Object.values(UserRole).includes(role as UserRole);
-    if (!isStandardRole) {
-        if (permissions.length === 0) return false; // sin permisos → bloqueado
-        // Solo el dashboard raíz exacto → true
-        // Para subrutas → false (auth.config las deja pasar, el sidebar filtra)
-        // Nota: en auth.config.ts al validar una subruta como /dashboard/admin/crm
-        // para un custom role, retornamos true si tiene permisos (ver authorized()).
-        return true; // el authorized() callback ya verificó que tiene permisos
+    // ── Verificar roles CUSTOM primero ─────────────────────
+    const roleLower = role.toString().toLowerCase();
+    if (CUSTOM_ROLE_PERMISSIONS[roleLower]) {
+        const allowedRoutes = CUSTOM_ROLE_PERMISSIONS[roleLower];
+
+        // Match exacto
+        if (allowedRoutes.includes(pathname)) return true;
+
+        // Prefix match (la ruta más larga que haga match)
+        const prefixMatch = allowedRoutes
+            .filter((r) => pathname.startsWith(r))
+            .sort((a, b) => b.length - a.length)[0];
+
+        return !!prefixMatch;
     }
 
-    // Buscar match exacto primero
+    // ── Verificar roles ESTÁNDAR ────────────────────────────
+    const isStandardRole = Object.values(UserRole).includes(role as UserRole);
+
+    if (!isStandardRole) {
+        // Rol desconocido sin permisos configurados → bloqueado
+        return false;
+    }
+
+    // GUEST siempre bloqueado
+    if (role === UserRole.GUEST) return false;
+
+    // Buscar match exacto
     if (ROUTE_PERMISSIONS[pathname]) {
         return ROUTE_PERMISSIONS[pathname].includes(role as UserRole);
     }
@@ -144,28 +197,35 @@ export function canAccessRoute(pathname: string, role: UserRole | string, permis
     // Buscar el prefijo más largo que haga match
     const matchingPrefixes = Object.keys(ROUTE_PERMISSIONS)
         .filter((route) => pathname.startsWith(route))
-        .sort((a, b) => b.length - a.length); // más específico primero
+        .sort((a, b) => b.length - a.length);
 
     if (matchingPrefixes.length > 0) {
         return ROUTE_PERMISSIONS[matchingPrefixes[0]].includes(role as UserRole);
     }
 
-    // Si la ruta empieza con /dashboard y no está en la matriz,
-    // se requiere autenticación pero cualquier rol autenticado pasa.
+    // Ruta bajo /dashboard no listada → cualquier rol autenticado (salvo GUEST)
     if (pathname.startsWith("/dashboard")) {
         return role !== UserRole.GUEST;
     }
 
-    return true; // ruta desconocida → pass
+    return true;
 }
 
 /**
  * Devuelve la lista de rutas del dashboard accesibles por un rol.
  * Usada por el sidebar para filtrar la navegación.
  */
-export function getAccessibleRoutes(role: UserRole): string[] {
+export function getAccessibleRoutes(role: UserRole | string): string[] {
     if (role === UserRole.SUPER_ADMIN) return Object.keys(ROUTE_PERMISSIONS);
+
+    // Roles custom
+    const roleLower = role.toString().toLowerCase();
+    if (CUSTOM_ROLE_PERMISSIONS[roleLower]) {
+        return CUSTOM_ROLE_PERMISSIONS[roleLower];
+    }
+
+    // Roles estándar
     return Object.entries(ROUTE_PERMISSIONS)
-        .filter(([, roles]) => roles.includes(role))
+        .filter(([, roles]) => roles.includes(role as UserRole))
         .map(([route]) => route);
 }
