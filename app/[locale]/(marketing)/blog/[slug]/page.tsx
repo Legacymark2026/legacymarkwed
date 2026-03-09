@@ -2,8 +2,7 @@ import { getPostBySlug, getRelatedPosts } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Tag, Rss, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, Tag, Rss, Calendar, Clock, ChevronRight } from "lucide-react";
 import {
     BlogPostHeader,
     ShareButtons,
@@ -57,14 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             publishedTime: post.createdAt.toISOString(),
             modifiedTime: post.updatedAt.toISOString(),
             authors: [post.author?.name || 'LegacyMark'],
-            images: post.coverImage ? [
-                {
-                    url: post.coverImage,
-                    width: 1200,
-                    height: 630,
-                    alt: post.imageAlt || post.title
-                }
-            ] : [],
+            images: post.coverImage ? [{ url: post.coverImage, width: 1200, height: 630, alt: post.imageAlt || post.title }] : [],
             siteName: 'LegacyMark',
             locale: 'es_ES',
         },
@@ -74,13 +66,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             description: post.metaDescription || post.excerpt || '',
             images: post.coverImage ? [post.coverImage] : [],
         },
-        alternates: {
-            canonical: post.canonicalUrl || postUrl,
-        },
-        robots: {
-            index: post.published,
-            follow: true,
-        }
+        alternates: { canonical: post.canonicalUrl || postUrl },
+        robots: { index: post.published, follow: true },
     };
 }
 
@@ -88,13 +75,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     const { slug } = await params;
     const post = await getPostBySlug(slug);
 
-    if (!post) {
-        notFound();
-    }
+    if (!post) notFound();
 
     const categoryIds = post.categories?.map(c => c.id) || [];
 
-    // Safe calls that handle missing tables gracefully
     let relatedPosts: any[] = [];
     let comments: any[] = [];
     let commentCount = 0;
@@ -133,38 +117,51 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 items={[
                     { name: 'Inicio', url: baseUrl },
                     { name: 'Blog', url: `${baseUrl}/blog` },
-                    ...(post.categories?.[0] ? [{
-                        name: post.categories[0].name,
-                        url: `${baseUrl}/blog?category=${post.categories[0].id}`
-                    }] : []),
+                    ...(post.categories?.[0] ? [{ name: post.categories[0].name, url: `${baseUrl}/blog?category=${post.categories[0].id}` }] : []),
                     { name: post.title, url: postUrl }
                 ]}
             />
 
-            <article className="min-h-screen bg-white dark:bg-gray-950">
-                {/* Reading Progress Bar - Fixed at top */}
-                <div className="fixed top-0 left-0 right-0 h-1 bg-gray-100 dark:bg-gray-800 z-50">
+            {/* ── NOISE + GLOW (matching home) ─────────────────────────── */}
+            <div className="bg-noise fixed inset-0 z-50 pointer-events-none mix-blend-multiply opacity-[0.015]" />
+
+            <article className="min-h-screen relative" style={{ background: '#020617' }}>
+
+                {/* Global ambient glows */}
+                <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[110%] h-[700px] bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.07)_0%,transparent_60%)] pointer-events-none -z-0" />
+                <div className="absolute top-[40%] right-[-5%] w-[400px] h-[400px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.04)_0%,transparent_70%)] pointer-events-none -z-0" />
+
+                {/* ── TEAL Reading Progress Bar ──────────────────────────── */}
+                <div className="fixed top-0 left-0 right-0 h-[2px] z-50" style={{ background: 'rgba(15,23,42,0.9)' }}>
                     <div
                         id="reading-progress"
-                        className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-150"
-                        style={{ width: '0%' }}
+                        className="h-full transition-all duration-150"
+                        style={{ width: '0%', background: 'linear-gradient(90deg, #2dd4bf 0%, #38bdf8 60%, #a78bfa 100%)' }}
                     />
                 </div>
 
-                {/* Hero Section */}
-                <div className="relative pt-24 pb-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-                    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                {/* ── HERO SECTION ───────────────────────────────────────── */}
+                <div
+                    className="relative pt-28 pb-14 overflow-hidden"
+                    style={{ background: 'linear-gradient(180deg, rgba(13,148,136,0.07) 0%, transparent 100%)' }}
+                >
+                    {/* Top accent line */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-14 bg-gradient-to-b from-teal-400/50 to-transparent" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-teal-500 -translate-y-1" />
+
+                    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
+
                         {/* Breadcrumb */}
-                        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                            <Link href="/" className="hover:text-gray-900 dark:hover:text-white transition-colors">Inicio</Link>
-                            <span>/</span>
-                            <Link href="/blog" className="hover:text-gray-900 dark:hover:text-white transition-colors">Blog</Link>
+                        <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-8 font-mono">
+                            <Link href="/" className="hover:text-teal-400 transition-colors">Inicio</Link>
+                            <ChevronRight className="w-3 h-3 text-slate-700" />
+                            <Link href="/blog" className="hover:text-teal-400 transition-colors">Blog</Link>
                             {post.categories?.[0] && (
                                 <>
-                                    <span>/</span>
+                                    <ChevronRight className="w-3 h-3 text-slate-700" />
                                     <Link
                                         href={`/blog?category=${post.categories[0].id}`}
-                                        className="hover:text-gray-900 dark:hover:text-white transition-colors"
+                                        className="hover:text-teal-400 transition-colors"
                                     >
                                         {post.categories[0].name}
                                     </Link>
@@ -173,9 +170,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         </nav>
 
                         <Link href="/blog">
-                            <Button variant="ghost" className="mb-8 -ml-4 pl-2 text-gray-500 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                                <ArrowLeft className="mr-2 h-4 w-4" /> Volver al Blog
-                            </Button>
+                            <span className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-xl text-sm font-bold text-slate-400 border border-slate-800 bg-slate-900/60 hover:border-teal-500/40 hover:text-teal-400 transition-all -ml-1">
+                                <ArrowLeft className="w-4 h-4" /> Volver al Blog
+                            </span>
                         </Link>
 
                         <BlogPostHeader
@@ -199,35 +196,34 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     </div>
                 </div>
 
-                {/* Cover Image - Full Width */}
+                {/* ── COVER IMAGE ────────────────────────────────────────── */}
                 {post.coverImage && (
-                    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 -mt-4 mb-12">
+                    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 -mt-4 mb-12 relative z-10">
                         <figure className="relative">
-                            <div className="aspect-[21/9] w-full relative overflow-hidden rounded-2xl shadow-2xl group">
+                            <div className="aspect-[21/9] w-full relative overflow-hidden rounded-2xl group" style={{ boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(30,41,59,0.8)' }}>
                                 <img
                                     src={post.coverImage}
                                     alt={post.imageAlt || post.title}
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     loading="eager"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent" />
                             </div>
                             {post.imageAlt && (
-                                <figcaption className="mt-3 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    {post.imageAlt}
-                                </figcaption>
+                                <figcaption className="mt-3 text-center text-sm text-slate-600">{post.imageAlt}</figcaption>
                             )}
                         </figure>
                     </div>
                 )}
 
-                {/* Main Content Area */}
-                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-16">
+                {/* ── MAIN CONTENT AREA ──────────────────────────────────── */}
+                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-20 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12">
+
                         {/* Article Content */}
                         <div className="order-2 lg:order-1">
                             {/* Share Buttons - Top */}
-                            <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-800">
+                            <div className="mb-8 pb-6" style={{ borderBottom: '1px solid rgba(30,41,59,0.8)' }}>
                                 <ShareButtons title={post.title} url={postUrl} />
                             </div>
 
@@ -236,14 +232,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                             {/* Tags */}
                             {post.tags && post.tags.length > 0 && (
-                                <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+                                <div className="mt-12 pt-8" style={{ borderTop: '1px solid rgba(30,41,59,0.8)' }}>
                                     <div className="flex flex-wrap items-center gap-3">
-                                        <Tag className="h-4 w-4 text-gray-500" />
+                                        <Tag className="h-4 w-4 text-slate-600" />
                                         {post.tags.map((tag) => (
                                             <Link
                                                 key={tag.name}
                                                 href={`/blog?tag=${encodeURIComponent(tag.name)}`}
-                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold transition-all"
+                                                style={{
+                                                    background: 'rgba(13,148,136,0.1)',
+                                                    border: '1px solid rgba(13,148,136,0.25)',
+                                                    color: '#2dd4bf'
+                                                }}
+                                                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(13,148,136,0.2)')}
+                                                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(13,148,136,0.1)')}
                                             >
                                                 #{tag.name}
                                             </Link>
@@ -253,7 +256,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             )}
 
                             {/* Engagement Bar - Desktop */}
-                            <div className="hidden lg:block mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+                            <div className="hidden lg:block mt-8 pt-8" style={{ borderTop: '1px solid rgba(30,41,59,0.8)' }}>
                                 <EngagementBar
                                     postId={post.id}
                                     postSlug={slug}
@@ -263,7 +266,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             </div>
 
                             {/* Share Buttons - Bottom */}
-                            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+                            <div className="mt-8 pt-8" style={{ borderTop: '1px solid rgba(30,41,59,0.8)' }}>
                                 <ShareButtons title={post.title} url={postUrl} />
                             </div>
 
@@ -277,7 +280,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             </div>
 
                             {/* Comments Section */}
-                            <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800" id="comentarios">
+                            <div className="mt-16 pt-12" style={{ borderTop: '1px solid rgba(30,41,59,0.8)' }} id="comentarios">
                                 <CommentSection
                                     postId={post.id}
                                     initialComments={comments.map((c: any) => ({
@@ -303,20 +306,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             <TableOfContents content={post.content} />
 
                             {/* Quick Stats */}
-                            <div className="p-5 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl text-white">
-                                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-300">
+                            <div
+                                className="p-5 rounded-2xl"
+                                style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.8)' }}
+                            >
+                                <h3 className="text-xs font-black uppercase tracking-widest mb-4 text-slate-500 font-mono">
                                     Información
                                 </h3>
                                 <div className="space-y-3 text-sm">
                                     <div className="flex items-center gap-3">
-                                        <Clock className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-300">Tiempo de lectura</span>
-                                        <span className="ml-auto font-medium">{readingTime} min</span>
+                                        <Clock className="h-4 w-4 text-teal-500" />
+                                        <span className="text-slate-400">Tiempo de lectura</span>
+                                        <span className="ml-auto font-bold text-white">{readingTime} min</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="h-4 w-4 text-gray-400" />
-                                        <span className="text-gray-300">Publicado</span>
-                                        <span className="ml-auto font-medium">
+                                        <Calendar className="h-4 w-4 text-teal-500" />
+                                        <span className="text-slate-400">Publicado</span>
+                                        <span className="ml-auto font-bold text-white">
                                             {new Date(post.createdAt).toLocaleDateString('es-ES', {
                                                 day: '2-digit',
                                                 month: 'short',
@@ -333,45 +339,54 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                             {/* RSS Feed Link */}
                             <Link
                                 href="/rss"
-                                className="flex items-center gap-2 p-4 bg-orange-50 dark:bg-orange-950/30 rounded-xl text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-950/50 transition-colors"
+                                className="flex items-center gap-2 p-4 rounded-xl font-medium transition-all"
+                                style={{
+                                    background: 'rgba(249,115,22,0.08)',
+                                    border: '1px solid rgba(249,115,22,0.2)',
+                                    color: '#fb923c'
+                                }}
                                 target="_blank"
                             >
                                 <Rss className="h-5 w-5" />
-                                <span className="font-medium">Suscribirse vía RSS</span>
+                                <span>Suscribirse vía RSS</span>
                             </Link>
                         </aside>
                     </div>
                 </div>
 
-                {/* Related Posts Section */}
+                {/* ── RELATED POSTS SECTION ──────────────────────────────── */}
                 {relatedPosts.length > 0 && (
-                    <section className="bg-gray-50 dark:bg-gray-900 py-16 border-t border-gray-200 dark:border-gray-800">
+                    <section
+                        className="py-16 sm:py-24 relative z-10"
+                        style={{ borderTop: '1px solid rgba(30,41,59,0.8)', background: 'rgba(15,23,42,0.4)' }}
+                    >
                         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                             <RelatedPosts posts={relatedPosts} />
                         </div>
                     </section>
                 )}
 
-                {/* Reading Progress Script */}
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            if (typeof window !== 'undefined') {
-                                window.addEventListener('scroll', function() {
-                                    const article = document.querySelector('article');
-                                    const progress = document.getElementById('reading-progress');
-                                    if (article && progress) {
-                                        const scrollTop = window.scrollY;
-                                        const docHeight = article.scrollHeight - window.innerHeight;
-                                        const scrollPercent = Math.min((scrollTop / docHeight) * 100, 100);
-                                        progress.style.width = scrollPercent + '%';
-                                    }
-                                });
-                            }
-                        `
-                    }}
-                />
             </article>
+
+            {/* Reading Progress Script */}
+            <script
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        if (typeof window !== 'undefined') {
+                            window.addEventListener('scroll', function() {
+                                const article = document.querySelector('article');
+                                const progress = document.getElementById('reading-progress');
+                                if (article && progress) {
+                                    const scrollTop = window.scrollY;
+                                    const docHeight = article.scrollHeight - window.innerHeight;
+                                    const scrollPercent = Math.min((scrollTop / docHeight) * 100, 100);
+                                    progress.style.width = scrollPercent + '%';
+                                }
+                            });
+                        }
+                    `
+                }}
+            />
         </>
     );
 }

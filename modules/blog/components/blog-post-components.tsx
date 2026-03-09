@@ -1,8 +1,10 @@
 'use client';
 
 import { Calendar, Clock, Share2, Facebook, Twitter, Linkedin, Link as LinkIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import Link from "next/link";
+
+// ─── BlogPostHeader ──────────────────────────────────────────────────────────
 
 interface BlogPostHeaderProps {
     title: string;
@@ -13,76 +15,77 @@ interface BlogPostHeaderProps {
     categories?: { id: string; name: string }[];
 }
 
-export function BlogPostHeader({
-    title,
-    createdAt,
-    authorName,
-    authorImage,
-    readingTime,
-    categories
-}: BlogPostHeaderProps) {
+export function BlogPostHeader({ title, createdAt, authorName, authorImage, readingTime, categories }: BlogPostHeaderProps) {
     return (
         <div className="space-y-6">
             {/* Categories */}
             {categories && categories.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
-                        <span
+                        <Link
                             key={category.id}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-100 dark:from-blue-900/40 dark:to-indigo-900/40 dark:text-blue-300 dark:border-blue-800"
+                            href={`/blog?category=${category.id}`}
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest transition-all"
+                            style={{
+                                background: 'rgba(13,148,136,0.12)',
+                                border: '1px solid rgba(13,148,136,0.3)',
+                                color: '#2dd4bf'
+                            }}
                         >
                             {category.name}
-                        </span>
+                        </Link>
                     ))}
                 </div>
             )}
 
             {/* Title */}
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl leading-tight">
+            <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl lg:text-6xl leading-tight">
                 {title}
             </h1>
 
             {/* Meta Info */}
-            <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400">
+            <div className="flex flex-wrap items-center gap-4 text-slate-500 text-sm">
                 {/* Author */}
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-800 dark:to-gray-950 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+                    <div
+                        className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0"
+                        style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', border: '2px solid rgba(13,148,136,0.4)' }}
+                    >
                         {authorImage ? (
-                            <img src={authorImage} alt={authorName || "Author"} className="h-full w-full object-cover" />
+                            <img src={authorImage} alt={authorName || 'Author'} className="h-full w-full object-cover" />
                         ) : (
-                            authorName?.charAt(0)?.toUpperCase() || "A"
+                            authorName?.charAt(0)?.toUpperCase() || 'A'
                         )}
                     </div>
                     <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{authorName || "Autor"}</p>
+                        <p className="font-bold text-slate-200">{authorName || 'Autor'}</p>
+                        <p className="text-xs text-slate-600">LegacyMark</p>
                     </div>
                 </div>
 
-                <span className="text-gray-300 dark:text-gray-700">|</span>
+                <span className="text-slate-800">|</span>
 
                 {/* Date */}
-                <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-teal-500" />
                     <time dateTime={new Date(createdAt).toISOString()}>
-                        {new Date(createdAt).toLocaleDateString('es-ES', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })}
+                        {new Date(createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </time>
                 </div>
 
-                <span className="text-gray-300 dark:text-gray-700">|</span>
+                <span className="text-slate-800">|</span>
 
                 {/* Reading Time */}
-                <div className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4" />
+                <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-teal-500" />
                     <span>{readingTime} min de lectura</span>
                 </div>
             </div>
         </div>
     );
 }
+
+// ─── ShareButtons ────────────────────────────────────────────────────────────
 
 interface ShareButtonsProps {
     title: string;
@@ -108,54 +111,53 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
         }
     };
 
+    const btnBase: React.CSSProperties = {
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 36, height: 36, borderRadius: '10px',
+        background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(30,41,59,0.9)',
+        color: '#94a3b8', cursor: 'pointer', transition: 'all 0.2s'
+    };
+
     return (
-        <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                <Share2 className="h-4 w-4" />
-                Compartir:
+        <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-xs font-black text-slate-600 flex items-center gap-2 uppercase tracking-widest font-mono">
+                <Share2 className="h-3.5 w-3.5" />
+                Compartir
             </span>
             <div className="flex items-center gap-2">
-                <a
-                    href={shareLinks.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-colors"
-                    aria-label="Compartir en Facebook"
-                >
+                <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer" style={btnBase}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.4)'; (e.currentTarget as HTMLElement).style.color = '#60a5fa'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8'; }}
+                    aria-label="Compartir en Facebook">
                     <Facebook className="h-4 w-4" />
                 </a>
-                <a
-                    href={shareLinks.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-sky-100 hover:text-sky-500 transition-colors"
-                    aria-label="Compartir en Twitter"
-                >
+                <a href={shareLinks.twitter} target="_blank" rel="noopener noreferrer" style={btnBase}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(14,165,233,0.4)'; (e.currentTarget as HTMLElement).style.color = '#38bdf8'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8'; }}
+                    aria-label="Compartir en X/Twitter">
                     <Twitter className="h-4 w-4" />
                 </a>
-                <a
-                    href={shareLinks.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                    aria-label="Compartir en LinkedIn"
-                >
+                <a href={shareLinks.linkedin} target="_blank" rel="noopener noreferrer" style={btnBase}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.4)'; (e.currentTarget as HTMLElement).style.color = '#60a5fa'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8'; }}
+                    aria-label="Compartir en LinkedIn">
                     <Linkedin className="h-4 w-4" />
                 </a>
-                <button
-                    onClick={copyToClipboard}
-                    className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-600 transition-colors"
-                    aria-label="Copiar enlace"
-                >
+                <button onClick={copyToClipboard} style={btnBase}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(13,148,136,0.4)'; (e.currentTarget as HTMLElement).style.color = '#2dd4bf'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8'; }}
+                    aria-label="Copiar enlace">
                     <LinkIcon className="h-4 w-4" />
                 </button>
                 {copied && (
-                    <span className="text-xs text-green-600 font-medium animate-pulse">¡Copiado!</span>
+                    <span className="text-xs text-teal-400 font-bold animate-pulse">¡Copiado!</span>
                 )}
             </div>
         </div>
     );
 }
+
+// ─── AuthorBio ───────────────────────────────────────────────────────────────
 
 interface AuthorBioProps {
     name: string;
@@ -165,24 +167,32 @@ interface AuthorBioProps {
 
 export function AuthorBio({ name, image, bio }: AuthorBioProps) {
     return (
-        <div className="flex items-start gap-4 p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl border border-gray-200 dark:border-gray-800">
-            <div className="flex-shrink-0 h-16 w-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-800 dark:to-gray-950 flex items-center justify-center text-white text-xl font-bold overflow-hidden">
+        <div
+            className="flex items-start gap-5 p-6 rounded-2xl"
+            style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.8)' }}
+        >
+            <div
+                className="flex-shrink-0 h-16 w-16 rounded-full flex items-center justify-center text-white text-xl font-black overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', border: '2px solid rgba(13,148,136,0.4)' }}
+            >
                 {image ? (
                     <img src={image} alt={name} className="h-full w-full object-cover" />
                 ) : (
-                    name?.charAt(0)?.toUpperCase() || "A"
+                    name?.charAt(0)?.toUpperCase() || 'A'
                 )}
             </div>
             <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Escrito por</p>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{name}</h3>
+                <p className="text-xs font-black text-teal-500 uppercase tracking-widest mb-1 font-mono">Escrito por</p>
+                <h3 className="text-lg font-black text-white">{name}</h3>
                 {bio && (
-                    <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{bio}</p>
+                    <p className="mt-2 text-slate-400 text-sm leading-relaxed">{bio}</p>
                 )}
             </div>
         </div>
     );
 }
+
+// ─── RelatedPosts ────────────────────────────────────────────────────────────
 
 interface RelatedPost {
     id: string;
@@ -200,29 +210,47 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
     if (!posts || posts.length === 0) return null;
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Artículos Relacionados</h2>
+        <div className="space-y-8">
+            <div className="flex items-center gap-3">
+                <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(30,41,59,0.8))' }} />
+                <span className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-slate-500 font-mono"
+                    style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.8)' }}>
+                    Artículos Relacionados
+                </span>
+                <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, rgba(30,41,59,0.8), transparent)' }} />
+            </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {posts.map((post) => (
                     <a
                         key={post.id}
                         href={`/blog/${post.slug}`}
-                        className="group block overflow-hidden rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
+                        className="group block overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1"
+                        style={{
+                            background: 'rgba(15,23,42,0.6)',
+                            border: '1px solid rgba(30,41,59,0.8)',
+                            boxShadow: '0 0 0 transparent'
+                        }}
+                        onMouseEnter={e => {
+                            (e.currentTarget as HTMLElement).style.borderColor = 'rgba(13,148,136,0.35)';
+                            (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(13,148,136,0.06)';
+                        }}
+                        onMouseLeave={e => {
+                            (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,41,59,0.8)';
+                            (e.currentTarget as HTMLElement).style.boxShadow = '0 0 0 transparent';
+                        }}
                     >
-                        <div className="aspect-[16/9] w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+                        <div className="aspect-[16/9] w-full overflow-hidden">
                             <div
                                 className="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                                style={{
-                                    backgroundImage: `url(${post.coverImage || 'https://images.unsplash.com/photo-1432821596592-e2c18b781492?q=80&w=400&auto=format&fit=crop'})`
-                                }}
+                                style={{ backgroundImage: `url(${post.coverImage || 'https://images.unsplash.com/photo-1432821596592-e2c18b781492?q=80&w=400&auto=format&fit=crop'})` }}
                             />
                         </div>
-                        <div className="p-4">
-                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors line-clamp-2">
+                        <div className="p-5">
+                            <h3 className="font-black text-slate-200 group-hover:text-teal-300 transition-colors line-clamp-2 mb-2">
                                 {post.title}
                             </h3>
                             {post.excerpt && (
-                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{post.excerpt}</p>
+                                <p className="text-sm text-slate-500 line-clamp-2">{post.excerpt}</p>
                             )}
                         </div>
                     </a>
@@ -232,19 +260,20 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
     );
 }
 
+// ─── TableOfContents ─────────────────────────────────────────────────────────
+
 interface TableOfContentsProps {
     content: string;
 }
 
 export function TableOfContents({ content }: TableOfContentsProps) {
-    // Extract headings from HTML content
     const headingRegex = /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/gi;
     const headings: { level: number; text: string; id: string }[] = [];
 
     let match;
     while ((match = headingRegex.exec(content)) !== null) {
         const level = parseInt(match[1]);
-        const text = match[2].replace(/<[^>]*>/g, ''); // Strip HTML tags
+        const text = match[2].replace(/<[^>]*>/g, '');
         const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         headings.push({ level, text, id });
     }
@@ -252,19 +281,19 @@ export function TableOfContents({ content }: TableOfContentsProps) {
     if (headings.length < 2) return null;
 
     return (
-        <nav className="p-5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">
+        <nav
+            className="p-5 rounded-2xl"
+            style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.8)' }}
+        >
+            <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 font-mono">
                 En este artículo
             </h2>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5">
                 {headings.map((heading, index) => (
-                    <li
-                        key={index}
-                        className={heading.level === 3 ? 'ml-4' : ''}
-                    >
+                    <li key={index} className={heading.level === 3 ? 'ml-4' : ''}>
                         <a
                             href={`#${heading.id}`}
-                            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors block py-1"
+                            className="text-sm text-slate-500 hover:text-teal-400 transition-colors block py-1 leading-snug"
                         >
                             {heading.text}
                         </a>
