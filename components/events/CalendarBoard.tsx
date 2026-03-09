@@ -39,11 +39,17 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
                 return matchType && matchQuery;
             })
             .map(e => {
-                // Determine color based on type, making it slightly more vibrant
-                const backgroundColor =
-                    e.type === 'ONLINE' ? '#2563eb' : // blue-600
-                        e.type === 'PHYSICAL' ? '#ea580c' : // orange-600
-                            '#9333ea'; // purple-600
+                // Determine color based on type
+                const colorByType: Record<string, string> = {
+                    ONLINE: '#2563eb', // blue
+                    PHYSICAL: '#ea580c', // orange
+                    HYBRID: '#9333ea', // purple
+                    NETWORKING: '#0d9488', // teal
+                    MEETING: '#0891b2', // cyan
+                    TASK: '#d97706', // amber
+                    OTHER: '#7c3aed', // violet
+                };
+                const backgroundColor = colorByType[e.type] ?? '#64748b'; // slate fallback
 
                 return {
                     id: e.id,
@@ -81,31 +87,32 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
         const { event, timeText } = eventInfo;
         const type = event.extendedProps.type;
 
-        let pointColor = "bg-slate-300";
-        let bgColorClass = "bg-slate-100";
-        if (type === 'ONLINE') {
-            pointColor = 'bg-blue-500';
-            bgColorClass = 'bg-blue-100/80';
-        }
-        if (type === 'PHYSICAL') {
-            pointColor = 'bg-orange-500';
-            bgColorClass = 'bg-orange-100/80';
-        }
-        if (type === 'HYBRID') {
-            pointColor = 'bg-purple-500';
-            bgColorClass = 'bg-purple-100/80';
+        let pointColor = 'bg-slate-400';
+        let bgColorClass = 'bg-slate-800/60';
+        const colorByType: Record<string, { point: string; bg: string }> = {
+            ONLINE: { point: 'bg-blue-400', bg: 'bg-blue-500/20' },
+            PHYSICAL: { point: 'bg-orange-400', bg: 'bg-orange-500/20' },
+            HYBRID: { point: 'bg-purple-400', bg: 'bg-purple-500/20' },
+            NETWORKING: { point: 'bg-teal-400', bg: 'bg-teal-500/20' },
+            MEETING: { point: 'bg-cyan-400', bg: 'bg-cyan-500/20' },
+            TASK: { point: 'bg-amber-400', bg: 'bg-amber-500/20' },
+            OTHER: { point: 'bg-violet-400', bg: 'bg-violet-500/20' },
+        };
+        if (colorByType[type]) {
+            pointColor = colorByType[type].point;
+            bgColorClass = colorByType[type].bg;
         }
 
         return (
             <div
-                className={`flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors ${bgColorClass} hover:brightness-95`}
+                className={`flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors ${bgColorClass} hover:brightness-110`}
                 title={`${event.title}${timeText ? ` (${timeText})` : ''}`}
             >
                 <div className="flex items-center gap-1.5 w-full mb-0.5">
                     <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${pointColor} shadow-sm`} />
-                    <span className="text-[10px] font-black truncate tracking-wide text-slate-700">{timeText}</span>
+                    <span className="text-[10px] font-black truncate tracking-wide text-slate-200">{timeText}</span>
                 </div>
-                <div className="text-[11px] font-bold leading-tight truncate w-full text-slate-900 whitespace-normal line-clamp-2">
+                <div className="text-[11px] font-bold leading-tight truncate w-full text-white whitespace-normal line-clamp-2">
                     {event.title}
                 </div>
             </div>
