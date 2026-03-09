@@ -87,25 +87,22 @@ export function CalendarBoard({ events, resources = [], filters, selectedDate, o
         const { event, timeText } = eventInfo;
         const type = event.extendedProps.type;
 
-        let pointColor = 'bg-slate-400';
-        let bgColorClass = 'bg-slate-800/60';
-        const colorByType: Record<string, { point: string; bg: string }> = {
-            ONLINE: { point: 'bg-blue-400', bg: 'bg-blue-500/20' },
-            PHYSICAL: { point: 'bg-orange-400', bg: 'bg-orange-500/20' },
-            HYBRID: { point: 'bg-purple-400', bg: 'bg-purple-500/20' },
-            NETWORKING: { point: 'bg-teal-400', bg: 'bg-teal-500/20' },
-            MEETING: { point: 'bg-cyan-400', bg: 'bg-cyan-500/20' },
-            TASK: { point: 'bg-amber-400', bg: 'bg-amber-500/20' },
-            OTHER: { point: 'bg-violet-400', bg: 'bg-violet-500/20' },
+        // Map type → color token
+        const colorByType: Record<string, { point: string; bg: string; text: string }> = {
+            ONLINE: { point: '#60a5fa', bg: 'rgba(59,130,246,0.18)', text: '#bfdbfe' },
+            PHYSICAL: { point: '#fb923c', bg: 'rgba(234,88,12,0.18)', text: '#fed7aa' },
+            HYBRID: { point: '#c084fc', bg: 'rgba(147,51,234,0.18)', text: '#e9d5ff' },
+            NETWORKING: { point: '#2dd4bf', bg: 'rgba(13,148,136,0.22)', text: '#99f6e4' },
+            MEETING: { point: '#22d3ee', bg: 'rgba(8,145,178,0.20)', text: '#a5f3fc' },
+            TASK: { point: '#fbbf24', bg: 'rgba(217,119,6,0.22)', text: '#fde68a' },
+            OTHER: { point: '#a78bfa', bg: 'rgba(124,58,237,0.20)', text: '#ddd6fe' },
         };
-        if (colorByType[type]) {
-            pointColor = colorByType[type].point;
-            bgColorClass = colorByType[type].bg;
-        }
+        const colors = colorByType[type] ?? { point: '#94a3b8', bg: 'rgba(100,116,139,0.15)', text: '#cbd5e1' };
 
         return (
             <div
-                className={`flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors ${bgColorClass} hover:brightness-110`}
+                className={`flex flex-col h-full w-full justify-start items-start p-1.5 overflow-hidden group rounded-md transition-colors hover:brightness-110`}
+                style={{ backgroundColor: colors.bg }}
                 title={`${event.title}${timeText ? ` (${timeText})` : ''}`}
             >
                 <div className="flex items-center gap-1.5 w-full mb-0.5">
