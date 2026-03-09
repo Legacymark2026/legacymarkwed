@@ -87,14 +87,15 @@ function canAccess(role: string, pathname: string): boolean {
     if (r === 'SUPER_ADMIN') return true;
     if (r === 'GUEST') return false;
 
-    // Custom roles — verificar en CUSTOM_ROLE_PERMISSIONS primero
+    // Custom roles — mismo algoritmo que lib/rbac.ts
     if (CUSTOM_ROLE_PERMISSIONS[rLower]) {
-        const allowed = CUSTOM_ROLE_PERMISSIONS[rLower];
-        if (allowed.includes(pathname)) return true;
-        const prefix = allowed
-            .filter(rt => pathname.startsWith(rt))
-            .sort((a, b) => b.length - a.length)[0];
-        return !!prefix;
+        const allowedRoutes = CUSTOM_ROLE_PERMISSIONS[rLower];
+        for (const allowed of allowedRoutes) {
+            if (pathname === allowed) return true;
+            // Solo hijos directos: /dashboard/inbox/123 sí, pero NO /dashboard/users
+            if (pathname.startsWith(allowed + '/')) return true;
+        }
+        return false;
     }
 
     // Roles estándar
@@ -102,9 +103,9 @@ function canAccess(role: string, pathname: string): boolean {
         return ROUTE_PERMISSIONS[pathname].includes(r);
     }
 
-    // prefix match (most specific first)
+    // prefix match con separador para estándar
     const match = Object.keys(ROUTE_PERMISSIONS)
-        .filter(rt => pathname.startsWith(rt))
+        .filter(rt => pathname === rt || pathname.startsWith(rt + '/'))
         .sort((a, b) => b.length - a.length)[0];
 
     if (match) return ROUTE_PERMISSIONS[match].includes(r);

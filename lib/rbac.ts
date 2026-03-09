@@ -162,23 +162,22 @@ export function canAccessRoute(pathname: string, role: UserRole | string, permis
     // SuperAdmin accede a todo sin restricción
     if (role === UserRole.SUPER_ADMIN) return true;
 
-    // ── Verificar roles CUSTOM primero ─────────────────────
+    // ── Verificar roles CUSTOM primero ──────────────────────
     const roleLower = role.toString().toLowerCase();
     if (CUSTOM_ROLE_PERMISSIONS[roleLower]) {
         const allowedRoutes = CUSTOM_ROLE_PERMISSIONS[roleLower];
 
-        // Match exacto
-        if (allowedRoutes.includes(pathname)) return true;
-
-        // Prefix match (la ruta más larga que haga match)
-        const prefixMatch = allowedRoutes
-            .filter((r) => pathname.startsWith(r))
-            .sort((a, b) => b.length - a.length)[0];
-
-        return !!prefixMatch;
+        for (const allowed of allowedRoutes) {
+            // Exact match
+            if (pathname === allowed) return true;
+            // Prefix match con separador: /dashboard/inbox da acceso a /dashboard/inbox/algo
+            // pero NO a /dashboard/users (rutas hermanas)
+            if (pathname.startsWith(allowed + '/')) return true;
+        }
+        return false;
     }
 
-    // ── Verificar roles ESTÁNDAR ────────────────────────────
+    // ── Verificar roles ESTÁNDAR ──────────────────────────
     const isStandardRole = Object.values(UserRole).includes(role as UserRole);
 
     if (!isStandardRole) {
@@ -196,7 +195,7 @@ export function canAccessRoute(pathname: string, role: UserRole | string, permis
 
     // Buscar el prefijo más largo que haga match
     const matchingPrefixes = Object.keys(ROUTE_PERMISSIONS)
-        .filter((route) => pathname.startsWith(route))
+        .filter((route) => pathname.startsWith(route + '/') || pathname === route)
         .sort((a, b) => b.length - a.length);
 
     if (matchingPrefixes.length > 0) {
