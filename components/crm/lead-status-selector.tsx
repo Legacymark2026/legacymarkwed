@@ -5,12 +5,12 @@ import { updateLead } from "@/actions/crm";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-    NEW: { label: "Nuevo", color: "text-sky-700", bg: "bg-sky-50 border-sky-200 hover:bg-sky-100" },
-    CONTACTED: { label: "Contactado", color: "text-violet-700", bg: "bg-violet-50 border-violet-200 hover:bg-violet-100" },
-    QUALIFIED: { label: "Calificado", color: "text-teal-700", bg: "bg-teal-50 border-teal-200 hover:bg-teal-100" },
-    CONVERTED: { label: "Convertido", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200 hover:bg-emerald-100" },
-    LOST: { label: "Perdido", color: "text-red-700", bg: "bg-red-50 border-red-200 hover:bg-red-100" },
+const STATUS_CONFIG: Record<string, { label: string; color: string; border: string; bg: string }> = {
+    NEW: { label: "Nuevo", color: "#38bdf8", border: "rgba(56,189,248,0.4)", bg: "rgba(56,189,248,0.1)" },
+    CONTACTED: { label: "Contactado", color: "#a78bfa", border: "rgba(167,139,250,0.4)", bg: "rgba(167,139,250,0.1)" },
+    QUALIFIED: { label: "Calificado", color: "#2dd4bf", border: "rgba(45,212,191,0.4)", bg: "rgba(45,212,191,0.1)" },
+    CONVERTED: { label: "Convertido", color: "#34d399", border: "rgba(52,211,153,0.4)", bg: "rgba(52,211,153,0.1)" },
+    LOST: { label: "Perdido", color: "#f87171", border: "rgba(248,113,113,0.4)", bg: "rgba(248,113,113,0.1)" },
 };
 
 interface Props {
@@ -25,54 +25,77 @@ export function LeadStatusSelector({ leadId, initialStatus, isMobile = false, ca
     const [isPending, startTransition] = useTransition();
     const [isOpen, setIsOpen] = useState(false);
 
-    // Keep state in sync if initialStatus changes
-    useEffect(() => {
-        setStatus(initialStatus);
-    }, [initialStatus]);
+    useEffect(() => { setStatus(initialStatus); }, [initialStatus]);
 
-    const activeConfig = STATUS_CONFIG[status] ?? STATUS_CONFIG["NEW"];
+    const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG["NEW"];
 
     async function handleStatusChange(newStatus: string) {
         if (newStatus === status) return;
         setIsOpen(false);
-        const prevStatus = status;
-        setStatus(newStatus); // Optimistic UI update
-
+        const prev = status;
+        setStatus(newStatus);
         startTransition(async () => {
             const res = await updateLead(leadId, { status: newStatus });
             if (res.error) {
-                setStatus(prevStatus); // Revert on failure
-                toast?.error?.(res.error) || alert("Error: " + res.error);
+                setStatus(prev);
+                toast?.error?.(res.error);
             } else {
-                toast?.success?.("Estado actualizado") || alert("Estado actualizado exitosamente");
+                toast?.success?.("Estado actualizado");
             }
         });
     }
 
     return (
-        <div className="relative inline-block text-left">
+        <div style={{ position: "relative", display: "inline-block" }}>
             <button
                 onClick={() => canManageLeads && setIsOpen(!isOpen)}
                 disabled={isPending || !canManageLeads}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 ${activeConfig.bg} ${activeConfig.color} ${isPending ? 'opacity-70 cursor-wait' : canManageLeads ? 'cursor-pointer hover:shadow-sm' : 'cursor-default opacity-80'}`}
+                style={{
+                    display: "inline-flex", alignItems: "center", gap: "6px",
+                    padding: "5px 12px", borderRadius: "99px", fontSize: "11px", fontWeight: 800,
+                    color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}`,
+                    cursor: canManageLeads ? "pointer" : "default",
+                    opacity: isPending ? 0.6 : 1, transition: "all 0.15s",
+                    fontFamily: "monospace",
+                }}
             >
-                {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-                {activeConfig.label}
-                {canManageLeads && <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />}
+                {isPending && <Loader2 style={{ width: "12px", height: "12px" }} className="animate-spin" />}
+                {cfg.label}
+                {canManageLeads && (
+                    <ChevronDown style={{ width: "12px", height: "12px", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+                )}
             </button>
 
             {isOpen && (
                 <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-                    <div className={`absolute z-50 mt-2 w-40 rounded-xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden ${isMobile ? 'bottom-full mb-2 left-0' : 'right-0 origin-top-right'}`}>
-                        <div className="py-1">
-                            {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                    <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setIsOpen(false)} />
+                    <div style={{
+                        position: "absolute", zIndex: 50, marginTop: "6px",
+                        width: "160px",
+                        background: "rgba(11,15,25,0.98)",
+                        border: "1px solid rgba(30,41,59,0.9)",
+                        borderRadius: "12px",
+                        boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
+                        overflow: "hidden",
+                        ...(isMobile ? { bottom: "100%", marginBottom: "6px", left: 0 } : { right: 0 }),
+                    }}>
+                        <div style={{ padding: "6px" }}>
+                            {Object.entries(STATUS_CONFIG).map(([key, c]) => (
                                 <button
                                     key={key}
                                     onClick={() => handleStatusChange(key)}
-                                    className={`w-full text-left px-4 py-2 text-xs font-bold transition-colors hover:bg-slate-50 ${status === key ? config.color : 'text-slate-600'}`}
+                                    style={{
+                                        width: "100%", textAlign: "left", padding: "8px 12px",
+                                        fontSize: "11px", fontWeight: 800, fontFamily: "monospace",
+                                        color: status === key ? c.color : "#475569",
+                                        background: status === key ? c.bg : "transparent",
+                                        border: "none", borderRadius: "8px",
+                                        cursor: "pointer", transition: "all 0.1s",
+                                    }}
+                                    onMouseEnter={e => { if (status !== key) (e.currentTarget as HTMLElement).style.background = "rgba(30,41,59,0.7)"; }}
+                                    onMouseLeave={e => { if (status !== key) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                                 >
-                                    {config.label}
+                                    {c.label}
                                 </button>
                             ))}
                         </div>
