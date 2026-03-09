@@ -5,9 +5,7 @@ import {
     User, MapPin, Mail, Phone, Tag, Clock,
     CreditCard, TrendingUp, AlertCircle, Plus, X, Link, DollarSign, CheckCircle, Copy
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -20,177 +18,141 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Dark HUD tokens
+const D = {
+    bg: "rgba(8,12,20,0.98)",
+    card: "rgba(15,23,42,0.8)",
+    border: "rgba(30,41,59,0.8)",
+    textPrimary: "#cbd5e1",
+    textMuted: "#334155",
+    textDim: "#1e293b",
+    teal: "#2dd4bf",
+    tealBg: "rgba(13,148,136,0.12)",
+    tealBorder: "rgba(13,148,136,0.3)",
+    mono: "monospace",
+};
+
 export function RightSidebar({ conversation, leadDetails }: { conversation: any, leadDetails?: any }) {
     if (!conversation) return (
-        <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-400 text-sm">
+        <div style={{ width: "100%", height: "100%", background: D.bg, display: "flex", alignItems: "center", justifyContent: "center", color: D.textMuted, fontSize: "12px", fontFamily: D.mono }}>
             Select a conversation
         </div>
     );
 
     const lead = leadDetails || conversation.lead || {};
-
-    // Real Data or Default
     const leadScore = lead.score || 0;
-    const temperature = leadScore > 70 ? 'Hot' : leadScore > 40 ? 'Warm' : 'Cold';
-    const tempColor = leadScore > 70 ? 'text-red-600' : leadScore > 40 ? 'text-amber-600' : 'text-blue-600';
-    const tempBg = leadScore > 70 ? 'bg-red-50' : leadScore > 40 ? 'bg-amber-50' : 'bg-blue-50';
+    const temperature = leadScore > 70 ? 'Hot 🔥' : leadScore > 40 ? 'Warm ☀️' : 'Cold 🧊';
+    const tempColor = leadScore > 70 ? '#f87171' : leadScore > 40 ? '#fbbf24' : '#60a5fa';
+    const tempBg = leadScore > 70 ? 'rgba(248,113,113,0.12)' : leadScore > 40 ? 'rgba(251,191,36,0.12)' : 'rgba(96,165,250,0.12)';
 
-    // Interactive States
     const [isConverted, setIsConverted] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
     const [noteDraft, setNoteDraft] = useState('');
-    const [savedNotes, setSavedNotes] = useState<string[]>(
-        lead.notes ? [lead.notes] : []
-    );
+    const [savedNotes, setSavedNotes] = useState<string[]>(lead.notes ? [lead.notes] : []);
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [showDealModal, setShowDealModal] = useState(false);
-
-    // Dynamic Tags State
-    const [activeTags, setActiveTags] = useState<string[]>(
-        conversation.tags || []
-    );
-
-    // Dynamic CRM Custom Fields State
+    const [activeTags, setActiveTags] = useState<string[]>(conversation.tags || []);
     const [customFields, setCustomFields] = useState<{ name: string, value: string }[]>([]);
     const [showNewFieldInput, setShowNewFieldInput] = useState(false);
     const [newFieldName, setNewFieldName] = useState('');
     const [newFieldValue, setNewFieldValue] = useState('');
 
     return (
-        <div className="w-full h-full bg-white flex flex-col overflow-y-auto">
+        <div style={{ width: "100%", height: "100%", background: D.bg, display: "flex", flexDirection: "column", overflowY: "auto" }}>
             {/* Lead Header */}
-            <div className="p-6 text-center border-b border-gray-100 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-indigo-50/50 to-transparent -z-10" />
+            <div style={{ padding: "20px 16px 16px", textAlign: "center", borderBottom: `1px solid ${D.border}`, position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "60px", background: `linear-gradient(to bottom, ${D.tealBg}, transparent)` }} />
 
-                <div className="w-20 h-20 mx-auto rounded-full bg-white p-1 shadow-lg mb-3 relative">
-                    <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
-                        {lead.name?.substring(0, 2).toUpperCase() || 'UN'}
-                    </div>
-                    <div className="absolute bottom-0 right-0">
-                        <ChannelIcon channel={conversation.channel} className="h-6 w-6 bg-white rounded-full p-1 shadow-sm border border-gray-100" />
+                <div style={{ width: "68px", height: "68px", margin: "0 auto 12px", borderRadius: "50%", background: `linear-gradient(135deg, #0d9488, #2dd4bf)`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "20px", fontWeight: 800, fontFamily: D.mono, position: "relative", border: `2px solid ${D.tealBorder}`, boxShadow: "0 0 20px rgba(13,148,136,0.2)" }}>
+                    {lead.name?.substring(0, 2).toUpperCase() || 'UN'}
+                    <div style={{ position: "absolute", bottom: "-2px", right: "-2px" }}>
+                        <ChannelIcon channel={conversation.channel} className="h-6 w-6 bg-[rgba(8,12,20,0.95)] rounded-full p-1 border border-[rgba(30,41,59,0.9)]" />
                     </div>
                 </div>
 
-                <h3 className="font-bold text-lg text-gray-900">{lead.name || 'Unknown Lead'}</h3>
-                <p className="text-sm text-gray-500 mb-4">{lead.email || 'No email provided'}</p>
+                <h3 style={{ fontWeight: 800, fontSize: "15px", color: D.textPrimary, marginBottom: "4px", fontFamily: D.mono }}>{lead.name || 'Unknown Lead'}</h3>
+                <p style={{ fontSize: "11px", color: D.textMuted, marginBottom: "14px", fontFamily: D.mono }}>{lead.email || 'No email provided'}</p>
 
-                <div className="flex justify-center gap-2">
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800" onClick={() => setShowProfileModal(true)}>
-                        <User size={12} />
-                        Profile
-                    </Button>
-                    <Button size="sm" variant="outline" className="h-8 rounded-full text-xs gap-1.5 border-green-200 text-green-700 bg-green-50 hover:bg-green-100 hover:text-green-800" onClick={() => setShowDealModal(true)}>
-                        <CreditCard size={12} />
-                        Deal
-                    </Button>
+                <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
+                    <button style={{ padding: "5px 12px", borderRadius: "99px", fontSize: "11px", fontWeight: 700, border: `1px solid ${D.tealBorder}`, background: D.tealBg, color: D.teal, cursor: "pointer", fontFamily: D.mono, display: "flex", alignItems: "center", gap: "5px" }} onClick={() => setShowProfileModal(true)}>
+                        <User size={10} /> Profile
+                    </button>
+                    <button style={{ padding: "5px 12px", borderRadius: "99px", fontSize: "11px", fontWeight: 700, border: "1px solid rgba(16,185,129,0.3)", background: "rgba(16,185,129,0.1)", color: "#10b981", cursor: "pointer", fontFamily: D.mono, display: "flex", alignItems: "center", gap: "5px" }} onClick={() => setShowDealModal(true)}>
+                        <CreditCard size={10} /> Deal
+                    </button>
                 </div>
-                <div className="flex justify-center gap-2 mt-2">
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className={cn("h-8 rounded-full text-[10px] gap-1 border-slate-200 transition-colors", isConverted ? "bg-green-50 text-green-700 border-green-200" : "text-slate-700 hover:bg-slate-50")}
-                        onClick={() => {
-                            setIsConverted(true);
-                            toast.success('Lead converted successfully');
-                        }}
-                        disabled={isConverted}
-                    >
-                        {isConverted ? <CheckCircle size={10} className="text-green-500" /> : <User size={10} className="text-blue-500" />}
+                <div style={{ display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <button style={{ padding: "4px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 700, border: isConverted ? "1px solid rgba(16,185,129,0.3)" : `1px solid ${D.border}`, background: isConverted ? "rgba(16,185,129,0.1)" : D.card, color: isConverted ? "#10b981" : D.textMuted, cursor: "pointer", fontFamily: D.mono, display: "flex", alignItems: "center", gap: "4px" }}
+                        onClick={() => { setIsConverted(true); toast.success('Lead converted!'); }} disabled={isConverted}>
+                        {isConverted ? <CheckCircle size={9} /> : <User size={9} />}
                         {isConverted ? 'Converted' : '+ Convert Lead'}
-                    </Button>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className={cn("h-8 rounded-full text-[10px] gap-1 border-slate-200 transition-all w-28", linkCopied ? "bg-indigo-50 text-indigo-700 border-indigo-200" : "text-slate-700 hover:bg-slate-50")}
-                        onClick={() => {
-                            setLinkCopied(true);
-                            toast.success('Payment Link Copied!');
-                            setTimeout(() => setLinkCopied(false), 2000);
-                        }}
-                    >
-                        {linkCopied ? <Copy size={10} className="text-indigo-500" /> : <Link size={10} className="text-indigo-500" />}
+                    </button>
+                    <button style={{ padding: "4px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 700, border: linkCopied ? `1px solid ${D.tealBorder}` : `1px solid ${D.border}`, background: linkCopied ? D.tealBg : D.card, color: linkCopied ? D.teal : D.textMuted, cursor: "pointer", fontFamily: D.mono, display: "flex", alignItems: "center", gap: "4px" }}
+                        onClick={() => { setLinkCopied(true); toast.success('Payment Link Copied!'); setTimeout(() => setLinkCopied(false), 2000); }}>
+                        {linkCopied ? <Copy size={9} /> : <Link size={9} />}
                         {linkCopied ? 'Copied!' : 'Payment Link'}
-                    </Button>
+                    </button>
                 </div>
             </div>
 
-            {/* SLA Routing & Tags (Phase 2) */}
-            <div className="p-5 border-b border-gray-100 space-y-4 bg-slate-50/50">
-                <div className="flex flex-col gap-1.5">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Cesionario</span>
+            {/* Assignee + Tags */}
+            <div style={{ padding: "14px 14px", borderBottom: `1px solid ${D.border}`, display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <span style={{ fontSize: "9px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: D.textDim, fontFamily: D.mono }}>Cesionario</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="flex items-center justify-between w-full p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors text-sm text-left shadow-sm">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
+                            <button style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", padding: "7px 10px", background: D.card, border: `1px solid ${D.border}`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", textAlign: "left" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: "linear-gradient(135deg, #0d9488, #2dd4bf)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: 800, fontFamily: D.mono }}>
                                         {conversation.assignee?.name?.substring(0, 2).toUpperCase() || 'UN'}
                                     </div>
-                                    <span className="font-medium text-gray-700">{conversation.assignee?.name || 'Sin Asignar'}</span>
+                                    <span style={{ fontWeight: 600, color: D.textPrimary, fontFamily: D.mono }}>{conversation.assignee?.name || 'Sin Asignar'}</span>
                                 </div>
-                                <User size={14} className="text-gray-400" />
+                                <User size={12} style={{ color: D.textMuted }} />
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-[calc(100vw-3rem)] sm:w-64 z-50">
-                            <DropdownMenuItem className="flex gap-2 items-center" onClick={() => toast.success('Asignado a: Sarah Connor')}>
-                                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">SC</div>
-                                Sarah Connor
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2 items-center" onClick={() => toast.success('Asignado a: John Doe')}>
-                                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-[10px] font-bold">JD</div>
-                                John Doe
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="flex gap-2 items-center text-red-600 focus:text-red-700" onClick={() => toast.info('Desasignado')}>
-                                <X size={14} /> Desasignar
-                            </DropdownMenuItem>
+                        <DropdownMenuContent align="start" className="w-56 z-50">
+                            <DropdownMenuItem onClick={() => toast.success('Asignado a: Sarah Connor')}>Sarah Connor</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast.success('Asignado a: John Doe')}>John Doe</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600" onClick={() => toast.info('Desasignado')}><X size={12} /> Desasignar</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <p className="text-[10px] text-gray-400 pl-1">Asignar a otro cesionario</p>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center justify-between">
-                        Etiquetas de Chat
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: "9px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: D.textDim, fontFamily: D.mono }}>Etiquetas</span>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="text-indigo-600 hover:bg-indigo-50 p-0.5 rounded transition-colors"><Plus size={14} /></button>
+                                <button style={{ background: "none", border: "none", cursor: "pointer", color: D.teal, padding: "2px" }}><Plus size={12} /></button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 {['Ventas', 'Soporte VIP', 'Dudas', 'URGENTE'].filter(t => !activeTags.includes(t)).map(tag => (
-                                    <DropdownMenuItem key={tag} onClick={() => {
-                                        setActiveTags(prev => [...prev, tag]);
-                                        toast.success(`Etiqueta agregada: ${tag}`);
-                                    }}>
-                                        {tag}
-                                    </DropdownMenuItem>
+                                    <DropdownMenuItem key={tag} onClick={() => { setActiveTags(prev => [...prev, tag]); toast.success(`Etiqueta: ${tag}`); }}>{tag}</DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                        {activeTags.length > 0 ? activeTags.map((tag: string, i: number) => (
-                            <Badge key={i} variant="secondary" className="bg-rose-100 text-rose-700 hover:bg-rose-200 font-medium border-none pl-2 pr-1 h-6 transition-all">
-                                {tag} <button className="ml-1 opacity-70 hover:opacity-100" onClick={() => {
-                                    setActiveTags(prev => prev.filter(t => t !== tag));
-                                    toast.success(`Sujeción de etiqueta ${tag} removida`);
-                                }}><X size={12} /></button>
-                            </Badge>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                        {activeTags.length > 0 ? activeTags.map((tag, i) => (
+                            <span key={i} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "2px 8px", background: "rgba(244,63,94,0.12)", border: "1px solid rgba(244,63,94,0.3)", borderRadius: "99px", fontSize: "10px", fontWeight: 700, color: "#fb7185", fontFamily: D.mono }}>
+                                {tag}
+                                <button style={{ background: "none", border: "none", cursor: "pointer", color: "#fb7185", padding: 0, display: "flex" }} onClick={() => { setActiveTags(p => p.filter(t => t !== tag)); }}>
+                                    <X size={9} />
+                                </button>
+                            </span>
                         )) : (
-                            <span className="text-[10px] text-gray-400 italic">Sin etiquetas</span>
+                            <span style={{ fontSize: "10px", color: D.textDim, fontFamily: D.mono, fontStyle: "italic" }}>Sin etiquetas</span>
                         )}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="h-6 px-3 rounded-full border border-dashed border-gray-300 text-[10px] text-gray-400 hover:bg-gray-50 font-medium flex items-center gap-1 transition-colors">
-                                    <Plus size={10} /> Añadir
+                                <button style={{ display: "flex", alignItems: "center", gap: "3px", padding: "2px 8px", background: "none", border: `1px dashed ${D.border}`, borderRadius: "99px", fontSize: "10px", color: D.textMuted, cursor: "pointer", fontFamily: D.mono }}>
+                                    <Plus size={9} /> Añadir
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
                                 {['Ventas', 'Soporte VIP', 'Dudas', 'URGENTE'].filter(t => !activeTags.includes(t)).map(tag => (
-                                    <DropdownMenuItem key={tag} onClick={() => {
-                                        setActiveTags(prev => [...prev, tag]);
-                                        toast.success(`Etiqueta agregada: ${tag}`);
-                                    }}>
-                                        {tag}
-                                    </DropdownMenuItem>
+                                    <DropdownMenuItem key={tag} onClick={() => { setActiveTags(prev => [...prev, tag]); toast.success(`Etiqueta: ${tag}`); }}>{tag}</DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -198,253 +160,212 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                 </div>
             </div>
 
-            {/* Lead Score & Temperature */}
-            <div className="p-5 border-b border-gray-100">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Lead Score</span>
-                    <span className={cn("text-xs font-bold px-2 py-0.5 rounded-full border", tempColor, tempBg, "border-opacity-20")}>
+            {/* Lead Score */}
+            <div style={{ padding: "14px", borderBottom: `1px solid ${D.border}` }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "9px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: D.textDim, fontFamily: D.mono }}>Lead Score</span>
+                    <span style={{ fontSize: "10px", fontWeight: 800, padding: "2px 8px", borderRadius: "99px", background: tempBg, color: tempColor, fontFamily: D.mono, border: `1px solid ${tempColor}30` }}>
                         {temperature} ({leadScore})
                     </span>
                 </div>
-                <Progress value={leadScore} className="h-2 bg-gray-100" />
-                <p className="text-[10px] text-gray-400 mt-2 text-right">
-                    Based on recent activity
-                </p>
+                <div style={{ height: "5px", background: D.card, borderRadius: "99px", overflow: "hidden", border: `1px solid ${D.border}` }}>
+                    <div style={{ height: "100%", width: `${leadScore}%`, background: `linear-gradient(to right, ${tempColor}90, ${tempColor})`, borderRadius: "99px", transition: "width 0.5s" }} />
+                </div>
+                <p style={{ fontSize: "9px", color: D.textDim, marginTop: "6px", textAlign: "right", fontFamily: D.mono }}>Based on recent activity</p>
             </div>
 
-            {/* Tabs for Details */}
+            {/* Tabs */}
             <Tabs defaultValue="details" className="flex-1">
-                <TabsList className="w-full grid grid-cols-3 rounded-none border-b border-gray-200 bg-white p-0 h-10">
-                    <TabsTrigger value="details" className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-600 text-xs text-gray-500 h-full">Details</TabsTrigger>
-                    <TabsTrigger value="activity" className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-600 text-xs text-gray-500 h-full">Journey</TabsTrigger>
-                    <TabsTrigger value="notes" className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-600 text-xs text-gray-500 h-full">Notes</TabsTrigger>
+                <TabsList style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderRadius: 0, borderBottom: `1px solid ${D.border}`, background: D.bg, padding: 0, height: "38px" }}>
+                    {['details', 'activity', 'notes'].map(tab => (
+                        <TabsTrigger key={tab} value={tab} style={{ borderRadius: 0, fontSize: "11px", fontFamily: D.mono, fontWeight: 700, textTransform: "capitalize" }}
+                            className="data-[state=active]:border-b-2 data-[state=active]:border-teal-500 data-[state=active]:text-teal-400 data-[state=inactive]:text-slate-600 data-[state=inactive]:bg-transparent h-full">
+                            {tab === 'activity' ? 'Journey' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </TabsTrigger>
+                    ))}
                 </TabsList>
 
-                <TabsContent value="details" className="p-5 space-y-5">
+                <TabsContent value="details" style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "14px" }}>
                     {/* Contact Info */}
-                    <div className="space-y-3">
-                        <h4 className="text-xs font-semibold text-gray-900 flex items-center gap-2">
-                            <User size={14} className="text-gray-400" /> Contact Info
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <h4 style={{ fontSize: "10px", fontWeight: 800, color: D.textPrimary, display: "flex", alignItems: "center", gap: "6px", fontFamily: D.mono, margin: 0 }}>
+                            <User size={12} style={{ color: D.teal }} /> Contact Info
                         </h4>
-                        <div className="space-y-2 pl-6">
-                            <div className="flex items-start gap-2">
-                                <Mail size={14} className="text-gray-400 mt-0.5" />
-                                <span className="text-sm text-gray-600 break-all">{lead.email || '-'}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Phone size={14} className="text-gray-400" />
-                                <span className="text-sm text-gray-600">{lead.phone || '-'}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <MapPin size={14} className="text-gray-400" />
-                                <span className="text-sm text-gray-600">{lead.city || 'Unknown Location'}</span>
-                            </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px", paddingLeft: "18px" }}>
+                            {[
+                                { icon: Mail, val: lead.email || '-' },
+                                { icon: Phone, val: lead.phone || '-' },
+                                { icon: MapPin, val: lead.city || 'Unknown Location' },
+                            ].map(({ icon: Icon, val }, i) => (
+                                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                                    <Icon size={12} style={{ color: D.textMuted, marginTop: "1px", flexShrink: 0 }} />
+                                    <span style={{ fontSize: "11px", color: D.textMuted, fontFamily: D.mono, wordBreak: "break-all" }}>{val}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    <Separator />
+                    <div style={{ height: "1px", background: D.border }} />
 
                     {/* Attribution */}
-                    <div className="space-y-3">
-                        <h4 className="text-xs font-semibold text-gray-900 flex items-center gap-2">
-                            <TrendingUp size={14} className="text-gray-400" /> Attribution
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <h4 style={{ fontSize: "10px", fontWeight: 800, color: D.textPrimary, display: "flex", alignItems: "center", gap: "6px", fontFamily: D.mono, margin: 0 }}>
+                            <TrendingUp size={12} style={{ color: D.teal }} /> Attribution
                         </h4>
-                        <div className="grid grid-cols-2 gap-3 pl-1">
-                            <div className="bg-gray-50 p-2 rounded-lg border border-gray-100">
-                                <span className="text-[10px] text-gray-400 block uppercase">Source</span>
-                                <span className="text-xs font-medium text-gray-700">{lead.source || 'Direct'}</span>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                            {[
+                                { label: "Source", val: lead.source || 'Direct' },
+                                { label: "Campaign", val: lead.campaign?.name || '-' },
+                            ].map(({ label, val }) => (
+                                <div key={label} style={{ background: D.card, padding: "8px", borderRadius: "8px", border: `1px solid ${D.border}` }}>
+                                    <span style={{ fontSize: "9px", color: D.textDim, display: "block", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: D.mono }}>{label}</span>
+                                    <span style={{ fontSize: "11px", fontWeight: 700, color: D.textMuted, fontFamily: D.mono }}>{val}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div style={{ height: "1px", background: D.border }} />
+
+                    {/* Purchase History */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <h4 style={{ fontSize: "10px", fontWeight: 800, color: D.textPrimary, display: "flex", alignItems: "center", gap: "6px", fontFamily: D.mono, margin: 0 }}>
+                            <DollarSign size={12} style={{ color: "#10b981" }} /> Purchase History
+                        </h4>
+                        <div style={{ background: "rgba(16,185,129,0.06)", padding: "10px", borderRadius: "10px", border: "1px solid rgba(16,185,129,0.2)" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+                                <span style={{ fontSize: "11px", fontWeight: 600, color: "#10b981", fontFamily: D.mono }}>LTV</span>
+                                <span style={{ fontSize: "14px", fontWeight: 800, color: "#34d399", fontFamily: D.mono }}>${(lead.score * 12.5 || 0).toLocaleString()}</span>
                             </div>
-                            <div className="bg-gray-50 p-2 rounded-lg border border-gray-100">
-                                <span className="text-[10px] text-gray-400 block uppercase">Campaign</span>
-                                <span className="text-xs font-medium text-gray-700">{lead.campaign?.name || '-'}</span>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <span style={{ fontSize: "10px", color: "#10b981", fontFamily: D.mono }}>Total Orders</span>
+                                <span style={{ fontSize: "10px", fontWeight: 800, color: "#34d399", fontFamily: D.mono }}>{lead.score > 0 ? Math.floor(lead.score / 15) : 0}</span>
                             </div>
                         </div>
                     </div>
 
-                    <Separator />
-
-                    {/* CRM Metrics (Lifetime Value & History) */}
-                    <div className="space-y-3">
-                        <h4 className="text-xs font-semibold text-gray-900 flex items-center gap-2">
-                            <DollarSign size={14} className="text-emerald-500" /> Purchase History
-                        </h4>
-                        <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
-                            <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs font-medium text-emerald-800">Lifetime Value (LTV)</span>
-                                <span className="text-sm font-bold text-emerald-700">${(lead.score * 12.5 || 0).toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-[10px] text-emerald-600">Total Orders</span>
-                                <span className="text-[10px] font-semibold text-emerald-700">{lead.score > 0 ? Math.floor(lead.score / 15) : 0}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <Separator />
+                    <div style={{ height: "1px", background: D.border }} />
 
                     {/* Custom CRM Fields */}
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-semibold text-gray-900 flex items-center gap-2">
-                                <AlertCircle size={14} className="text-gray-400" /> Campos CRM Personali...
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <h4 style={{ fontSize: "10px", fontWeight: 800, color: D.textPrimary, display: "flex", alignItems: "center", gap: "6px", fontFamily: D.mono, margin: 0 }}>
+                                <AlertCircle size={12} style={{ color: D.textMuted }} /> Campos CRM
                             </h4>
-                            <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-600 hover:bg-indigo-50" onClick={() => setShowNewFieldInput(!showNewFieldInput)}>
-                                <Plus size={14} />
-                            </Button>
+                            <button style={{ background: "none", border: "none", cursor: "pointer", color: D.teal }} onClick={() => setShowNewFieldInput(!showNewFieldInput)}><Plus size={12} /></button>
                         </div>
-
-                        {customFields.length > 0 ? (
-                            <div className="grid grid-cols-2 gap-3 pl-1">
-                                {customFields.map((field, i) => (
-                                    <div key={i} className="bg-gray-50 p-2 rounded-lg border border-gray-100 relative group">
-                                        <button
-                                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500"
-                                            onClick={() => setCustomFields(prev => prev.filter((_, idx) => idx !== i))}
-                                        ><X size={10} /></button>
-                                        <span className="text-[10px] text-gray-400 block uppercase truncate pr-4">{field.name}</span>
-                                        <span className="text-xs font-medium text-gray-700 truncate">{field.value}</span>
+                        {customFields.length > 0 && (
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                {customFields.map((f, i) => (
+                                    <div key={i} style={{ background: D.card, padding: "7px", borderRadius: "7px", border: `1px solid ${D.border}`, position: "relative" }}>
+                                        <button style={{ position: "absolute", top: "3px", right: "3px", background: "none", border: "none", cursor: "pointer", color: "#475569" }} onClick={() => setCustomFields(p => p.filter((_, idx) => idx !== i))}><X size={9} /></button>
+                                        <span style={{ fontSize: "9px", color: D.textDim, display: "block", textTransform: "uppercase", fontFamily: D.mono, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: "12px" }}>{f.name}</span>
+                                        <span style={{ fontSize: "11px", fontWeight: 700, color: D.textMuted, fontFamily: D.mono }}>{f.value}</span>
                                     </div>
                                 ))}
                             </div>
-                        ) : (
-                            <p className="text-[10px] text-gray-400 pl-1 italic">No hay campos personalizados.</p>
                         )}
-
+                        {!customFields.length && !showNewFieldInput && <p style={{ fontSize: "10px", color: D.textDim, fontFamily: D.mono, fontStyle: "italic" }}>No hay campos personalizados.</p>}
                         {showNewFieldInput && (
-                            <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 space-y-2 animate-in zoom-in-95">
-                                <input
-                                    className="w-full text-xs p-1.5 border border-indigo-200 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                                    placeholder="Nombre del campo (ej. Empresa)"
-                                    value={newFieldName} onChange={e => setNewFieldName(e.target.value)}
-                                />
-                                <input
-                                    className="w-full text-xs p-1.5 border border-indigo-200 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                                    placeholder="Valor"
-                                    value={newFieldValue} onChange={e => setNewFieldValue(e.target.value)}
-                                />
-                                <div className="flex gap-2">
-                                    <Button size="sm" variant="ghost" className="flex-1 h-7 text-[10px]" onClick={() => {
-                                        setShowNewFieldInput(false);
-                                        setNewFieldName('');
-                                        setNewFieldValue('');
-                                    }}>Cancelar</Button>
-                                    <Button size="sm" className="flex-1 h-7 text-[10px] bg-indigo-600 hover:bg-indigo-700" disabled={!newFieldName || !newFieldValue} onClick={() => {
-                                        setCustomFields(prev => [...prev, { name: newFieldName, value: newFieldValue }]);
-                                        setShowNewFieldInput(false);
-                                        setNewFieldName('');
-                                        setNewFieldValue('');
-                                        toast.success('Campo personalizado agregado');
-                                    }}>Guardar</Button>
+                            <div style={{ background: D.tealBg, border: `1px solid ${D.tealBorder}`, borderRadius: "8px", padding: "10px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                                <input style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: "6px", padding: "6px 8px", fontSize: "11px", color: D.textPrimary, outline: "none", fontFamily: D.mono, width: "100%", boxSizing: "border-box" }} placeholder="Nombre del campo" value={newFieldName} onChange={e => setNewFieldName(e.target.value)} />
+                                <input style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: "6px", padding: "6px 8px", fontSize: "11px", color: D.textPrimary, outline: "none", fontFamily: D.mono, width: "100%", boxSizing: "border-box" }} placeholder="Valor" value={newFieldValue} onChange={e => setNewFieldValue(e.target.value)} />
+                                <div style={{ display: "flex", gap: "6px" }}>
+                                    <button style={{ flex: 1, padding: "5px", borderRadius: "6px", border: `1px solid ${D.border}`, background: "transparent", color: D.textMuted, fontSize: "11px", cursor: "pointer", fontFamily: D.mono }} onClick={() => { setShowNewFieldInput(false); setNewFieldName(''); setNewFieldValue(''); }}>Cancelar</button>
+                                    <button style={{ flex: 1, padding: "5px", borderRadius: "6px", border: `1px solid ${D.tealBorder}`, background: D.tealBg, color: D.teal, fontSize: "11px", fontWeight: 800, cursor: "pointer", fontFamily: D.mono }} disabled={!newFieldName || !newFieldValue} onClick={() => { setCustomFields(p => [...p, { name: newFieldName, value: newFieldValue }]); setShowNewFieldInput(false); setNewFieldName(''); setNewFieldValue(''); toast.success('Campo agregado'); }}>Guardar</button>
                                 </div>
                             </div>
                         )}
                     </div>
                 </TabsContent>
 
-                <TabsContent value="activity" className="p-5">
-                    <div className="relative border-l border-gray-200 ml-2 space-y-6">
+                <TabsContent value="activity" style={{ padding: "14px" }}>
+                    <div style={{ position: "relative", borderLeft: `1px solid ${D.border}`, marginLeft: "8px", display: "flex", flexDirection: "column", gap: "20px" }}>
                         {lead.marketingEvents?.length > 0 ? lead.marketingEvents.map((event: any) => (
-                            <div key={event.id} className="relative pl-6">
-                                <div className={cn(
-                                    "absolute -left-1.5 top-1 h-3 w-3 rounded-full border-2 border-white shadow-sm",
-                                    event.eventType === 'PAGE_VIEW' ? "bg-blue-500" :
-                                        event.eventType === 'FORM_SUBMIT' ? "bg-green-500" : "bg-gray-400"
-                                )} />
-                                <p className="text-xs text-gray-500 mb-0.5">{new Date(event.createdAt).toLocaleDateString()}</p>
-                                <p className="text-sm font-medium text-gray-900">{event.eventName || event.eventType}</p>
-                                <p className="text-xs text-gray-500 truncate max-w-[180px]">{event.url}</p>
+                            <div key={event.id} style={{ position: "relative", paddingLeft: "20px" }}>
+                                <div style={{ position: "absolute", left: "-5px", top: "3px", width: "9px", height: "9px", borderRadius: "50%", background: event.eventType === 'PAGE_VIEW' ? "#60a5fa" : event.eventType === 'FORM_SUBMIT' ? "#34d399" : "#334155", border: `2px solid ${D.bg}` }} />
+                                <p style={{ fontSize: "10px", color: D.textDim, marginBottom: "2px", fontFamily: D.mono }}>{new Date(event.createdAt).toLocaleDateString()}</p>
+                                <p style={{ fontSize: "12px", fontWeight: 700, color: D.textPrimary, fontFamily: D.mono }}>{event.eventName || event.eventType}</p>
+                                <p style={{ fontSize: "10px", color: D.textMuted, fontFamily: D.mono, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>{event.url}</p>
                             </div>
                         )) : (
-                            <p className="text-sm text-gray-500 pl-4">No recent activity.</p>
+                            <p style={{ fontSize: "11px", color: D.textDim, paddingLeft: "16px", fontFamily: D.mono, fontStyle: "italic" }}>No recent activity.</p>
                         )}
                     </div>
                 </TabsContent>
 
-                <TabsContent value="notes" className="p-5 flex flex-col h-[400px]">
-                    <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-4">
-                        {savedNotes.length > 0 ? (
-                            savedNotes.map((note, idx) => (
-                                <div key={idx} className="bg-yellow-50/50 border border-yellow-100 rounded-lg p-3 text-sm text-gray-700 whitespace-pre-wrap relative group">
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-[9px] text-yellow-600 font-medium">Just now</span>
-                                    </div>
-                                    {note}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-sm text-gray-400 italic text-center py-4">No notes yet.</div>
+                <TabsContent value="notes" style={{ padding: "14px", display: "flex", flexDirection: "column", height: "400px" }}>
+                    <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
+                        {savedNotes.length > 0 ? savedNotes.map((note, idx) => (
+                            <div key={idx} style={{ background: "rgba(234,179,8,0.06)", border: "1px solid rgba(234,179,8,0.2)", borderRadius: "8px", padding: "10px", fontSize: "11px", color: D.textMuted, whiteSpace: "pre-wrap", fontFamily: D.mono }}>
+                                {note}
+                            </div>
+                        )) : (
+                            <div style={{ fontSize: "11px", color: D.textDim, textAlign: "center", padding: "16px", fontFamily: D.mono, fontStyle: "italic" }}>No notes yet.</div>
                         )}
                     </div>
-                    <div className="shrink-0">
+                    <div style={{ flexShrink: 0 }}>
                         <textarea
-                            className="w-full text-sm border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 min-h-[80px] resize-none p-3 bg-gray-50 mb-2"
+                            style={{ width: "100%", background: D.card, border: `1px solid ${D.border}`, borderRadius: "8px", padding: "10px", fontSize: "11px", color: D.textPrimary, outline: "none", minHeight: "80px", resize: "none", marginBottom: "8px", fontFamily: D.mono, boxSizing: "border-box" }}
                             placeholder="Type a new internal note..."
                             value={noteDraft}
-                            onChange={(e) => setNoteDraft(e.target.value)}
+                            onChange={e => setNoteDraft(e.target.value)}
                         />
-                        <Button
-                            size="sm"
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm"
+                        <button
+                            style={{ width: "100%", padding: "8px", borderRadius: "8px", border: `1px solid ${D.tealBorder}`, background: noteDraft.trim() ? D.tealBg : "transparent", color: noteDraft.trim() ? D.teal : D.textDim, fontSize: "12px", fontWeight: 800, cursor: noteDraft.trim() ? "pointer" : "not-allowed", fontFamily: D.mono, transition: "all 0.15s" }}
                             disabled={!noteDraft.trim()}
-                            onClick={() => {
-                                setSavedNotes(prev => [...prev, noteDraft]);
-                                setNoteDraft('');
-                                toast.success('Note saved securely');
-                            }}
+                            onClick={() => { setSavedNotes(p => [...p, noteDraft]); setNoteDraft(''); toast.success('Note saved'); }}
                         >
                             Save Note
-                        </Button>
+                        </button>
                     </div>
                 </TabsContent>
             </Tabs>
 
-            {/* Modals Overlay Simulation */}
+            {/* Modals */}
             {showProfileModal && (
-                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="font-bold text-gray-900">Extensive CRM Profile</h3>
-                            <button onClick={() => setShowProfileModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+                <div style={{ position: "absolute", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                    <div style={{ background: "rgba(11,15,25,0.98)", border: `1px solid ${D.border}`, borderRadius: "16px", width: "100%", maxWidth: "340px", overflow: "hidden" }}>
+                        <div style={{ padding: "14px 18px", borderBottom: `1px solid ${D.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(8,12,20,0.9)" }}>
+                            <h3 style={{ fontWeight: 800, color: D.textPrimary, fontSize: "14px", fontFamily: D.mono, margin: 0 }}>CRM Profile</h3>
+                            <button onClick={() => setShowProfileModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: D.textMuted }}><X size={14} /></button>
                         </div>
-                        <div className="p-6 text-center space-y-4">
-                            <div className="w-16 h-16 mx-auto rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl font-bold">
+                        <div style={{ padding: "20px", textAlign: "center", display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
+                            <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: `linear-gradient(135deg, #0d9488, #2dd4bf)`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "18px", fontWeight: 800, fontFamily: D.mono }}>
                                 {lead.name?.substring(0, 2).toUpperCase() || 'UN'}
                             </div>
                             <div>
-                                <p className="font-bold text-lg">{lead.name}</p>
-                                <p className="text-sm text-gray-500">{lead.email}</p>
+                                <p style={{ fontWeight: 800, fontSize: "15px", color: D.textPrimary, fontFamily: D.mono, margin: 0 }}>{lead.name}</p>
+                                <p style={{ fontSize: "11px", color: D.textMuted, fontFamily: D.mono }}>{lead.email}</p>
                             </div>
-                            <Button className="w-full" onClick={() => setShowProfileModal(false)}>Close Full Profile View</Button>
+                            <button style={{ width: "100%", padding: "8px", borderRadius: "8px", border: `1px solid ${D.tealBorder}`, background: D.tealBg, color: D.teal, fontSize: "12px", fontWeight: 800, cursor: "pointer", fontFamily: D.mono }} onClick={() => setShowProfileModal(false)}>Close</button>
                         </div>
                     </div>
                 </div>
             )}
 
             {showDealModal && (
-                <div className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
-                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-green-50">
-                            <h3 className="font-bold text-green-900 flex items-center gap-2"><CreditCard size={16} /> Create Deal</h3>
-                            <button onClick={() => setShowDealModal(false)} className="text-green-600 hover:text-green-800"><X size={16} /></button>
+                <div style={{ position: "absolute", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                    <div style={{ background: "rgba(11,15,25,0.98)", border: `1px solid ${D.border}`, borderRadius: "16px", width: "100%", maxWidth: "340px", overflow: "hidden" }}>
+                        <div style={{ padding: "14px 18px", borderBottom: `1px solid ${D.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(8,12,20,0.9)" }}>
+                            <h3 style={{ fontWeight: 800, color: D.textPrimary, fontSize: "14px", fontFamily: D.mono, margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><CreditCard size={13} style={{ color: "#10b981" }} /> Create Deal</h3>
+                            <button onClick={() => setShowDealModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: D.textMuted }}><X size={14} /></button>
                         </div>
-                        <div className="p-5 space-y-4">
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">Deal Value ($)</label>
-                                <input type="number" className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-green-500 focus:border-green-500" placeholder="e.g. 5000" />
+                        <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: D.textDim, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: D.mono, display: "block", marginBottom: "5px" }}>Deal Value ($)</label>
+                                <input type="number" style={{ width: "100%", background: D.card, border: `1px solid ${D.border}`, borderRadius: "7px", padding: "7px 10px", fontSize: "12px", color: D.textPrimary, outline: "none", fontFamily: D.mono, boxSizing: "border-box" }} placeholder="e.g. 5000" />
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-gray-500">Pipeline Stage</label>
-                                <select className="w-full border-gray-200 rounded-lg p-2 text-sm focus:ring-green-500 focus:border-green-500">
+                            <div>
+                                <label style={{ fontSize: "10px", fontWeight: 800, color: D.textDim, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: D.mono, display: "block", marginBottom: "5px" }}>Pipeline Stage</label>
+                                <select style={{ width: "100%", background: D.card, border: `1px solid ${D.border}`, borderRadius: "7px", padding: "7px 10px", fontSize: "12px", color: D.textPrimary, outline: "none", fontFamily: D.mono, boxSizing: "border-box" }}>
                                     <option>Prospecting</option>
                                     <option>Qualification</option>
                                     <option>Proposal Made</option>
                                     <option>In Negotiation</option>
                                 </select>
                             </div>
-                            <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => {
-                                toast.success('Deal Created Successfully');
-                                setShowDealModal(false);
-                            }}>Save Deal</Button>
+                            <button style={{ width: "100%", padding: "9px", borderRadius: "8px", border: "1px solid rgba(16,185,129,0.3)", background: "rgba(16,185,129,0.12)", color: "#10b981", fontSize: "12px", fontWeight: 800, cursor: "pointer", fontFamily: D.mono }} onClick={() => { toast.success('Deal Created!'); setShowDealModal(false); }}>Save Deal</button>
                         </div>
                     </div>
                 </div>

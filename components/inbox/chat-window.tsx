@@ -405,57 +405,50 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#f8f9fa]">
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "transparent" }}>
             {/* Header - Glassmorphism touch */}
-            <div className="h-[72px] px-6 border-b border-gray-200 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10">
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-sm">
+            <div style={{ height: "64px", padding: "0 20px", borderBottom: "1px solid rgba(30,41,59,0.8)", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(8,12,20,0.95)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                    <div style={{ position: "relative" }}>
+                        <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, #0d9488, #2dd4bf)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 800, fontSize: "13px", fontFamily: "monospace" }}>
                             {conversation.lead?.name?.substring(0, 2).toUpperCase() || 'UN'}
                         </div>
-                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-gray-100">
+                        <div style={{ position: "absolute", bottom: "-3px", right: "-3px", background: "rgba(8,12,20,0.95)", borderRadius: "50%", padding: "2px", border: "1px solid rgba(30,41,59,0.9)" }}>
                             <ChannelIcon channel={conversation.channel} className="text-xs" />
                         </div>
                     </div>
 
                     <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <h2 className="font-bold text-gray-900 text-sm md:text-base">{conversation.lead?.name || 'Unknown Lead'}</h2>
-                            <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded flex items-center gap-1 cursor-default" title="AI Sentiment Analysis: Positive">
-                                😊 Positive
-                            </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                            <h2 style={{ fontWeight: 800, color: "#e2e8f0", fontSize: "14px", fontFamily: "monospace", margin: 0 }}>{conversation.lead?.name || 'Unknown Lead'}</h2>
+                            <span style={{ fontSize: "10px", fontWeight: 800, background: "rgba(16,185,129,0.15)", color: "#34d399", padding: "2px 6px", borderRadius: "99px", border: "1px solid rgba(16,185,129,0.3)" }}>😊 Positive</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 font-medium">{conversation.channel}</span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                            <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "11px", color: "#334155", fontFamily: "monospace" }}>{conversation.channel}</span>
+                            <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#1e293b" }} />
+                            <span style={{ fontSize: "11px", color: "#10b981", display: "flex", alignItems: "center", gap: "4px" }}>
+                                <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
                                 Active
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300 mx-1"></span>
-
-                            {/* Analytics Phase 6 */}
-                            <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded" title="First Response Time">
-                                <Timer size={10} className="text-slate-400" /> FRT: 3m
+                            <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#1e293b" }} />
+                            <span style={{ fontSize: "10px", color: "#334155", display: "flex", alignItems: "center", gap: "3px", background: "rgba(30,41,59,0.6)", padding: "1px 6px", borderRadius: "6px", fontFamily: "monospace" }}>
+                                <Timer size={9} style={{ color: "#475569" }} /> FRT: 3m
                             </span>
-                            <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded" title="Total Resolution Time">
-                                <Clock size={10} className="text-slate-400" /> TRT: 45m
+                            <span style={{ fontSize: "10px", color: "#334155", display: "flex", alignItems: "center", gap: "3px", background: "rgba(30,41,59,0.6)", padding: "1px 6px", borderRadius: "6px", fontFamily: "monospace" }}>
+                                <Clock size={9} style={{ color: "#475569" }} /> TRT: 45m
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-gray-500">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#475569" }}>
                     {/* Status Dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className={cn(
-                                "h-8 border-dashed gap-2 font-medium",
-                                conversation.status === 'OPEN' ? "text-green-600 border-green-200 bg-green-50" : "text-gray-500"
-                            )}>
-                                {conversation.status === 'OPEN' ? <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> : <span className="w-2 h-2 rounded-full bg-gray-300" />}
+                            <button style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "monospace", border: conversation.status === 'OPEN' ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(30,41,59,0.9)", background: conversation.status === 'OPEN' ? "rgba(16,185,129,0.1)" : "rgba(30,41,59,0.6)", color: conversation.status === 'OPEN' ? "#10b981" : "#475569" }}>
+                                {conversation.status === 'OPEN' ? <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> : <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#334155", display: "inline-block" }} />}
                                 {conversation.status}
-                            </Button>
+                            </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => updateConversationStatus(conversation.id, 'OPEN')}>Mark as Open</DropdownMenuItem>
@@ -464,37 +457,34 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
+                    <div style={{ width: "1px", height: "20px", background: "rgba(30,41,59,0.8)", margin: "0 4px" }} />
 
-                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => setActiveCall('audio')}>
-                        <Phone size={18} />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors hidden sm:flex" onClick={() => setActiveCall('video')}>
-                        <Video size={18} />
-                    </Button>
-                    <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
+                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", borderRadius: "8px", color: "#334155", display: "flex" }} onClick={() => setActiveCall('audio')}>
+                        <Phone size={17} />
+                    </button>
+                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", borderRadius: "8px", color: "#334155", display: "flex" }} onClick={() => setActiveCall('video')}>
+                        <Video size={17} />
+                    </button>
+                    <div style={{ width: "1px", height: "20px", background: "rgba(30,41,59,0.8)", margin: "0 4px" }} />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="hover:text-gray-900 rounded-full">
-                                <MoreHorizontal size={20} />
-                            </Button>
+                            <button style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", borderRadius: "8px", color: "#334155", display: "flex" }}>
+                                <MoreHorizontal size={18} />
+                            </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem onClick={() => toast.info('Opening contact details...')}>View Contact Details</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => toast.success('Pinned to top')}>Pin to Top</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => updateConversationStatus(conversation.id, 'SNOOZED')}>Snooze Conversation</DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2 text-indigo-600 focus:text-indigo-600" onClick={() => toast.success('Transcript exported as PDF')}>
+                            <DropdownMenuItem className="gap-2 text-teal-600 focus:text-teal-600" onClick={() => toast.success('Transcript exported as PDF')}>
                                 <Download size={14} /> Export Transcript
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-amber-600 focus:text-amber-600" onClick={() => toast.warning('Conversation marked as spam')}>Mark as Spam</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => {
-                                updateConversationStatus(conversation.id, 'CLOSED');
-                                handleCloseDeal();
-                            }}>Close Conversation</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => { updateConversationStatus(conversation.id, 'CLOSED'); handleCloseDeal(); }}>Close Conversation</DropdownMenuItem>
                             {isAdmin && (
                                 <>
-                                    <div className="h-px bg-gray-200 my-1" />
+                                    <div className="h-px bg-[rgba(30,41,59,0.8)] my-1" />
                                     <DropdownMenuItem className="text-red-700 bg-red-50 focus:text-white focus:bg-red-600 font-bold gap-2" onClick={() => toast.success('Chat deleted permanently')}>
                                         <Trash2 size={14} /> Delete Chat (Admin)
                                     </DropdownMenuItem>
@@ -744,15 +734,14 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6"
                 style={{
-                    backgroundImage: 'radial-gradient(circle at 50% 50%, #f0f4f8 1px, transparent 1px)',
-                    backgroundSize: '24px 24px'
+                    backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(30,41,59,0.3) 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
+                    background: "rgba(11,15,25,0.97)",
                 }}
             >
                 {/* Date Separator (Example) */}
-                <div className="flex justify-center mb-6">
-                    <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-wider">
-                        Today
-                    </span>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                    <span style={{ fontSize: "10px", fontWeight: 700, color: "#475569", background: "rgba(30,41,59,0.7)", padding: "3px 10px", borderRadius: "99px", fontFamily: "monospace", border: "1px solid rgba(30,41,59,0.9)", letterSpacing: "0.08em" }}>Today</span>
                 </div>
 
                 <AnimatePresence initial={false}>
@@ -779,11 +768,15 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                                     )}
 
                                     <div className={cn(
-                                        "px-5 py-3 text-sm shadow-sm relative group transition-all hover:shadow-md",
+                                        "px-4 py-3 text-sm shadow-sm relative group transition-all",
                                         isMe
-                                            ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl rounded-br-sm"
-                                            : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm"
-                                    )}>
+                                            ? "text-white rounded-2xl rounded-br-sm"
+                                            : "rounded-2xl rounded-bl-sm"
+                                    )}
+                                        style={isMe
+                                            ? { background: "linear-gradient(135deg, #0d7a72, #0d9488)", border: "1px solid rgba(13,148,136,0.4)" }
+                                            : { background: "rgba(15,23,42,0.9)", border: "1px solid rgba(30,41,59,0.9)", color: "#94a3b8" }
+                                        }>
                                         {msg.content.startsWith('🎤 Nota de Voz') ? (
                                             <AudioPlayer
                                                 durationText={msg.content.split('(')[1]?.replace(')', '') || '0:00'}
