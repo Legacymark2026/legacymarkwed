@@ -10,14 +10,13 @@ interface Activity {
     id: string; type: string; content: string; createdAt: Date;
     user?: { name: string | null; image: string | null };
 }
-
 interface Props { dealId: string; activities: Activity[]; }
 
-const TYPE_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string; bg: string }> = {
-    NOTE: { icon: <FileText className="w-3.5 h-3.5" />, label: "Nota", color: "text-slate-600", bg: "bg-slate-100" },
-    CALL: { icon: <Phone className="w-3.5 h-3.5" />, label: "Llamada", color: "text-teal-600", bg: "bg-teal-50" },
-    EMAIL: { icon: <Mail className="w-3.5 h-3.5" />, label: "Email", color: "text-sky-600", bg: "bg-sky-50" },
-    MEETING: { icon: <Users className="w-3.5 h-3.5" />, label: "Reunión", color: "text-violet-600", bg: "bg-violet-50" },
+const TYPE_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string; border: string; bg: string }> = {
+    NOTE: { icon: <FileText style={{ width: "13px", height: "13px" }} />, label: "Nota", color: "#94a3b8", border: "rgba(148,163,184,0.3)", bg: "rgba(148,163,184,0.1)" },
+    CALL: { icon: <Phone style={{ width: "13px", height: "13px" }} />, label: "Llamada", color: "#2dd4bf", border: "rgba(45,212,191,0.3)", bg: "rgba(45,212,191,0.1)" },
+    EMAIL: { icon: <Mail style={{ width: "13px", height: "13px" }} />, label: "Email", color: "#38bdf8", border: "rgba(56,189,248,0.3)", bg: "rgba(56,189,248,0.1)" },
+    MEETING: { icon: <Users style={{ width: "13px", height: "13px" }} />, label: "Reunión", color: "#a78bfa", border: "rgba(167,139,250,0.3)", bg: "rgba(167,139,250,0.1)" },
 };
 
 export function DealActivityTimeline({ dealId, activities: initial }: Props) {
@@ -37,50 +36,60 @@ export function DealActivityTimeline({ dealId, activities: initial }: Props) {
         setLoading(false);
     };
 
+    const cfg_curr = TYPE_CONFIG[type] ?? TYPE_CONFIG["NOTE"];
+
     return (
-        <div className="space-y-5">
-            {/* Add activity */}
-            <div className="rounded-2xl border border-slate-100 bg-white p-5">
-                <div className="flex gap-2 mb-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+            {/* Add activity panel */}
+            <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "14px", padding: "16px" }}>
+                <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
                     {Object.entries(TYPE_CONFIG).map(([k, v]) => (
-                        <button key={k} onClick={() => setType(k)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${type === k ? `${v.bg} ${v.color} border-current` : "border-slate-200 text-slate-500 hover:border-slate-300"}`}>
+                        <button key={k} onClick={() => setType(k)}
+                            style={{
+                                display: "flex", alignItems: "center", gap: "5px",
+                                padding: "5px 12px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, fontFamily: "monospace",
+                                border: `1px solid ${type === k ? v.border : "rgba(30,41,59,0.7)"}`,
+                                background: type === k ? v.bg : "transparent",
+                                color: type === k ? v.color : "#475569",
+                                cursor: "pointer", transition: "all 0.15s",
+                            }}>
                             {v.icon} {v.label}
                         </button>
                     ))}
                 </div>
-                <textarea
-                    value={content} onChange={(e) => setContent(e.target.value)}
-                    placeholder={`Añadir ${TYPE_CONFIG[type]?.label.toLowerCase()}...`}
-                    rows={3}
-                    className="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
-                />
-                <div className="flex justify-end mt-2">
-                    <button onClick={handleAdd} disabled={loading || !content.trim()} className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-bold rounded-xl disabled:opacity-40 hover:bg-teal-700 transition-colors">
-                        <Plus className="w-4 h-4" /> {loading ? "Guardando…" : "Añadir"}
+                <textarea value={content} onChange={(e) => setContent(e.target.value)}
+                    placeholder={`Añadir ${cfg_curr.label.toLowerCase()}...`} rows={3}
+                    style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "#cbd5e1", outline: "none", resize: "none" }} />
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+                    <button onClick={handleAdd} disabled={loading || !content.trim()}
+                        style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", background: "linear-gradient(135deg,#0d9488,#0f766e)", color: "#fff", fontSize: "12px", fontWeight: 800, borderRadius: "10px", border: "none", cursor: "pointer", opacity: (loading || !content.trim()) ? 0.4 : 1 }}>
+                        <Plus style={{ width: "13px", height: "13px" }} /> {loading ? "Guardando…" : "Añadir"}
                     </button>
                 </div>
             </div>
 
             {/* Timeline */}
-            <div className="relative space-y-4">
-                <div className="absolute left-5 top-0 bottom-0 w-px bg-slate-100" aria-hidden />
-                {activities.length === 0 && <p className="text-sm text-slate-400 text-center py-8">No hay actividades registradas.</p>}
+            <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ position: "absolute", left: "19px", top: 0, bottom: 0, width: "1px", background: "rgba(30,41,59,0.8)" }} aria-hidden />
+                {activities.length === 0 && (
+                    <p style={{ fontSize: "12px", color: "#334155", textAlign: "center", padding: "32px 0", fontFamily: "monospace" }}>— Sin actividades registradas —</p>
+                )}
                 {activities.map((a) => {
-                    const cfg = TYPE_CONFIG[a.type] ?? TYPE_CONFIG["NOTE"];
+                    const c = TYPE_CONFIG[a.type] ?? TYPE_CONFIG["NOTE"];
                     return (
-                        <div key={a.id} className="flex gap-4 relative">
-                            <div className={`relative z-10 w-10 h-10 rounded-full ${cfg.bg} ${cfg.color} flex items-center justify-center flex-shrink-0 border border-white shadow-sm`}>
-                                {cfg.icon}
+                        <div key={a.id} style={{ display: "flex", gap: "14px", position: "relative" }}>
+                            <div style={{ position: "relative", zIndex: 10, width: "38px", height: "38px", borderRadius: "50%", background: c.bg, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: c.color }}>
+                                {c.icon}
                             </div>
-                            <div className="flex-1 min-w-0 bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className={`text-xs font-bold uppercase tracking-wider ${cfg.color}`}>{cfg.label}</span>
-                                    <span className="text-xs text-slate-400">
+                            <div style={{ flex: 1, background: "rgba(11,15,25,0.6)", border: "1px solid rgba(30,41,59,0.7)", borderRadius: "12px", padding: "12px 14px" }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                                    <span style={{ fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: c.color, fontFamily: "monospace" }}>{c.label}</span>
+                                    <span style={{ fontSize: "11px", color: "#334155", fontFamily: "monospace" }}>
                                         {formatDistanceToNow(new Date(a.createdAt), { addSuffix: true, locale: es })}
                                     </span>
                                 </div>
-                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{a.content}</p>
-                                {a.user?.name && <p className="text-xs text-slate-400 mt-2">— {a.user.name}</p>}
+                                <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: 1.6, whiteSpace: "pre-wrap", margin: 0 }}>{a.content}</p>
+                                {a.user?.name && <p style={{ fontSize: "11px", color: "#334155", marginTop: "8px", fontFamily: "monospace" }}>— {a.user.name}</p>}
                             </div>
                         </div>
                     );

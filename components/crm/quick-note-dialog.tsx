@@ -7,12 +7,7 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { createDealActivity } from "@/actions/crm";
 
-interface Props {
-    companyId: string;
-    dealId?: string;
-    trigger?: React.ReactNode;
-    onSuccess?: () => void;
-}
+interface Props { companyId: string; dealId?: string; trigger?: React.ReactNode; onSuccess?: () => void; }
 
 export function QuickNoteDialog({ companyId, dealId, trigger, onSuccess }: Props) {
     const router = useRouter();
@@ -24,95 +19,53 @@ export function QuickNoteDialog({ companyId, dealId, trigger, onSuccess }: Props
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!note.trim()) return;
-        setLoading(true);
-        setError("");
+        setLoading(true); setError("");
         try {
             if (dealId) {
                 const result = await createDealActivity(dealId, "NOTE", `📝 ${note}`);
-                if ("error" in result) {
-                    setError(result.error ?? "Error al guardar nota");
-                    return;
-                }
+                if ("error" in result) { setError(result.error ?? "Error al guardar nota"); return; }
             }
-
-            toast.success("✅ Nota guardada correctamente");
-            setNote("");
-            setOpen(false);
-            onSuccess?.();
-            router.refresh();
-        } catch {
-            setError("Error inesperado. Intenta de nuevo.");
-        } finally {
-            setLoading(false);
-        }
+            toast.success("✅ Nota guardada");
+            setNote(""); setOpen(false); onSuccess?.(); router.refresh();
+        } catch { setError("Error inesperado."); } finally { setLoading(false); }
     };
 
     const dialogContent = open && (
-        <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 overflow-y-auto"
-            onClick={(e) => e.target === e.currentTarget && !loading && setOpen(false)}
-        >
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md my-auto">
-                {/* Header */}
-                <div className="px-8 pt-8 pb-4 border-b border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white flex-shrink-0">
-                            <MessageSquare className="w-5 h-5" />
+        <div style={{ position: "fixed", inset: 0, zIndex: 99999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)" }}
+            onClick={(e) => e.target === e.currentTarget && !loading && setOpen(false)}>
+            <div style={{ background: "rgba(11,15,25,0.98)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "20px", boxShadow: "0 25px 80px rgba(0,0,0,0.6)", width: "100%", maxWidth: "440px" }}>
+                <div style={{ padding: "22px 26px 16px", borderBottom: "1px solid rgba(30,41,59,0.8)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{ width: "38px", height: "38px", borderRadius: "11px", background: "linear-gradient(135deg,#d97706,#ea580c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <MessageSquare style={{ width: "16px", height: "16px", color: "#fff" }} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-black text-slate-900">Nota Rápida</h2>
-                            <p className="text-xs text-slate-400">Añade un comentario o recordatorio</p>
+                            <h2 style={{ fontSize: "16px", fontWeight: 900, color: "#f1f5f9", margin: 0 }}>Nota Rápida</h2>
+                            <p style={{ fontSize: "11px", color: "#475569", margin: 0, fontFamily: "monospace" }}>Añade un comentario o recordatorio</p>
                         </div>
                     </div>
-                    <button
-                        onClick={() => setOpen(false)}
-                        disabled={loading}
-                        className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-40"
-                    >
-                        <X className="w-5 h-5" />
+                    <button onClick={() => setOpen(false)} disabled={loading}
+                        style={{ padding: "6px", borderRadius: "8px", color: "#475569", background: "none", border: "none", cursor: "pointer", display: "flex" }}>
+                        <X style={{ width: "16px", height: "16px" }} />
                     </button>
                 </div>
-
-                <form onSubmit={handleSubmit} className="px-8 pb-8 pt-5 space-y-4">
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-600">
-                            Nota <span className="text-red-400">*</span>
+                <form onSubmit={handleSubmit} style={{ padding: "18px 26px 24px", display: "flex", flexDirection: "column", gap: "14px" }}>
+                    <div>
+                        <label style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", display: "block", marginBottom: "6px", fontFamily: "monospace" }}>
+                            Nota <span style={{ color: "#f87171" }}>*</span>
                         </label>
-                        <textarea
-                            required
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            rows={5}
+                        <textarea required value={note} onChange={(e) => setNote(e.target.value)} rows={5}
                             placeholder="Escribe un recordatorio, observación o nota interna..."
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
-                            autoFocus
-                        />
+                            style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "#cbd5e1", width: "100%", outline: "none", resize: "none" }}
+                            autoFocus />
                     </div>
-
-                    {!dealId && (
-                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700">
-                            💡 Para asociar la nota a un Deal, ábrela desde el perfil del deal.
-                        </div>
-                    )}
-
-                    {error && (
-                        <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">{error}</div>
-                    )}
-
-                    <div className="flex gap-3 pt-1">
-                        <button
-                            type="button"
-                            onClick={() => setOpen(false)}
-                            disabled={loading}
-                            className="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors disabled:opacity-40"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading || !note.trim()}
-                            className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-sm hover:from-amber-500 hover:to-orange-600 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-amber-200 disabled:opacity-50"
-                        >
+                    {!dealId && <div style={{ padding: "10px 12px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: "10px", fontSize: "11px", color: "#fcd34d" }}>💡 Ábrela desde el perfil del deal para asociarla.</div>}
+                    {error && <div style={{ padding: "10px 12px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: "10px", fontSize: "12px", color: "#f87171" }}>{error}</div>}
+                    <div style={{ display: "flex", gap: "10px" }}>
+                        <button type="button" onClick={() => setOpen(false)} disabled={loading}
+                            style={{ flex: 1, padding: "10px", borderRadius: "10px", border: "1px solid rgba(30,41,59,0.9)", background: "transparent", color: "#64748b", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}>Cancelar</button>
+                        <button type="submit" disabled={loading || !note.trim()}
+                            style={{ flex: 1, padding: "10px", borderRadius: "10px", background: "linear-gradient(135deg,#d97706,#ea580c)", color: "#fff", fontWeight: 800, fontSize: "13px", border: "none", cursor: "pointer", opacity: (loading || !note.trim()) ? 0.5 : 1 }}>
                             {loading ? "Guardando…" : "Guardar Nota ✓"}
                         </button>
                     </div>
@@ -125,15 +78,12 @@ export function QuickNoteDialog({ companyId, dealId, trigger, onSuccess }: Props
         <>
             <div onClick={() => setOpen(true)}>
                 {trigger ?? (
-                    <button className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 transition-colors">
-                        <MessageSquare className="w-4 h-4" />
-                        Nota
+                    <button style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: "linear-gradient(135deg,#d97706,#ea580c)", color: "#fff", fontSize: "12px", fontWeight: 800, borderRadius: "10px", border: "none", cursor: "pointer" }}>
+                        <MessageSquare style={{ width: "13px", height: "13px" }} /> Nota
                     </button>
                 )}
             </div>
-            {typeof window !== "undefined" && dialogContent
-                ? createPortal(dialogContent, document.body)
-                : null}
+            {typeof window !== "undefined" && dialogContent ? createPortal(dialogContent, document.body) : null}
         </>
     );
 }
