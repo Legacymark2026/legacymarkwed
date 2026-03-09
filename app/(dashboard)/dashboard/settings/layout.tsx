@@ -7,13 +7,13 @@ export default function SettingsLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-slate-50/50">
+        <div className="ds-page">
             <TrackPageEvent eventName="ViewSettings" isCustom={true} />
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
                 <div className="hidden lg:block mb-8">
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900">Configuración</h1>
-                    <p className="text-slate-500 mt-2 font-medium">Gestiona tu perfil, preferencias del sistema e integraciones empresariales.</p>
+                    <h1 className="ds-heading-page">Configuración</h1>
+                    <p className="ds-subtext mt-2">Gestiona tu perfil, preferencias del sistema e integraciones empresariales.</p>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
