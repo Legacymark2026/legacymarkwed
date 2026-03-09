@@ -87,13 +87,14 @@ function canAccess(role: string, pathname: string): boolean {
     if (r === 'SUPER_ADMIN') return true;
     if (r === 'GUEST') return false;
 
-    // Custom roles — mismo algoritmo que lib/rbac.ts
+    // Custom roles — mismo algoritmo corregido que lib/rbac.ts
     if (CUSTOM_ROLE_PERMISSIONS[rLower]) {
         const allowedRoutes = CUSTOM_ROLE_PERMISSIONS[rLower];
         for (const allowed of allowedRoutes) {
             if (pathname === allowed) return true;
-            // Solo hijos directos: /dashboard/inbox/123 sí, pero NO /dashboard/users
-            if (pathname.startsWith(allowed + '/')) return true;
+            // CRÍTICO: excluir /dashboard del prefix match
+            // /dashboard + '/' es prefijo de TODAS las rutas → daría acceso total
+            if (allowed !== '/dashboard' && pathname.startsWith(allowed + '/')) return true;
         }
         return false;
     }

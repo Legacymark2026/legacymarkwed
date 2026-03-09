@@ -168,11 +168,12 @@ export function canAccessRoute(pathname: string, role: UserRole | string, permis
         const allowedRoutes = CUSTOM_ROLE_PERMISSIONS[roleLower];
 
         for (const allowed of allowedRoutes) {
-            // Exact match
+            // Exact match siempre funciona
             if (pathname === allowed) return true;
-            // Prefix match con separador: /dashboard/inbox da acceso a /dashboard/inbox/algo
-            // pero NO a /dashboard/users (rutas hermanas)
-            if (pathname.startsWith(allowed + '/')) return true;
+            // Prefix match SOLO para rutas con sub-paths reales
+            // EXCLUIR /dashboard del prefix match porque /dashboard/ es prefijo
+            // de ABSOLUTAMENTE TODAS las rutas del dashboard
+            if (allowed !== '/dashboard' && pathname.startsWith(allowed + '/')) return true;
         }
         return false;
     }
