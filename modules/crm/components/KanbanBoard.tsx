@@ -46,55 +46,66 @@ function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, st
     return (
         <div
             ref={setNodeRef}
-            className={`min-w-[320px] w-[320px] shrink-0 flex flex-col rounded-[24px] border transition-all duration-500 ease-out overlay-gradient relative overflow-hidden group/stage ${isOver ? 'ring-2 ring-blue-500/50 bg-blue-50/90 shadow-[inset_0_4px_20px_rgba(59,130,246,0.1)] scale-[1.01]' :
-                isBottleneck ? 'border-red-200/60 bg-red-50/40 shadow-sm' :
-                    'border-slate-200/50 bg-slate-50/40 hover:bg-slate-50/60 shadow-sm'
-                }`}
+            style={{
+                minWidth: "300px", width: "300px", flexShrink: 0,
+                display: "flex", flexDirection: "column",
+                borderRadius: "16px",
+                border: isOver ? "1px solid rgba(56,189,248,0.5)" : isBottleneck ? "1px solid rgba(248,113,113,0.3)" : "1px solid rgba(30,41,59,0.8)",
+                background: isOver ? "rgba(56,189,248,0.06)" : isBottleneck ? "rgba(248,113,113,0.04)" : "rgba(11,15,25,0.6)",
+                transition: "all 0.3s",
+                overflow: "hidden",
+                transform: isOver ? "scale(1.01)" : undefined,
+                boxShadow: isOver ? "0 0 24px rgba(56,189,248,0.15)" : undefined,
+                position: "relative",
+            }}
         >
-            <div className={`p-4 border-b border-slate-200/40 bg-white/70 backdrop-blur-xl rounded-t-[24px] z-10 sticky top-0 transition-colors ${isBottleneck ? 'bg-red-50/90 border-red-200/50' : ''}`}>
-                <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-2.5">
-                        <div className={`w-2.5 h-2.5 rounded-full ${stage.color.replace('bg-', 'bg-').replace('border-', 'bg-')} shadow-[0_0_10px_rgba(0,0,0,0.1)] ring-2 ring-white`} />
-                        <h3 className="font-bold text-sm text-slate-800 tracking-tight uppercase">{stage.label}</h3>
+            <div style={{
+                padding: "14px 16px",
+                borderBottom: "1px solid rgba(30,41,59,0.9)",
+                background: "rgba(15,20,35,0.85)",
+                backdropFilter: "blur(10px)",
+                position: "sticky", top: 0, zIndex: 10,
+            }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: stage.accent || "#2dd4bf", boxShadow: `0 0 8px ${stage.accent || "#2dd4bf"}` }} />
+                        <h3 style={{ fontWeight: 800, fontSize: "11px", color: "#94a3b8", letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "monospace", margin: 0 }}>{stage.label}</h3>
                         {isBottleneck && (
-                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-[10px] text-red-600 ring-1 ring-red-300 animate-pulse" title="Alerta: Acumulación (+2) de deals estancados">
+                            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "18px", height: "18px", borderRadius: "50%", background: "rgba(248,113,113,0.15)", fontSize: "10px" }} title="Alerta: +2 deals estancados">
                                 ⚠️
                             </span>
                         )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         {onQuickAdd && (
-                            <button
-                                onClick={onQuickAdd}
-                                className="text-slate-400 hover:text-blue-600 hover:bg-blue-50/80 rounded-lg p-1.5 transition-all active:scale-95 duration-200"
-                                title="Añadir Deal Rápido"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button onClick={onQuickAdd}
+                                style={{ padding: "4px", borderRadius: "6px", background: "rgba(30,41,59,0.7)", border: "none", color: "#475569", cursor: "pointer", display: "flex" }}
+                                title="Añadir Deal Rápido">
+                                <svg style={{ width: "12px", height: "12px" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                                 </svg>
                             </button>
                         )}
-                        <Badge variant="outline" className="bg-white/80 text-[11px] font-mono text-slate-600 border-slate-200 shadow-sm font-semibold tracking-tight">
+                        <span style={{ padding: "2px 8px", fontSize: "10px", fontWeight: 800, fontFamily: "monospace", borderRadius: "99px", color: "#2dd4bf", background: "rgba(13,148,136,0.1)", border: "1px solid rgba(13,148,136,0.25)" }}>
                             ${(totalValue / 1000).toFixed(1)}k
-                        </Badge>
+                        </span>
                     </div>
                 </div>
 
-                {/* Advanced Stage Metrics (Fase 1) */}
-                <div className="flex justify-between items-center text-[10.5px] text-slate-500 font-medium tracking-wide">
-                    <div className="flex gap-3">
-                        <span className="flex items-center gap-1.5 opacity-80">
-                            <Rows className="w-3.5 h-3.5" /> {dealCount}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "10px", color: "#334155", fontFamily: "monospace" }}>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                            <Rows style={{ width: "10px", height: "10px" }} /> {dealCount}
                         </span>
                         {avgDaysInStage !== undefined && avgDaysInStage > 0 && (
-                            <span className="text-indigo-600/90 flex items-center gap-1.5 bg-indigo-50/50 px-1.5 rounded-md" title="Promedio de días en etapa">
+                            <span style={{ color: "#818cf8", display: "flex", alignItems: "center", gap: "4px", background: "rgba(99,102,241,0.1)", padding: "1px 6px", borderRadius: "4px" }} title="Promedio de días en etapa">
                                 ⏱️ ~{avgDaysInStage}d
                             </span>
                         )}
                     </div>
-                    <div className="flex gap-2">
+                    <div>
                         {(stagnantCount || 0) > 0 && (
-                            <span className="text-amber-700 bg-amber-100/60 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm border border-amber-200/50 font-semibold animate-pulse">
+                            <span style={{ color: "#f59e0b", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", padding: "2px 8px", borderRadius: "6px", fontWeight: 800 }}>
                                 ⏳ {stagnantCount} estancados
                             </span>
                         )}
@@ -102,18 +113,14 @@ function DroppableStage({ stage, children, totalValue, dealCount, onQuickAdd, st
                 </div>
             </div>
 
-            {/* Scrollbars ocultas en Y */}
             <div className="flex-1 p-3 overflow-y-auto min-h-0 relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {/* Subtle Background Pattern */}
-                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] pointer-events-none mix-blend-multiply group-hover/stage:opacity-[0.05] transition-opacity duration-500" />
-
                 <div className="space-y-3 min-h-[150px] relative z-10 pb-4">
                     {dealCount === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-32 text-slate-400/70 border-2 border-dashed border-slate-200/60 rounded-xl m-2 bg-white/30 backdrop-blur-sm transition-colors group-hover/stage:border-blue-200/50 group-hover/stage:bg-blue-50/20">
-                            <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "128px", border: "2px dashed rgba(30,41,59,0.8)", borderRadius: "12px", margin: "6px", color: "#334155" }}>
+                            <svg style={{ width: "28px", height: "28px", marginBottom: "8px", opacity: 0.5 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                             </svg>
-                            <span className="text-[11px] font-semibold tracking-wider uppercase">Soltar Aquí</span>
+                            <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "monospace" }}>Soltar Aquí</span>
                         </div>
                     ) : children}
                 </div>
@@ -388,66 +395,33 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
 
     return (
         <div className="flex flex-col h-full space-y-5">
-            {/* Phase 15 & Fase 1: Pipeline Intelligence Dashboard (Premium Glassmorphism) */}
+            {/* KPI Metrics */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500" />
-                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                        Total Pipeline
-                        <span className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                {[
+                    { label: "Tubería Total", value: `$${(totalPipeline / 1000).toFixed(1)}`, unit: "mil", color: "#60a5fa", icon: "$", code: "PPL" },
+                    { label: "Pronóstico Ponderado", value: `$${(weightedForecast / 1000).toFixed(1)}`, unit: "mil", color: "#34d399", icon: "📊", code: "WGT" },
+                    { label: "Tasa de Victorias", value: `${winRate}`, unit: "%", color: "#a78bfa", icon: "🏆", code: "WIN" },
+                    { label: "Ofertas Activas", value: `${deals.filter(d => d.stage !== 'WON' && d.stage !== 'LOST').length}`, unit: "", color: "#fbbf24", icon: "📋", code: "ACT" },
+                ].map((m, i) => (
+                    <div key={i} style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "14px", padding: "14px 16px", position: "relative", overflow: "hidden" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <p style={{ fontSize: "9px", fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "monospace", margin: 0 }}>{m.label}</p>
+                            <span style={{ fontSize: "14px" }}>{m.icon}</span>
+                        </div>
+                        <p style={{ fontSize: "28px", fontWeight: 900, color: m.color, fontFamily: "monospace", lineHeight: 1, marginTop: "8px" }}>
+                            {m.value}<span style={{ fontSize: "14px", color: "#475569" }}>{m.unit}</span>
+                        </p>
                     </div>
-                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                        ${(totalPipeline / 1000).toFixed(1)}<span className="text-lg text-slate-400">k</span>
-                    </div>
-                </div>
-
-                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500" />
-                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                        Forecast Ponderado
-                        <span className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
-                    </div>
-                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                        ${(weightedForecast / 1000).toFixed(1)}<span className="text-lg text-slate-400">k</span>
-                    </div>
-                </div>
-
-                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all duration-500" />
-                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                        Win Rate
-                        <span className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-500"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></span>
-                    </div>
-                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                        {winRate}<span className="text-xl text-slate-400">%</span>
-                    </div>
-                </div>
-
-                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-4 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500" />
-                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1 flex items-center justify-between">
-                        Active Deals
-                        <span className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><Rows className="w-3.5 h-3.5" /></span>
-                    </div>
-                    <div className="text-3xl font-extrabold text-slate-800 font-mono tracking-tighter">
-                        {deals.filter(d => d.stage !== 'WON' && d.stage !== 'LOST').length}
-                    </div>
-                </div>
+                ))}
 
                 {/* Funnel Visual */}
-                <div className="col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[20px] p-3 shadow-sm flex flex-col justify-end relative h-full">
-                    <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 absolute top-4 left-4">Conversion Funnel</div>
-                    <div className="flex items-end gap-1.5 h-12 mt-6">
+                <div style={{ background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "14px", padding: "14px", display: "flex", flexDirection: "column", justifyContent: "flex-end", position: "relative", minHeight: "90px" }}>
+                    <div style={{ fontSize: "8px", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.12em", color: "#334155", position: "absolute", top: "12px", left: "14px", fontFamily: "monospace" }}>Embudo de Conversión</div>
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: "44px", marginTop: "20px" }}>
                         {funnelData.map((stage, i) => (
-                            <div
-                                key={stage.name}
-                                className="flex-1 rounded-t-sm transition-all duration-700 hover:opacity-100 opacity-80 group/bar relative"
-                                style={{
-                                    height: `${Math.max((stage.count / maxFunnelCount) * 100, 15)}%`,
-                                    background: `linear-gradient(to top, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, ${0.4 + (i * 0.1)}))`
-                                }}
-                            >
-                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-600 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-white px-1 shadow-sm rounded">
+                            <div key={stage.name} className="flex-1 rounded-t-sm transition-all duration-700 hover:opacity-100 opacity-80 group/bar relative"
+                                style={{ height: `${Math.max((stage.count / maxFunnelCount) * 100, 15)}%`, background: `linear-gradient(to top, rgba(13,148,136,0.5), rgba(45,212,191,${0.3 + i * 0.08}))` }}>
+                                <div style={{ position: "absolute", top: "-18px", left: "50%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 800, color: "#2dd4bf", background: "rgba(11,15,25,0.9)", padding: "1px 4px", borderRadius: "4px", opacity: 0, fontFamily: "monospace" }} className="group-hover/bar:opacity-100 transition-opacity">
                                     {stage.count}
                                 </div>
                             </div>
@@ -457,22 +431,22 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
             </div>
 
             {/* Toolbar Principal */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-2 bg-white/50 backdrop-blur-md border border-slate-200/50 rounded-2xl">
-                <div className="relative w-full sm:max-w-md group">
-                    <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    <Input
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "10px", padding: "10px 12px", background: "rgba(11,15,25,0.7)", border: "1px solid rgba(30,41,59,0.8)", borderRadius: "12px" }}>
+                <div style={{ position: "relative", flex: 1, minWidth: "220px", maxWidth: "380px" }}>
+                    <Search style={{ position: "absolute", left: "10px", top: "9px", width: "13px", height: "13px", color: "#475569" }} />
+                    <input
                         placeholder="Buscar deals, clientes, emails..."
-                        className="pl-10 lg:w-[400px] h-10 bg-white/80 border-slate-200/60 focus-visible:ring-blue-500/30 focus-visible:border-blue-500 rounded-xl shadow-sm transition-all text-sm"
+                        style={{ width: "100%", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "9px", padding: "8px 12px 8px 30px", fontSize: "12px", color: "#cbd5e1", outline: "none" }}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <div className="flex items-center bg-white/80 border border-slate-200/60 rounded-xl shadow-sm p-1">
-                        <ArrowUpDown className="w-4 h-4 text-slate-400 mx-2" />
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "center", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "4px 8px", gap: "5px" }}>
+                        <ArrowUpDown style={{ width: "12px", height: "12px", color: "#475569" }} />
                         <select
-                            className="text-sm bg-transparent border-none focus:ring-0 text-slate-600 font-medium cursor-pointer pl-0 py-1.5 outline-none appearance-none"
+                            style={{ fontSize: "11px", background: "transparent", border: "none", color: "#94a3b8", fontFamily: "monospace", outline: "none", cursor: "pointer" }}
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as "date" | "value")}
                         >
@@ -481,10 +455,10 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
                         </select>
                     </div>
 
-                    <div className="flex items-center bg-white/80 border border-slate-200/60 rounded-xl shadow-sm p-1">
-                        <Filter className="w-4 h-4 text-slate-400 mx-2" />
+                    <div style={{ display: "flex", alignItems: "center", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "8px", padding: "4px 8px", gap: "5px" }}>
+                        <Filter style={{ width: "12px", height: "12px", color: "#475569" }} />
                         <select
-                            className="text-sm bg-transparent border-none focus:ring-0 text-slate-600 font-medium cursor-pointer pl-0 py-1.5 outline-none appearance-none"
+                            style={{ fontSize: "11px", background: "transparent", border: "none", color: "#94a3b8", fontFamily: "monospace", outline: "none", cursor: "pointer" }}
                             value={priorityFilter}
                             onChange={(e) => setPriorityFilter(e.target.value)}
                         >
@@ -495,36 +469,25 @@ export function KanbanBoard({ initialDeals }: { initialDeals: any[] }) {
                         </select>
                     </div>
 
-                    {/* Batch 3: Compact Mode Toggle */}
-                    <button
-                        onClick={() => setCompactMode(!compactMode)}
-                        className={`p-2.5 rounded-xl border border-transparent transition-all shadow-sm ${compactMode ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-white/80 border-slate-200/60 text-slate-500 hover:bg-white hover:text-slate-800'}`}
-                        title={compactMode ? 'Vista Extendida' : 'Vista Compacta'}
-                    >
-                        <Rows className="w-4 h-4" />
+                    <button onClick={() => setCompactMode(!compactMode)}
+                        style={{ padding: "7px", borderRadius: "8px", border: `1px solid ${compactMode ? "rgba(99,102,241,0.4)" : "rgba(30,41,59,0.9)"}`, background: compactMode ? "rgba(99,102,241,0.12)" : "rgba(15,23,42,0.8)", color: compactMode ? "#818cf8" : "#475569", cursor: "pointer", display: "flex" }}
+                        title={compactMode ? 'Vista Extendida' : 'Vista Compacta'}>
+                        <Rows style={{ width: "13px", height: "13px" }} />
                     </button>
 
-                    {/* Fase 2: Bulk Actions Mode Toggle */}
-                    <button
-                        onClick={toggleBulkMode}
-                        className={`p-2.5 rounded-xl border border-transparent transition-all shadow-sm ${isBulkMode ? 'bg-blue-600 border-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-white/80 border-slate-200/60 text-slate-500 hover:bg-white hover:text-slate-800'}`}
-                        title="Selección Múltiple"
-                    >
-                        <CheckSquare className="w-4 h-4" />
+                    <button onClick={toggleBulkMode}
+                        style={{ padding: "7px", borderRadius: "8px", border: `1px solid ${isBulkMode ? "rgba(99,102,241,0.5)" : "rgba(30,41,59,0.9)"}`, background: isBulkMode ? "rgba(99,102,241,0.2)" : "rgba(15,23,42,0.8)", color: isBulkMode ? "#818cf8" : "#475569", cursor: "pointer", display: "flex", boxShadow: isBulkMode ? "0 0 12px rgba(99,102,241,0.3)" : undefined }}
+                        title="Selección Múltiple">
+                        <CheckSquare style={{ width: "13px", height: "13px" }} />
                     </button>
 
-                    {/* Fase 2: Bulk Actions Controls */}
                     {isBulkMode && selectedDealIds.length > 0 && (
-                        <div className="flex items-center gap-2 bg-blue-50/90 border border-blue-200/60 rounded-xl shadow-sm p-1 animate-in slide-in-from-right-2">
-                            <span className="text-xs font-bold text-blue-700 px-2">{selectedDealIds.length} seleccionados</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: "9px", padding: "4px 8px" }}>
+                            <span style={{ fontSize: "11px", fontWeight: 800, color: "#818cf8", fontFamily: "monospace" }}>{selectedDealIds.length} sel.</span>
                             <select
-                                className="text-xs bg-white border border-blue-200 rounded-lg focus:ring-blue-500 text-slate-700 font-medium cursor-pointer px-2 py-1.5 outline-none"
-                                onChange={(e) => {
-                                    if (e.target.value) handleBulkMove(e.target.value);
-                                    e.target.value = ''; // reset
-                                }}
-                                defaultValue=""
-                            >
+                                style={{ fontSize: "11px", background: "rgba(15,23,42,0.8)", border: "1px solid rgba(30,41,59,0.9)", borderRadius: "6px", color: "#94a3b8", fontFamily: "monospace", outline: "none", cursor: "pointer", padding: "3px 6px" }}
+                                onChange={(e) => { if (e.target.value) handleBulkMove(e.target.value); e.target.value = ''; }}
+                                defaultValue="">
                                 <option value="" disabled>Mover a...</option>
                                 {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
                             </select>
