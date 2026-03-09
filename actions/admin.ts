@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/types/auth";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { PERMISSION_ROUTE_MAP } from "@/lib/rbac";
+import { invalidateRoleCache } from "@/lib/role-config";
 
 // Verifica acceso de admin y retorna la sesión
 async function checkAdmin(): Promise<{ error: string } | null> {
@@ -529,6 +531,29 @@ export async function saveCustomRoles(customRoles: any[]) {
                     data: { permissions: matchedCustomRole.permissions || [] }
                 });
             }
+        }
+
+        // ── UNIFICACIÓN: Sincronizar con RoleConfig (rutas) ──
+        for (const role of customRoles) {
+            const roleId = role.id.toLowerCase();
+            const perms = (role.permissions || []) as string[];
+            const allowedRoutes = new Set<string>();
+
+            // Convertir permisos granulares a rutas usando el mapa unificado
+            if (perms.length > 0) allowedRoutes.add("/dashboard");
+            for (const mapItem of PERMISSION_ROUTE_MAP) {
+                if (perms.includes(mapItem.perm)) {
+                    mapItem.routes.forEach(r => allowedRoutes.add(r));
+                }
+            }
+
+            // Sync con la tabla que usa NextAuth JWT
+            await prisma.roleConfig.upsert({
+                where: { roleName: roleId },
+                update: { allowedRoutes: Array.from(allowedRoutes), isActive: true },
+                create: { roleName: roleId, allowedRoutes: Array.from(allowedRoutes), isActive: true, description: role.name },
+            });
+            invalidateRoleCache(roleId);
         }
 
         revalidatePath("/dashboard", "layout");
