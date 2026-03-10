@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-
 import { prisma } from '@/lib/prisma';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy getter — avoids Resend constructor running at module level during Next.js build
+function getResend() {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) throw new Error('RESEND_API_KEY not configured');
+    return new Resend(key);
+}
 
 export async function POST(req: NextRequest) {
     const session = await auth();
@@ -46,10 +50,11 @@ export async function POST(req: NextRequest) {
             for (let i = 0; i < recipients.length; i += CHUNK_SIZE) {
                 const chunk = recipients.slice(i, i + CHUNK_SIZE);
 
+                const resend = getResend();
                 const results = await Promise.allSettled(
                     chunk.map((r) => {
                         const vars = (r.variables as Record<string, string>) ?? {};
-                        const html = blast.htmlBody.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? r.name ?? '');
+                        const html = blast.htmlBody.replace(/\{\{(\w+)\}\}/g, (_: string, k: string) => vars[k] ?? r.name ?? '');
                         return resend.emails.send({
                             from: `${blast.fromName} <${blast.fromEmail}>`,
                             to: r.email,

@@ -5,7 +5,12 @@ import { auth } from '@/lib/auth';
 
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy getter — avoids running Resend() at module level during Next.js build
+function getResend() {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) throw new Error('RESEND_API_KEY not configured');
+    return new Resend(key);
+}
 
 export interface RecipientInput {
     email: string;
@@ -136,7 +141,7 @@ export async function sendEmailBlast(blastId: string) {
         try {
             // Resend free tier: send individually in parallel within chunk
             const results = await Promise.allSettled(
-                emails.map((e) => resend.emails.send({ from: e.from, to: e.to, subject: e.subject, html: e.html }))
+                emails.map((e) => getResend().emails.send({ from: e.from, to: e.to, subject: e.subject, html: e.html }))
             );
 
             for (let i = 0; i < results.length; i++) {
@@ -212,7 +217,7 @@ export async function deleteEmailBlast(blastId: string) {
 // ── Enviar email de prueba ────────────────────────────────────────────────
 
 export async function sendTestEmail(subject: string, html: string, toEmail: string) {
-    const result = await resend.emails.send({
+    const result = await getResend().emails.send({
         from: 'LegacyMark <noreply@legacymarksas.com>',
         to: toEmail,
         subject: `[PRUEBA] ${subject}`,
