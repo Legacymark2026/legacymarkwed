@@ -74,15 +74,33 @@ const DEFAULT_CONFIG: AdvancedConfig = {
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
 function parseCSV(text: string): { headers: string[]; rows: Recipient[] } {
-    const lines = text.trim().split(/\r?\n/);
+    // Strip UTF-8 BOM that Excel adds
+    const clean = text.replace(/^\uFEFF/, '').trim();
+    const lines = clean.split(/\r?\n/).filter(l => l.trim().length > 0);
     if (lines.length < 2) return { headers: [], rows: [] };
-    const headers = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
+
+    // Auto-detect separator: semicolon (Spanish Excel) or comma
+    const firstLine = lines[0];
+    const sep = firstLine.includes(';') ? ';' : ',';
+
+    const splitLine = (line: string) =>
+        line.split(sep).map((c) => c.trim().replace(/^"|"$/g, '').trim());
+
+    const headers = splitLine(firstLine);
     const rows: Recipient[] = [];
+
     for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
+        const cols = splitLine(lines[i]);
         const row: Recipient = { email: '' };
-        headers.forEach((h, idx) => { row[h.toLowerCase()] = cols[idx] ?? ''; });
-        if (row.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) rows.push(row);
+        headers.forEach((h, idx) => {
+            row[h.toLowerCase().trim()] = cols[idx] ?? '';
+        });
+        // Clean trailing commas/spaces from email
+        const emailVal = (row.email ?? '').replace(/[,;]+$/, '').trim();
+        row.email = emailVal;
+        if (emailVal && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            rows.push(row);
+        }
     }
     return { headers, rows };
 }
