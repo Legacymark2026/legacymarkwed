@@ -1252,3 +1252,45 @@ model ProjectToProjectTag {
   @@index([B], map: "_ProjectToProjectTag_B_index")
   @@map("_ProjectToProjectTag")
 }
+
+// ── Email Masivo ───────────────────────────────────────────────────────────
+
+model EmailBlast {
+  id              String               @id @default(uuid())
+  name            String
+  subject         String
+  htmlBody        String               @map("html_body")
+  fromName        String               @default("LegacyMark") @map("from_name")
+  fromEmail       String               @default("noreply@legacymarksas.com") @map("from_email")
+  status          String               @default("DRAFT")
+  totalRecipients Int                  @default(0) @map("total_recipients")
+  sent            Int                  @default(0)
+  failed          Int                  @default(0)
+  companyId       String               @map("company_id")
+  createdById     String               @map("created_by_id")
+  sentAt          DateTime?            @map("sent_at")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  recipients      EmailBlastRecipient[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("email_blasts")
+}
+
+model EmailBlastRecipient {
+  id           String     @id @default(uuid())
+  blastId      String     @map("blast_id")
+  email        String
+  name         String?
+  variables    Json?      @default("{}")
+  status       String     @default("PENDING")
+  errorMessage String?    @map("error_message")
+  sentAt       DateTime?  @map("sent_at")
+  blast        EmailBlast @relation(fields: [blastId], references: [id], onDelete: Cascade)
+
+  @@index([blastId])
+  @@index([status])
+  @@map("email_blast_recipients")
+}
+
