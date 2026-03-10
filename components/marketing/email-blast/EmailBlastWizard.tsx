@@ -497,7 +497,11 @@ export function EmailBlastWizard({ onDone }: { onDone: () => void }) {
                     if (data.type === 'done') { setProgress({ sent: data.sent, failed: data.failed, total: data.total, done: true }); toast.success(`Campaña enviada: ${data.sent} exitosos`); setTimeout(() => onDone(), 2000); }
                 }
             }
-        } catch (err) { toast.error('Error al enviar'); console.error(err); }
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error('[EmailBlast] Error al enviar:', msg);
+            toast.error(`Error: ${msg.slice(0, 120)}`);
+        }
         finally { setSending(false); }
     };
 
