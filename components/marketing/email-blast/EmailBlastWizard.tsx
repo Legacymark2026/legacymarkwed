@@ -470,6 +470,7 @@ export function EmailBlastWizard({ onDone }: { onDone: () => void }) {
         setSending(true);
         try {
             const finalHtml = buildFinalHtml(state.htmlBody, state.config);
+            // 1. Create blast record
             const blast = await createEmailBlast({
                 name: state.name || `Campaña ${state.config.mode} ${new Date().toLocaleDateString()}`,
                 subject: state.subject,
@@ -478,31 +479,34 @@ export function EmailBlastWizard({ onDone }: { onDone: () => void }) {
                 fromEmail: state.fromEmail,
                 recipients: state.recipients,
             });
-            setProgress({ sent: 0, failed: 0, total: blast.recipients.length, done: false });
-            const res = await fetch('/api/email-blast/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ blastId: blast.id }),
-            });
-            const reader = res.body?.getReader();
-            const decoder = new TextDecoder();
-            if (!reader) return;
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                for (const line of decoder.decode(value).split('\n')) {
-                    if (!line.startsWith('data: ')) continue;
-                    const data = JSON.parse(line.slice(6));
-                    if (data.type === 'progress') setProgress({ sent: data.sent, failed: data.failed, total: data.total, done: false });
-                    if (data.type === 'done') { setProgress({ sent: data.sent, failed: data.failed, total: data.total, done: true }); toast.success(`Campaña enviada: ${data.sent} exitosos`); setTimeout(() => onDone(), 2000); }
-                }
-            }
+
+            const total = blast.recipients.length;
+            setProgress({ sent: 0, failed: 0, total, done: false });
+
+            // 2. Call sendEmailBlast server action directly (avoids NGINX SSE issues)
+            const { sendEmailBlast } = await import('@/actions/email-blast');
+
+            // Show animated progress while waiting
+            let tick = 0;
+            const interval = setInterval(() => {
+                tick++;
+                const estimated = Math.min(Math.floor((tick / 20) * total), total - 1);
+                setProgress(p => p ? { ...p, sent: estimated } : p);
+            }, 500);
+
+            const result = await sendEmailBlast(blast.id);
+            clearInterval(interval);
+
+            setProgress({ sent: result.sent, failed: result.failed, total, done: true });
+            toast.success(`¡Campaña enviada! ${result.sent} exitosos${result.failed > 0 ? `, ${result.failed} fallidos` : ''}`);
+            setTimeout(() => onDone(), 2500);
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error('[EmailBlast] Error al enviar:', msg);
             toast.error(`Error: ${msg.slice(0, 120)}`);
+        } finally {
+            setSending(false);
         }
-        finally { setSending(false); }
     };
 
     const canNext = [
