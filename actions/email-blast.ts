@@ -152,49 +152,57 @@ export async function sendEmailBlast(blastId: string) {
         });
 
         try {
-            // Resend free tier: send individually in parallel within chunk
-            const results = await Promise.allSettled(
-                emails.map((e) => {
-                    console.log(`[EmailBlast] Iniciando envío a ${e.to} | De: ${e.from}`);
-                    return getResend().emails.send({ 
-                        from: e.from, 
-                        to: e.to, 
-                        subject: e.subject, 
-                        html: e.html,
-                        // headers: e.headers 
-                    });
-                })
-            );
-
-            for (let i = 0; i < results.length; i++) {
-                const result = results[i];
+            // Envío secuencial con retraso para respetar el límite gratuito de Resend (2/seg)
+            for (let i = 0; i < emails.length; i++) {
+                const e = emails[i];
                 const recipient = chunk[i];
-                if (result.status === 'fulfilled' && result.value.data?.id) {
-                    await prisma.emailBlastRecipient.update({
-                        where: { id: recipient.id },
-                        data: { status: 'SENT', sentAt: new Date() },
+
+                try {
+                    console.log(`[EmailBlast] Enviando (${i+1}/${emails.length}) a ${e.to} | De: ${e.from}`);
+                    const result = await getResend().emails.send({
+                        from: e.from,
+                        to: e.to,
+                        subject: e.subject,
+                        html: e.html,
+                        // headers: e.headers
                     });
-                    totalSent++;
-                } else {
-                    const errMsg = result.status === 'rejected' ? String(result.reason) : 'Error desconocido';
+
+                    if (result.data?.id) {
+                        await prisma.emailBlastRecipient.update({
+                            where: { id: recipient.id },
+                            data: { status: 'SENT', sentAt: new Date() },
+                        });
+                        totalSent++;
+                    } else if (result.error) {
+                        await prisma.emailBlastRecipient.update({
+                            where: { id: recipient.id },
+                            data: { status: 'FAILED', errorMessage: result.error.message || 'Error de la API de Resend' },
+                        });
+                        totalFailed++;
+                    }
+                } catch (err: any) {
                     await prisma.emailBlastRecipient.update({
                         where: { id: recipient.id },
-                        data: { status: 'FAILED', errorMessage: errMsg },
+                        data: { status: 'FAILED', errorMessage: err.message || String(err) },
                     });
                     totalFailed++;
                 }
+
+                // Pausa de 600ms para asegurar máximo 1.6 envíos por segundo
+                await new Promise((r) => setTimeout(r, 600));
             }
-        } catch (err) {
-            // Mark all in chunk as failed
+        } catch (err: any) {
+            // Failsafe general
             await prisma.emailBlastRecipient.updateMany({
                 where: { id: { in: chunk.map((r) => r.id) } },
-                data: { status: 'FAILED', errorMessage: String(err) },
+                data: { status: 'FAILED', errorMessage: 'Error crítico en el lote: ' + (err.message || String(err)) },
             });
             totalFailed += chunk.length;
         }
 
-        // Rate limit pause between chunks
-        await new Promise((r) => setTimeout(r, 300));
+        // Ya hemos pausado 600ms por correo, no necesitamos pausar 300ms tontos extra al final.
+        // Pero dejaremos un pequeño respiro si queremos:
+        await new Promise((r) => setTimeout(r, 500));
     }
 
     await prisma.emailBlast.update({
