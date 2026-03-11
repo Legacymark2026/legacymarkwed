@@ -78,6 +78,9 @@ async function run() {
     // ── 4. Envío de correo de prueba ─────────────────────────────────────────
     console.log(`\n📋 [4/4] Enviando correo de prueba a: ${TO_EMAIL}...`);
     try {
+        const fromEmail = 'noreply@legacymarksas.com';
+        console.log(`   🔸 Remitente: ${fromEmail}`);
+        
         const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -85,10 +88,19 @@ async function run() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                from: 'LegacyMark Test <onboarding@resend.dev>',
+                from: `LegacyMark <${fromEmail}>`,
                 to: [TO_EMAIL],
-                subject: '✅ Prueba de Email Blast — LegacyMark',
-                html: '<h1 style="color:#0d9488">¡Funcionando!</h1><p>El sistema de Email Blast está configurado correctamente.</p>'
+                subject: '🚀 Prueba Crítica de Entrega — LegacyMark',
+                html: `
+                    <div style="font-family:sans-serif; max-width:600px; margin:auto; border:1px solid #eee; padding:20px; border-radius:10px;">
+                        <h1 style="color:#0d9488">Verificación de Entrega</h1>
+                        <p>Este es un correo de prueba técnica para verificar la configuración de <b>SPF, DKIM y DMARC</b>.</p>
+                        <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+                        <p style="font-size:12px; color:#666;">
+                            Enviado desde el servidor de producción el ${new Date().toLocaleString('es-CO')}
+                        </p>
+                    </div>
+                `
             })
         });
 
@@ -96,16 +108,18 @@ async function run() {
 
         if (!response.ok) {
             console.error(`   ❌ Error al enviar: [${response.status}] ${JSON.stringify(data)}`);
-            if (data.name === 'validation_error') {
-                console.error('   💡 El dominio del remitente no está verificado en Resend');
-                console.error('   💡 Usa onboarding@resend.dev como remitente temporalmente');
-            }
             process.exit(1);
         }
 
-        console.log(`   ✅ Correo enviado! ID: ${data.id}`);
+        console.log(`   ✅ ¡Correo enviado exitosamente!`);
+        console.log(`   🆔 ID de Resend: ${data.id}`);
         console.log('\n══════════════════════════════════════════');
-        console.log('  ✅ TODO OK — El sistema está listo     ');
+        console.log('  ⚠️  SIGUIENTE PASO:                    ');
+        console.log('  1. Revisa tu bandeja de entrada.       ');
+        console.log('  2. Si no llegó, revisa SPAM (podría tardar 2-3 min)');
+        console.log('  3. Si SIGUE sin llegar, ve a resend.com');
+        console.log('     y revisa "Emails" -> "Activity" para');
+        console.log('     ver por qué rebotó (Bounced).       ');
         console.log('══════════════════════════════════════════\n');
     } catch (err) {
         console.error('   ❌ Error inesperado:', err.message);
