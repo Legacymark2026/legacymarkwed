@@ -138,28 +138,32 @@ export async function sendEmailBlast(blastId: string) {
             };
 
             const html = blast.htmlBody.replace(/\{\{(\w+)\}\}/g, (_, k) => getVar(k));
+            const subject = blast.subject.replace(/\{\{(\w+)\}\}/g, (_, k) => getVar(k));
             
             return {
                 from: `${blast.fromName} <${blast.fromEmail}>`,
                 to: r.email,
-                subject: blast.subject,
+                subject,
                 html,
-                headers: {
-                    'List-Unsubscribe': `<https://legacymarksas.com/unsubscribe?e=${encodeURIComponent(r.email)}>, <mailto:unsubscribe@legacymarksas.com?subject=unsubscribe%20${r.email}>`,
-                }
+                // headers: {
+                //    'List-Unsubscribe': `<https://legacymarksas.com/unsubscribe?e=${encodeURIComponent(r.email)}>, <mailto:unsubscribe@legacymarksas.com?subject=unsubscribe%20${r.email}>`,
+                // }
             };
         });
 
         try {
             // Resend free tier: send individually in parallel within chunk
             const results = await Promise.allSettled(
-                emails.map((e) => getResend().emails.send({ 
-                    from: e.from, 
-                    to: e.to, 
-                    subject: e.subject, 
-                    html: e.html,
-                    headers: e.headers 
-                }))
+                emails.map((e) => {
+                    console.log(`[EmailBlast] Iniciando envío a ${e.to} | De: ${e.from}`);
+                    return getResend().emails.send({ 
+                        from: e.from, 
+                        to: e.to, 
+                        subject: e.subject, 
+                        html: e.html,
+                        // headers: e.headers 
+                    });
+                })
             );
 
             for (let i = 0; i < results.length; i++) {
