@@ -129,19 +129,37 @@ export async function sendEmailBlast(blastId: string) {
     for (const chunk of chunks) {
         const emails = chunk.map((r) => {
             const vars = (r.variables as Record<string, string>) ?? {};
-            const html = blast.htmlBody.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? r.name ?? '');
+            // Case-insensitive variables lookup
+            const getVar = (key: string) => {
+                const k = key.toLowerCase();
+                if (k === 'unsubscribe_url') return `https://legacymarksas.com/unsubscribe?e=${encodeURIComponent(r.email)}`;
+                const foundKey = Object.keys(vars).find(v => v.toLowerCase() === k);
+                return (foundKey ? vars[foundKey] : null) ?? r.name ?? '';
+            };
+
+            const html = blast.htmlBody.replace(/\{\{(\w+)\}\}/g, (_, k) => getVar(k));
+            
             return {
                 from: `${blast.fromName} <${blast.fromEmail}>`,
                 to: r.email,
                 subject: blast.subject,
                 html,
+                headers: {
+                    'List-Unsubscribe': `<https://legacymarksas.com/unsubscribe?e=${encodeURIComponent(r.email)}>, <mailto:unsubscribe@legacymarksas.com?subject=unsubscribe%20${r.email}>`,
+                }
             };
         });
 
         try {
             // Resend free tier: send individually in parallel within chunk
             const results = await Promise.allSettled(
-                emails.map((e) => getResend().emails.send({ from: e.from, to: e.to, subject: e.subject, html: e.html }))
+                emails.map((e) => getResend().emails.send({ 
+                    from: e.from, 
+                    to: e.to, 
+                    subject: e.subject, 
+                    html: e.html,
+                    headers: e.headers 
+                }))
             );
 
             for (let i = 0; i < results.length; i++) {

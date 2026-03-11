@@ -355,7 +355,10 @@ p{color:#475569;font-size:15px;line-height:1.7;margin:0 0 16px;}
     <p>¿Le gustaría agendar una llamada de 20 minutos para explorar cómo podríamos colaborar?</p>
     <a href="https://legacymarksas.com/contacto" class="cta">Agendar una reunión →</a>
   </div>
-  <div class="footer"><p>© 2026 LegacyMark · Girón, Santander · Colombia</p></div>
+  <div class="footer">
+    <p>© 2026 LegacyMark · Girón, Santander · Colombia</p>
+    <p style="margin-top:8px;"><a href="{{unsubscribe_url}}" style="color:#0d9488; text-decoration:none;">Cancelar suscripción</a></p>
+  </div>
 </div>
 </body>
 </html>`;
