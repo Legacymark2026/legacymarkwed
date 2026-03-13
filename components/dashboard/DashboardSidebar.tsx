@@ -12,6 +12,7 @@ import { canAccessRoute, isStandardRole, PERMISSION_ROUTE_MAP } from "@/lib/rbac
 import { UserRole } from "@/types/auth";
 import { prisma } from "@/lib/prisma";
 import { getRoleAllowedRoutes, canCustomRoleAccess } from "@/lib/role-config";
+import { Image as ImageIcon } from "lucide-react";
 
 interface NavItem { href: string; label: string; icon: React.ReactNode; code?: string; }
 interface NavGroup { title: string; code: string; accent?: string; items: NavItem[]; }
@@ -59,6 +60,7 @@ const NAV_GROUPS: NavGroup[] = [
             { href: "/dashboard/posts", label: "Blog", icon: <BookOpen size={14} />, code: "BLG" },
             { href: "/dashboard/posts/categories", label: "Categorías", icon: <FileText size={14} />, code: "CAT" },
             { href: "/dashboard/projects", label: "Portafolio", icon: <Briefcase size={14} />, code: "PRJ" },
+            { href: "/dashboard/media", label: "Archivos & Medios", icon: <ImageIcon size={14} />, code: "MED" },
             { href: "/dashboard/admin/architecture", label: "Organización", icon: <Building2 size={14} />, code: "ORG" },
         ],
     },

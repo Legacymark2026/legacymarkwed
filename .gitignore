@@ -58,3 +58,5 @@ demo_output*.txt
 prisma_error.log
 prisma_validate*.log
 debug-whatsapp.log
+
+public/uploads
