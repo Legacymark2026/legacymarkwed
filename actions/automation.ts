@@ -130,6 +130,13 @@ export async function triggerWorkflow(triggerType: string, triggerData: any) {
             }
         }
 
+        if (triggerType === 'FORM_SUBMISSION' && wf.triggerConfig) {
+            const config = wf.triggerConfig as any;
+            if (config.formSource && config.formSource !== triggerData.source) {
+                continue; // Saltar si el flujo escucha un formulario específico y no es este
+            }
+        }
+
         try {
             // Async execution in background (fire and forget for caller)
             executeWorkflow(wf.id, triggerData).catch(err => console.error("Async Workflow Error", err));

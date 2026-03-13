@@ -72,6 +72,7 @@ export default function NodeConfigPanel({ selectedNode, onChange, onClose }: Nod
                             </SelectContent>
                         </Select>
                     </Field>
+                    {t === 'FORM_SUBMISSION' && <Field label="Origen del Formulario" hint="Ej: Flyering_LeadMagnet (Vacío = Todos)"><Input value={data.formSource||''} onChange={e=>h('formSource',e.target.value)} placeholder="Identificador exacto"/></Field>}
                     {t === 'DEAL_STAGE_CHANGED' && <Field label="Etapa Objetivo"><Select value={data.stage||'WON'} onValueChange={v=>h('stage',v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="QUALIFIED">Qualified</SelectItem><SelectItem value="PROPOSAL">Proposal</SelectItem><SelectItem value="NEGOTIATION">Negotiation</SelectItem><SelectItem value="WON">Won</SelectItem></SelectContent></Select></Field>}
                     {t === 'SCHEDULE' && <Field label="Cron Expression" hint="Ej: 0 9 * * 1 (Lunes 9AM)"><Input value={data.cronExpression||''} onChange={e=>h('cronExpression',e.target.value)} placeholder="0 9 * * 1" className="font-mono text-xs"/></Field>}
                     {t === 'WEBHOOK_LISTENER' && <Field label="URL auto-generada"><Input disabled value={`https://legacymark.com/api/webhooks/${id}`} className="font-mono text-xs bg-gray-100 text-gray-500"/></Field>}

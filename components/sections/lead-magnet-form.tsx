@@ -11,6 +11,8 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, Loader2, Send, ShieldCheck, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import { submitLeadMagnetForm } from "@/actions/public-forms";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     name: z.string().min(2, "El nombre es requerido"),
@@ -58,10 +60,24 @@ export function LeadMagnetForm() {
 
     const onSubmit = async (data: FormValues) => {
         setIsSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log("Form Submitted:", data);
-        setIsSuccess(true);
-        setIsSubmitting(false);
+        
+        try {
+            const result = await submitLeadMagnetForm({ 
+                ...data, 
+                source: "Flyering_LeadMagnet" // <-- ESTO ES LO QUE EL NODO LEERÁ
+            });
+            
+            if (result?.error) {
+                toast.error(result.error);
+                return;
+            }
+            
+            setIsSuccess(true);
+        } catch (error) {
+            toast.error("Ocurrió un error inesperado al enviar el formulario.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
