@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
     Mail, Plus, Send, CheckCircle, XCircle, Clock, BarChart2,
-    Trash2, X, Eye, ChevronDown, RotateCcw, AlertTriangle
+    Trash2, X, Eye, RotateCcw, AlertTriangle, Copy, Download, Search, Filter
 } from 'lucide-react';
 import { EmailBlastWizard } from './EmailBlastWizard';
-import { deleteEmailBlast, deleteEmailBlasts, getEmailBlastStats } from '@/actions/email-blast';
+import { deleteEmailBlast, deleteEmailBlasts, getEmailBlastStats, cloneEmailBlast } from '@/actions/email-blast';
 import { toast } from 'sonner';
 
 // ─── Types ────────────────────────────────────────────────────────────────
@@ -61,6 +61,29 @@ const RECIPIENT_STATUS: Record<string, { label: string; color: string; dotColor:
     FAILED: { label: 'Fallido', color: '#f87171', dotColor: '#ef4444' },
 };
 
+// ─── CSV Export helper ────────────────────────────────────────────────────
+
+function exportDetailCSV(detail: BlastDetail) {
+    const headers = ['Email', 'Nombre', 'Estado', 'Enviado a las', 'Error'];
+    const rows = detail.recipients.map((r) => [
+        r.email,
+        r.name ?? '',
+        RECIPIENT_STATUS[r.status]?.label ?? r.status,
+        r.sentAt ? new Date(r.sentAt).toLocaleString('es-CO') : '',
+        r.errorMessage ?? '',
+    ]);
+    const csvContent = [headers, ...rows]
+        .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_${detail.name.replace(/\s+/g, '_').toLowerCase()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 // ─── Detail Modal ─────────────────────────────────────────────────────────
 
 function DetailModal({ detail, onClose, onResend }: { detail: BlastDetail; onClose: () => void; onResend: () => void }) {
@@ -80,11 +103,21 @@ function DetailModal({ detail, onClose, onResend }: { detail: BlastDetail; onClo
                         <h2 className="text-lg font-black text-white">{detail.name}</h2>
                         <p className="text-sm text-slate-500 mt-0.5">{detail.subject}</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        {/* Export CSV */}
+                        <button
+                            onClick={() => exportDetailCSV(detail)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-violet-400 transition-all hover:text-violet-300"
+                            style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)' }}
+                            title="Descargar reporte CSV"
+                        >
+                            <Download className="w-4 h-4" />
+                            Exportar
+                        </button>
                         {failedCount > 0 && (
                             <button
                                 onClick={onResend}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-amber-400 transition-all hover:text-amber-300"
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-amber-400 transition-all hover:text-amber-300"
                                 style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)' }}
                             >
                                 <RotateCcw className="w-4 h-4" />
@@ -182,6 +215,10 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
     const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
     const [selectedBlasts, setSelectedBlasts] = useState<string[]>([]);
 
+    // ── Search & Filter state ──
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'ALL' | 'DRAFT' | 'SENDING' | 'COMPLETED' | 'FAILED'>('ALL');
+
     const handleDone = () => {
         setShowWizard(false);
         window.location.reload();
@@ -207,16 +244,28 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
         }
     };
 
+    const handleClone = async (id: string) => {
+        const toastId = toast.loading('Clonando campaña…');
+        try {
+            const clone = await cloneEmailBlast(id);
+            // Refresh list — simplest approach
+            window.location.reload();
+            toast.success('Campaña clonada como borrador', { id: toastId });
+        } catch {
+            toast.error('Error al clonar campaña', { id: toastId });
+        }
+    };
+
     const toggleSelectAll = () => {
-        if (selectedBlasts.length === blasts.length && blasts.length > 0) {
+        if (selectedBlasts.length === filteredBlasts.length && filteredBlasts.length > 0) {
             setSelectedBlasts([]);
         } else {
-            setSelectedBlasts(blasts.map(b => b.id));
+            setSelectedBlasts(filteredBlasts.map(b => b.id));
         }
     };
 
     const toggleSelect = (id: string) => {
-        setSelectedBlasts(prev => 
+        setSelectedBlasts(prev =>
             prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
         );
     };
@@ -232,6 +281,20 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
             setLoadingDetail(null);
         }
     };
+
+    // ── Filtered & searched blasts ──
+    const filteredBlasts = useMemo(() => {
+        return blasts.filter((b) => {
+            const matchesStatus = statusFilter === 'ALL' || b.status === statusFilter;
+            const query = searchQuery.toLowerCase();
+            const matchesSearch =
+                !query ||
+                b.name.toLowerCase().includes(query) ||
+                b.subject.toLowerCase().includes(query) ||
+                b.creatorName.toLowerCase().includes(query);
+            return matchesStatus && matchesSearch;
+        });
+    }, [blasts, searchQuery, statusFilter]);
 
     const totalSent = blasts.reduce((a, b) => a + b.sent, 0);
     const totalFailed = blasts.reduce((a, b) => a + b.failed, 0);
@@ -292,6 +355,49 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                 ))}
             </div>
 
+            {/* Search & Filter Bar */}
+            {blasts.length > 0 && (
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                    {/* Search */}
+                    <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.6)' }}>
+                        <Search className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre, asunto o creador..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="flex-1 bg-transparent text-sm text-white placeholder-slate-600 outline-none"
+                        />
+                        {searchQuery && (
+                            <button onClick={() => setSearchQuery('')} className="text-slate-500 hover:text-white transition-colors">
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        )}
+                    </div>
+                    {/* Status filter */}
+                    <div className="flex items-center gap-1.5 p-1 rounded-xl" style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(30,41,59,0.6)' }}>
+                        <Filter className="w-3.5 h-3.5 text-slate-600 ml-2" />
+                        {(['ALL', 'DRAFT', 'SENDING', 'COMPLETED', 'FAILED'] as const).map((s) => {
+                            const cfg = s === 'ALL' ? { label: 'Todos', color: '#94a3b8' } : STATUS_CONFIG[s];
+                            const isActive = statusFilter === s;
+                            return (
+                                <button
+                                    key={s}
+                                    onClick={() => setStatusFilter(s)}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                                    style={{
+                                        background: isActive ? (s === 'ALL' ? 'rgba(30,41,59,0.8)' : STATUS_CONFIG[s]?.bg ?? 'rgba(30,41,59,0.8)') : 'transparent',
+                                        color: isActive ? (s === 'ALL' ? '#e2e8f0' : (STATUS_CONFIG[s]?.color ?? '#94a3b8')) : '#475569',
+                                    }}
+                                >
+                                    {s === 'ALL' ? 'Todos' : STATUS_CONFIG[s]?.label ?? s}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             {/* Blast list */}
             {blasts.length === 0 ? (
                 <div className="text-center py-24">
@@ -308,27 +414,41 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                         Crear primera campaña
                     </button>
                 </div>
+            ) : filteredBlasts.length === 0 ? (
+                <div className="text-center py-16 rounded-2xl" style={{ border: '1px solid rgba(30,41,59,0.4)', background: 'rgba(15,23,42,0.4)' }}>
+                    <Search className="w-8 h-8 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-400 font-bold">Sin resultados</p>
+                    <p className="text-slate-600 text-sm mt-1">Prueba con otro término o limpia los filtros</p>
+                    <button onClick={() => { setSearchQuery(''); setStatusFilter('ALL'); }} className="mt-4 text-sm text-teal-400 hover:text-teal-300 transition-colors">
+                        Limpiar filtros
+                    </button>
+                </div>
             ) : (
                 <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(30,41,59,0.6)' }}>
                     <div className="px-6 py-4 flex items-center gap-4" style={{ background: 'rgba(15,23,42,0.8)', borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
-                        <input 
-                            type="checkbox" 
-                            checked={blasts.length > 0 && selectedBlasts.length === blasts.length}
+                        <input
+                            type="checkbox"
+                            checked={filteredBlasts.length > 0 && selectedBlasts.length === filteredBlasts.length}
                             onChange={toggleSelectAll}
                             className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-900 cursor-pointer"
                         />
-                        <span className="text-sm font-black text-white">Historial de campañas</span>
+                        <span className="text-sm font-black text-white">
+                            Historial de campañas
+                            {filteredBlasts.length !== blasts.length && (
+                                <span className="ml-2 text-slate-500 font-normal">{filteredBlasts.length} de {blasts.length}</span>
+                            )}
+                        </span>
                     </div>
                     <div style={{ background: 'rgba(2,6,23,0.6)' }}>
-                        {blasts.map((blast) => {
+                        {filteredBlasts.map((blast) => {
                             const cfg = STATUS_CONFIG[blast.status] ?? STATUS_CONFIG.DRAFT;
                             const Icon = cfg.Icon;
                             const rate = blast.totalRecipients > 0 ? Math.round((blast.sent / blast.totalRecipients) * 100) : 0;
                             const isLoading = loadingDetail === blast.id;
                             const isSelected = selectedBlasts.includes(blast.id);
-                            
-                            const dateStr = new Date(blast.createdAt).toLocaleString('es-CO', { 
-                                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+
+                            const dateStr = new Date(blast.createdAt).toLocaleString('es-CO', {
+                                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                             });
 
                             return (
@@ -337,8 +457,8 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                                     className={`px-6 py-4 flex items-center gap-4 transition-colors hover:bg-slate-900/40 ${isSelected ? 'bg-slate-900/60' : ''}`}
                                     style={{ borderBottom: '1px solid rgba(30,41,59,0.3)' }}
                                 >
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={isSelected}
                                         onChange={() => toggleSelect(blast.id)}
                                         className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-900 cursor-pointer"
@@ -396,6 +516,14 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                                             ) : (
                                                 <Eye className="w-4 h-4" />
                                             )}
+                                        </button>
+                                        {/* Clone */}
+                                        <button
+                                            onClick={() => handleClone(blast.id)}
+                                            className="p-1.5 rounded-lg text-slate-500 hover:text-violet-400 transition-colors"
+                                            title="Duplicar campaña como borrador"
+                                        >
+                                            <Copy className="w-4 h-4" />
                                         </button>
                                         {/* Warning if has failures */}
                                         {blast.failed > 0 && (

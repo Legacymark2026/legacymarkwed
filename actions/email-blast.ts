@@ -266,6 +266,48 @@ export async function deleteEmailBlasts(blastIds: string[]) {
     return { success: true };
 }
 
+// ── Clonar un blast (crea un DRAFT con el mismo contenido) ────────────────
+
+export async function cloneEmailBlast(blastId: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('No autenticado');
+    const companyId = await getCompanyId();
+
+    const original = await prisma.emailBlast.findFirst({
+        where: { id: blastId, companyId },
+        include: {
+            recipients: {
+                select: { email: true, name: true, variables: true },
+            },
+        },
+    });
+    if (!original) throw new Error('Blast no encontrado');
+
+    const clone = await prisma.emailBlast.create({
+        data: {
+            name: `${original.name} (Copia)`,
+            subject: original.subject,
+            htmlBody: original.htmlBody,
+            fromName: original.fromName,
+            fromEmail: original.fromEmail,
+            status: 'DRAFT',
+            totalRecipients: original.totalRecipients,
+            companyId,
+            createdById: session.user.id,
+            recipients: {
+                create: original.recipients.map((r) => ({
+                    email: r.email,
+                    name: r.name,
+                    variables: r.variables ?? {},
+                    status: 'PENDING',
+                })),
+            },
+        },
+    });
+
+    return clone;
+}
+
 // ── Enviar email de prueba ────────────────────────────────────────────────
 
 export async function sendTestEmail(subject: string, html: string, toEmail: string) {
