@@ -23,7 +23,7 @@ export function CognitiveAgentChat() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-teal-600 hover:bg-teal-500 text-white rounded-full shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all z-50 flex items-center justify-center group"
+          className="fixed bottom-6 right-6 p-4 bg-teal-600 hover:bg-teal-500 text-white rounded-full shadow-[0_0_20px_rgba(20,184,166,0.8)] transition-all z-[9999] flex items-center justify-center group"
         >
           <Sparkles className="h-6 w-6 group-hover:scale-110 transition-transform" />
         </button>
@@ -32,7 +32,7 @@ export function CognitiveAgentChat() {
       {/* Ventana del Chat / Drawer */}
       <div
         className={cn(
-          "fixed bottom-6 right-6 w-[400px] h-[600px] bg-slate-950 border border-teal-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 z-50 origin-bottom-right",
+          "fixed bottom-6 right-6 w-[400px] h-[600px] bg-slate-950 border border-teal-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 z-[9999] origin-bottom-right",
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"
         )}
       >
