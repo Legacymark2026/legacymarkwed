@@ -46,6 +46,9 @@ model User {
   createdTasks          Task[]             @relation("TaskCreator")
   activityLogs          UserActivityLog[]
   profile               UserProfile?
+  createdBounties       Bounty[]           @relation("BountyCreator")
+  claimedBounties       Bounty[]           @relation("BountyClaimer")
+  socialPosts           SocialPost[]       @relation("SocialPostAuthor")
 
   @@index([role])
   @@index([email])
@@ -174,6 +177,7 @@ model Company {
   tasks                   Task[]
   teams                   Team[]
   workflows               Workflow[]
+  socialPosts             SocialPost[]
 
   @@map("companies")
 }
@@ -207,6 +211,7 @@ model CompanyUser {
   invitedBy   String?  @map("invited_by")
   joinedAt    DateTime @default(now()) @map("joined_at")
   teamId      String?  @map("team_id")
+  phoneExtension String? @map("phone_extension")
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   inviter     User?    @relation("InvitedBy", fields: [invitedBy], references: [id])
   team        Team?    @relation(fields: [teamId], references: [id])
@@ -225,10 +230,13 @@ model Team {
   level       Int                      @default(0)
   parentId    String?                  @map("parent_id")
   companyId   String                   @map("company_id")
+  maxHeadcount Int?                    @map("max_headcount")
+  monthlyBudget Float?                 @map("monthly_budget")
   createdAt   DateTime                 @default(now()) @map("created_at")
   updatedAt   DateTime                 @updatedAt @map("updated_at")
   permissions CustomObjectPermission[]
   members     CompanyUser[]
+  bounties    Bounty[]
   company     Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   parent      Team?                    @relation("TeamHierarchy", fields: [parentId], references: [id])
   children    Team[]                   @relation("TeamHierarchy")
@@ -510,6 +518,27 @@ model WorkflowExecution {
   @@index([workflowId])
   @@index([status])
   @@map("workflow_executions")
+}
+
+model Bounty {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  rewardAmount Float    @map("reward_amount")
+  status      String   @default("OPEN")
+  teamId      String   @map("team_id")
+  createdBy   String   @map("created_by")
+  claimedBy   String?  @map("claimed_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  creator     User     @relation("BountyCreator", fields: [createdBy], references: [id])
+  claimer     User?    @relation("BountyClaimer", fields: [claimedBy], references: [id])
+
+  @@index([teamId])
+  @@index([status])
+  @@map("bounties")
 }
 
 model PostView {
@@ -1294,3 +1323,25 @@ model EmailBlastRecipient {
   @@map("email_blast_recipients")
 }
 
+// ── Modulo Publishing (Multi-Plataforma) ─────────────────────
+model SocialPost {
+  id           String    @id @default(uuid())
+  content      String    @db.Text
+  mediaUrls    Json?     @default("[]") // URLs de imágenes/videos ["url1", "url2"]
+  platforms    Json      @default("[]") // ["FACEBOOK", "LINKEDIN", "TIKTOK", "GOOGLE"]
+  status       String    @default("DRAFT") // DRAFT, SCHEDULED, PUBLISHED, FAILED
+  scheduledAt  DateTime? @map("scheduled_at")
+  publishedAt  DateTime? @map("published_at")
+  authorId     String    @map("author_id")
+  campaignId   String?   @map("campaign_id") // ID externo o interno de campaña
+  companyId    String    @map("company_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  author       User      @relation("SocialPostAuthor", fields: [authorId], references: [id])
+  company      Company   @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@index([status])
+  @@map("social_posts")
+}

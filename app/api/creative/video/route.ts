@@ -139,14 +139,6 @@ export async function POST(req: NextRequest) {
                         type: 'VIDEO',
                         url: blob.url,
                         mimeType: 'video/mp4',
-                        metadata: {
-                            script,
-                            prompt: enrichedPrompt,
-                            platform,
-                            aspectRatio,
-                            duration,
-                            generatedAt: new Date().toISOString(),
-                        } as object,
                     },
                 });
             }

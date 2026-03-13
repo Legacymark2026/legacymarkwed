@@ -93,7 +93,7 @@ export function UserDrawer({ user, onClose, onUpdate }: UserDrawerProps) {
                             {TABS.map((tab) => (
                                 <button key={tab.id} onClick={() => handleTabChange(tab.id as any)}
                                     style={{ padding: "10px 14px", fontSize: "11px", fontWeight: 800, fontFamily: "monospace", display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", borderBottom: `2px solid ${activeTab === tab.id ? tab.accent : "transparent"}`, color: activeTab === tab.id ? tab.accent : "#475569", cursor: "pointer", transition: "all 0.15s" }}>
-                                    {tab.label} {tab.icon}
+                                    {tab.label} {(tab as any).icon}
                                 </button>
                             ))}
                         </div>

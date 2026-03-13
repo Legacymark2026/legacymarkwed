@@ -101,7 +101,6 @@ export function CreativeStudio({ campaignId, abTestId }: CreativeStudioProps) {
                                 borderBottom: mainTab === tab.key ? "2px solid #2dd4bf" : "2px solid transparent",
                                 color: mainTab === tab.key ? "#2dd4bf" : "#475569",
                                 background: "transparent", border: "none",
-                                borderBottom: mainTab === tab.key ? "2px solid #2dd4bf" : "2px solid transparent",
                                 cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
                                 fontFamily: "monospace",
                             }}>

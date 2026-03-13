@@ -33,6 +33,7 @@ const NAV_GROUPS: NavGroup[] = [
         items: [
             { href: "/dashboard/admin/marketing", label: "CMO Dashboard", icon: <BarChart2 size={14} />, code: "CMO" },
             { href: "/dashboard/admin/marketing/campaigns", label: "Campañas (Live)", icon: <Target size={14} />, code: "LIV" },
+            { href: "/dashboard/marketing/calendar", label: "Planificador", icon: <Calendar size={14} />, code: "PUB" },
             { href: "/dashboard/marketing/email-blast", label: "Email Masivo", icon: <Mail size={14} />, code: "EML" },
             { href: "/dashboard/admin/marketing/creative-studio", label: "Creative Studio", icon: <Wand2 size={14} />, code: "CRE" },
             { href: "/dashboard/admin/automation", label: "Automatización", icon: <Workflow size={14} />, code: "BOT" },

@@ -33,7 +33,7 @@ export async function getCreativeInsights(): Promise<CreativeInsight[]> {
             id: true,
             platform: true,
             status: true,
-            assets: { select: { id: true, url: true, metadata: true } },
+            assets: { select: { id: true, url: true } },
             adSpends: { select: { amount: true, clicks: true, impressions: true, conversions: true } },
         },
     });
@@ -61,7 +61,7 @@ export async function getCreativeInsights(): Promise<CreativeInsight[]> {
         byPlatform[c.platform].impressions.push(totalImpressions);
 
         c.assets.forEach((asset) => {
-            const meta = asset.metadata as Record<string, unknown> | null;
+            const meta = (asset as any).metadata as Record<string, unknown> | null;
             byPlatform[c.platform].assets.push({
                 url: asset.url,
                 roas: totalSpend > 0 ? revenue / totalSpend : 0,

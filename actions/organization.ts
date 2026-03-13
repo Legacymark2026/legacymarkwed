@@ -12,6 +12,9 @@ export type OrgNode = {
     parentId: string | null;
     companyId: string;
     memberCount: number;
+    maxHeadcount: number | null;
+    monthlyBudget: number | null;
+    activeBounties: number;
 };
 
 /**
@@ -23,7 +26,10 @@ export async function getOrganizationChart(companyId: string): Promise<{ success
             where: { companyId },
             include: {
                 _count: {
-                    select: { members: true }
+                    select: { 
+                        members: true,
+                        bounties: { where: { status: 'OPEN' } }
+                    }
                 }
             },
             orderBy: [{ level: 'asc' }, { name: 'asc' }]
@@ -36,7 +42,10 @@ export async function getOrganizationChart(companyId: string): Promise<{ success
             level: t.level,
             parentId: t.parentId,
             companyId: t.companyId,
-            memberCount: t._count.members
+            memberCount: t._count.members,
+            maxHeadcount: t.maxHeadcount,
+            monthlyBudget: t.monthlyBudget,
+            activeBounties: t._count.bounties
         }));
 
         return { success: true, data: nodes };
@@ -130,6 +139,10 @@ export async function getTeamDetails(teamId: string) {
                             select: { id: true, name: true, email: true, image: true }
                         }
                     }
+                },
+                bounties: {
+                    where: { status: 'OPEN' },
+                    orderBy: { createdAt: 'desc' }
                 }
             }
         });
@@ -193,5 +206,84 @@ export async function deleteTeamInteractive(teamId: string) {
         return { success: true };
     } catch (error) {
         return { success: false, error: "Error interno al borrar el equipo" };
+    }
+}
+
+/**
+ * Actualiza la configuración de eficiencia y presupuesto de un equipo.
+ */
+export async function updateTeamConfig(
+    teamId: string, 
+    data: { name?: string, description?: string, maxHeadcount?: number | null, monthlyBudget?: number | null }
+) {
+    try {
+        await prisma.team.update({
+            where: { id: teamId },
+            data: {
+                name: data.name,
+                description: data.description,
+                maxHeadcount: data.maxHeadcount,
+                monthlyBudget: data.monthlyBudget
+            }
+        });
+        
+        revalidatePath('/dashboard/admin/architecture');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: "Error actualizando la configuración del equipo." };
+    }
+}
+
+/**
+ * Gamificación: Lanza un Bounty (Recompensa) para motivar al departamento.
+ */
+export async function createTeamBounty(teamId: string, title: string, rewardAmount: number, userId: string) {
+    try {
+        const team = await prisma.team.findUnique({ where: { id: teamId } });
+        if (!team) return { success: false, error: "El departamento no existe." };
+
+        const bounty = await prisma.bounty.create({
+            data: {
+                title,
+                rewardAmount,
+                teamId,
+                createdBy: userId
+            }
+        });
+
+        revalidatePath('/dashboard/admin/architecture');
+        return { success: true, data: bounty };
+    } catch (error) {
+        return { success: false, error: "Error al publicar la oferta de recompensa (Bounty)." };
+    }
+}
+
+/**
+ * Cierra o elimina un Bounty activo.
+ */
+export async function deleteTeamBounty(bountyId: string) {
+    try {
+        await prisma.bounty.delete({ where: { id: bountyId } });
+        revalidatePath('/dashboard/admin/architecture');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: "Error interno al eliminar el bounty." };
+    }
+}
+
+/**
+ * Reubica gráficamente a un usuario de un equipo a otro (Drag and Drop Support)
+ */
+export async function reassignUserToTeam(companyUserId: string, newTeamId: string) {
+    try {
+        await prisma.companyUser.update({
+            where: { id: companyUserId },
+            data: { teamId: newTeamId }
+        });
+        
+        revalidatePath('/dashboard/admin/architecture');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: "No se pudo reasignar al usuario al nuevo equipo." };
     }
 }

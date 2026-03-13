@@ -17,7 +17,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import dagre from 'dagre';
 import TeamNode from './team-node';
-import { getOrganizationChart, updateTeamParent, OrgNode } from '@/actions/organization';
+import { getOrganizationChart, updateTeamParent, reassignUserToTeam } from '@/actions/organization';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw, Maximize, Minimize, ArrowDownToLine, ArrowRightToLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -74,27 +74,43 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
 
+    const handleDropUser = async (companyUserId: string, targetTeamId: string) => {
+        setIsLoading(true); // Mostrar ligero loader o toast
+        const res = await reassignUserToTeam(companyUserId, targetTeamId);
+        if (res.success) {
+            toast.success("Talento reasignado con éxito a la nueva división.");
+            await loadData(); // recargar canvas para actualizar números
+            // Refrescar panel si el equipo origen/destino estaba abierto, o se puede dejar abierto para ver cómo bajó de headcount.
+        } else {
+            toast.error(res.error || "No se pudo mover el talento.");
+        }
+        setIsLoading(false);
+    };
+
     const loadData = useCallback(async () => {
         setIsLoading(true);
+        const start = performance.now();
         const result = await getOrganizationChart(companyId);
+        
         if (result.success && result.data) {
-            const initialNodes: Node[] = [];
-            const initialEdges: Edge[] = [];
-
-            result.data.forEach((team) => {
-                initialNodes.push({
+            const initialNodes: Node[] = result.data.map(team => ({
+                id: team.id,
+                type: 'team',
+                position: { x: 0, y: 0 },
+                data: { 
                     id: team.id,
-                    type: 'team',
-                    position: { x: 0, y: 0 },
-                    data: {
-                        id: team.id,
-                        name: team.name,
-                        level: team.level,
-                        memberCount: team.memberCount,
-                        onTriggerConfig: (id: string) => setSelectedTeamId(id)
-                    }
-                });
-
+                    name: team.name,
+                    level: team.level,
+                    memberCount: team.memberCount,
+                    maxHeadcount: team.maxHeadcount,
+                    activeBounties: team.activeBounties,
+                    onTriggerConfig: (id: string) => setSelectedTeamId(id),
+                    onDropUser: handleDropUser
+                }
+            }));
+            
+            const initialEdges: Edge[] = [];
+            result.data.forEach((team) => {
                 if (team.parentId) {
                     initialEdges.push({
                         id: `e-${team.parentId}-${team.id}`,

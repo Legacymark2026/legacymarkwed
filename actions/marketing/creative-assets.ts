@@ -133,7 +133,6 @@ export async function uploadManualAsset(formData: FormData, campaignId: string) 
             url: blob.url,
             mimeType: file.type,
             name: file.name,
-            metadata: { uploadedAt: new Date().toISOString(), source: 'manual' } as object,
         },
     });
 

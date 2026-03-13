@@ -113,15 +113,6 @@ export async function POST(req: NextRequest) {
                         mimeType,
                         width: dims.width,
                         height: dims.height,
-                        metadata: {
-                            prompt: enrichedPrompt,
-                            originalPrompt: prompt,
-                            aspectRatio,
-                            platform,
-                            style,
-                            brandColors,
-                            generatedAt: new Date().toISOString(),
-                        } as object,
                     },
                 });
             }

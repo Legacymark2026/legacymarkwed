@@ -1,0 +1,26 @@
+actions/marketing/analytics.ts(183,39): error TS2322: Type 'null' is not assignable to type 'string | NestedStringFilter<"Lead"> | undefined'.
+actions/marketing/creative-analytics.ts(36,54): error TS2353: Object literal may only specify known properties, and 'metadata' does not exist in type 'CampaignAssetSelect<DefaultArgs>'.
+actions/marketing/creative-analytics.ts(53,30): error TS2339: Property 'adSpends' does not exist on type '{ id: string; name: string; code: string; platform: string; status: string; budget: number | null; startDate: Date | null; endDate: Date | null; description: string | null; impressions: number; ... 11 more ...; trackingConfig: JsonValue; }'.
+actions/marketing/creative-analytics.ts(53,47): error TS7006: Parameter 'a' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(53,50): error TS7006: Parameter 'b' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(54,31): error TS2339: Property 'adSpends' does not exist on type '{ id: string; name: string; code: string; platform: string; status: string; budget: number | null; startDate: Date | null; endDate: Date | null; description: string | null; impressions: number; ... 11 more ...; trackingConfig: JsonValue; }'.
+actions/marketing/creative-analytics.ts(54,48): error TS7006: Parameter 'a' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(54,51): error TS7006: Parameter 'b' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(55,36): error TS2339: Property 'adSpends' does not exist on type '{ id: string; name: string; code: string; platform: string; status: string; budget: number | null; startDate: Date | null; endDate: Date | null; description: string | null; impressions: number; ... 11 more ...; trackingConfig: JsonValue; }'.
+actions/marketing/creative-analytics.ts(55,53): error TS7006: Parameter 'a' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(55,56): error TS7006: Parameter 'b' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(56,36): error TS2339: Property 'adSpends' does not exist on type '{ id: string; name: string; code: string; platform: string; status: string; budget: number | null; startDate: Date | null; endDate: Date | null; description: string | null; impressions: number; ... 11 more ...; trackingConfig: JsonValue; }'.
+actions/marketing/creative-analytics.ts(56,53): error TS7006: Parameter 'a' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(56,56): error TS7006: Parameter 'b' implicitly has an 'any' type.
+actions/marketing/creative-analytics.ts(63,11): error TS2339: Property 'assets' does not exist on type '{ id: string; name: string; code: string; platform: string; status: string; budget: number | null; startDate: Date | null; endDate: Date | null; description: string | null; impressions: number; ... 11 more ...; trackingConfig: JsonValue; }'.
+actions/marketing/creative-analytics.ts(63,27): error TS7006: Parameter 'asset' implicitly has an 'any' type.
+actions/marketing/creative-assets.ts(136,13): error TS2353: Object literal may only specify known properties, and 'metadata' does not exist in type 'Without<CampaignAssetCreateInput, CampaignAssetUncheckedCreateInput> & CampaignAssetUncheckedCreateInput'.
+app/(dashboard)/dashboard/marketing/page.tsx(147,62): error TS2339: Property 'email' does not exist on type 'never'.
+app/api/creative/image/route.ts(116,25): error TS2353: Object literal may only specify known properties, and 'metadata' does not exist in type 'Without<CampaignAssetCreateInput, CampaignAssetUncheckedCreateInput> & CampaignAssetUncheckedCreateInput'.
+app/api/creative/video/route.ts(142,25): error TS2353: Object literal may only specify known properties, and 'metadata' does not exist in type 'Without<CampaignAssetCreateInput, CampaignAssetUncheckedCreateInput> & CampaignAssetUncheckedCreateInput'.
+components/crm/lead-sources.tsx(135,33): error TS2322: Type '{ children: Element[]; activeIndex: number; activeShape: (props: any) => Element; data: LeadSource[]; cx: string; cy: string; innerRadius: number; outerRadius: number; ... 5 more ...; cornerRadius: number; }' is not assignable to type 'IntrinsicAttributes & PieSvgAttributes & PieProps'.
+  Property 'activeIndex' does not exist on type 'IntrinsicAttributes & PieSvgAttributes & PieProps'.
+components/marketing/creative-studio/asset-gallery.tsx(193,41): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+components/marketing/creative-studio/creative-studio.tsx(104,33): error TS1117: An object literal cannot have multiple properties with the same name.
+components/users/UserDrawer.tsx(96,54): error TS2339: Property 'icon' does not exist on type '{ readonly id: "info"; readonly label: "Perfil HR"; readonly accent: "#6366f1"; } | { readonly id: "security"; readonly label: "Seguridad"; readonly accent: "#f87171"; readonly icon: Element; } | { ...; }'.
+  Property 'icon' does not exist on type '{ readonly id: "info"; readonly label: "Perfil HR"; readonly accent: "#6366f1"; }'.

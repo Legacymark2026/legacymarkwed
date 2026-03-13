@@ -144,7 +144,7 @@ export default async function MarketingDashboardPage() {
                                     {event.eventName && <span className="text-slate-500 font-light"> — {event.eventName}</span>}
                                 </p>
                                 <p className="ds-mono-label mt-0.5">
-                                    {event.lead ? event.lead.email : (event.visitorId ? `Visitor ${event.visitorId.substring(0, 8)}...` : 'Anonymous')}
+                                    {event.lead ? (event.lead as any).email : (event.visitorId ? `Visitor ${event.visitorId.substring(0, 8)}...` : 'Anonymous')}
                                     {' '}&bull; {new Date(event.createdAt).toLocaleTimeString()}
                                 </p>
                             </div>

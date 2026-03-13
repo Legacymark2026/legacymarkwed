@@ -132,7 +132,6 @@ export function LeadSources({ data }: LeadSourcesProps) {
                                 ))}
                             </defs>
                             <Pie
-                                activeIndex={activeIndex}
                                 activeShape={renderActiveShape}
                                 data={data}
                                 cx="50%"

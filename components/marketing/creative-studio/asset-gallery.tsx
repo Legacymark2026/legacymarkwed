@@ -190,9 +190,9 @@ export function AssetGallery({ campaignId, onAssetSelected, showUpload = true }:
                                             isVideo ? 'bg-pink-500/80 text-white' : 'bg-violet-500/80 text-white')}>
                                             {isVideo ? 'VIDEO' : 'IMG'}
                                         </span>
-                                        {meta?.platform && (
+                                        {Boolean(meta?.platform) && (
                                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/60 text-gray-300">
-                                                {String(meta.platform).replace('_ADS', '')}
+                                                {String(meta?.platform).replace('_ADS', '')}
                                             </span>
                                         )}
                                     </div>

@@ -180,7 +180,7 @@ export async function getMarketingKPIs(companyId: string) {
 export async function getAttributionStats(companyId: string) {
     // Get leads grouped by source, filtering out null sources
     const allLeads = await prisma.lead.findMany({
-        where: { companyId, source: { not: null } },
+        where: { companyId, source: { not: '' } },
         select: { source: true },
     });
 
