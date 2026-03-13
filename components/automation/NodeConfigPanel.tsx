@@ -135,6 +135,7 @@ export default function NodeConfigPanel({ selectedNode, onChange, onClose }: Nod
                     <Field label="Asunto"><Input value={data.subject||''} onChange={e=>h('subject',e.target.value)} placeholder="Hola {{lead.name}}!"/></Field>
                     <Field label="Template"><Select value={data.templateId||'blank'} onValueChange={v=>h('templateId',v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="blank">HTML Libre</SelectItem><SelectItem value="welcome">Bienvenida</SelectItem><SelectItem value="followup">Seguimiento</SelectItem><SelectItem value="newsletter">Newsletter</SelectItem></SelectContent></Select></Field>
                     <Field label="Cuerpo del Email"><Textarea value={data.body||''} onChange={e=>h('body',e.target.value)} placeholder="Hola {{lead.name}}, ..." className="h-28 font-mono text-xs"/></Field>
+                    <Field label="📎 Adjuntar Archivo (PDF URL)" hint="Pega el enlace directo a tu PDF o súbelo al gestor primero"><Input type="url" value={data.pdfAttachmentUrl||''} onChange={e=>h('pdfAttachmentUrl',e.target.value)} placeholder="https://legacymark.com/files/catalogo.pdf" className="text-teal-900 bg-teal-50/50 border-teal-200"/></Field>
                 </Section>
                 <Section title="Avanzado" icon={<Settings2 size={12}/>} color="gray" defaultOpen={false}>
                     <Field label="De (From Name)"><Input value={data.fromName||''} onChange={e=>h('fromName',e.target.value)} placeholder="Equipo LegacyMark"/></Field>
