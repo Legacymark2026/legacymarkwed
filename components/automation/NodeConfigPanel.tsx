@@ -19,17 +19,17 @@ interface NodeConfigPanelProps {
 function Section({ title, icon, children, defaultOpen = true, color = "blue" }: any) {
     const [open, setOpen] = useState(defaultOpen);
     const colors: Record<string, string> = {
-        blue: "bg-blue-50 border-blue-200 text-blue-800",
-        purple: "bg-purple-50 border-purple-200 text-purple-800",
-        gray: "bg-gray-50 border-gray-200 text-gray-700",
+        blue: "bg-teal-900/40 border-teal-700/60 text-teal-300",
+        purple: "bg-purple-900/40 border-purple-700/60 text-purple-300",
+        gray: "bg-slate-800/60 border-slate-700/60 text-slate-400",
     };
     return (
-        <div className="border rounded-lg overflow-hidden mb-4">
+        <div className="border border-slate-700/60 rounded-lg overflow-hidden mb-4">
             <button onClick={() => setOpen(!open)} className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider border-b ${colors[color] || colors.blue}`}>
                 <span className="flex items-center gap-1.5">{icon}{title}</span>
                 {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
-            {open && <div className="p-3 space-y-3 bg-white">{children}</div>}
+            {open && <div className="p-3 space-y-3 bg-slate-900/80">{children}</div>}
         </div>
     );
 }
@@ -37,9 +37,9 @@ function Section({ title, icon, children, defaultOpen = true, color = "blue" }: 
 function Field({ label, hint, children }: any) {
     return (
         <div className="space-y-1">
-            <Label className="text-xs font-semibold text-gray-700">{label}</Label>
+            <Label className="text-xs font-semibold text-slate-300">{label}</Label>
             {children}
-            {hint && <p className="text-[10px] text-gray-400">{hint}</p>}
+            {hint && <p className="text-[10px] text-slate-500">{hint}</p>}
         </div>
     );
 }
@@ -467,25 +467,31 @@ export default function NodeConfigPanel({ selectedNode, onChange, onClose }: Nod
     };
 
     return (
-        <div className="w-80 border-l border-gray-200 p-0 bg-white absolute right-0 top-0 bottom-0 shadow-2xl z-20 flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/80 backdrop-blur">
+        <div className="w-80 border-l border-slate-700/60 p-0 bg-slate-900 absolute right-0 top-0 bottom-0 shadow-2xl shadow-black/50 z-20 flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b border-slate-700/60" style={{background:'linear-gradient(135deg,#0f172a 0%,#1e293b 100%)'}}>
                 <div>
-                    <h3 className="font-bold text-gray-800 tracking-tight">Configuración</h3>
-                    <p className="text-xs text-indigo-600 font-medium">{data.label || 'Propiedades del Nodo'}</p>
+                    <h3 className="font-bold text-white tracking-tight">Configuración</h3>
+                    <p className="text-xs text-teal-400 font-medium">{data.label || 'Propiedades del Nodo'}</p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-gray-200">×</Button>
+                <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-slate-700 text-slate-400 hover:text-white">×</Button>
             </div>
 
-            <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
+            <div className="p-4 flex-1 overflow-y-auto custom-scrollbar" style={{scrollbarColor:'#334155 #0f172a'}}>
                 <div className="mb-4">
-                    <Label className="text-[10px] text-gray-400 font-bold mb-1 block uppercase tracking-wider">Nombre del Nodo</Label>
-                    <Input value={data.label||''} onChange={e=>h('label',e.target.value)} className="bg-gray-50/50 font-medium border-gray-200 focus:bg-white transition-colors"/>
+                    <Label className="text-[10px] text-teal-400/70 font-bold mb-1 block uppercase tracking-widest">Nombre del Nodo</Label>
+                    <input
+                        value={data.label||''}
+                        onChange={e=>onChange(id, { ...data, label: e.target.value })}
+                        className="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-white font-medium text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                    />
                 </div>
-                <Separator className="my-4"/>
+
+                <div className="my-4 border-t border-slate-700/60" />
+
                 {renderContent()}
             </div>
 
-            <div className="p-3 border-t border-gray-100 bg-gray-50 text-[10px] text-gray-400 font-mono text-center truncate">
+            <div className="p-3 border-t border-slate-700/60 bg-slate-950 text-[10px] text-slate-500 font-mono text-center truncate">
                 ID: {id}
             </div>
         </div>

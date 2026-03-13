@@ -21,13 +21,13 @@ export default function Sidebar() {
     };
 
     return (
-        <aside className="w-72 border-r border-gray-200 bg-white flex flex-col h-full z-10 shadow-lg">
-            <div className="p-5 border-b border-gray-100 bg-gray-50/50">
-                <h2 className="font-bold text-gray-900 text-sm uppercase tracking-wide flex items-center gap-2">
-                    <LayoutDashboard size={16} className="text-blue-600" />
+        <aside className="w-72 border-r border-slate-700/60 bg-slate-900 flex flex-col h-full z-10 shadow-xl shadow-black/30">
+            <div className="p-5 border-b border-slate-700/60" style={{background:'linear-gradient(135deg,#0f172a 0%,#1e293b 100%)'}}>
+                <h2 className="font-bold text-teal-300 text-sm uppercase tracking-widest flex items-center gap-2">
+                    <LayoutDashboard size={16} className="text-teal-400" />
                     Catálogo de Nodos
                 </h2>
-                <p className="text-xs text-gray-500 mt-1">Arrastra los bloques hacia el canvas.</p>
+                <p className="text-xs text-slate-400 mt-1">Arrastra los bloques hacia el canvas.</p>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-8 custom-scrollbar">

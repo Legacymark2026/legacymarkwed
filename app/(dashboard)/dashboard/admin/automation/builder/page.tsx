@@ -516,18 +516,18 @@ function AutomationBuilder() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] w-full relative bg-gray-50/50">
+        <div className="flex flex-col h-[calc(100vh-64px)] w-full relative bg-slate-950">
             {isLoading && (
-                <div className="absolute inset-0 bg-white/80 z-50 flex items-center justify-center">
-                    <Loader2 className="animate-spin text-indigo-600 h-10 w-10" />
+                <div className="absolute inset-0 bg-slate-950/80 z-50 flex items-center justify-center">
+                    <Loader2 className="animate-spin text-teal-400 h-10 w-10" />
                 </div>
             )}
 
             {/* TOP NAVIGATION BAR */}
-            <div className="bg-white border-b border-gray-200 px-6 py-3 flex flex-col md:flex-row justify-between md:items-center shadow-sm z-10 w-full gap-4 md:gap-0">
+            <div className="bg-slate-900 border-b border-slate-700/60 px-6 py-3 flex flex-col md:flex-row justify-between md:items-center shadow-lg shadow-black/30 z-10 w-full gap-4 md:gap-0" style={{backdropFilter:'blur(8px)'}}>
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard/admin/automation">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300">
                             <ChevronLeft size={16} />
                         </Button>
                     </Link>
@@ -535,43 +535,43 @@ function AutomationBuilder() {
                         <input
                             value={workflowName}
                             onChange={(e) => setWorkflowName(e.target.value)}
-                            className="text-xl font-bold text-gray-800 bg-transparent border-none focus:ring-0 p-0 outline-none hover:bg-gray-50 rounded"
+                            className="text-xl font-bold text-white bg-transparent border-none focus:ring-0 p-0 outline-none hover:bg-slate-800/50 rounded px-1 transition-colors"
                         />
-                        {workflowId && <div className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {workflowId}</div>}
+                        {workflowId && <div className="text-[10px] text-teal-400/70 font-mono mt-0.5">ID: {workflowId}</div>}
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                     {/* Undo / Redo / Layout */}
-                    <div className="flex items-center mr-2 bg-gray-100 rounded-lg p-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-600" onClick={handleUndo} disabled={historyIndex <= 0}>
+                    <div className="flex items-center mr-2 bg-slate-800 border border-slate-700 rounded-lg p-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700" onClick={handleUndo} disabled={historyIndex <= 0}>
                             <Undo2 size={16} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-600" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
                             <Redo2 size={16} />
                         </Button>
-                        <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-600" onClick={handleAutoLayout} title="Auto-organizar Nodos">
+                        <div className="w-[1px] h-4 bg-slate-600 mx-1"></div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700" onClick={handleAutoLayout} title="Auto-organizar Nodos">
                             <LayoutGrid size={16} />
                         </Button>
                     </div>
 
-                    <Button variant="outline" className="gap-2 text-gray-700 bg-white shadow-sm border-gray-200" onClick={handleTestRun} disabled={isSimulating}>
-                        <Play size={16} className="text-emerald-500" />
+                    <Button variant="outline" className="gap-2 text-teal-300 bg-slate-800 shadow-sm border-slate-600 hover:bg-slate-700 hover:border-teal-500" onClick={handleTestRun} disabled={isSimulating}>
+                        <Play size={16} className="text-teal-400" />
                         {isSimulating ? "Simulando..." : "Simular Flujo"}
                     </Button>
                     <Button
                         variant="outline"
                         onClick={() => handleSave(false)}
                         disabled={isSaving}
-                        className="gap-2 text-indigo-700 border-indigo-200 hover:bg-indigo-50 bg-white"
+                        className="gap-2 text-slate-300 border-slate-600 hover:bg-slate-700 bg-slate-800"
                     >
                         <FileDown size={16} /> Guardar Borrador
                     </Button>
                     <Button
                         onClick={() => handleSave(true)}
                         disabled={isSaving}
-                        className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
+                        className="gap-2 bg-teal-500 text-white hover:bg-teal-400 shadow-lg shadow-teal-900/40 font-semibold"
                     >
                         {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />}
                         Publicar y Activar
@@ -599,20 +599,22 @@ function AutomationBuilder() {
                         fitView
                         attributionPosition="bottom-right"
                     >
-                        <Background color="#cbd5e1" gap={16} size={2} />
-                        <Controls className="bg-white shadow-md border border-gray-200 rounded-lg p-1" />
+                        <Background color="#334155" gap={20} size={1.5} />
+                        <Controls className="bg-slate-800 shadow-md border border-slate-700 rounded-lg p-1 [&>button]:bg-slate-800 [&>button]:text-slate-300 [&>button:hover]:bg-slate-700 [&>button]:border-slate-700" />
                         <MiniMap
                             nodeStrokeColor={(n) => {
                                 if (n.type === 'triggerNode') return '#f59e0b';
                                 if (n.type === 'conditionNode') return '#94a3b8';
-                                return '#6366f1';
+                                return '#14b8a6';
                             }}
                             nodeColor={(n) => {
-                                if (n.type === 'triggerNode') return '#fef3c7';
-                                if (n.type === 'conditionNode') return '#f8fafc';
-                                return '#e0e7ff';
+                                if (n.type === 'triggerNode') return '#78350f';
+                                if (n.type === 'conditionNode') return '#1e293b';
+                                return '#134e4a';
                             }}
-                            className="shadow-lg border border-gray-200 rounded-lg bg-white overflow-hidden"
+                            maskColor="rgba(2,6,23,0.7)"
+                            style={{ backgroundColor: '#0f172a', border: '1px solid #334155' }}
+                            className="shadow-xl rounded-lg overflow-hidden"
                         />
                     </ReactFlow>
 
@@ -631,7 +633,7 @@ function AutomationBuilder() {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader2 className="animate-spin text-indigo-500 h-12 w-12" /></div>}>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-950"><Loader2 className="animate-spin text-teal-400 h-12 w-12" /></div>}>
             <ReactFlowProvider>
                 <AutomationBuilder />
             </ReactFlowProvider>
