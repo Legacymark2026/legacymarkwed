@@ -23,24 +23,7 @@ const NAV_GROUPS: NavGroup[] = [
             { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={14} />, code: "OVW" },
             { href: "/dashboard/inbox", label: "Inbox Omnicanal", icon: <MessageSquare size={14} />, code: "BCX" },
             { href: "/dashboard/events", label: "Calendario", icon: <Calendar size={14} />, code: "CAL" },
-        ],
-    },
-    {
-        title: "Administración", code: "ADM_OPS",
-        items: [
-            { href: "/dashboard/users", label: "Usuarios", icon: <Users size={14} />, code: "USR" },
-            { href: "/dashboard/experts", label: "Equipo", icon: <UserCog size={14} />, code: "TEM" },
-            { href: "/dashboard/security", label: "Seguridad", icon: <Shield size={14} />, code: "SEC" },
-            { href: "/dashboard/settings", label: "Configuración", icon: <Settings size={14} />, code: "CFG" },
-        ],
-    },
-    {
-        title: "Contenido", code: "CNT_MGR",
-        items: [
-            { href: "/dashboard/posts", label: "Blog", icon: <BookOpen size={14} />, code: "BLG" },
-            { href: "/dashboard/posts/categories", label: "Categorías", icon: <FileText size={14} />, code: "CAT" },
-            { href: "/dashboard/projects", label: "Portafolio", icon: <Briefcase size={14} />, code: "PRJ" },
-            { href: "/dashboard/analytics", label: "Analítica", icon: <BarChart2 size={14} />, code: "ANL" },
+            { href: "/dashboard/analytics", label: "Analítica Web", icon: <BarChart2 size={14} />, code: "ANL" },
         ],
     },
     {
@@ -48,13 +31,13 @@ const NAV_GROUPS: NavGroup[] = [
         accent: "teal",
         items: [
             { href: "/dashboard/admin/marketing", label: "CMO Dashboard", icon: <BarChart2 size={14} />, code: "CMO" },
+            { href: "/dashboard/admin/marketing/campaigns", label: "Campañas (Live)", icon: <Target size={14} />, code: "LIV" },
+            { href: "/dashboard/marketing/email-blast", label: "Email Masivo", icon: <Mail size={14} />, code: "EML" },
+            { href: "/dashboard/admin/marketing/creative-studio", label: "Creative Studio", icon: <Wand2 size={14} />, code: "CRE" },
+            { href: "/dashboard/admin/automation", label: "Automatización", icon: <Workflow size={14} />, code: "BOT" },
             { href: "/dashboard/admin/marketing/spend", label: "Ad Spend (ROI)", icon: <DollarSign size={14} />, code: "ROI" },
             { href: "/dashboard/admin/marketing/links", label: "Link Tracker", icon: <Link2 size={14} />, code: "TRK" },
-            { href: "/dashboard/admin/marketing/campaigns", label: "Campañas (Live)", icon: <Target size={14} />, code: "LIV" },
-            { href: "/dashboard/admin/marketing/creative-studio", label: "Creative Studio", icon: <Wand2 size={14} />, code: "CRE" },
             { href: "/dashboard/admin/marketing/settings", label: "APIs & Config", icon: <Settings size={14} />, code: "API" },
-            { href: "/dashboard/admin/architecture", label: "Organización", icon: <Building2 size={14} />, code: "ORG" },
-            { href: "/dashboard/admin/automation", label: "Automatización", icon: <Workflow size={14} />, code: "BOT" },
         ],
     },
     {
@@ -68,6 +51,24 @@ const NAV_GROUPS: NavGroup[] = [
             { href: "/dashboard/admin/crm/reports", label: "Reportes CRM", icon: <BarChart2 size={14} />, code: "RPT" },
             { href: "/dashboard/admin/crm/templates", label: "Templates Email", icon: <Mail size={14} />, code: "TPL" },
             { href: "/dashboard/admin/crm/scoring", label: "Lead Scoring", icon: <Zap size={14} />, code: "SCR" },
+        ],
+    },
+    {
+        title: "Contenido & Web", code: "CNT_MGR",
+        items: [
+            { href: "/dashboard/posts", label: "Blog", icon: <BookOpen size={14} />, code: "BLG" },
+            { href: "/dashboard/posts/categories", label: "Categorías", icon: <FileText size={14} />, code: "CAT" },
+            { href: "/dashboard/projects", label: "Portafolio", icon: <Briefcase size={14} />, code: "PRJ" },
+            { href: "/dashboard/admin/architecture", label: "Organización", icon: <Building2 size={14} />, code: "ORG" },
+        ],
+    },
+    {
+        title: "Administración", code: "ADM_OPS",
+        items: [
+            { href: "/dashboard/users", label: "Usuarios", icon: <Users size={14} />, code: "USR" },
+            { href: "/dashboard/experts", label: "Equipo", icon: <UserCog size={14} />, code: "TEM" },
+            { href: "/dashboard/security", label: "Seguridad", icon: <Shield size={14} />, code: "SEC" },
+            { href: "/dashboard/settings", label: "Configuración", icon: <Settings size={14} />, code: "CFG" },
         ],
     },
 ];
@@ -194,12 +195,19 @@ export async function DashboardSidebar({ role: _roleProp, name, email, image, us
             {/* Teal glow top accent line */}
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/50 to-transparent" />
 
-            {/* Logo */}
-            <div className="h-14 flex items-center justify-center shrink-0 px-4"
+            {/* Logo — filtro blanco, tamaño 4× */}
+            <div className="flex items-center justify-center shrink-0 px-3 py-4"
                 style={{ borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
                 <Link href="/" className="flex items-center justify-center w-full group">
-                    <div className="relative h-9 w-[140px] transition-opacity group-hover:opacity-80">
-                        <Image src="/logo.png" alt="LegacyMark" fill className="object-contain" priority />
+                    <div className="relative h-16 w-full transition-opacity group-hover:opacity-80">
+                        <Image
+                            src="/logo.png"
+                            alt="LegacyMark"
+                            fill
+                            className="object-contain"
+                            priority
+                            style={{ filter: 'brightness(0) invert(1)' }}
+                        />
                     </div>
                 </Link>
             </div>
