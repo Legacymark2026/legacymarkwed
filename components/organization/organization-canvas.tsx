@@ -11,16 +11,18 @@ import ReactFlow, {
     Connection,
     Edge,
     Node,
-    MarkerType
+    MarkerType,
+    MiniMap
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import dagre from 'dagre';
 import TeamNode from './team-node';
 import { getOrganizationChart, updateTeamParent, OrgNode } from '@/actions/organization';
 import { toast } from 'sonner';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Maximize, Minimize, ArrowDownToLine, ArrowRightToLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CreateTeamDialog } from '@/modules/crm/components/create-team-dialog';
+import { TeamConfigPanel } from './team-config-panel';
 
 const nodeTypes = {
     team: TeamNode,
@@ -68,6 +70,9 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [direction, setDirection] = useState<'TB' | 'LR'>('TB');
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
 
     const loadData = useCallback(async () => {
         setIsLoading(true);
@@ -86,7 +91,7 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
                         name: team.name,
                         level: team.level,
                         memberCount: team.memberCount,
-                        onTriggerConfig: (id: string) => alert(`Configurando equipo ${id} (Implementaremos SidePanel luego)`)
+                        onTriggerConfig: (id: string) => setSelectedTeamId(id)
                     }
                 });
 
@@ -107,7 +112,7 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
             const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
                 initialNodes,
                 initialEdges,
-                'TB' // Top to Bottom
+                direction
             );
 
             setNodes([...layoutedNodes]);
@@ -116,7 +121,7 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
             toast.error(result.error || "Error cargando la estructura");
         }
         setIsLoading(false);
-    }, [companyId, setNodes, setEdges]);
+    }, [companyId, setNodes, setEdges, direction]);
 
     useEffect(() => {
         loadData();
@@ -160,7 +165,7 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
     }
 
     return (
-        <div className="w-full h-full min-h-[750px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+        <div className={`w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-800 transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'relative h-full min-h-[750px] max-h-[80vh]'}`}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -174,7 +179,19 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
             >
                 <Background color="#1e293b" gap={16} size={1} />
                 <Controls className="bg-slate-900 border-slate-800 fill-slate-300" />
+                <MiniMap 
+                    nodeColor={(n) => '#14b8a6'} 
+                    maskColor="rgba(2, 6, 23, 0.8)" 
+                    className="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden"
+                />
                 <Panel position="top-right" className="bg-slate-900/50 backdrop-blur-md border border-slate-800 p-2 rounded-lg flex items-center gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => setDirection(d => d === 'TB' ? 'LR' : 'TB')} className="h-8 w-8 text-slate-400 hover:text-teal-400 hover:bg-slate-800" title="Cambiar Orientación">
+                        {direction === 'TB' ? <ArrowRightToLine size={16} /> : <ArrowDownToLine size={16} />}
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(!isFullscreen)} className="h-8 w-8 text-slate-400 hover:text-teal-400 hover:bg-slate-800" title="Modo Pantalla Completa">
+                        {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+                    </Button>
+                    <div className="w-px h-6 bg-slate-700 mx-1"></div>
                     <Button variant="outline" size="sm" onClick={loadData} className="bg-slate-950/50 h-8 px-2 border-slate-700 hover:bg-slate-800">
                         <RefreshCw size={14} className="text-teal-400 mr-2" /> Refrescar
                     </Button>
@@ -185,6 +202,13 @@ export default function OrganizationCanvas({ companyId }: OrganizationCanvasProp
                     } />
                 </Panel>
             </ReactFlow>
+
+            {/* Panel de Configuración Deslizable */}
+            <TeamConfigPanel 
+                teamId={selectedTeamId}
+                open={!!selectedTeamId}
+                onClose={() => setSelectedTeamId(null)}
+            />
         </div>
     );
 }
