@@ -3,36 +3,12 @@
 import React, { memo, useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import {
-    Mail,
-    MessageSquare,
-    Clock,
-    Split,
-    Zap,
-    Bot,
-    Webhook,
-    Smartphone,
-    Phone,
-    Briefcase,
-    Users,
-    CheckCircle,
-    LayoutDashboard,
-    MoreHorizontal,
-    Edit2,
-    Copy,
-    Trash2,
-    CalendarClock,
-    ActivitySquare,
-    Tags,
-    UserPlus,
-    Network,
-    GitBranch,
-    Repeat,
-    Mic,
-    BookOpen,
-    FileJson,
-    Terminal,
-    Search,
-    CalendarPlus
+    Mail, MessageSquare, Clock, Split, Zap, Bot, Webhook, Smartphone, Phone,
+    Briefcase, Users, CheckCircle, LayoutDashboard, MoreHorizontal, Edit2, Copy, Trash2,
+    CalendarClock, ActivitySquare, Tags, UserPlus, Network, GitBranch, Repeat, Mic, BookOpen,
+    FileJson, Terminal, Search, CalendarPlus, CreditCard, ShoppingCart, Target,
+    Inbox, FileText, Bell, Sparkles, Database, Layers, Globe, Star, ShieldCheck,
+    PhoneCall, Wand2, ArrowLeftRight
 } from 'lucide-react';
 
 const NodeWrapper = ({ children, selected, colorClass = "border-gray-200", bgClass = "bg-white" }: any) => (
@@ -143,6 +119,31 @@ const TriggerNode = memo(({ id, data, selected }: any) => {
         headerColor = "bg-fuchsia-50 border-fuchsia-100";
         colorClass = "border-fuchsia-200";
         bodyText = `Score > ${data.targetScore || 50}`;
+    } else if (type === 'WHATSAPP_TRIGGER') {
+        icon = <MessageSquare size={14} className="text-green-600" />;
+        headerColor = "bg-green-50 border-green-100";
+        colorClass = "border-green-200";
+        bodyText = "On WhatsApp Message";
+    } else if (type === 'META_LEADS') {
+        icon = <Target size={14} className="text-blue-600" />;
+        headerColor = "bg-blue-50 border-blue-100";
+        colorClass = "border-blue-200";
+        bodyText = "Meta Ads Lead Capture";
+    } else if (type === 'STRIPE_PAYMENT') {
+        icon = <CreditCard size={14} className="text-indigo-600" />;
+        headerColor = "bg-indigo-50 border-indigo-100";
+        colorClass = "border-indigo-200";
+        bodyText = "Stripe Checkout Paid";
+    } else if (type === 'SHOPIFY_ORDER') {
+        icon = <ShoppingCart size={14} className="text-emerald-600" />;
+        headerColor = "bg-emerald-50 border-emerald-100";
+        colorClass = "border-emerald-200";
+        bodyText = "New Shopify Order";
+    } else if (type === 'EMAIL_LISTENER') {
+        icon = <Inbox size={14} className="text-gray-600" />;
+        headerColor = "bg-gray-50 border-gray-200";
+        colorClass = "border-gray-300";
+        bodyText = "Inbox Email Received";
     } else if (type === 'FORM_SUBMISSION') {
         bodyText = "Type: Form Submit";
     }
@@ -184,6 +185,22 @@ const CRMActionNode = memo(({ id, data, selected }: any) => {
         icon = <UserPlus size={14} className="text-emerald-600" />;
         label = "Assign User";
         body = data.userId ? `Assign to ID: ${data.userId}` : "Assign to sales rep";
+    } else if (type === 'ADJUST_SCORE') {
+        icon = <Star size={14} className="text-fuchsia-600" />;
+        label = "Adjust Score";
+        body = data.scoreAdj ? `Score: ${data.scoreAdj}` : "Adjust Lead Score";
+    } else if (type === 'META_AUDIENCE') {
+        icon = <Users size={14} className="text-blue-600" />;
+        label = "Meta Audience";
+        body = "Add to Ad Audience";
+    } else if (type === 'GENERATE_INVOICE') {
+        icon = <FileText size={14} className="text-indigo-600" />;
+        label = "Invoice";
+        body = "Generate Billing Doc";
+    } else if (type === 'VALIDATE_DATA') {
+        icon = <ShieldCheck size={14} className="text-emerald-600" />;
+        label = "Validate";
+        body = "Validate Email/Phone";
     }
 
     return (
@@ -262,6 +279,47 @@ const HttpNode = memo(({ id, data, selected }: any) => {
                 </div>
             </NodeBody>
             <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-cyan-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+// NEW COMMUNICATION NODES
+const SocialNode = memo(({ id, data, selected }: any) => {
+    const isReply = data.channel === 'SOCIAL_COMMENT';
+    return (
+        <NodeWrapper selected={selected} colorClass={isReply ? "border-blue-300" : "border-pink-300"}>
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader id={id} icon={<MessageSquare size={14} className={isReply ? "text-blue-600" : "text-pink-600"} />} label={data.label || (isReply ? "Comment Reply" : "IG Message")} color={isReply ? "bg-blue-50 border-blue-200" : "bg-pink-50 border-pink-200"} />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">{data.message || "Message body..."}</div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className={`w-3 h-3 border-2 border-white ${isReply ? "bg-blue-500" : "bg-pink-500"}`} />
+        </NodeWrapper>
+    );
+});
+
+const PhoneCallNode = memo(({ id, data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-violet-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader id={id} icon={<PhoneCall size={14} className="text-violet-600" />} label={data.label || "AI Voice Call"} color="bg-violet-50 border-violet-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">Agent: <span className="font-bold text-violet-700">{data.agentId || 'Sales Bot'}</span></div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-violet-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+const PushNode = memo(({ id, data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-amber-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader id={id} icon={<Bell size={14} className="text-amber-600" />} label={data.label || "Push Notification"} color="bg-amber-50 border-amber-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">{data.title || "Notification Title"}</div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-amber-500 border-2 border-white" />
         </NodeWrapper>
     );
 });
@@ -374,6 +432,57 @@ const LoopNode = memo(({ id, data, selected }: any) => {
                     <Handle type="source" id="done" position={Position.Bottom} className="w-3 h-3 bg-gray-500 border-2 border-white" style={{ left: 'auto', right: 10 }} />
                 </div>
             </div>
+        </NodeWrapper>
+    );
+});
+
+// NEW LOGIC NODES
+const SplitNode = memo(({ id, data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-fuchsia-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader id={id} icon={<ArrowLeftRight size={14} className="text-fuchsia-600" />} label={data.label || "A/B Split"} color="bg-fuchsia-50 border-fuchsia-200" />
+            <div className="p-3 bg-white text-xs space-y-2 font-mono">
+                <div className="text-center bg-fuchsia-50/50 p-1 rounded border border-fuchsia-100 text-fuchsia-700">
+                    Split Ratio: {data.splitRatio || '50/50'}
+                </div>
+            </div>
+            <div className="flex justify-between px-3 pb-3 rounded-b-lg bg-white mt-4">
+                <div className="relative">
+                    <span className="absolute -bottom-6 -left-1 text-[10px] font-bold text-fuchsia-600">A (50%)</span>
+                    <Handle type="source" id="path_a" position={Position.Bottom} className="w-3 h-3 bg-fuchsia-500 border-2 border-white" style={{ left: 10 }} />
+                </div>
+                <div className="relative">
+                    <span className="absolute -bottom-6 -right-1 text-[10px] font-bold text-fuchsia-600">B (50%)</span>
+                    <Handle type="source" id="path_b" position={Position.Bottom} className="w-3 h-3 bg-fuchsia-500 border-2 border-white" style={{ left: 'auto', right: 10 }} />
+                </div>
+            </div>
+        </NodeWrapper>
+    );
+});
+
+const TransformerNode = memo(({ id, data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-teal-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader id={id} icon={<Layers size={14} className="text-teal-600" />} label={data.label || "Transform Data"} color="bg-teal-50 border-teal-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">Format: <span className="font-bold text-teal-700">{data.formatType || 'JSON -> Params'}</span></div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-teal-500 border-2 border-white" />
+        </NodeWrapper>
+    );
+});
+
+const EnrichmentNode = memo(({ id, data, selected }: any) => {
+    return (
+        <NodeWrapper selected={selected} colorClass="border-emerald-300">
+            <Handle type="target" position={Position.Top} className="w-3 h-3 bg-gray-400 border-2 border-white" />
+            <NodeHeader id={id} icon={<Database size={14} className="text-emerald-600" />} label={data.label || "Data Enrichment"} color="bg-emerald-50 border-emerald-200" />
+            <NodeBody>
+                <div className="truncate max-w-[200px]">Service: <span className="font-bold text-emerald-700">{data.service || 'Clearbit'}</span></div>
+            </NodeBody>
+            <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-emerald-500 border-2 border-white" />
         </NodeWrapper>
     );
 });
@@ -494,6 +603,12 @@ export const nodeTypes = {
     codeNode: CodeNode,
     findRecordNode: FindRecordNode,
     calendarNode: CalendarNode,
+    socialNode: SocialNode,
+    phoneCallNode: PhoneCallNode,
+    pushNode: PushNode,
+    splitNode: SplitNode,
+    transformerNode: TransformerNode,
+    enrichmentNode: EnrichmentNode,
 };
 
 // Required names for proper imports
@@ -515,3 +630,9 @@ ExtractorNode.displayName = "ExtractorNode";
 CodeNode.displayName = "CodeNode";
 FindRecordNode.displayName = "FindRecordNode";
 CalendarNode.displayName = "CalendarNode";
+SocialNode.displayName = "SocialNode";
+PhoneCallNode.displayName = "PhoneCallNode";
+PushNode.displayName = "PushNode";
+SplitNode.displayName = "SplitNode";
+TransformerNode.displayName = "TransformerNode";
+EnrichmentNode.displayName = "EnrichmentNode";

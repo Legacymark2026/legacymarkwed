@@ -2,33 +2,12 @@
 
 import React from 'react';
 import {
-    Mail,
-    MessageSquare,
-    Clock,
-    Split,
-    Zap,
-    Bot,
-    Webhook,
-    Smartphone,
-    Phone,
-    Briefcase,
-    Users,
-    CheckCircle,
-    LayoutDashboard,
-    ArrowRight,
-    CalendarClock,
-    ActivitySquare,
-    Tags,
-    UserPlus,
-    Network,
-    GitBranch,
-    Repeat,
-    Mic,
-    BookOpen,
-    FileJson,
-    Terminal,
-    Search,
-    CalendarPlus
+    Mail, MessageSquare, Clock, Split, Zap, Bot, Webhook, Smartphone, Phone,
+    Briefcase, Users, CheckCircle, LayoutDashboard, ArrowRight, CalendarClock,
+    ActivitySquare, Tags, UserPlus, Network, GitBranch, Repeat, Mic, BookOpen,
+    FileJson, Terminal, Search, CalendarPlus, CreditCard, ShoppingCart, Target,
+    Inbox, FileText, Bell, Sparkles, Database, Layers, Globe, Star, ShieldCheck,
+    PhoneCall, Wand2, ArrowLeftRight
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -62,16 +41,40 @@ export default function Sidebar() {
                         color="bg-amber-50 border-amber-200 text-amber-900"
                     />
                     <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'WhatsApp Keyword', { triggerType: 'WHATSAPP_TRIGGER' })}
+                        icon={<MessageSquare size={16} className="text-green-600" />}
+                        label="Mensaje Entrante WA"
+                        color="bg-green-50 border-green-200 text-green-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'Meta Lead Ads', { triggerType: 'META_LEADS' })}
+                        icon={<Target size={16} className="text-blue-600" />}
+                        label="Lead Capturado (Meta)"
+                        color="bg-blue-50 border-blue-200 text-blue-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'Stripe Payment', { triggerType: 'STRIPE_PAYMENT' })}
+                        icon={<CreditCard size={16} className="text-indigo-600" />}
+                        label="Pago Recibido (Stripe)"
+                        color="bg-indigo-50 border-indigo-200 text-indigo-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'Shopify Order', { triggerType: 'SHOPIFY_ORDER' })}
+                        icon={<ShoppingCart size={16} className="text-emerald-600" />}
+                        label="Nueva Orden Shopify"
+                        color="bg-emerald-50 border-emerald-200 text-emerald-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'Email Inbound', { triggerType: 'EMAIL_LISTENER' })}
+                        icon={<Inbox size={16} className="text-gray-600" />}
+                        label="Email Recibido"
+                        color="bg-gray-50 border-gray-300 text-gray-900"
+                    />
+                    <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'triggerNode', 'Deal Stage Changed', { triggerType: 'DEAL_STAGE_CHANGED' })}
                         icon={<Briefcase size={16} className="text-purple-600" />}
                         label="Cambio de Etapa (Deal)"
                         color="bg-purple-50 border-purple-200 text-purple-900"
-                    />
-                    <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'New Lead Created', { triggerType: 'LEAD_CREATED' })}
-                        icon={<Users size={16} className="text-blue-600" />}
-                        label="Nuevo Lead Creado"
-                        color="bg-blue-50 border-blue-200 text-blue-900"
                     />
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'triggerNode', 'Scheduled Time', { triggerType: 'SCHEDULE' })}
@@ -85,16 +88,10 @@ export default function Sidebar() {
                         label="Escuchar Webhook"
                         color="bg-teal-50 border-teal-200 text-teal-900"
                     />
-                    <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'triggerNode', 'Lead Score Threshold', { triggerType: 'LEAD_SCORE' })}
-                        icon={<ActivitySquare size={16} className="text-fuchsia-600" />}
-                        label="Lead Score Alcanzado"
-                        color="bg-fuchsia-50 border-fuchsia-200 text-fuchsia-900"
-                    />
                 </Section>
 
                 {/* CRM Actions Section */}
-                <Section title="Acciones CRM" description="Actualiza base de datos">
+                <Section title="Acciones CRM & Ventas" description="Actualiza base de datos">
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Create Task', { actionType: 'CREATE_TASK' })}
                         icon={<CheckCircle size={16} className="text-emerald-600" />}
@@ -108,27 +105,39 @@ export default function Sidebar() {
                         color="bg-emerald-50 border-emerald-200 text-emerald-900"
                     />
                     <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Adjust Score', { actionType: 'ADJUST_SCORE' })}
+                        icon={<Star size={16} className="text-fuchsia-600" />}
+                        label="Ajustar Lead Score"
+                        color="bg-fuchsia-50 border-fuchsia-200 text-fuchsia-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Meta Audience', { actionType: 'META_AUDIENCE' })}
+                        icon={<Users size={16} className="text-blue-600" />}
+                        label="Añadir Audiencia Ads"
+                        color="bg-blue-50 border-blue-200 text-blue-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Generate Invoice', { actionType: 'GENERATE_INVOICE' })}
+                        icon={<FileText size={16} className="text-indigo-600" />}
+                        label="Generar Factura"
+                        color="bg-indigo-50 border-indigo-200 text-indigo-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Validate Data', { actionType: 'VALIDATE_DATA' })}
+                        icon={<ShieldCheck size={16} className="text-emerald-600" />}
+                        label="Validar Email/Teléfono"
+                        color="bg-emerald-50 border-emerald-200 text-emerald-900"
+                    />
+                    <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Add Tag', { actionType: 'ADD_TAG' })}
                         icon={<Tags size={16} className="text-emerald-600" />}
                         label="Añadir Etiqueta"
                         color="bg-emerald-50 border-emerald-200 text-emerald-900"
                     />
-                    <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Remove Tag', { actionType: 'REMOVE_TAG' })}
-                        icon={<Tags size={16} className="text-emerald-600" />}
-                        label="Remover Etiqueta"
-                        color="bg-emerald-50 border-emerald-200 text-emerald-900"
-                    />
-                    <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'crmActionNode', 'Assign User', { actionType: 'ASSIGN_USER' })}
-                        icon={<UserPlus size={16} className="text-emerald-600" />}
-                        label="Asignar Usuario"
-                        color="bg-emerald-50 border-emerald-200 text-emerald-900"
-                    />
                 </Section>
 
                 {/* Communication Section */}
-                <Section title="Comunicación" description="Mensajería y notificaciones">
+                <Section title="Canales & Comunicación" description="Mensajería y notificaciones">
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'actionNode', 'Send Email')}
                         icon={<Mail size={16} className="text-indigo-600" />}
@@ -136,10 +145,34 @@ export default function Sidebar() {
                         color="bg-indigo-50 border-indigo-200 text-indigo-900"
                     />
                     <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'slackNode', 'Send Slack')}
+                        onDragStart={(e) => onDragStart(e, 'whatsappNode', 'WhatsApp Msg')}
+                        icon={<Phone size={16} className="text-green-600" />}
+                        label="Enviar WhatsApp"
+                        color="bg-green-50 border-green-200 text-green-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'socialNode', 'IG Direct Message', { channel: 'IG_DM' })}
                         icon={<MessageSquare size={16} className="text-pink-600" />}
-                        label="Notificar en Slack"
+                        label="Enviar IG Direct"
                         color="bg-pink-50 border-pink-200 text-pink-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'phoneCallNode', 'AI Voice Call')}
+                        icon={<PhoneCall size={16} className="text-violet-600" />}
+                        label="Llamada IA (Vapi/Twilio)"
+                        color="bg-violet-50 border-violet-200 text-violet-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'pushNode', 'Push Notification')}
+                        icon={<Bell size={16} className="text-amber-600" />}
+                        label="Enviar Notificación Push"
+                        color="bg-amber-50 border-amber-200 text-amber-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'socialNode', 'Reply Comment', { channel: 'SOCIAL_COMMENT' })}
+                        icon={<MessageSquare size={16} className="text-blue-500" />}
+                        label="Responder Comentario"
+                        color="bg-blue-50 border-blue-200 text-blue-900"
                     />
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'smsNode', 'Send SMS')}
@@ -147,21 +180,22 @@ export default function Sidebar() {
                         label="Enviar SMS"
                         color="bg-sky-50 border-sky-200 text-sky-900"
                     />
-                    <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'whatsappNode', 'WhatsApp Msg')}
-                        icon={<Phone size={16} className="text-green-600" />}
-                        label="Enviar WhatsApp"
-                        color="bg-green-50 border-green-200 text-green-900"
-                    />
+
                 </Section>
 
                 {/* Logic Section */}
-                <Section title="Lógica & IA" description="Control de flujo e integraciones">
+                <Section title="Lógica, Transformación & IA" description="Control de flujo e integraciones">
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'waitNode', 'Wait / Delay', { delayValue: '1', delayUnit: 'h' })}
                         icon={<Clock size={16} className="text-orange-600" />}
                         label="Espera / Retraso"
                         color="bg-orange-50 border-orange-200 text-orange-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'splitNode', 'A/B Split Test')}
+                        icon={<ArrowLeftRight size={16} className="text-fuchsia-600" />}
+                        label="Split A/B Test"
+                        color="bg-fuchsia-50 border-fuchsia-200 text-fuchsia-900"
                     />
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'conditionNode', 'Condition (If/Else)')}
@@ -176,27 +210,33 @@ export default function Sidebar() {
                         color="bg-indigo-50 border-indigo-200 text-indigo-900"
                     />
                     <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'loopNode', 'Loop (Bucle)')}
-                        icon={<Repeat size={16} className="text-teal-600" />}
-                        label="Loop (Bucle)"
+                        onDragStart={(e) => onDragStart(e, 'aiNode', 'Intent Classifier', { aiTask: 'CLASSIFY_INTENT' })}
+                        icon={<Sparkles size={16} className="text-yellow-600" />}
+                        label="Clasificar Intención (IA)"
+                        color="bg-yellow-50 border-yellow-200 text-yellow-900"
+                    />
+                    <DraggableItem
+                        onDragStart={(e) => onDragStart(e, 'transformerNode', 'Transform Data')}
+                        icon={<Layers size={16} className="text-teal-600" />}
+                        label="Transformar Formato"
                         color="bg-teal-50 border-teal-200 text-teal-900"
                     />
                     <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'aiNode', 'AI Agent')}
-                        icon={<Bot size={16} className="text-violet-600" />}
-                        label="Agente IA"
-                        color="bg-violet-50 border-violet-200 text-violet-900"
+                        onDragStart={(e) => onDragStart(e, 'aiNode', 'AI Translator', { aiTask: 'TRANSLATOR' })}
+                        icon={<Globe size={16} className="text-blue-600" />}
+                        label="Traductor IA"
+                        color="bg-blue-50 border-blue-200 text-blue-900"
                     />
                     <DraggableItem
-                        onDragStart={(e) => onDragStart(e, 'httpNode', 'HTTP Request')}
-                        icon={<Network size={16} className="text-cyan-600" />}
-                        label="Petición HTTP"
-                        color="bg-cyan-50 border-cyan-200 text-cyan-900"
+                        onDragStart={(e) => onDragStart(e, 'enrichmentNode', 'Data Enrichment')}
+                        icon={<Database size={16} className="text-emerald-600" />}
+                        label="Enriquecer Lead Data"
+                        color="bg-emerald-50 border-emerald-200 text-emerald-900"
                     />
                 </Section>
 
                 {/* Advanced AI & Code Section */}
-                <Section title="Agentes IA & Datos Avanzados" description="Procesamiento y Scripts">
+                <Section title="Agentes IA & Avanzados" description="Procesamiento y Scripts">
                     <DraggableItem
                         onDragStart={(e) => onDragStart(e, 'voiceNode', 'Audio Transcriber')}
                         icon={<Mic size={16} className="text-violet-600" />}
