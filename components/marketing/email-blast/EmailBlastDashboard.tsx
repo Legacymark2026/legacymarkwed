@@ -6,7 +6,7 @@ import {
     Trash2, X, Eye, ChevronDown, RotateCcw, AlertTriangle
 } from 'lucide-react';
 import { EmailBlastWizard } from './EmailBlastWizard';
-import { deleteEmailBlast, getEmailBlastStats } from '@/actions/email-blast';
+import { deleteEmailBlast, deleteEmailBlasts, getEmailBlastStats } from '@/actions/email-blast';
 import { toast } from 'sonner';
 
 // ─── Types ────────────────────────────────────────────────────────────────
@@ -21,6 +21,7 @@ type BlastSummary = {
     failed: number;
     sentAt: Date | null;
     createdAt: Date;
+    creatorName: string;
 };
 
 type Recipient = {
@@ -179,6 +180,7 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
     const [showWizard, setShowWizard] = useState(false);
     const [detail, setDetail] = useState<BlastDetail | null>(null);
     const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
+    const [selectedBlasts, setSelectedBlasts] = useState<string[]>([]);
 
     const handleDone = () => {
         setShowWizard(false);
@@ -189,7 +191,34 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
         if (!confirm('¿Eliminar esta campaña?')) return;
         await deleteEmailBlast(id);
         setBlasts((b) => b.filter((x) => x.id !== id));
+        setSelectedBlasts((s) => s.filter((x) => x !== id));
         toast.success('Campaña eliminada');
+    };
+
+    const handleBulkDelete = async () => {
+        if (!confirm(`¿Eliminar ${selectedBlasts.length} campañas seleccionadas?`)) return;
+        try {
+            await deleteEmailBlasts(selectedBlasts);
+            setBlasts((b) => b.filter((x) => !selectedBlasts.includes(x.id)));
+            setSelectedBlasts([]);
+            toast.success('Campañas eliminadas');
+        } catch {
+            toast.error('Error al eliminar campañas');
+        }
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedBlasts.length === blasts.length && blasts.length > 0) {
+            setSelectedBlasts([]);
+        } else {
+            setSelectedBlasts(blasts.map(b => b.id));
+        }
+    };
+
+    const toggleSelect = (id: string) => {
+        setSelectedBlasts(prev => 
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
     };
 
     const handleViewDetail = async (blast: BlastSummary) => {
@@ -223,14 +252,25 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                             <p className="text-slate-500 text-sm">Sube tu base de datos y envía campañas personalizadas</p>
                         </div>
                     </div>
-                    <button
-                        onClick={() => setShowWizard(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all hover:scale-105"
-                        style={{ background: 'linear-gradient(135deg,#0d9488,#0891b2)' }}
-                    >
-                        <Plus className="w-4 h-4" />
-                        Nueva campaña
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        {selectedBlasts.length > 0 && (
+                            <button
+                                onClick={handleBulkDelete}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-red-500 hover:bg-red-500/10 transition-colors border border-red-500/20"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Eliminar ({selectedBlasts.length})
+                            </button>
+                        )}
+                        <button
+                            onClick={() => setShowWizard(true)}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all hover:scale-105"
+                            style={{ background: 'linear-gradient(135deg,#0d9488,#0891b2)' }}
+                        >
+                            <Plus className="w-4 h-4" />
+                            Nueva campaña
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -270,7 +310,13 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                 </div>
             ) : (
                 <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(30,41,59,0.6)' }}>
-                    <div className="px-6 py-4" style={{ background: 'rgba(15,23,42,0.8)', borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
+                    <div className="px-6 py-4 flex items-center gap-4" style={{ background: 'rgba(15,23,42,0.8)', borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
+                        <input 
+                            type="checkbox" 
+                            checked={blasts.length > 0 && selectedBlasts.length === blasts.length}
+                            onChange={toggleSelectAll}
+                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-900 cursor-pointer"
+                        />
                         <span className="text-sm font-black text-white">Historial de campañas</span>
                     </div>
                     <div style={{ background: 'rgba(2,6,23,0.6)' }}>
@@ -279,18 +325,36 @@ export function EmailBlastDashboard({ initialBlasts }: { initialBlasts: BlastSum
                             const Icon = cfg.Icon;
                             const rate = blast.totalRecipients > 0 ? Math.round((blast.sent / blast.totalRecipients) * 100) : 0;
                             const isLoading = loadingDetail === blast.id;
+                            const isSelected = selectedBlasts.includes(blast.id);
+                            
+                            const dateStr = new Date(blast.createdAt).toLocaleString('es-CO', { 
+                                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                            });
+
                             return (
                                 <div
                                     key={blast.id}
-                                    className="px-6 py-4 flex items-center gap-4 transition-colors hover:bg-slate-950/50"
+                                    className={`px-6 py-4 flex items-center gap-4 transition-colors hover:bg-slate-900/40 ${isSelected ? 'bg-slate-900/60' : ''}`}
                                     style={{ borderBottom: '1px solid rgba(30,41,59,0.3)' }}
                                 >
+                                    <input 
+                                        type="checkbox" 
+                                        checked={isSelected}
+                                        onChange={() => toggleSelect(blast.id)}
+                                        className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-900 cursor-pointer"
+                                    />
                                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: cfg.bg, border: `1px solid ${cfg.color}33` }}>
                                         <Icon className="w-4 h-4" style={{ color: cfg.color }} />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-bold text-white truncate">{blast.name}</p>
-                                        <p className="text-xs text-slate-500 truncate">{blast.subject}</p>
+                                        <p className="text-xs text-slate-500 truncate flex items-center gap-2">
+                                            <span>{blast.subject}</span>
+                                            <span className="opacity-50">•</span>
+                                            <span>Por {blast.creatorName}</span>
+                                            <span className="opacity-50">•</span>
+                                            <span>{dateStr}</span>
+                                        </p>
                                     </div>
 
                                     {/* Stats */}

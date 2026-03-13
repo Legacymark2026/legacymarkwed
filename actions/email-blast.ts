@@ -81,7 +81,7 @@ export async function createEmailBlast(input: CreateEmailBlastInput) {
 export async function getEmailBlasts() {
     const companyId = await getCompanyId();
 
-    return prisma.emailBlast.findMany({
+    const blasts = await prisma.emailBlast.findMany({
         where: { companyId },
         orderBy: { createdAt: 'desc' },
         select: {
@@ -94,8 +94,22 @@ export async function getEmailBlasts() {
             failed: true,
             sentAt: true,
             createdAt: true,
+            createdById: true,
         },
     });
+
+    // Resolve creator names
+    const userIds = Array.from(new Set(blasts.map((b) => b.createdById).filter(Boolean)));
+    const users = await prisma.user.findMany({
+        where: { id: { in: userIds } },
+        select: { id: true, name: true, email: true },
+    });
+    const userMap = new Map(users.map((u) => [u.id, u.name || u.email || 'Sistema']));
+
+    return blasts.map((b) => ({
+        ...b,
+        creatorName: b.createdById ? userMap.get(b.createdById) || 'Desconocido' : 'Sistema',
+    }));
 }
 
 // ── Enviar un blast (procesado chunk-by-chunk) ────────────────────────────
@@ -241,6 +255,14 @@ export async function getEmailBlastStats(blastId: string) {
 export async function deleteEmailBlast(blastId: string) {
     const companyId = await getCompanyId();
     await prisma.emailBlast.delete({ where: { id: blastId, companyId } });
+    return { success: true };
+}
+
+export async function deleteEmailBlasts(blastIds: string[]) {
+    const companyId = await getCompanyId();
+    await prisma.emailBlast.deleteMany({
+        where: { id: { in: blastIds }, companyId },
+    });
     return { success: true };
 }
 
