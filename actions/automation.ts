@@ -206,11 +206,17 @@ export async function executeWorkflow(workflowId: string, triggerData: any) {
                     const subject = replaceVariables(step.config?.subject || "Update", triggerData);
                     const body = replaceVariables(step.config?.body || "Notification", triggerData);
                     const toEmail = triggerData.email || triggerData.contactEmail;
+                    const pdfAttachmentUrl = replaceVariables(step.config?.pdfAttachmentUrl || "", triggerData);
 
                     if (toEmail) {
-                        await sendEmail({ to: toEmail, subject, html: body });
+                        await sendEmail({ 
+                            to: toEmail, 
+                            subject, 
+                            html: body, 
+                            pdfAttachmentUrl: pdfAttachmentUrl || undefined 
+                        });
                         logEntry.status = 'SUCCESS';
-                        logEntry.details = `Sent to ${toEmail}`;
+                        logEntry.details = `Sent to ${toEmail}${pdfAttachmentUrl ? ' (with Attachment)' : ''}`;
                     } else {
                         logEntry.status = 'SKIPPED';
                         logEntry.details = 'No email address found';

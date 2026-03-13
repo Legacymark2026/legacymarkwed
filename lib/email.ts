@@ -6,17 +6,17 @@ interface SendEmailParams {
     to: string;
     subject: string;
     html: string;
+    pdfAttachmentUrl?: string;
 }
 
-export async function sendEmail({ to, subject, html }: SendEmailParams) {
+export async function sendEmail({ to, subject, html, pdfAttachmentUrl }: SendEmailParams) {
     // Check for missing or dummy key
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey || apiKey === 're_123456789') {
         console.warn("⚠️ RESEND_API_KEY missing or dummy. Mocking email send:");
         console.log(`To: ${to}`);
         console.log(`Subject: ${subject}`);
-        // In production, this should probably be an error, but let's allow it for now to avoid crashing entirely
-        // and just log it heavily.
+        console.log(`Attachment: ${pdfAttachmentUrl || 'None'}`);
         if (process.env.NODE_ENV === 'production') {
             console.error("❌ CRITICAL: Emails will NOT work in production without a valid RESEND_API_KEY.");
         }
@@ -24,12 +24,23 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
     }
 
     try {
-        const data = await resend.emails.send({
+        const payload: any = {
             from: 'LegacyMark <onboarding@resend.dev>', // TODO: Verify domain in Resend dashboard
             to: [to],
             subject: subject,
             html: html,
-        });
+        };
+
+        if (pdfAttachmentUrl && pdfAttachmentUrl.trim() !== '') {
+            payload.attachments = [
+                {
+                    filename: 'documento_adjunto.pdf',
+                    path: pdfAttachmentUrl
+                }
+            ];
+        }
+
+        const data = await resend.emails.send(payload);
         return { success: true, id: data.data?.id };
     } catch (error) {
         console.error("Email Error:", error);
