@@ -64,7 +64,7 @@ export function SocialCalendar({ companyId, authorId, initialPosts }: { companyI
         setPosts(updatedPosts);
         
         // Update via Action
-        const res = await updateSocialPost(postId, { scheduledAt: newDate });
+        const res = await updateSocialPost(postId, authorId, { scheduledAt: newDate });
         if (res.success) {
             toast.success("Publicación reprogramada con éxito.");
         } else {

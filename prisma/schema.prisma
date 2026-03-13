@@ -49,6 +49,9 @@ model User {
   createdBounties       Bounty[]           @relation("BountyCreator")
   claimedBounties       Bounty[]           @relation("BountyClaimer")
   socialPosts           SocialPost[]       @relation("SocialPostAuthor")
+  approvedSocialPosts   SocialPost[]       @relation("SocialPostApprover")
+  socialPostComments    SocialPostComment[]
+  socialPostLogs        SocialPostLog[]
 
   @@index([role])
   @@index([email])
@@ -1335,13 +1338,72 @@ model SocialPost {
   authorId     String    @map("author_id")
   campaignId   String?   @map("campaign_id") // ID externo o interno de campaña
   companyId    String    @map("company_id")
+
+  // --- Eje 5: Gobernanza y Aprobaciones ---
+  approvalStatus String  @default("PENDING") @map("approval_status") // PENDING, IN_REVIEW, APPROVED, REJECTED
+  approvedById   String? @map("approved_by_id")
+  internalNotes  String? @db.Text @map("internal_notes")
+  
+  // --- Eje 1: Automatización y Scheduling Avanzado ---
+  isEvergreen  Boolean   @default(false) @map("is_evergreen")
+  timezone     String?   
+
+  // --- Eje 3: Capacidades Nativas Multi-Plataforma ---
+  targetUrl    String?   @map("target_url") // Link para Google MyBusiness / LinkedIn
+  tiktokAudioId String?  @map("tiktok_audio_id")
+  firstComment String?   @db.Text @map("first_comment")
+  
+  // --- Eje 4: Analítica Unificada ---
+  utmCampaign  String?   @map("utm_campaign")
+  utmSource    String?   @map("utm_source")
+  utmMedium    String?   @map("utm_medium")
+  metrics      Json?     // Para guardar consolidación de engagement
+
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
   author       User      @relation("SocialPostAuthor", fields: [authorId], references: [id])
-  company      Company   @relation(fields: [companyId], references: [id])
+  approver     User?     @relation("SocialPostApprover", fields: [approvedById], references: [id])
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  comments     SocialPostComment[]
+  logs         SocialPostLog[]
 
   @@index([companyId])
   @@index([status])
+  @@index([approvalStatus])
   @@map("social_posts")
+}
+
+// ── Comentarios Internos (Módulo Social Publisher) ───────────
+model SocialPostComment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+  @@map("social_post_comments")
+}
+
+// ── Logs de Auditoría Específicos (Social Publisher) ─────────
+model SocialPostLog {
+  id        String   @id @default(uuid())
+  action    String   // e.g. "STATUS_CHANGED", "CONTENT_EDITED", "APPROVED"
+  details   Json?    // Guarda metadata de los cambios
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+  @@map("social_post_logs")
 }
