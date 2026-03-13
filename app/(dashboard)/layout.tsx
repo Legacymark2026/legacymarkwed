@@ -4,6 +4,7 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { UserRole } from "@/types/auth";
 import { prisma } from "@/lib/prisma";
 import { MobileSidebarWrapper } from "@/components/dashboard/MobileSidebarWrapper";
+import { CognitiveAgentChat } from "@/components/ai/cognitive-agent-chat";
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +52,9 @@ export default async function DashboardLayout({
                     {children}
                 </div>
             </main>
+
+            {/* Agente de IA Flotante Nivel C-Level */}
+            <CognitiveAgentChat />
         </div>
     );
 }

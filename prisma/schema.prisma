@@ -181,6 +181,7 @@ model Company {
   teams                   Team[]
   workflows               Workflow[]
   socialPosts             SocialPost[]
+  invoices                Invoice[]
 
   @@map("companies")
 }
@@ -1406,4 +1407,25 @@ model SocialPostLog {
   @@index([postId])
   @@index([userId])
   @@map("social_post_logs")
+}
+
+// ── Módulo de Facturación y Cobros (Cognitive AI) ────────────
+model Invoice {
+  id                  String   @id @default(uuid())
+  clientName          String   @map("client_name")
+  serviceDescription  String   @map("service_description")
+  totalAmount         Float    @map("total_amount")
+  advanceAmount       Float    @map("advance_amount") // 60%
+  finalAmount         Float    @map("final_amount")   // 40%
+  status              String   @default("DRAFT_AWAITING_PAYMENT") // DRAFT_AWAITING_PAYMENT, PAID, CANCELLED
+  companyId           String   @map("company_id")
+  
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  company             Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+  @@map("invoices")
 }
