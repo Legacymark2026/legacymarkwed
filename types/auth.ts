@@ -4,6 +4,7 @@ export enum UserRole {
     CONTENT_MANAGER = 'content_manager',  // Marketing_SEO / Creativo senior
     CLIENT_ADMIN = 'client_admin',     // Ventas: CRM y leads
     CLIENT_USER = 'client_user',      // Creativo junior: tareas asignadas
+    EXTERNAL_CLIENT = 'external_client',// Cliente final (Dashboard restringido)
     GUEST = 'guest'             // Sin acceso al panel
 }
 
@@ -106,6 +107,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
         Permission.VIEW_PROJECTS,
         Permission.CREATE_CONTENT, Permission.EDIT_CONTENT,
         Permission.UPLOAD_ASSETS,
+    ],
+
+    [UserRole.EXTERNAL_CLIENT]: [
         Permission.VIEW_CLIENT_DASHBOARD,
     ],
 

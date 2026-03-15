@@ -61,9 +61,13 @@ export async function registerUser(formData: z.infer<typeof registerSchema>) {
 
 export async function loginUser(prevState: string | undefined, formData: FormData) {
     try {
+        const email = formData.get("email") as string;
+        const user = await prisma.user.findUnique({ where: { email } });
+        const redirectTo = user?.role === UserRole.EXTERNAL_CLIENT ? '/dashboard/client' : '/dashboard';
+
         await signIn('credentials', {
             ...Object.fromEntries(formData),
-            redirectTo: '/dashboard'
+            redirectTo: redirectTo
         });
     } catch (error) {
         if (error instanceof AuthError) {

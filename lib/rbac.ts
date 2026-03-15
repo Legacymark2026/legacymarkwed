@@ -99,6 +99,9 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
 
     // ── Calendario / Eventos ──────────────────────────────
     "/dashboard/events": [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.CLIENT_ADMIN],
+
+    // ── Portal del Cliente ────────────────────────────────
+    "/dashboard/client": [UserRole.EXTERNAL_CLIENT],
 };
 
 // ── Helpers ───────────────────────────────────────────────

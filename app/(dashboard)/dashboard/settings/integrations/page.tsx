@@ -1,6 +1,7 @@
 import { GoogleIntegrations } from "@/components/settings/google-integrations";
 import { MetaIntegrations } from "@/components/settings/meta-integrations";
 import { HotjarIntegrations } from "@/components/settings/hotjar-integrations";
+import { StripeIntegrations } from "@/components/settings/stripe-integrations";
 
 import { IntegrationsToastHandler } from "@/components/settings/integrations-toast-handler";
 import { Suspense } from "react";
@@ -23,6 +24,7 @@ export default function SettingsIntegrationsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <StripeIntegrations />
                 <MetaIntegrations />
                 <GoogleIntegrations />
                 <HotjarIntegrations />

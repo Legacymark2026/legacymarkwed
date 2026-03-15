@@ -4,7 +4,7 @@ import {
     Shield, BookOpen, Briefcase, BarChart2, Workflow,
     MessageSquare, Target, TrendingUp, Link2, Building2,
     Lock, UserCog, DollarSign, CheckSquare, Zap, Mail, Calendar, Wand2,
-    Activity, Wifi, Bot
+    Activity, Wifi, Bot, Trello, CreditCard
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import Image from "next/image";
@@ -19,9 +19,19 @@ interface NavGroup { title: string; code: string; accent?: string; items: NavIte
 
 const NAV_GROUPS: NavGroup[] = [
     {
+        title: "Portal del Cliente", code: "CLIENT_PORTAL",
+        accent: "teal",
+        items: [
+            { href: "/dashboard/client", label: "Mi Resumen", icon: <LayoutDashboard size={14} />, code: "C_OVW" },
+            { href: "/dashboard/client/proposals", label: "Mis Propuestas", icon: <FileText size={14} />, code: "C_QOT" },
+            { href: "/dashboard/client/projects", label: "Mis Proyectos", icon: <Briefcase size={14} />, code: "C_PRJ" },
+        ],
+    },
+    {
         title: "Panel General", code: "SYS_CORE",
         items: [
             { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={14} />, code: "OVW" },
+            { href: "/dashboard/kanban", label: "Gestión Operativa", icon: <Trello size={14} />, code: "KBN" },
             { href: "/dashboard/inbox", label: "Inbox Omnicanal", icon: <MessageSquare size={14} />, code: "BCX" },
             { href: "/dashboard/events", label: "Calendario", icon: <Calendar size={14} />, code: "CAL" },
             { href: "/dashboard/analytics", label: "Analítica Web", icon: <BarChart2 size={14} />, code: "ANL" },
@@ -49,6 +59,8 @@ const NAV_GROUPS: NavGroup[] = [
             { href: "/dashboard/admin/crm", label: "CRM Overview", icon: <TrendingUp size={14} />, code: "OVW" },
             { href: "/dashboard/admin/crm/leads", label: "Leads", icon: <Users size={14} />, code: "LDS" },
             { href: "/dashboard/admin/crm/pipeline", label: "Pipeline", icon: <Briefcase size={14} />, code: "PIP" },
+            { href: "/dashboard/admin/proposals", label: "Cotizaciones (e-Sign)", icon: <FileText size={14} />, code: "QOT" },
+            { href: "/dashboard/admin/invoices", label: "Facturación B2B", icon: <CreditCard size={14} />, code: "INV" },
             { href: "/dashboard/admin/crm/tasks", label: "Tareas", icon: <CheckSquare size={14} />, code: "TSK" },
             { href: "/dashboard/admin/crm/reports", label: "Reportes CRM", icon: <BarChart2 size={14} />, code: "RPT" },
             { href: "/dashboard/admin/crm/templates", label: "Templates Email", icon: <Mail size={14} />, code: "TPL" },
@@ -89,6 +101,7 @@ const ROLE_BADGES: Record<UserRole, { label: string; color: string }> = {
     [UserRole.CONTENT_MANAGER]: { label: "Marketing / SEO", color: "border-teal-900/50 text-teal-400 bg-slate-900/60" },
     [UserRole.CLIENT_ADMIN]: { label: "Ventas", color: "border-amber-900/50 text-amber-400 bg-slate-900/60" },
     [UserRole.CLIENT_USER]: { label: "Creativo", color: "border-teal-900/50 text-teal-400 bg-slate-900/60" },
+    [UserRole.EXTERNAL_CLIENT]: { label: "Cliente", color: "border-indigo-900/50 text-indigo-400 bg-slate-900/60" },
     [UserRole.GUEST]: { label: "En Revisión", color: "border-slate-700/50 text-slate-500 bg-slate-900/60" },
 };
 
