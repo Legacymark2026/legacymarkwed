@@ -14,15 +14,16 @@ interface InvoicePageProps {
 export default async function PublicInvoicePage({ params }: InvoicePageProps) {
     const { token } = params;
 
-    const invoice = await prisma.invoice.findUnique({
-        where: { token },
-        include: {
-            company: true,
-            items: true
-        }
-    });
+    try {
+        const invoice = await prisma.invoice.findUnique({
+            where: { token },
+            include: {
+                company: true,
+                items: true
+            }
+        });
 
-    if (!invoice) return notFound();
+        if (!invoice) return notFound();
 
     const isPaid = invoice.status === 'PAID';
     const isCancelled = invoice.status === 'CANCELLED';
@@ -33,14 +34,14 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
             <nav className="w-full bg-slate-900 border-b border-slate-800/60 sticky top-0 z-10 backdrop-blur-md bg-opacity-80">
                 <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        {invoice.company.logoUrl ? (
-                             <img src={invoice.company.logoUrl} alt={invoice.company.name} className="h-8 object-contain" />
+                        {invoice.company?.logoUrl ? (
+                             <img src={invoice.company.logoUrl} alt={invoice.company?.name || "Empresa"} className="h-8 object-contain" />
                         ) : (
                             <div className="h-8 w-8 bg-teal-600 rounded flex items-center justify-center font-bold text-white">
-                                {invoice.company.name.charAt(0)}
+                                {invoice.company?.name?.charAt(0) || "E"}
                             </div>
                         )}
-                        <span className="font-semibold text-lg text-white">{invoice.company.name}</span>
+                        <span className="font-semibold text-lg text-white">{invoice.company?.name || "Empresa Sin Nombre"}</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm font-medium">
                         {isPaid && <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Pagado</span>}
@@ -100,7 +101,7 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                                 <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mb-3">Emitido Por</p>
                                 <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
                                      <Building className="w-5 h-5 text-teal-500 opacity-70" />
-                                     {invoice.company.name}
+                                     {invoice.company?.name || "Empresa"}
                                 </h3>
                                 <p className="text-slate-400 text-sm flex items-center gap-2 mb-1">
                                     <Mail className="w-4 h-4 opacity-70" /> contacto@empresa.com
@@ -121,7 +122,7 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                                         </tr>
                                     </thead>
                                     <tbody className="text-sm text-slate-300">
-                                        {invoice.items.length > 0 ? invoice.items.map((item, i) => (
+                                        {(invoice.items && invoice.items.length > 0) ? invoice.items.map((item, i) => (
                                             <tr key={i} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
                                                 <td className="py-4 font-medium text-slate-200">
                                                     {item.title}
@@ -145,25 +146,25 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                                 <div className="w-full md:w-1/2 space-y-3 text-sm">
                                     <div className="flex justify-between text-slate-400">
                                         <span>Subtotal</span>
-                                        <span className="tabular-nums">${invoice.subtotalAmount.toLocaleString()}</span>
+                                        <span className="tabular-nums">${(invoice.subtotalAmount || 0).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-slate-400">
                                         <span>Impuestos</span>
-                                        <span className="tabular-nums">${invoice.taxAmount.toLocaleString()}</span>
+                                        <span className="tabular-nums">${(invoice.taxAmount || 0).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-base font-semibold text-white pt-4 border-t border-slate-800">
                                         <span>Total</span>
-                                        <span className="tabular-nums">${invoice.totalAmount.toLocaleString()} {invoice.currency}</span>
+                                        <span className="tabular-nums">${(invoice.totalAmount || 0).toLocaleString()} {invoice.currency}</span>
                                     </div>
-                                    {invoice.advanceAmount > 0 && (
+                                    {(invoice.advanceAmount || 0) > 0 && (
                                         <div className="flex justify-between text-rose-400/80">
                                             <span>Monto Reservado (no exigible)</span>
-                                            <span className="tabular-nums">-${invoice.advanceAmount.toLocaleString()}</span>
+                                            <span className="tabular-nums">-${(invoice.advanceAmount || 0).toLocaleString()}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between text-xl font-bold text-teal-400 pt-4 border-t border-slate-800 mt-2">
                                         <span>Total a Pagar</span>
-                                        <span className="tabular-nums">${invoice.finalAmount.toLocaleString()} {invoice.currency}</span>
+                                        <span className="tabular-nums">${(invoice.finalAmount || 0).toLocaleString()} {invoice.currency}</span>
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +201,7 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-teal-500/20 hover:bg-teal-500 hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ring-offset-[#020617]"
                                 >
                                     <CreditCard className="w-5 h-5" />
-                                    Pagar Ahora ${invoice.finalAmount.toLocaleString()} {invoice.currency}
+                                    Pagar Ahora ${(invoice.finalAmount || 0).toLocaleString()} {invoice.currency}
                                 </a>
                              ) : isPaid ? (
                                 <div className="px-6 py-3 rounded-xl bg-slate-800/50 text-emerald-400 border border-emerald-500/20 font-medium flex items-center gap-2">
@@ -218,4 +219,8 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
             </main>
         </div>
     );
+    } catch (error) {
+        console.error("🔴 ERROR INVOICE PAGE:", error);
+        return <div>Internal Server Error in Invoice Portal. Check console logs.</div>;
+    }
 }
