@@ -32,6 +32,8 @@ interface Conversation {
     } | null;
     assignedTo?: string | null;
     tags?: any;
+    sentiment?: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE' | 'URGENT' | null;
+    topic?: string | null;
 }
 
 export function ConversationList({ conversations, currentUser }: { conversations: Conversation[], currentUser?: any }) {
@@ -41,6 +43,7 @@ export function ConversationList({ conversations, currentUser }: { conversations
     const folderParam = searchParams.get('folder');
     const tagParam = searchParams.get('tag');
     const activeId = params?.conversationId;
+    const [currentTime, setCurrentTime] = useState(new Date());
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('all'); // all, mine, unassigned
     const [statusFilter, setStatusFilter] = useState<'OPEN' | 'CLOSED' | 'ALL'>('OPEN');
@@ -67,10 +70,11 @@ export function ConversationList({ conversations, currentUser }: { conversations
         setIsSyncing(false);
     };
 
-    // Real-time Polling (Phase 1 Improvement)
+    // Real-time Polling & Time Update (Phase 1 Improvement)
     useEffect(() => {
         const interval = setInterval(() => {
             router.refresh();
+            setCurrentTime(new Date());
         }, 5000); // Poll every 5 seconds
         return () => clearInterval(interval);
     }, [router]);
@@ -208,6 +212,16 @@ export function ConversationList({ conversations, currentUser }: { conversations
                     <div>
                         {filteredConversations.map((convo) => {
                             const isActive = activeId === convo.id;
+                            
+                            // SLA Logic: Over 15 mins, open, has unread? Let's just say if unread and > 15 mins
+                            const isSlaBreached = convo.unreadCount > 0 && 
+                                (currentTime.getTime() - new Date(convo.lastMessageAt).getTime()) > 15 * 60 * 1000;
+
+                            const getSentimentColor = (s: string | null | undefined) => {
+                                if (s === 'URGENT' || s === 'NEGATIVE') return 'text-rose-400 bg-rose-400/10 border-rose-400/20';
+                                if (s === 'POSITIVE') return 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
+                                return 'text-slate-400 bg-slate-400/10 border-slate-400/20'; // NEUTRAL
+                            };
 
                             return (
                                 <Link
@@ -238,18 +252,27 @@ export function ConversationList({ conversations, currentUser }: { conversations
                                         {/* Content */}
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "2px" }}>
-                                                <h3 style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "12px", color: isActive ? "#2dd4bf" : convo.unreadCount > 0 ? "#e2e8f0" : "#94a3b8", fontWeight: convo.unreadCount > 0 || isActive ? 800 : 500, fontFamily: "monospace", margin: 0 }}>
-                                                    {convo.lead?.name || 'Unknown Lead'}
+                                                <h3 style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "12px", color: isSlaBreached ? "#fb7185" : (isActive ? "#2dd4bf" : convo.unreadCount > 0 ? "#e2e8f0" : "#94a3b8"), fontWeight: convo.unreadCount > 0 || isActive ? 800 : 500, fontFamily: "monospace", margin: 0 }}>
+                                                    {convo.lead?.name || 'Unknown Lead'} {isSlaBreached && '🔥'}
                                                 </h3>
-                                                <span style={{ fontSize: "10px", whiteSpace: "nowrap", marginLeft: "8px", color: convo.unreadCount > 0 ? "#2dd4bf" : "#1e293b", fontFamily: "monospace" }}>
+                                                <span style={{ fontSize: "10px", whiteSpace: "nowrap", marginLeft: "8px", color: isSlaBreached ? "#fb7185" : (convo.unreadCount > 0 ? "#2dd4bf" : "#1e293b"), fontFamily: "monospace" }}>
                                                     {formatDistanceToNow(new Date(convo.lastMessageAt), { addSuffix: false })}
                                                 </span>
                                             </div>
 
-                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                                                <p style={{ fontSize: "11px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: "8px", maxWidth: "170px", color: convo.unreadCount > 0 ? "#475569" : "#1e293b", fontWeight: convo.unreadCount > 0 ? 600 : 400, margin: 0 }}>
-                                                    {convo.lastMessagePreview || 'Inició una conversación'}
-                                                </p>
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "4px" }}>
+                                                <div style={{display: "flex", gap: "4px", flexWrap: "wrap", overflow: "hidden"}}>
+                                                  {convo.topic && (
+                                                      <span className={cn("px-1.5 py-[2px] rounded border text-[9px] font-mono leading-none", getSentimentColor(convo.sentiment))}>
+                                                          {convo.topic}
+                                                      </span>
+                                                  )}
+                                                  {convo.sentiment === 'URGENT' && (
+                                                      <span className="px-1.5 py-[2px] rounded border text-[9px] font-mono leading-none text-rose-400 bg-rose-400/10 border-rose-400/20">
+                                                          URGENT
+                                                      </span>
+                                                  )}
+                                                </div>
 
                                                 {convo.unreadCount > 0 && (
                                                     <span style={{ padding: "1px 6px", borderRadius: "99px", fontSize: "10px", fontWeight: 800, background: "rgba(13,148,136,0.2)", color: "#2dd4bf", border: "1px solid rgba(13,148,136,0.3)", fontFamily: "monospace", flexShrink: 0 }}>

@@ -522,3 +522,75 @@ export async function getLeadDetails(leadId: string) {
         return null;
     }
 }
+
+export async function draftCopilotServerAction(conversationId: string) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
+        const { draftCopilotReply } = await import("@/lib/services/ai-inbox");
+        const reply = await draftCopilotReply(conversationId);
+        
+        return { success: true, draft: reply };
+    } catch (error: any) {
+        console.error("Error drafting reply:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function executeMacro(conversationId: string, macroId: string) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+        
+        // Mock macro execution logic (in real app, we'd fetch the macro by ID and run its payload)
+        // 1. Get Conversation
+        const conversation = await db.conversation.findUnique({
+            where: { id: conversationId }
+        });
+        if (!conversation) return { success: false, error: "Not found" };
+
+        let payloadText = '';
+        
+        switch (macroId) {
+            case '1':
+                payloadText = '🤖 [MACRO]: Pedir Pago activado. Enviando enlace Stripe...';
+                break;
+            case '2':
+                payloadText = '🤖 [MACRO]: Agendar Cita activado. Aquí tienes nuestro enlace Calendly...';
+                break;
+            case '3':
+                payloadText = '🤖 [MACRO]: Escalando caso a Soporte L1...';
+                break;
+            default:
+                payloadText = '🤖 [MACRO]: Acción automatizada ejecutada.';
+        }
+        
+        // 2. Add System Note or Message
+         await db.message.create({
+            data: {
+                conversationId,
+                content: payloadText,
+                direction: 'INTERNAL',
+                senderId: session.user.id,
+                status: 'SENT'
+            }
+        });
+
+        // 3. Re-open / Update Status
+        await db.conversation.update({
+            where: { id: conversationId },
+            data: {
+                status: 'OPEN',
+                lastMessageAt: new Date(),
+                lastMessagePreview: payloadText
+            }
+        });
+        
+        revalidatePath('/dashboard/inbox');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error executing macro:", error);
+        return { success: false, error: error.message };
+    }
+}

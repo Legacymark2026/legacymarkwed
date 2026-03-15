@@ -4,6 +4,7 @@ import { automationHub } from "@/lib/integrations/providers";
 import { ChannelType } from "@/types/inbox";
 import { prisma } from "@/lib/prisma";
 import { createLead } from "@/modules/leads/actions/leads";
+import { analyzeIncomingMessage } from "@/lib/services/ai-inbox";
 
 // Map URL param to ChannelType
 const getChannelFromProvider = (provider: string): ChannelType | null => {
@@ -78,36 +79,62 @@ async function handlePost(
             return NextResponse.json({ message: "Ignored event" });
         }
 
-        // 2. Resolve Company (For now, use the first available company or a default fallback)
-        // In a multi-tenant setup, this would come from the PhoneNumberID mapping
-        const company = await prisma.company.findFirst();
+        // 2. Resolve Company (Multi-Tenant Support)
+        // Extract the recipient identity (e.g., WhatsApp Phone Number ID or Facebook Page ID) from metadata
+        const recipientId = inboundMessage.metadata?.recipientId || inboundMessage.metadata?.phoneNumberId || inboundMessage.metadata?.pageId as string | undefined;
+        let companyId: string | null = null;
+        
+        if (recipientId) {
+            // Check IntegrationConfigs for a matching recipient
+            // Since `config` is JSON, we do a raw/contains query or fetch and filter
+            const integrations = await prisma.integrationConfig.findMany({
+                where: { provider: channel, isEnabled: true },
+                select: { companyId: true, config: true }
+            });
+            
+            const match = integrations.find(int => {
+                const configStr = JSON.stringify(int.config);
+                return configStr.includes(recipientId);
+            });
+            
+            if (match) companyId = match.companyId;
+        }
 
-        if (!company) {
-            console.error("No company found for incoming webhook");
+        // Fallback for single-tenant / local dev
+        if (!companyId) {
+            const defaultCompany = await prisma.company.findFirst();
+            if (defaultCompany) companyId = defaultCompany.id;
+        }
+
+        if (!companyId) {
+            console.error(`[Webhook:${channel}] No company resolved for recipient ${recipientId}`);
             return NextResponse.json({ error: "Configuration Error" }, { status: 500 });
         }
+        
+        const validCompanyId = companyId;
 
         // 3. Find or Create Lead
         let lead = await prisma.lead.findFirst({
             where: {
-                phone: inboundMessage.externalId,
-                companyId: company.id
+                OR: [
+                    { phone: inboundMessage.externalId },
+                    { email: `${channel.toLowerCase()}_${inboundMessage.externalId}@placeholder.com` }
+                ],
+                companyId: validCompanyId
             }
         });
 
         if (!lead) {
-            // Create a new lead for this WhatsApp user
-            // Use a placeholder email since it's required by the schema/action
-            const placeholderEmail = `wa_${inboundMessage.externalId}@placeholder.com`;
+            // Create a new lead for this user with a safer, channel-specific placeholder
+            const placeholderEmail = `${channel.toLowerCase()}_${inboundMessage.externalId}@placeholder.com`;
 
             const result = await createLead({
                 email: placeholderEmail,
-                companyId: company.id,
-                name: inboundMessage.sender.name || "WhatsApp User",
-                phone: inboundMessage.externalId,
-                // source: 'WHATSAPP', // Not in InputType, auto-detected from utmSource
-                utmSource: 'whatsapp',
-                tags: ['whatsapp-inbound']
+                companyId: validCompanyId,
+                name: inboundMessage.sender.name || `${channel} User`,
+                phone: channel === 'WHATSAPP' || channel === 'SMS' ? inboundMessage.externalId : undefined,
+                utmSource: channel.toLowerCase(),
+                tags: [`${channel.toLowerCase()}-inbound`]
             });
 
             if (result.success && result.data) {
@@ -123,33 +150,42 @@ async function handlePost(
         let conversation = await prisma.conversation.findFirst({
             where: {
                 platformId: inboundMessage.externalId,
-                channel: 'WHATSAPP',
-                companyId: company.id
+                channel: channel,
+                companyId: validCompanyId
             }
         });
 
         if (!conversation) {
+            const analysis = await analyzeIncomingMessage(inboundMessage.content);
             conversation = await prisma.conversation.create({
                 data: {
-                    channel: 'WHATSAPP',
+                    channel: channel,
                     platformId: inboundMessage.externalId,
-                    companyId: company.id,
+                    companyId: validCompanyId,
                     leadId: lead?.id,
                     status: 'OPEN',
                     unreadCount: 1,
                     lastMessageAt: new Date(),
-                    lastMessagePreview: inboundMessage.content.substring(0, 100)
+                    lastMessagePreview: inboundMessage.content.substring(0, 100),
+                    sentiment: analysis.sentiment,
+                    topic: analysis.topic,
+                    metadata: inboundMessage.metadata ? JSON.parse(JSON.stringify(inboundMessage.metadata)) : undefined
                 }
             });
         } else {
-            // Update conversation state
+            // Analyze the incoming message with Gemini
+            const analysis = await analyzeIncomingMessage(inboundMessage.content);
+
+            // Update conversation state with AI sentiment/topic
             await prisma.conversation.update({
                 where: { id: conversation.id },
                 data: {
                     unreadCount: { increment: 1 },
                     lastMessageAt: new Date(),
                     lastMessagePreview: inboundMessage.content.substring(0, 100),
-                    status: conversation.status === 'ARCHIVED' ? 'OPEN' : conversation.status
+                    status: conversation.status === 'ARCHIVED' ? 'OPEN' : conversation.status,
+                    sentiment: analysis.sentiment,
+                    topic: analysis.topic
                 }
             });
         }

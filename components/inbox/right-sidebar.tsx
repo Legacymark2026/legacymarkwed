@@ -8,9 +8,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from '@/lib/utils';
 import { ChannelIcon } from './channel-icon';
 import { toast } from 'sonner';
+import { executeMacro } from '@/actions/inbox';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -56,6 +56,14 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
     const [showNewFieldInput, setShowNewFieldInput] = useState(false);
     const [newFieldName, setNewFieldName] = useState('');
     const [newFieldValue, setNewFieldValue] = useState('');
+    
+    // Macros Fake State
+    const [isExecutingMacro, setIsExecutingMacro] = useState<string | null>(null);
+    const mockMacros = [
+        { id: '1', title: 'Pedir Pago', description: 'Envía link de pago de Stripe', actionType: 'SEND_PAYMENT_LINK', color: '#10b981' },
+        { id: '2', title: 'Agendar Cita', description: 'Envía Calendly y etiqueta como Interesado', actionType: 'SCHEDULE_MEETING', color: '#8b5cf6' },
+        { id: '3', title: 'Enviar Soporte L1', description: 'Deriva al equipo de escalamiento', actionType: 'ESCALATE', color: '#f59e0b' }
+    ];
 
     return (
         <div style={{ width: "100%", height: "100%", background: D.bg, display: "flex", flexDirection: "column", overflowY: "auto" }}>
@@ -176,8 +184,8 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
 
             {/* Tabs */}
             <Tabs defaultValue="details" className="flex-1">
-                <TabsList style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderRadius: 0, borderBottom: `1px solid ${D.border}`, background: D.bg, padding: 0, height: "38px" }}>
-                    {['details', 'activity', 'notes'].map(tab => (
+                <TabsList style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", borderRadius: 0, borderBottom: `1px solid ${D.border}`, background: D.bg, padding: 0, height: "38px" }}>
+                    {['details', 'activity', 'notes', 'macros'].map(tab => (
                         <TabsTrigger key={tab} value={tab} style={{ borderRadius: 0, fontSize: "11px", fontFamily: D.mono, fontWeight: 700, textTransform: "capitalize" }}
                             className="data-[state=active]:border-b-2 data-[state=active]:border-teal-500 data-[state=active]:text-teal-400 data-[state=inactive]:text-slate-600 data-[state=inactive]:bg-transparent h-full">
                             {tab === 'activity' ? 'Journey' : tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -318,6 +326,44 @@ export function RightSidebar({ conversation, leadDetails }: { conversation: any,
                         >
                             Save Note
                         </button>
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="macros" style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                        <h4 style={{ fontSize: "10px", fontWeight: 800, color: D.textPrimary, fontFamily: D.mono, margin: 0 }}>Acciones de 1-Click</h4>
+                        <button style={{ fontSize: "9px", background: "none", border: "none", color: D.teal, cursor: "pointer", fontFamily: D.mono }}>+ Nuevo</button>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {mockMacros.map(macro => (
+                            <div key={macro.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: "8px", padding: "10px", display: "flex", flexDirection: "column", gap: "8px", position: "relative", overflow: "hidden" }}>
+                                <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "3px", backgroundColor: macro.color }} />
+                                
+                                <div>
+                                    <h5 style={{ fontSize: "12px", fontWeight: 700, color: D.textPrimary, margin: "0 0 2px 0", fontFamily: D.mono }}>{macro.title}</h5>
+                                    <p style={{ fontSize: "10px", color: D.textMuted, margin: 0, fontFamily: D.mono, lineHeight: 1.2 }}>{macro.description}</p>
+                                </div>
+                                
+                                <button 
+                                    style={{ width: "100%", padding: "6px", borderRadius: "6px", border: `1px solid ${macro.color}40`, background: `${macro.color}15`, color: macro.color, fontSize: "11px", fontWeight: 800, cursor: isExecutingMacro === macro.id ? "wait" : "pointer", fontFamily: D.mono, transition: "all 0.2s" }}
+                                    disabled={isExecutingMacro !== null}
+                                    onClick={async () => {
+                                        setIsExecutingMacro(macro.id);
+                                        const tId = toast.loading(`Ejecutando ${macro.title}...`);
+                                        const res = await executeMacro(conversation.id, macro.id);
+                                        if (res.success) {
+                                            toast.success('Macro ejecutado correctamente', { id: tId });
+                                        } else {
+                                            toast.error('Error al ejecutar macro', { id: tId });
+                                        }
+                                        setIsExecutingMacro(null);
+                                    }}
+                                >
+                                    {isExecutingMacro === macro.id ? 'Ejecutando...' : 'Ejecutar'}
+                                </button>
+                            </div>
+                        ))}
                     </div>
                 </TabsContent>
             </Tabs>

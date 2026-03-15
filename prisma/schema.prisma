@@ -192,6 +192,7 @@ model Company {
   agentConfig             AgentConfig?
   kanbanProjects          KanbanProject[]
   proposals               Proposal[]
+  inboxMacros             InboxMacro[]
 
   @@map("companies")
 }
@@ -996,6 +997,8 @@ model Conversation {
   lastMessagePreview String?   @map("last_message_preview")
   tags               String[]  @default([])
   metadata           Json?     @default("{}")
+  sentiment          String?   // AI sentiment analysis result (e.g., POSITIVE, NEGATIVE, URGENT)
+  topic              String?   // AI intent classification
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
   assignee           User?     @relation(fields: [assignedTo], references: [id])
@@ -1597,6 +1600,23 @@ model ProposalItem {
 
   @@index([proposalId])
   @@map("proposal_items")
+}
+
+model InboxMacro {
+  id          String   @id @default(uuid())
+  companyId   String   @map("company_id")
+  name        String
+  description String?
+  actions     Json     // Define lo que hace la macro (ej: {"addTag": "VIP", "changeStatus": "CLOSED", "sendStripeLink": true})
+  icon        String?  @default("Wand2")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("inbox_macros")
 }
 
 model TimeEntry {

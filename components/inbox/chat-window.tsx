@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { sendMessage, updateConversationStatus } from '@/actions/inbox';
+import { sendMessage, updateConversationStatus, draftCopilotServerAction } from '@/actions/inbox';
 import { ChannelIcon } from './channel-icon';
 import {
     DropdownMenu,
@@ -916,7 +916,17 @@ export function ChatWindow({ conversation, messages: initialMessages, currentUse
                             <div className="w-px h-3 bg-indigo-400/50"></div>
                             <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.success('AI: Resumen copiado al portapapeles'); }}>Resumir Chat</button>
                             <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.loading('IA Mejorando tono...', { duration: 1500 }); setTimeout(() => setNewItem('Hola! Excelente día. ¿En qué puedo apoyarte hoy?'), 1500); }}>Mejorar Tono</button>
-                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={(e) => { e.preventDefault(); toast.loading('IA Sugiriendo respuesta...', { duration: 1500 }); setTimeout(() => setNewItem('Te enviaré la información de inmediato.'), 1500); }}>Sugerir Respuesta</button>
+                            <button className="text-[10px] font-medium text-white hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors" onClick={async (e) => { 
+                                e.preventDefault(); 
+                                const id = toast.loading('IA Sugiriendo respuesta...');
+                                const res = await draftCopilotServerAction(conversation.id);
+                                if (res.success && res.draft) {
+                                    setNewItem(res.draft);
+                                    toast.success('Borrador generado', { id });
+                                } else {
+                                    toast.error('Error generando borrador', { id });
+                                }
+                            }}>Sugerir Respuesta</button>
                         </div>
 
                         {/* Audio Recording UI or Textarea */}
