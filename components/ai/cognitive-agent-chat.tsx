@@ -1,25 +1,89 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Bot, Send, X, Loader2, Sparkles, Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
+
 export function CognitiveAgentChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const { messages, input, setInput, handleSubmit: chatSubmit, append, isLoading } = useChat({
-    api: "/api/agent",
-  });
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    chatSubmit(e);
+    const userText = input.trim();
+    if (!userText || isLoading) return;
+
+    const userMessage: Message = { id: Date.now().toString(), role: "user", content: userText };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    const assistantId = (Date.now() + 1).toString();
+    setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
+
+    try {
+      const res = await fetch("/api/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+
+      if (!res.ok || !res.body) throw new Error("Error en la respuesta del servidor de IA.");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        // Parse Vercel AI data stream format: "0:\"text\"\n"
+        const lines = chunk.split("\n");
+        for (const line of lines) {
+          if (line.startsWith("0:")) {
+            try {
+              const text = JSON.parse(line.slice(2));
+              fullText += text;
+              setMessages((prev) =>
+                prev.map((m) => m.id === assistantId ? { ...m, content: fullText } : m)
+              );
+            } catch {
+              // non-json line, skip
+            }
+          }
+        }
+      }
+    } catch (err) {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, content: "⚠️ Error de conexión con el Agente. Verifica que tu API Key esté configurada." }
+            : m
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [input, isLoading, messages]);
+
+  const quickPrompt = (text: string) => {
+    setInput(text);
   };
 
   return (
@@ -67,18 +131,20 @@ export function CognitiveAgentChat() {
                 Soy tu Copiloto C-Level. Puedo consultar el CRM, generar facturas y operar la agencia por ti.
               </p>
               <div className="flex flex-wrap gap-2 justify-center mt-4">
-                <span
-                  className="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-slate-300 border border-slate-700 cursor-pointer hover:bg-slate-700"
-                  onClick={() => { append({ role: "user", content: "Genera una factura de ejemplo" }); }}
+                <button
+                  type="button"
+                  onClick={() => quickPrompt("Genera una factura de ejemplo")}
+                  className="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-slate-300 border border-slate-700 hover:bg-slate-700"
                 >
                   &quot;Genera una factura&quot;
-                </span>
-                <span
-                  className="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-slate-300 border border-slate-700 cursor-pointer hover:bg-slate-700"
-                  onClick={() => { append({ role: "user", content: "Busca mis tratos activos" }); }}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => quickPrompt("Busca mis tratos activos")}
+                  className="text-[10px] px-2 py-1 bg-slate-800 rounded-full text-slate-300 border border-slate-700 hover:bg-slate-700"
                 >
                   &quot;Busca mis tratos activos&quot;
-                </span>
+                </button>
               </div>
             </div>
           )}
@@ -87,34 +153,21 @@ export function CognitiveAgentChat() {
             <div
               key={m.id}
               className={cn(
-                "max-w-[85%] rounded-xl p-3 text-sm flex flex-col gap-1",
+                "max-w-[85%] rounded-xl p-3 text-sm",
                 m.role === "user"
                   ? "bg-teal-600 text-white self-end ml-auto"
                   : "bg-slate-800 text-slate-200 self-start border border-slate-700"
               )}
             >
-              {/* Tool invocations en API 4.x */}
-              {(m as any).toolInvocations?.map((tool: any) => (
-                <div key={tool.toolCallId} className="bg-slate-900 border border-slate-700 text-slate-400 rounded p-2 text-xs font-mono my-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Loader2 className="h-3 w-3 animate-spin" /> {tool.toolName}()
-                  </div>
-                  {tool.state === "result" && (
-                    <div className="text-teal-500 pl-4 border-l-2 border-slate-800 truncate">
-                      Operación en DB completada.
-                    </div>
-                  )}
-                </div>
-              ))}
-              <span className="whitespace-pre-wrap leading-relaxed">{m.content}</span>
+              <span className="whitespace-pre-wrap leading-relaxed">
+                {m.content || (m.role === "assistant" && isLoading ? "" : m.content)}
+              </span>
+              {m.role === "assistant" && !m.content && isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-teal-500" />
+              )}
             </div>
           ))}
 
-          {isLoading && (
-            <div className="bg-slate-800 p-3 rounded-xl self-start w-fit border border-slate-700">
-              <Loader2 className="h-4 w-4 animate-spin text-teal-500" />
-            </div>
-          )}
           <div ref={messagesEndRef} />
         </div>
 
@@ -133,7 +186,7 @@ export function CognitiveAgentChat() {
               disabled={!input.trim() || isLoading}
               className="absolute right-2 p-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:hover:bg-teal-600 transition-colors"
             >
-              <Send className="h-4 w-4" />
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
           </div>
         </form>

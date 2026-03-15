@@ -19,7 +19,7 @@ git pull origin main
 # 2. Instalar dependencias (incluyendo nuevas)
 echo ""
 echo "[2/6] Instalando dependencias npm..."
-npm install
+npm install --legacy-peer-deps
 
 # 3. Regenerar el cliente de Prisma
 echo ""
