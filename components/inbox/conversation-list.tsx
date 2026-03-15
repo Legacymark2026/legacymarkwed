@@ -213,9 +213,13 @@ export function ConversationList({ conversations, currentUser }: { conversations
                         {filteredConversations.map((convo) => {
                             const isActive = activeId === convo.id;
                             
+                            // Safe date parsing to avoid client-side crashes
+                            const lastMsgDate = convo.lastMessageAt ? new Date(convo.lastMessageAt) : new Date();
+                            const isValidDate = !isNaN(lastMsgDate.getTime());
+                            
                             // SLA Logic: Over 15 mins, open, has unread? Let's just say if unread and > 15 mins
-                            const isSlaBreached = convo.unreadCount > 0 && 
-                                (currentTime.getTime() - new Date(convo.lastMessageAt).getTime()) > 15 * 60 * 1000;
+                            const isSlaBreached = convo.unreadCount > 0 && isValidDate &&
+                                (currentTime.getTime() - lastMsgDate.getTime()) > 15 * 60 * 1000;
 
                             const getSentimentColor = (s: string | null | undefined) => {
                                 if (s === 'URGENT' || s === 'NEGATIVE') return 'text-rose-400 bg-rose-400/10 border-rose-400/20';
@@ -256,7 +260,7 @@ export function ConversationList({ conversations, currentUser }: { conversations
                                                     {convo.lead?.name || 'Unknown Lead'} {isSlaBreached && '🔥'}
                                                 </h3>
                                                 <span style={{ fontSize: "10px", whiteSpace: "nowrap", marginLeft: "8px", color: isSlaBreached ? "#fb7185" : (convo.unreadCount > 0 ? "#2dd4bf" : "#1e293b"), fontFamily: "monospace" }}>
-                                                    {formatDistanceToNow(new Date(convo.lastMessageAt), { addSuffix: false })}
+                                                    {isValidDate ? formatDistanceToNow(lastMsgDate, { addSuffix: false }) : 'N/A'}
                                                 </span>
                                             </div>
 
