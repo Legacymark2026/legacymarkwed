@@ -675,6 +675,7 @@ model Deal {
   events        Event[]
   kanbanProject KanbanProject?
   proposals     Proposal[]
+  invoices      Invoice[]
 
   @@index([companyId])
   @@index([stage])
@@ -839,6 +840,7 @@ model Lead {
   campaign            Campaign?          @relation(fields: [campaignId], references: [id])
   crmCompany          Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
   marketingEvents     MarketingEvent[]
+  invoices            Invoice[]
 
   @@index([companyId])
   @@index([source])
@@ -1428,25 +1430,62 @@ model SocialPostLog {
 model Invoice {
   id                 String @id @default(uuid())
   clientName         String @map("client_name")
-  serviceDescription String @map("service_description")
+  serviceDescription String? @map("service_description")
+  
+  subtotalAmount     Float  @default(0) @map("subtotal_amount")
+  taxAmount          Float  @default(0) @map("tax_amount")
+  discountAmount     Float  @default(0) @map("discount_amount")
   totalAmount        Float  @map("total_amount")
   advanceAmount      Float  @map("advance_amount") // 60%
   finalAmount        Float  @map("final_amount") // 40%
-  status             String @default("DRAFT_AWAITING_PAYMENT") // DRAFT_AWAITING_PAYMENT, PAID, CANCELLED
+  
+  status             String @default("DRAFT_AWAITING_PAYMENT") // DRAFT, PAID, CANCELLED, SENT
+  dueDate            DateTime? @map("due_date")
+  notes              String?   @db.Text
+  terms              String?   @db.Text
   companyId          String @map("company_id")
+  leadId             String? @map("lead_id")
+  dealId             String? @map("deal_id")
 
   stripeInvoiceId String? @map("stripe_invoice_id")
   paymentUrl      String? @map("payment_url")
+  pdfUrl          String? @map("pdf_url")
+  token           String?   @unique @default(uuid())
   currency        String  @default("USD")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lead    Lead?   @relation(fields: [leadId], references: [id])
+  deal    Deal?   @relation(fields: [dealId], references: [id])
+  items   InvoiceLineItem[]
 
   @@index([companyId])
   @@index([status])
+  @@index([leadId])
+  @@index([dealId])
+  @@index([token])
   @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id          String   @id @default(uuid())
+  invoiceId   String   @map("invoice_id")
+  title       String
+  description String?  @db.Text
+  quantity    Int      @default(1)
+  unitPrice   Float    @default(0) @map("unit_price")
+  taxRate     Float    @default(0) @map("tax_rate") // e.g., 0.19 for 19%
+  totalAmount Float    @default(0) @map("total_amount")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_line_items")
 }
 
 // ── Módulo Agente Cognitivo: Historial de Conversaciones ────────────────────
