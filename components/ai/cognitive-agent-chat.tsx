@@ -87,29 +87,75 @@ export function CognitiveAgentChat() {
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let fullText = "";
+        let buffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          for (const line of chunk.split("\n")) {
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          // Keep the last potentially incomplete line in the buffer
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            // Vercel AI stream protocol: text chunks start with "0:"
             if (line.startsWith("0:")) {
               try {
                 const textPiece = JSON.parse(line.slice(2));
-                fullText += textPiece;
+                if (typeof textPiece === "string") {
+                  fullText += textPiece;
+                  setMessages((prev) =>
+                    prev.map((m) => m.id === assistantId ? { ...m, content: fullText } : m)
+                  );
+                }
+              } catch { /* skip malformed */ }
+            }
+            // SSE format: data: {"choices":[{"delta":{"content":"..."}}]}
+            else if (line.startsWith("data: ") && line !== "data: [DONE]") {
+              try {
+                const data = JSON.parse(line.slice(6));
+                const piece = data?.choices?.[0]?.delta?.content
+                  ?? data?.candidates?.[0]?.content?.parts?.[0]?.text
+                  ?? "";
+                if (piece) {
+                  fullText += piece;
+                  setMessages((prev) =>
+                    prev.map((m) => m.id === assistantId ? { ...m, content: fullText } : m)
+                  );
+                }
+              } catch { /* skip malformed */ }
+            }
+            // Plain text fallback (non-protocol streaming)
+            else if (line && !line.startsWith("2:") && !line.startsWith("d:") && !line.startsWith("e:") && !line.startsWith("8:") && !line.startsWith("f:")) {
+              const cleaned = line.trim();
+              if (cleaned && !/^\d+:/.test(cleaned)) {
+                fullText += cleaned + " ";
                 setMessages((prev) =>
-                  prev.map((m) => m.id === assistantId ? { ...m, content: fullText } : m)
+                  prev.map((m) => m.id === assistantId ? { ...m, content: fullText.trim() } : m)
                 );
-              } catch { /* skip */ }
+              }
             }
           }
         }
 
-        if (!fullText) {
+        // Process any remaining buffer
+        if (buffer.startsWith("0:")) {
+          try {
+            const textPiece = JSON.parse(buffer.slice(2));
+            if (typeof textPiece === "string" && textPiece) {
+              fullText += textPiece;
+              setMessages((prev) =>
+                prev.map((m) => m.id === assistantId ? { ...m, content: fullText } : m)
+              );
+            }
+          } catch { /* skip */ }
+        }
+
+        if (!fullText.trim()) {
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantId
-                ? { ...m, content: "✅ Comando ejecutado. Consulta el CRM para ver los cambios." }
+                ? { ...m, content: "⚠️ El agente no retornó texto. Verifica que GOOGLE_GENERATIVE_AI_API_KEY esté configurada en el .env del servidor." }
                 : m
             )
           );
