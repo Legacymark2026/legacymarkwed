@@ -1430,6 +1430,10 @@ model SocialPostLog {
 model Invoice {
   id                 String @id @default(uuid())
   clientName         String @map("client_name")
+  clientNit          String? @map("client_nit")
+  clientAddress      String? @map("client_address")
+  clientCity         String? @map("client_city")
+  clientPhone        String? @map("client_phone")
   serviceDescription String? @map("service_description")
   
   subtotalAmount     Float  @default(0) @map("subtotal_amount")

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CreditCard, Download, CheckCircle2, ShieldCheck, Mail, Building, FileText } from "lucide-react";
+import { CreditCard, Download, CheckCircle2, ShieldCheck, Mail, Building, FileText, QrCode } from "lucide-react";
 
 interface InvoicePageProps {
     params: {
@@ -71,42 +71,64 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                     </div>
 
                     <div className="p-8 md:p-12 relative z-10">
-                        {/* Header details */}
-                        <div className="flex flex-col md:flex-row justify-between gap-8 mb-12">
+                        {/* Header details DIAN */}
+                        <div className="flex flex-col md:flex-row justify-between gap-8 mb-8 border-b border-slate-800/80 pb-8">
                             <div>
-                                <h1 className="text-4xl font-bold text-white tracking-tight mb-2">Factura</h1>
-                                <p className="text-slate-400 font-mono text-sm">Ref. #{invoice.id.split('-')[0].toUpperCase()}</p>
+                                <h1 className="text-2xl font-bold text-white tracking-tight mb-2 uppercase">Factura Electrónica de Venta No. AE2402E3</h1>
+                                <p className="text-slate-400 font-mono text-xs mb-4">Ref. Interna #{invoice.id.split('-')[0].toUpperCase()}</p>
+                                <div className="space-y-1 text-sm text-slate-300">
+                                    <p className="font-semibold text-white">LegacyMark SAS</p>
+                                    <p>NIT: 901.456.789-0</p>
+                                    <p>Responsable de IVA</p>
+                                    <p>Bogotá D.C., Colombia</p>
+                                    <p>Tel: +57 300 123 4567</p>
+                                </div>
                             </div>
-                            <div className="md:text-right">
-                                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mb-1">Fecha Emisión</p>
-                                <p className="text-slate-200">{format(new Date(invoice.createdAt), "dd 'de' MMMM, yyyy", { locale: es })}</p>
-                                {invoice.dueDate && (
-                                    <>
-                                        <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mb-1 mt-4">Vencimiento</p>
-                                        <p className="text-slate-200">{format(new Date(invoice.dueDate), "dd 'de' MMMM, yyyy", { locale: es })}</p>
-                                    </>
-                                )}
+                            <div className="md:text-right flex flex-col items-end">
+                                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center gap-4 text-left">
+                                    <QrCode className="w-16 h-16 text-teal-500" />
+                                    <div>
+                                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">CUFE</p>
+                                        <p className="text-xs text-slate-300 font-mono break-all w-48 leading-tight">
+                                            3a8b4c9d-1e2f-5g6h-7i8j-9k0l1m2n3o4p5q6r7s8t9u0v1w2x3y4z
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Entities info */}
-                        <div className="grid md:grid-cols-2 gap-12 mb-12 py-8 border-y border-slate-800/80">
+                        {/* Entities info DIAN */}
+                        <div className="grid md:grid-cols-2 gap-12 mb-8 py-6 border-b border-slate-800/80">
                             <div>
-                                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mb-3">Facturado A</p>
+                                <p className="text-xs text-teal-500 font-bold uppercase tracking-wider mb-3">Receptor / Adquiriente</p>
                                 <h3 className="text-lg font-semibold text-white mb-2">{invoice.clientName}</h3>
+                                <div className="space-y-1 text-sm text-slate-400">
+                                    {invoice.clientNit && <p>NIT: {invoice.clientNit}</p>}
+                                    {invoice.clientAddress && <p>Dirección: {invoice.clientAddress}</p>}
+                                    {invoice.clientCity && <p>Ciudad: {invoice.clientCity}</p>}
+                                    {invoice.clientPhone && <p>Teléfono: {invoice.clientPhone}</p>}
+                                </div>
                                 {invoice.serviceDescription && (
-                                     <p className="text-slate-400 text-sm">{invoice.serviceDescription}</p>
+                                     <p className="text-slate-500 text-sm mt-3 pt-3 border-t border-slate-800/50">{invoice.serviceDescription}</p>
                                 )}
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mb-3">Emitido Por</p>
-                                <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                                     <Building className="w-5 h-5 text-teal-500 opacity-70" />
-                                     {invoice.company?.name || "Empresa"}
-                                </h3>
-                                <p className="text-slate-400 text-sm flex items-center gap-2 mb-1">
-                                    <Mail className="w-4 h-4 opacity-70" /> contacto@empresa.com
-                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                     <div>
+                                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Fecha Emisión</p>
+                                        <p className="text-slate-200 text-sm">{format(new Date(invoice.createdAt), "dd 'de' MMMM, yyyy", { locale: es })}</p>
+                                     </div>
+                                     <div>
+                                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Vencimiento</p>
+                                        <p className="text-slate-200 text-sm">{invoice.dueDate ? format(new Date(invoice.dueDate), "dd 'de' MMMM, yyyy", { locale: es }) : format(new Date(invoice.createdAt.getTime() + 30*24*60*60*1000), "dd 'de' MMMM, yyyy", { locale: es })}</p>
+                                     </div>
+                                </div>
+                                <div className="mt-6 p-4 rounded-lg bg-slate-950/50 border border-slate-800/50 text-xs text-slate-400">
+                                    <p className="font-semibold text-slate-300 mb-1">Resolución de Facturación DIAN</p>
+                                    <p>Resolución No. 18764034567891 de 2024-01-15</p>
+                                    <p>Rango autorizado: AE 1 al 5000</p>
+                                    <p>Vigencia: 12 meses</p>
+                                </div>
                             </div>
                         </div>
 
@@ -150,7 +172,7 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                                         <span className="tabular-nums">${(invoice.subtotalAmount || 0).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-slate-400">
-                                        <span>Impuestos</span>
+                                        <span>IVA (19%)</span>
                                         <span className="tabular-nums">${(invoice.taxAmount || 0).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-base font-semibold text-white pt-4 border-t border-slate-800">
@@ -171,23 +193,36 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                             </div>
                         </div>
 
-                        {/* Notes Section */}
-                        {(invoice.notes || invoice.terms) && (
-                            <div className="bg-slate-950/80 rounded-lg p-5 border border-slate-800/50 text-sm mb-12">
-                                {invoice.notes && (
-                                    <div className="mb-4">
-                                        <h4 className="font-semibold text-slate-300 mb-1">Notas</h4>
-                                        <p className="text-slate-400 leading-relaxed whitespace-pre-wrap">{invoice.notes}</p>
-                                    </div>
-                                )}
-                                {invoice.terms && (
-                                    <div>
-                                        <h4 className="font-semibold text-slate-300 mb-1">Términos y Condiciones</h4>
-                                        <p className="text-slate-400 leading-relaxed whitespace-pre-wrap">{invoice.terms}</p>
-                                    </div>
-                                )}
+                        {/* Notes Section and Bank Details */}
+                        <div className="grid md:grid-cols-2 gap-8 mb-12">
+                            <div className="bg-slate-950/80 rounded-xl p-6 border border-slate-800 text-sm">
+                                <h4 className="font-semibold text-teal-400 mb-3 uppercase tracking-wider text-xs">Información de Pago Bancario</h4>
+                                <div className="space-y-2 text-slate-300">
+                                    <p><span className="text-slate-500">Banco:</span> Bancolombia</p>
+                                    <p><span className="text-slate-500">Tipo:</span> Cuenta de Ahorros</p>
+                                    <p><span className="text-slate-500">Número:</span> 123-456789-00</p>
+                                    <p><span className="text-slate-500">Titular:</span> LegacyMark SAS</p>
+                                    <p><span className="text-slate-500">NIT:</span> 901.456.789-0</p>
+                                </div>
                             </div>
-                        )}
+                            
+                            {(invoice.notes || invoice.terms) ? (
+                                <div className="bg-slate-950/80 rounded-xl p-6 border border-slate-800 text-sm">
+                                    {invoice.notes && (
+                                        <div className="mb-4">
+                                            <h4 className="font-semibold text-slate-300 mb-1">Notas</h4>
+                                            <p className="text-slate-400 leading-relaxed whitespace-pre-wrap">{invoice.notes}</p>
+                                        </div>
+                                    )}
+                                    {invoice.terms && (
+                                        <div>
+                                            <h4 className="font-semibold text-slate-300 mb-1">Términos y Condiciones</h4>
+                                            <p className="text-slate-400 leading-relaxed whitespace-pre-wrap">{invoice.terms}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : <div></div>}
+                        </div>
 
                         {/* Actions (Pay button) */}
                         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-800/80 pt-8">
@@ -213,8 +248,15 @@ export default async function PublicInvoicePage({ params }: InvoicePageProps) {
                     </div>
                 </div>
 
-                {/* Footer Footer */}
-                <div className="text-center mt-12 opacity-50 text-sm">
+                {/* Footer Legal Clause */}
+                <div className="text-center mt-12 mb-8">
+                    <p className="text-xs text-slate-500 max-w-3xl mx-auto leading-relaxed">
+                        Esta factura de venta se asimila en todos sus efectos a una letra de cambio constituyendo título valor de acuerdo con el artículo 774 del código de comercio. El comprador declara haber recibido real y materialmente las mercancías o servicios descritos en este título valor.
+                    </p>
+                </div>
+
+                {/* System Footer */}
+                <div className="text-center opacity-50 text-sm">
                     <p>Powered by LegacyMark Business Operations</p>
                 </div>
             </main>

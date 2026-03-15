@@ -24,6 +24,10 @@ export function InvoiceForm({ leads }: InvoiceFormProps) {
     
     const [formData, setFormData] = useState({
         clientName: "",
+        clientNit: "",
+        clientAddress: "",
+        clientCity: "",
+        clientPhone: "",
         leadId: "",
         dueDate: "",
         notes: "",
@@ -106,6 +110,10 @@ export function InvoiceForm({ leads }: InvoiceFormProps) {
 
             const payload = {
                 clientName: formData.clientName,
+                clientNit: formData.clientNit,
+                clientAddress: formData.clientAddress,
+                clientCity: formData.clientCity,
+                clientPhone: formData.clientPhone,
                 leadId: formData.leadId || undefined,
                 subtotalAmount: calculations.subtotalAmount,
                 taxAmount: calculations.taxAmount,
@@ -166,6 +174,50 @@ export function InvoiceForm({ leads }: InvoiceFormProps) {
                                 className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
                                 value={formData.clientName}
                                 onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">NIT / Documento</label>
+                            <input
+                                type="text"
+                                placeholder="Ej: 901.123.456-7"
+                                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+                                value={formData.clientNit}
+                                onChange={(e) => setFormData(prev => ({ ...prev, clientNit: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Dirección</label>
+                            <input
+                                type="text"
+                                placeholder="Dirección del cliente"
+                                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+                                value={formData.clientAddress}
+                                onChange={(e) => setFormData(prev => ({ ...prev, clientAddress: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Ciudad</label>
+                            <input
+                                type="text"
+                                placeholder="Ciudad"
+                                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+                                value={formData.clientCity}
+                                onChange={(e) => setFormData(prev => ({ ...prev, clientCity: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Teléfono</label>
+                            <input
+                                type="text"
+                                placeholder="Teléfono de contacto"
+                                className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+                                value={formData.clientPhone}
+                                onChange={(e) => setFormData(prev => ({ ...prev, clientPhone: e.target.value }))}
                             />
                         </div>
 

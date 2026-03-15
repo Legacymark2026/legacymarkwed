@@ -8,6 +8,10 @@ import { revalidatePath } from "next/cache";
 
 export type InvoiceInput = {
     clientName: string;
+    clientNit?: string;
+    clientAddress?: string;
+    clientCity?: string;
+    clientPhone?: string;
     subtotalAmount: number;
     taxAmount: number;
     discountAmount: number;
@@ -42,6 +46,10 @@ export async function createInvoice(data: InvoiceInput) {
         const invoice = await prisma.invoice.create({
             data: {
                 clientName: data.clientName,
+                clientNit: data.clientNit,
+                clientAddress: data.clientAddress,
+                clientCity: data.clientCity,
+                clientPhone: data.clientPhone,
                 subtotalAmount: data.subtotalAmount,
                 taxAmount: data.taxAmount,
                 discountAmount: data.discountAmount,
