@@ -81,7 +81,7 @@ export async function POST(req: Request) {
         };
 
         const geminiRes = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -90,10 +90,12 @@ export async function POST(req: Request) {
         );
 
         if (!geminiRes.ok) {
-            const errorData = await geminiRes.json().catch(() => ({}));
-            console.error("Gemini API Error:", errorData);
+            const errorText = await geminiRes.text().catch(() => "Unknown error");
+            console.error("Gemini API Error:", errorText);
+            let errorMsg = `HTTP ${geminiRes.status}`;
+            try { errorMsg = JSON.parse(errorText)?.error?.message || errorMsg; } catch {}
             return new Response(
-                JSON.stringify({ error: `Gemini API Error: ${JSON.stringify(errorData)}` }),
+                JSON.stringify({ error: `Gemini: ${errorMsg}` }),
                 { status: 502 }
             );
         }
