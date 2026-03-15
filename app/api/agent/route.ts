@@ -63,17 +63,25 @@ export async function POST(req: Request) {
         }
 
         // Convert messages to Gemini format
-        const geminiContents = messages
-            .filter((m: any) => m.role !== "system")
-            .map((m: any) => ({
-                role: m.role === "assistant" ? "model" : "user",
-                parts: [{ text: typeof m.content === "string" ? m.content : JSON.stringify(m.content) }],
-            }));
+        // Inject system prompt as first user-model exchange (most compatible format)
+        const geminiContents: { role: string; parts: { text: string }[] }[] = [
+            { role: "user", parts: [{ text: AGENCY_SYSTEM_PROMPT }] },
+            { role: "model", parts: [{ text: "Entendido. Estoy listo para asistirte como Agente Cognitivo de LegacyMark." }] },
+            ...messages
+                .filter((m: any) => m.role !== "system")
+                .map((m: any) => ({
+                    role: m.role === "assistant" ? "model" : "user",
+                    parts: [{ text: typeof m.content === "string" ? m.content : JSON.stringify(m.content) }],
+                })),
+        ];
 
-        // Call Gemini REST API with streaming
+        // Ensure last message is from user (Gemini requirement)
+        if (geminiContents[geminiContents.length - 1]?.role !== "user") {
+            geminiContents.push({ role: "user", parts: [{ text: "Continúa." }] });
+        }
+
         const geminiBody = {
             contents: geminiContents,
-            systemInstruction: { parts: [{ text: AGENCY_SYSTEM_PROMPT }] },
             generationConfig: {
                 temperature: 0.7,
                 maxOutputTokens: 1024,
