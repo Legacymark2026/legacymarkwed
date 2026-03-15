@@ -40,6 +40,7 @@ export async function POST(req: Request) {
             }
         });
 
+        // toDataStreamResponse() is used in ai@4.x. Returns Vercel AI stream protocol.
         return result.toDataStreamResponse();
     } catch (error) {
         console.error("Agent Error:", error);
