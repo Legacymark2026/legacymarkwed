@@ -38,6 +38,7 @@ model User {
   assignedDeals         Deal[]             @relation("AssignedDeals")
   eventParticipations   EventParticipant[]
   organizedEvents       Event[]            @relation("EventOrganizer")
+  agentConversations    AgentConversation[]
   marketingEvents       MarketingEvent[]
   posts                 Post[]
   readingList           ReadingListItem[]
@@ -182,6 +183,7 @@ model Company {
   workflows               Workflow[]
   socialPosts             SocialPost[]
   invoices                Invoice[]
+  agentConversations      AgentConversation[]
 
   @@map("companies")
 }
@@ -1428,4 +1430,35 @@ model Invoice {
   @@index([companyId])
   @@index([status])
   @@map("invoices")
+}
+
+// ── Módulo Agente Cognitivo: Historial de Conversaciones ────────────────────
+model AgentConversation {
+  id        String         @id @default(uuid())
+  title     String         @default("Nueva conversación")
+  userId    String         @map("user_id")
+  companyId String         @map("company_id")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  messages  AgentMessage[]
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([companyId])
+  @@map("agent_conversations")
+}
+
+model AgentMessage {
+  id             String            @id @default(uuid())
+  conversationId String            @map("conversation_id")
+  role           String            // "user" | "assistant"
+  content        String            @db.Text
+  createdAt      DateTime          @default(now()) @map("created_at")
+
+  conversation   AgentConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("agent_messages")
 }
