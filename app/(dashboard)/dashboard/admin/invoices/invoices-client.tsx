@@ -225,28 +225,28 @@ export function InvoicesClient({ invoices, stats }: InvoicesClientProps) {
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48 bg-slate-900 border-slate-800 text-slate-300">
-                                                    <DropdownMenuItem onClick={() => { if(invoice.token) router.push(`/es/invoice/${invoice.token}`); }} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2">
+                                                    <DropdownMenuItem onSelect={() => { if(invoice.token) router.push(`/es/invoice/${invoice.token}`); }} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2">
                                                         <FileText className="h-4 w-4" /> Ver Portal del Cliente
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => copyPaymentLink(invoice.token)} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2">
+                                                    <DropdownMenuItem onSelect={() => copyPaymentLink(invoice.token)} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2">
                                                         <ExternalLink className="h-4 w-4" /> Copiar Link de Pago
                                                     </DropdownMenuItem>
                                                     
                                                     {invoice.status !== 'PAID' && (
                                                         <>
-                                                            <DropdownMenuItem onClick={() => handleAction('send', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2">
+                                                            <DropdownMenuItem onSelect={() => handleAction('send', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2">
                                                                 <Send className="h-4 w-4" /> Re-enviar por Email
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleAction('paid', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2 text-emerald-400 focus:text-emerald-400">
+                                                            <DropdownMenuItem onSelect={() => handleAction('paid', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2 text-emerald-400 focus:text-emerald-400">
                                                                 <CheckCircle2 className="h-4 w-4" /> Marcar como Pagado
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleAction('cancel', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2 text-amber-400 focus:text-amber-400">
+                                                            <DropdownMenuItem onSelect={() => handleAction('cancel', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2 text-amber-400 focus:text-amber-400">
                                                                 <XCircle className="h-4 w-4" /> Anular Factura
                                                             </DropdownMenuItem>
                                                         </>
                                                     )}
                                                     
-                                                    <DropdownMenuItem onClick={() => handleAction('delete', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2 text-red-400 focus:text-red-400 border-t border-slate-800">
+                                                    <DropdownMenuItem onSelect={() => handleAction('delete', invoice.id)} disabled={isActioning === invoice.id} className="hover:bg-slate-800 focus:bg-slate-800 cursor-pointer flex items-center gap-2 text-red-400 focus:text-red-400 border-t border-slate-800">
                                                         <Trash2 className="h-4 w-4" /> Eliminar Factura
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
