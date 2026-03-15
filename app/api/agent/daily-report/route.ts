@@ -42,9 +42,14 @@ export async function POST(req: Request) {
             prisma.invoice.count({
                 where: { companyId: company.id, status: "DRAFT_AWAITING_PAYMENT" }
             }),
+            prisma.agentConfig.findUnique({
+                where: { companyId: company.id }
+            })
         ]);
 
         const monthRevenue = monthWonDeals.reduce((sum, d) => sum + (d.value || 0), 0);
+        const config = arguments[4] || (await prisma.agentConfig.findUnique({ where: { companyId: company.id } })); // The promise array trick
+
 
         const reportText = [
             `📊 *Reporte Diario — ${company.name}*`,
@@ -65,7 +70,7 @@ export async function POST(req: Request) {
         // Send via WhatsApp if configured
         const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
         const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-        const adminPhone = process.env.ADMIN_WHATSAPP_PHONE;
+        const adminPhone = config?.adminWhatsappPhone || process.env.ADMIN_WHATSAPP_PHONE;
 
         let whatsappSent = false;
         if (accessToken && phoneNumberId && adminPhone) {

@@ -4,7 +4,7 @@ import {
     Shield, BookOpen, Briefcase, BarChart2, Workflow,
     MessageSquare, Target, TrendingUp, Link2, Building2,
     Lock, UserCog, DollarSign, CheckSquare, Zap, Mail, Calendar, Wand2,
-    Activity, Wifi
+    Activity, Wifi, Bot
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import Image from "next/image";
@@ -71,6 +71,7 @@ const NAV_GROUPS: NavGroup[] = [
             { href: "/dashboard/users", label: "Usuarios", icon: <Users size={14} />, code: "USR" },
             { href: "/dashboard/experts", label: "Equipo", icon: <UserCog size={14} />, code: "TEM" },
             { href: "/dashboard/security", label: "Seguridad", icon: <Shield size={14} />, code: "SEC" },
+            { href: "/dashboard/admin/agent-config", label: "Agente Cognitivo", icon: <Bot size={14} />, code: "AIA" },
             { href: "/dashboard/settings", label: "Configuración", icon: <Settings size={14} />, code: "CFG" },
         ],
     },

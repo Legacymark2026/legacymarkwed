@@ -184,6 +184,7 @@ model Company {
   socialPosts             SocialPost[]
   invoices                Invoice[]
   agentConversations      AgentConversation[]
+  agentConfig             AgentConfig?
 
   @@map("companies")
 }
@@ -1461,4 +1462,27 @@ model AgentMessage {
 
   @@index([conversationId])
   @@map("agent_messages")
+}
+
+model AgentConfig {
+  id                 String   @id @default(uuid())
+  companyId          String   @unique @map("company_id")
+  isActive           Boolean  @default(true) @map("is_active")
+  
+  // LLM Settings
+  systemPrompt       String?  @db.Text @map("system_prompt")
+  llmModel           String   @default("gemini-2.0-flash-lite") @map("llm_model")
+  temperature        Float    @default(0.7)
+  maxTokens          Int      @default(1024) @map("max_tokens")
+  
+  // Custom Variables para el Agente
+  adminWhatsappPhone String?  @map("admin_whatsapp_phone")
+  monthlySalesTarget Float?   @map("monthly_sales_target")
+  
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  company            Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("agent_configs")
 }

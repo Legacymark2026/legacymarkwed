@@ -9,6 +9,7 @@ import {
     generateSalesReportTool,
 } from "@/lib/ai/tools/agency-tools";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const maxDuration = 60;
 
@@ -62,10 +63,25 @@ export async function POST(req: Request) {
             );
         }
 
+        // Fetch AgentConfig from DB
+        const config = await prisma.agentConfig.findUnique({
+            where: { companyId }
+        });
+
+        // Use DB settings or fallback to defaults
+        if (config && !config.isActive) {
+            return new Response(JSON.stringify({ error: "El agente está desactivado por el administrador." }), { status: 403 });
+        }
+
+        const activePrompt = config?.systemPrompt || AGENCY_SYSTEM_PROMPT;
+        const activeModel = config?.llmModel || "gemini-2.0-flash-lite";
+        const temp = config?.temperature ?? 0.7;
+        const maxTok = config?.maxTokens ?? 1024;
+
         // Convert messages to Gemini format
         // Inject system prompt as first user-model exchange (most compatible format)
         const geminiContents: { role: string; parts: { text: string }[] }[] = [
-            { role: "user", parts: [{ text: AGENCY_SYSTEM_PROMPT }] },
+            { role: "user", parts: [{ text: activePrompt }] },
             { role: "model", parts: [{ text: "Entendido. Estoy listo para asistirte como Agente Cognitivo de LegacyMark." }] },
             ...messages
                 .filter((m: any) => m.role !== "system")
@@ -83,13 +99,13 @@ export async function POST(req: Request) {
         const geminiBody = {
             contents: geminiContents,
             generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 1024,
+                temperature: temp,
+                maxOutputTokens: maxTok,
             },
         };
 
         const geminiRes = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:streamGenerateContent?alt=sse&key=${apiKey}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
