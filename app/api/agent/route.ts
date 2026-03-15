@@ -1,7 +1,15 @@
 import { google } from "@ai-sdk/google";
 import { streamText } from "ai";
 import { AGENCY_SYSTEM_PROMPT } from "@/lib/ai/system-prompt";
-import { updateDealStageTool, createInvoiceTool, getCRMDealsTool } from "@/lib/ai/tools/agency-tools";
+import {
+    updateDealStageTool,
+    createInvoiceTool,
+    getCRMDealsTool,
+    sendFollowUpEmailTool,
+    scheduleMeetingTool,
+    sendWhatsAppAlertTool,
+    generateSalesReportTool,
+} from "@/lib/ai/tools/agency-tools";
 import { auth } from "@/lib/auth";
 
 export const maxDuration = 30;
@@ -12,6 +20,7 @@ export async function POST(req: Request) {
 
         const session = await auth();
         const companyId = (session?.user as any)?.companyId || session?.user?.id;
+        const userId = session?.user?.id;
 
         if (!session?.user || !companyId) {
             return new Response(JSON.stringify({ error: "Unauthorized." }), { status: 401 });
@@ -22,6 +31,7 @@ export async function POST(req: Request) {
             system: AGENCY_SYSTEM_PROMPT,
             messages,
             tools: {
+                // ── CRM Tools ──────────────────────────────────────────────
                 updateDealStage: {
                     description: updateDealStageTool.description,
                     parameters: updateDealStageTool.parameters,
@@ -37,10 +47,32 @@ export async function POST(req: Request) {
                     parameters: getCRMDealsTool.parameters,
                     execute: async (args) => await getCRMDealsTool.execute({ ...args, companyId }),
                 },
+                // ── Communication Tools ─────────────────────────────────────
+                sendFollowUpEmail: {
+                    description: sendFollowUpEmailTool.description,
+                    parameters: sendFollowUpEmailTool.parameters,
+                    execute: async (args) => await sendFollowUpEmailTool.execute(args),
+                },
+                sendWhatsAppAlert: {
+                    description: sendWhatsAppAlertTool.description,
+                    parameters: sendWhatsAppAlertTool.parameters,
+                    execute: async (args) => await sendWhatsAppAlertTool.execute(args),
+                },
+                // ── Calendar Tool ───────────────────────────────────────────
+                scheduleMeeting: {
+                    description: scheduleMeetingTool.description,
+                    parameters: scheduleMeetingTool.parameters,
+                    execute: async (args) => await scheduleMeetingTool.execute({ ...args, companyId, userId }),
+                },
+                // ── Analytics Tool ──────────────────────────────────────────
+                generateSalesReport: {
+                    description: generateSalesReportTool.description,
+                    parameters: generateSalesReportTool.parameters,
+                    execute: async (args) => await generateSalesReportTool.execute({ ...args, companyId }),
+                },
             }
         });
 
-        // toDataStreamResponse() is used in ai@4.x. Returns Vercel AI stream protocol.
         return result.toDataStreamResponse();
     } catch (error) {
         console.error("Agent Error:", error);
