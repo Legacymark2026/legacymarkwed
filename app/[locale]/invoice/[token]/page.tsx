@@ -12,7 +12,8 @@ interface InvoicePageProps {
 }
 
 export default async function PublicInvoicePage({ params }: InvoicePageProps) {
-    const { token } = params;
+    const resolvedParams = await params;
+    const { token } = resolvedParams;
 
     try {
         const invoice = await prisma.invoice.findUnique({
