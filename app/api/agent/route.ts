@@ -1,4 +1,8 @@
-import { AGENCY_SYSTEM_PROMPT } from "@/lib/ai/system-prompt";
+import {
+    AGENCY_SYSTEM_PROMPT,
+    CMO_SYSTEM_PROMPT,
+    VENTAS_SYSTEM_PROMPT
+} from "@/lib/ai/system-prompt";
 import {
     updateDealStageTool,
     createInvoiceTool,
@@ -45,7 +49,7 @@ const GEMINI_TOOLS = [
 
 export async function POST(req: Request) {
     try {
-        const { messages } = await req.json();
+        const { messages, roleType } = await req.json();
 
         const session = await auth();
         const companyId = (session?.user as any)?.companyId || session?.user?.id;
@@ -73,22 +77,45 @@ export async function POST(req: Request) {
             return new Response(JSON.stringify({ error: "El agente está desactivado por el administrador." }), { status: 403 });
         }
 
-        const activePrompt = config?.systemPrompt || AGENCY_SYSTEM_PROMPT;
+        let basePrompt = config?.systemPrompt || AGENCY_SYSTEM_PROMPT;
+        if (roleType === "marketing") {
+            basePrompt = CMO_SYSTEM_PROMPT + "\n\n" + basePrompt;
+        } else if (roleType === "sales") {
+            basePrompt = VENTAS_SYSTEM_PROMPT + "\n\n" + basePrompt;
+        }
+
+        const activePrompt = basePrompt;
         const activeModel = config?.llmModel || "gemini-2.0-flash-lite";
         const temp = config?.temperature ?? 0.7;
         const maxTok = config?.maxTokens ?? 1024;
 
         // Convert messages to Gemini format
         // Inject system prompt as first user-model exchange (most compatible format)
-        const geminiContents: { role: string; parts: { text: string }[] }[] = [
+        const geminiContents: { role: string; parts: any[] }[] = [
             { role: "user", parts: [{ text: activePrompt }] },
-            { role: "model", parts: [{ text: "Entendido. Estoy listo para asistirte como Agente Cognitivo de LegacyMark." }] },
+            { role: "model", parts: [{ text: "Entendido. Estoy listo para asistirte como Agente de LegacyMark." }] },
             ...messages
                 .filter((m: any) => m.role !== "system")
-                .map((m: any) => ({
-                    role: m.role === "assistant" ? "model" : "user",
-                    parts: [{ text: typeof m.content === "string" ? m.content : JSON.stringify(m.content) }],
-                })),
+                .map((m: any) => {
+                    const parts: any[] = [];
+                    if (Array.isArray(m.content)) {
+                        m.content.forEach((c: any) => {
+                            if (c.type === "text") parts.push({ text: c.text });
+                            if (c.type === "image") {
+                                const base64Data = c.image.split(',')[1] || c.image;
+                                const mimeTypeMatch = c.image.match(/^data:([^;]+);/);
+                                const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : "image/jpeg";
+                                parts.push({ inlineData: { mimeType, data: base64Data } });
+                            }
+                        });
+                    } else {
+                        parts.push({ text: typeof m.content === "string" ? m.content : JSON.stringify(m.content) });
+                    }
+                    return {
+                        role: m.role === "assistant" ? "model" : "user",
+                        parts,
+                    };
+                }),
         ];
 
         // Ensure last message is from user (Gemini requirement)

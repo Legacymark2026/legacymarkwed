@@ -4,14 +4,14 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
     Bot, Send, X, Loader2, Sparkles, Mic, MicOff, Bell,
     TrendingUp, Search, FileText, Calendar, History, ChevronRight,
-    AlertTriangle, Clock, CheckCircle2, GripHorizontal
+    AlertTriangle, Clock, CheckCircle2, GripHorizontal, Paperclip, Image as ImageIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
     id: string;
     role: "user" | "assistant";
-    content: string;
+    content: string | any[];
     toolUsed?: string;
 }
 
@@ -45,6 +45,12 @@ export function CognitiveAgentChat() {
     const [alertCount, setAlertCount] = useState(0);
     const [isListening, setIsListening] = useState(false);
     const [historySessions, setHistorySessions] = useState<any[]>([]);
+    
+    // Nivel 4: Roles y Visión
+    const [roleType, setRoleType] = useState<"general"|"marketing"|"sales">("general");
+    const [attachedImage, setAttachedImage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const recognitionRef = useRef<any>(null);
 
@@ -148,18 +154,36 @@ export function CognitiveAgentChat() {
         didDrag.current = false;
     }, []);
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAttachedImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
+
     const handleSubmit = useCallback(async (e?: React.FormEvent, overrideInput?: string) => {
         e?.preventDefault();
         const userText = (overrideInput || input).trim();
-        if (!userText || isLoading) return;
+        if ((!userText && !attachedImage) || isLoading) return;
 
-        const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: userText };
+        let finalContent: any = userText;
+        if (attachedImage) {
+            finalContent = [];
+            if (userText) finalContent.push({ type: "text", text: userText });
+            finalContent.push({ type: "image", image: attachedImage });
+        }
+
+        const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: finalContent };
         const assistantId = crypto.randomUUID();
         const assistantMsg: Message = { id: assistantId, role: "assistant", content: "" };
 
         const nextMessages = [...messages, userMsg, assistantMsg];
         setMessages(nextMessages);
         setInput("");
+        setAttachedImage(null);
         setIsLoading(true);
         setActiveTool(null);
 
@@ -169,6 +193,7 @@ export function CognitiveAgentChat() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
+                    roleType
                 }),
             });
 
@@ -248,7 +273,7 @@ export function CognitiveAgentChat() {
             setIsLoading(false);
             setActiveTool(null);
         }
-    }, [input, isLoading, messages, saveHistory]);
+    }, [input, attachedImage, isLoading, messages, roleType, saveHistory]);
 
     const loadHistorySession = useCallback((session: any) => {
         setMessages(
@@ -308,8 +333,16 @@ export function CognitiveAgentChat() {
                                 <Bot className="h-4 w-4 text-teal-400" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-semibold text-slate-200">Agente Cognitivo</h3>
-                                <p className="text-[10px] text-teal-500 tracking-wider font-mono">EN LÍNEA · 7 HERRAMIENTAS ACTIVAS</p>
+                                <select 
+                                    value={roleType} 
+                                    onChange={(e) => setRoleType(e.target.value as any)}
+                                    className="bg-transparent text-sm font-semibold text-slate-200 outline-none cursor-pointer hover:text-teal-400 transition-colors"
+                                >
+                                    <option value="general" className="bg-slate-900">Copiloto General</option>
+                                    <option value="marketing" className="bg-slate-900">CMO (Marketing)</option>
+                                    <option value="sales" className="bg-slate-900">Director Ventas</option>
+                                </select>
+                                <p className="text-[10px] text-teal-500 tracking-wider font-mono">EN LÍNEA · 7 HERRAMIENTAS</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-1.5">
@@ -398,7 +431,15 @@ export function CognitiveAgentChat() {
                                                 <Loader2 className="h-4 w-4 animate-spin text-teal-500" />
                                                 <span className="text-xs text-slate-500">Procesando...</span>
                                               </div>
-                                            : <span className="whitespace-pre-wrap leading-relaxed">{m.content}</span>
+                                            : Array.isArray(m.content) 
+                                                ? <div className="flex flex-col gap-2">
+                                                    {m.content.map((c: any, i: number) => 
+                                                        c.type === "image" 
+                                                            ? <img key={i} src={c.image} alt="Upload" className="max-w-full rounded-md object-cover max-h-[200px]" />
+                                                            : <span key={i} className="whitespace-pre-wrap leading-relaxed">{c.text}</span>
+                                                    )}
+                                                  </div>
+                                                : <span className="whitespace-pre-wrap leading-relaxed">{m.content as string}</span>
                                         }
                                     </div>
                                 ))}
@@ -407,7 +448,34 @@ export function CognitiveAgentChat() {
 
                             {/* Input */}
                             <form onSubmit={handleSubmit} className="p-3 bg-slate-900 border-t border-slate-800 shrink-0">
+                                {attachedImage && (
+                                    <div className="mb-2 relative inline-block">
+                                        <img src={attachedImage} alt="Preview" className="h-16 w-16 object-cover rounded-lg border border-slate-700" />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setAttachedImage(null)}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                )}
                                 <div className="relative flex items-center gap-2">
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden" 
+                                        ref={fileInputRef} 
+                                        onChange={handleImageUpload} 
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="p-2 rounded-lg transition-colors shrink-0 bg-slate-800 text-slate-400 hover:text-white"
+                                        title="Adjuntar Imagen"
+                                    >
+                                        <Paperclip className="h-4 w-4" />
+                                    </button>
                                     <button
                                         type="button"
                                         onClick={toggleVoice}
@@ -423,12 +491,12 @@ export function CognitiveAgentChat() {
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         disabled={isLoading}
-                                        placeholder="Ordena un comando o haz una petición..."
+                                        placeholder="Ordena un comando, pregunta o sube una imagen..."
                                         className="flex-1 bg-slate-950 border border-slate-700 text-slate-200 text-sm rounded-lg pl-4 pr-10 py-2.5 focus:outline-none focus:ring-1 focus:ring-teal-500 placeholder:text-slate-600 disabled:opacity-50"
                                     />
                                     <button
                                         type="submit"
-                                        disabled={!input.trim() || isLoading}
+                                        disabled={(!input.trim() && !attachedImage) || isLoading}
                                         className="absolute right-2 p-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-md disabled:opacity-50 transition-colors"
                                     >
                                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
